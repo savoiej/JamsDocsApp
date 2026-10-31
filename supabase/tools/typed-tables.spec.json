@@ -1,0 +1,3214 @@
+[
+ {
+  "table": "clients",
+  "doc": "^meta/clients$",
+  "arr": "$",
+  "key": "id",
+  "comment": "Clients and prospects (Clients & invoices).",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "type",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "address",
+    "t"
+   ],
+   [
+    "phone",
+    "t"
+   ],
+   [
+    "email",
+    "t"
+   ],
+   [
+    "website",
+    "t"
+   ],
+   [
+    "terms",
+    "t"
+   ],
+   [
+    "created",
+    "t"
+   ],
+   [
+    "log",
+    "j"
+   ]
+  ],
+  "children": [
+   {
+    "table": "client_contacts",
+    "field": "contacts",
+    "key": "id",
+    "parent": "client_id",
+    "comment": "People at each client.",
+    "cols": [
+     [
+      "name",
+      "t"
+     ],
+     [
+      "title",
+      "t"
+     ],
+     [
+      "email",
+      "t"
+     ],
+     [
+      "phone",
+      "t"
+     ],
+     [
+      "primary",
+      "b"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "table": "invoices",
+  "doc": "^meta/invoices$",
+  "arr": "$",
+  "key": "id",
+  "comment": "Invoices (Clients & invoices, Time & invoicing, service contracts, network time).",
+  "cols": [
+   [
+    "no",
+    "t"
+   ],
+   [
+    "clientId",
+    "t"
+   ],
+   [
+    "pj",
+    "t"
+   ],
+   [
+    "project",
+    "t"
+   ],
+   [
+    "issued",
+    "d"
+   ],
+   [
+    "terms",
+    "t"
+   ],
+   [
+    "due",
+    "d"
+   ],
+   [
+    "taxPct",
+    "n"
+   ],
+   [
+    "sentAt",
+    "d"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "void",
+    "b"
+   ],
+   [
+    "src",
+    "j"
+   ]
+  ],
+  "children": [
+   {
+    "table": "invoice_lines",
+    "field": "lines",
+    "key": null,
+    "parent": "invoice_id",
+    "comment": "Line items on each invoice.",
+    "cols": [
+     [
+      "desc",
+      "t"
+     ],
+     [
+      "qty",
+      "n"
+     ],
+     [
+      "rate",
+      "n"
+     ],
+     [
+      "tax",
+      "b"
+     ]
+    ]
+   },
+   {
+    "table": "invoice_payments",
+    "field": "payments",
+    "key": null,
+    "parent": "invoice_id",
+    "comment": "Payments received against each invoice.",
+    "cols": [
+     [
+      "date",
+      "d"
+     ],
+     [
+      "amount",
+      "n"
+     ],
+     [
+      "method",
+      "t"
+     ],
+     [
+      "ref",
+      "t"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "table": "service_contracts",
+  "doc": "^meta/contracts$",
+  "arr": "$",
+  "key": "id",
+  "comment": "Service contracts with the companies you support.",
+  "cols": [
+   [
+    "no",
+    "t"
+   ],
+   [
+    "client",
+    "t"
+   ],
+   [
+    "title",
+    "t"
+   ],
+   [
+    "type",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "start",
+    "d"
+   ],
+   [
+    "end",
+    "d"
+   ],
+   [
+    "autoRenew",
+    "b"
+   ],
+   [
+    "cycle",
+    "t"
+   ],
+   [
+    "fee",
+    "n"
+   ],
+   [
+    "hours",
+    "n"
+   ],
+   [
+    "rate",
+    "n"
+   ],
+   [
+    "ahRate",
+    "n"
+   ],
+   [
+    "services",
+    "j"
+   ],
+   [
+    "sla",
+    "j"
+   ],
+   [
+    "coverage",
+    "t"
+   ],
+   [
+    "sites",
+    "t"
+   ],
+   [
+    "contact",
+    "t"
+   ],
+   [
+    "scope",
+    "t"
+   ],
+   [
+    "po",
+    "t"
+   ],
+   [
+    "created",
+    "ts"
+   ]
+  ],
+  "children": [
+   {
+    "table": "contract_visits",
+    "field": "visits",
+    "key": "id",
+    "parent": "contract_id",
+    "comment": "Service visits logged under each contract.",
+    "cols": [
+     [
+      "day",
+      "d"
+     ],
+     [
+      "service",
+      "t"
+     ],
+     [
+      "tech",
+      "t"
+     ],
+     [
+      "hrs",
+      "n"
+     ],
+     [
+      "site",
+      "t"
+     ],
+     [
+      "ticket",
+      "t"
+     ],
+     [
+      "note",
+      "t"
+     ],
+     [
+      "ah",
+      "b"
+     ],
+     [
+      "inv",
+      "t"
+     ]
+    ]
+   },
+   {
+    "table": "contract_billing_periods",
+    "field": "billed",
+    "key": null,
+    "parent": "contract_id",
+    "comment": "Billing periods (and prepaid blocks) already invoiced per contract.",
+    "cols": [
+     [
+      "key",
+      "t"
+     ],
+     [
+      "inv",
+      "t"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "table": "service_tickets",
+  "doc": "^meta/tickets-[0-9]+$",
+  "arr": "$",
+  "key": "id",
+  "comment": "AV service desk tickets.",
+  "cols": [
+   [
+    "site",
+    "t"
+   ],
+   [
+    "issue",
+    "t"
+   ],
+   [
+    "desc",
+    "t"
+   ],
+   [
+    "pri",
+    "t"
+   ],
+   [
+    "tech",
+    "t"
+   ],
+   [
+    "col",
+    "t"
+   ],
+   [
+    "when",
+    "t"
+   ],
+   [
+    "due",
+    "t"
+   ],
+   [
+    "cat",
+    "t"
+   ],
+   [
+    "reporter",
+    "t"
+   ],
+   [
+    "dev",
+    "j"
+   ],
+   [
+    "devLabel",
+    "t"
+   ],
+   [
+    "solution",
+    "t"
+   ],
+   [
+    "wn",
+    "j"
+   ],
+   [
+    "res",
+    "j"
+   ],
+   [
+    "log",
+    "j"
+   ],
+   [
+    "opened",
+    "ts"
+   ],
+   [
+    "closed",
+    "ts"
+   ]
+  ]
+ },
+ {
+  "table": "store_registers",
+  "doc": "^meta/registers-[0-9]+$",
+  "arr": "$",
+  "key": "id",
+  "comment": "Store registers (Store systems).",
+  "cols": [
+   [
+    "num",
+    "t"
+   ],
+   [
+    "store",
+    "t"
+   ],
+   [
+    "loc",
+    "t"
+   ],
+   [
+    "type",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "note",
+    "t"
+   ],
+   [
+    "created",
+    "ts"
+   ],
+   [
+    "updated",
+    "ts"
+   ]
+  ],
+  "children": [
+   {
+    "table": "register_devices",
+    "field": "devices",
+    "key": "id",
+    "parent": "register_id",
+    "comment": "Devices that make up each register.",
+    "cols": [
+     [
+      "role",
+      "t"
+     ],
+     [
+      "make",
+      "t"
+     ],
+     [
+      "model",
+      "t"
+     ],
+     [
+      "serial",
+      "t"
+     ],
+     [
+      "asset",
+      "t"
+     ],
+     [
+      "ip",
+      "t"
+     ],
+     [
+      "mac",
+      "t"
+     ],
+     [
+      "host",
+      "t"
+     ],
+     [
+      "sw",
+      "t"
+     ],
+     [
+      "conn",
+      "t"
+     ],
+     [
+      "note",
+      "t"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "table": "store_inventory",
+  "doc": "^meta/inventory-[0-9]+$",
+  "arr": "$",
+  "key": "id",
+  "comment": "Store inventory items (Store systems).",
+  "cols": [
+   [
+    "cat",
+    "t"
+   ],
+   [
+    "store",
+    "t"
+   ],
+   [
+    "loc",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "make",
+    "t"
+   ],
+   [
+    "model",
+    "t"
+   ],
+   [
+    "serial",
+    "t"
+   ],
+   [
+    "asset",
+    "t"
+   ],
+   [
+    "host",
+    "t"
+   ],
+   [
+    "ip",
+    "t"
+   ],
+   [
+    "mac",
+    "t"
+   ],
+   [
+    "sw",
+    "t"
+   ],
+   [
+    "imei",
+    "t"
+   ],
+   [
+    "ext",
+    "t"
+   ],
+   [
+    "user",
+    "t"
+   ],
+   [
+    "warranty",
+    "t"
+   ],
+   [
+    "note",
+    "t"
+   ],
+   [
+    "log",
+    "j"
+   ],
+   [
+    "created",
+    "ts"
+   ],
+   [
+    "updated",
+    "ts"
+   ]
+  ]
+ },
+ {
+  "table": "products",
+  "doc": "^meta/library$",
+  "arr": "$.lib",
+  "key": "id",
+  "comment": "Your equipment library (products you added or edited).",
+  "cols": [
+   [
+    "mfr",
+    "t"
+   ],
+   [
+    "model",
+    "t"
+   ],
+   [
+    "cat",
+    "t"
+   ],
+   [
+    "desc",
+    "t"
+   ],
+   [
+    "cost",
+    "n"
+   ],
+   [
+    "msrp",
+    "n"
+   ],
+   [
+    "labor",
+    "n"
+   ],
+   [
+    "ru",
+    "t"
+   ],
+   [
+    "watts",
+    "n"
+   ],
+   [
+    "mount",
+    "t"
+   ],
+   [
+    "ins",
+    "j"
+   ],
+   [
+    "outs",
+    "j"
+   ],
+   [
+    "imgs",
+    "j"
+   ],
+   [
+    "slots",
+    "j"
+   ],
+   [
+    "fits",
+    "t"
+   ],
+   [
+    "spec",
+    "t"
+   ],
+   [
+    "src",
+    "t"
+   ]
+  ]
+ },
+ {
+  "table": "pipeline_deals",
+  "doc": "^meta/service$",
+  "arr": "$.pipeline",
+  "key": "id",
+  "comment": "Sales pipeline entries shown on the dashboard.",
+  "cols": [
+   [
+    "client",
+    "t"
+   ],
+   [
+    "project",
+    "t"
+   ],
+   [
+    "value",
+    "n"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "updated",
+    "t"
+   ]
+  ]
+ },
+ {
+  "table": "service_agreements",
+  "doc": "^meta/service$",
+  "arr": "$.agreements",
+  "key": "id",
+  "comment": "Older simple service agreements (before service contracts).",
+  "cols": [
+   [
+    "client",
+    "t"
+   ],
+   [
+    "plan",
+    "t"
+   ],
+   [
+    "renews",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ]
+  ]
+ },
+ {
+  "table": "business_settings",
+  "doc": "^meta/settings$",
+  "arr": null,
+  "key": null,
+  "comment": "Your business details, pricing defaults and billing settings.",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "tagline",
+    "t"
+   ],
+   [
+    "address",
+    "t"
+   ],
+   [
+    "phone",
+    "t"
+   ],
+   [
+    "email",
+    "t"
+   ],
+   [
+    "website",
+    "t"
+   ],
+   [
+    "license",
+    "t"
+   ],
+   [
+    "logo",
+    "t"
+   ],
+   [
+    "markup",
+    "n"
+   ],
+   [
+    "laborRate",
+    "n"
+   ],
+   [
+    "laborPct",
+    "n"
+   ],
+   [
+    "tax",
+    "n"
+   ],
+   [
+    "internalRate",
+    "n"
+   ],
+   [
+    "terms",
+    "t"
+   ],
+   [
+    "deposit",
+    "n"
+   ],
+   [
+    "validDays",
+    "n"
+   ],
+   [
+    "payNote",
+    "t"
+   ],
+   [
+    "billRate",
+    "n"
+   ],
+   [
+    "billInc",
+    "n"
+   ]
+  ]
+ },
+ {
+  "table": "projects",
+  "doc": "^projects/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "comment": "Projects (AV installs, network jobs, service calls\u2026) with their proposal and billing setup.",
+  "cols": [
+   [
+    "job",
+    "t"
+   ],
+   [
+    "site",
+    "t"
+   ],
+   [
+    "created",
+    "t"
+   ],
+   [
+    "u",
+    "n",
+    "id_counter"
+   ],
+   [
+    "prop.no",
+    "t"
+   ],
+   [
+    "prop.client",
+    "t"
+   ],
+   [
+    "prop.project",
+    "t"
+   ],
+   [
+    "prop.ptype",
+    "t"
+   ],
+   [
+    "prop.services",
+    "j"
+   ],
+   [
+    "prop.status",
+    "t"
+   ],
+   [
+    "prop.markup",
+    "n"
+   ],
+   [
+    "prop.laborMethod",
+    "t"
+   ],
+   [
+    "prop.laborRate",
+    "n"
+   ],
+   [
+    "prop.laborPct",
+    "n"
+   ],
+   [
+    "prop.tax",
+    "n"
+   ],
+   [
+    "prop.signedTotal",
+    "n"
+   ],
+   [
+    "prop.signer",
+    "j"
+   ],
+   [
+    "prop.link",
+    "j"
+   ],
+   [
+    "prop.startDate",
+    "d"
+   ],
+   [
+    "prop.dueDate",
+    "d"
+   ],
+   [
+    "prop.po",
+    "t"
+   ],
+   [
+    "prop.scope",
+    "t"
+   ],
+   [
+    "prop.billRate",
+    "n"
+   ],
+   [
+    "prop.billing",
+    "j"
+   ],
+   [
+    "prop.log",
+    "j"
+   ],
+   [
+    "prop",
+    "j"
+   ],
+   [
+    "design.meta",
+    "j"
+   ],
+   [
+    "design.plan",
+    "j"
+   ],
+   [
+    "design.extras",
+    "j"
+   ],
+   [
+    "design.panels",
+    "j"
+   ],
+   [
+    "design.seq",
+    "n"
+   ],
+   [
+    "design.meta2",
+    "j"
+   ],
+   [
+    "design.meta3",
+    "j"
+   ],
+   [
+    "design.meta4",
+    "j"
+   ],
+   [
+    "design.meta5",
+    "j"
+   ]
+  ],
+  "children": [
+   {
+    "table": "project_tasks",
+    "field": "tasks",
+    "key": "id",
+    "parent": "project_id",
+    "comment": "Tasks on each project board.",
+    "cols": [
+     [
+      "title",
+      "t"
+     ],
+     [
+      "who",
+      "t"
+     ],
+     [
+      "col",
+      "t"
+     ],
+     [
+      "start",
+      "n",
+      "start_day"
+     ],
+     [
+      "dur",
+      "n",
+      "duration_days"
+     ],
+     [
+      "ev",
+      "t",
+      "calendar_event"
+     ],
+     [
+      "note",
+      "t"
+     ]
+    ]
+   },
+   {
+    "table": "time_entries",
+    "field": "time",
+    "key": "id",
+    "parent": "project_id",
+    "comment": "Hours logged on projects (Time & invoicing, project time log, field clock).",
+    "cols": [
+     [
+      "day",
+      "d"
+     ],
+     [
+      "hrs",
+      "n"
+     ],
+     [
+      "task",
+      "t"
+     ],
+     [
+      "type",
+      "t"
+     ],
+     [
+      "who",
+      "t"
+     ],
+     [
+      "rate",
+      "n"
+     ],
+     [
+      "note",
+      "t"
+     ],
+     [
+      "billable",
+      "b"
+     ],
+     [
+      "invoiceId",
+      "t"
+     ]
+    ]
+   },
+   {
+    "table": "project_photos",
+    "field": "photos",
+    "key": "id",
+    "parent": "project_id",
+    "comment": "Site photos taken in the field app.",
+    "cols": [
+     [
+      "asset",
+      "t"
+     ],
+     [
+      "uid",
+      "t"
+     ],
+     [
+      "tag",
+      "t"
+     ],
+     [
+      "caption",
+      "t"
+     ],
+     [
+      "at",
+      "ts"
+     ],
+     [
+      "who",
+      "t"
+     ]
+    ]
+   },
+   {
+    "table": "design_devices",
+    "field": "design.nodes",
+    "key": "uid",
+    "parent": "project_id",
+    "comment": "Devices placed on each project\u2019s AV drawings.",
+    "cols": [
+     [
+      "pid",
+      "t"
+     ],
+     [
+      "x",
+      "n"
+     ],
+     [
+      "y",
+      "n"
+     ],
+     [
+      "tag",
+      "t"
+     ],
+     [
+      "label",
+      "t"
+     ],
+     [
+      "loc",
+      "t"
+     ],
+     [
+      "fp",
+      "j"
+     ],
+     [
+      "mods",
+      "j"
+     ]
+    ]
+   },
+   {
+    "table": "design_cables",
+    "field": "design.cables",
+    "key": "id",
+    "parent": "project_id",
+    "comment": "Cables on each project\u2019s AV drawings (cable schedule).",
+    "cols": [
+     [
+      "type",
+      "t"
+     ],
+     [
+      "a",
+      "j"
+     ],
+     [
+      "b",
+      "j"
+     ],
+     [
+      "sku",
+      "t"
+     ],
+     [
+      "len",
+      "n"
+     ],
+     [
+      "status",
+      "t"
+     ],
+     [
+      "note",
+      "t"
+     ],
+     [
+      "label",
+      "t"
+     ]
+    ]
+   },
+   {
+    "table": "design_racks",
+    "field": "design.racks",
+    "key": "id",
+    "parent": "project_id",
+    "comment": "Equipment racks on each project\u2019s drawings.",
+    "cols": [
+     [
+      "name",
+      "t"
+     ],
+     [
+      "size",
+      "n"
+     ],
+     [
+      "items",
+      "j"
+     ],
+     [
+      "fp",
+      "j"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "table": "net_sites",
+  "doc": "^netline/v1/projects/[^/]+/sites/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Sites and locations. (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "code",
+    "t"
+   ],
+   [
+    "kind",
+    "t"
+   ],
+   [
+    "address",
+    "t"
+   ],
+   [
+    "contact",
+    "t"
+   ],
+   [
+    "hours",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_rooms",
+  "doc": "^netline/v1/projects/[^/]+/rooms/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Equipment rooms (MDF, IDF, closets). (Network docs)",
+  "cols": [
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "name",
+    "t"
+   ],
+   [
+    "kind",
+    "t"
+   ],
+   [
+    "floor",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_racks",
+  "doc": "^netline/v1/projects/[^/]+/racks/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Racks in each room. (Network docs)",
+  "cols": [
+   [
+    "roomId",
+    "t"
+   ],
+   [
+    "name",
+    "t"
+   ],
+   [
+    "heightU",
+    "n"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_devices",
+  "doc": "^netline/v1/projects/[^/]+/devices/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Network devices, patch panels and wall jacks. (Network docs)",
+  "cols": [
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "roomId",
+    "t"
+   ],
+   [
+    "rackId",
+    "t"
+   ],
+   [
+    "u",
+    "n"
+   ],
+   [
+    "uh",
+    "n"
+   ],
+   [
+    "hostname",
+    "t"
+   ],
+   [
+    "role",
+    "t"
+   ],
+   [
+    "vendor",
+    "t"
+   ],
+   [
+    "model",
+    "t"
+   ],
+   [
+    "serial",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "os",
+    "t"
+   ],
+   [
+    "mgmtIp",
+    "t"
+   ],
+   [
+    "credRef",
+    "t"
+   ],
+   [
+    "location",
+    "t"
+   ],
+   [
+    "purchased",
+    "t"
+   ],
+   [
+    "warranty",
+    "t"
+   ],
+   [
+    "eosl",
+    "t"
+   ],
+   [
+    "replaceCost",
+    "n"
+   ],
+   [
+    "lifeYears",
+    "n"
+   ],
+   [
+    "draw",
+    "n"
+   ],
+   [
+    "pos",
+    "j"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": [
+   {
+    "table": "net_device_ports",
+    "field": "ports",
+    "key": null,
+    "parent": "device_id",
+    "comment": "Ports on each network device.",
+    "cols": [
+     [
+      "n",
+      "t"
+     ],
+     [
+      "media",
+      "t"
+     ],
+     [
+      "desc",
+      "t"
+     ],
+     [
+      "mode",
+      "t"
+     ],
+     [
+      "vlan",
+      "t"
+     ],
+     [
+      "vlans",
+      "t"
+     ],
+     [
+      "speed",
+      "t"
+     ],
+     [
+      "ip",
+      "t"
+     ],
+     [
+      "poe",
+      "t"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "table": "net_cables",
+  "doc": "^netline/v1/projects/[^/]+/cables/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Cable schedule, port to port. (Network docs)",
+  "cols": [
+   [
+    "a",
+    "j"
+   ],
+   [
+    "b",
+    "j"
+   ],
+   [
+    "media",
+    "t"
+   ],
+   [
+    "label",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "color",
+    "t"
+   ],
+   [
+    "lengthM",
+    "n"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_vlans",
+  "doc": "^netline/v1/projects/[^/]+/vlans/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "VLAN plan. (Network docs)",
+  "cols": [
+   [
+    "vid",
+    "n"
+   ],
+   [
+    "name",
+    "t"
+   ],
+   [
+    "purpose",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_subnets",
+  "doc": "^netline/v1/projects/[^/]+/subnets/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Subnets. (Network docs)",
+  "cols": [
+   [
+    "cidr",
+    "t"
+   ],
+   [
+    "name",
+    "t"
+   ],
+   [
+    "vid",
+    "t"
+   ],
+   [
+    "gateway",
+    "t"
+   ],
+   [
+    "dhcp",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_ip_addresses",
+  "doc": "^netline/v1/projects/[^/]+/ips/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Documented IP addresses. (Network docs)",
+  "cols": [
+   [
+    "addr",
+    "t"
+   ],
+   [
+    "type",
+    "t"
+   ],
+   [
+    "hostname",
+    "t"
+   ],
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "mac",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_circuits",
+  "doc": "^netline/v1/projects/[^/]+/circuits/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "WAN circuits. (Network docs)",
+  "cols": [
+   [
+    "provider",
+    "t"
+   ],
+   [
+    "circuitId",
+    "t"
+   ],
+   [
+    "type",
+    "t"
+   ],
+   [
+    "bandwidth",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "port",
+    "t"
+   ],
+   [
+    "handoff",
+    "t"
+   ],
+   [
+    "publicBlock",
+    "t"
+   ],
+   [
+    "gateway",
+    "t"
+   ],
+   [
+    "support",
+    "t"
+   ],
+   [
+    "account",
+    "t"
+   ],
+   [
+    "term",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_wifi",
+  "doc": "^netline/v1/projects/[^/]+/wifi/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Wireless networks (SSIDs). (Network docs)",
+  "cols": [
+   [
+    "ssid",
+    "t"
+   ],
+   [
+    "vid",
+    "t"
+   ],
+   [
+    "auth",
+    "t"
+   ],
+   [
+    "bands",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "credRef",
+    "t"
+   ],
+   [
+    "hidden",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_inventory",
+  "doc": "^netline/v1/projects/[^/]+/assets/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Site inventory (workstations, printers, phones\u2026). (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "category",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "vendor",
+    "t"
+   ],
+   [
+    "model",
+    "t"
+   ],
+   [
+    "serial",
+    "t"
+   ],
+   [
+    "assetTag",
+    "t"
+   ],
+   [
+    "assignedTo",
+    "t"
+   ],
+   [
+    "department",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "roomId",
+    "t"
+   ],
+   [
+    "location",
+    "t"
+   ],
+   [
+    "os",
+    "t"
+   ],
+   [
+    "ip",
+    "t"
+   ],
+   [
+    "mac",
+    "t"
+   ],
+   [
+    "switchPort",
+    "t"
+   ],
+   [
+    "purchased",
+    "t"
+   ],
+   [
+    "warranty",
+    "t"
+   ],
+   [
+    "eosl",
+    "t"
+   ],
+   [
+    "lifeYears",
+    "n"
+   ],
+   [
+    "replaceCost",
+    "n"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "link",
+    "j"
+   ],
+   [
+    "pos",
+    "j"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_tickets",
+  "doc": "^netline/v1/projects/[^/]+/tickets/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Network tickets. (Network docs)",
+  "cols": [
+   [
+    "title",
+    "t"
+   ],
+   [
+    "priority",
+    "t"
+   ],
+   [
+    "category",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "assetId",
+    "t"
+   ],
+   [
+    "requester",
+    "t"
+   ],
+   [
+    "contact",
+    "t"
+   ],
+   [
+    "assignee",
+    "t"
+   ],
+   [
+    "due",
+    "t"
+   ],
+   [
+    "description",
+    "t"
+   ],
+   [
+    "num",
+    "n"
+   ],
+   [
+    "created",
+    "ts"
+   ],
+   [
+    "resolution",
+    "t"
+   ],
+   [
+    "resolvedAt",
+    "ts"
+   ],
+   [
+    "log",
+    "j"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_floor_plans",
+  "doc": "^netline/v1/projects/[^/]+/plans/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Floor plans. (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "floor",
+    "t"
+   ],
+   [
+    "widthM",
+    "n"
+   ],
+   [
+    "w",
+    "n"
+   ],
+   [
+    "h",
+    "n"
+   ],
+   [
+    "imageId",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "imageData",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_revisions",
+  "doc": "^netline/v1/projects/[^/]+/revs/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Issued revisions of the document set. (Network docs)",
+  "cols": [
+   [
+    "rev",
+    "t"
+   ],
+   [
+    "issuedAt",
+    "ts"
+   ],
+   [
+    "note",
+    "t"
+   ],
+   [
+    "changes",
+    "j"
+   ],
+   [
+    "counts",
+    "j"
+   ],
+   [
+    "size",
+    "n"
+   ],
+   [
+    "snapId",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_maintenance",
+  "doc": "^netline/v1/projects/[^/]+/maint/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Recurring maintenance tasks. (Network docs)",
+  "cols": [
+   [
+    "title",
+    "t"
+   ],
+   [
+    "category",
+    "t"
+   ],
+   [
+    "every",
+    "n"
+   ],
+   [
+    "unit",
+    "t"
+   ],
+   [
+    "next",
+    "d"
+   ],
+   [
+    "lead",
+    "n"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "deviceIds",
+    "j"
+   ],
+   [
+    "assignee",
+    "t"
+   ],
+   [
+    "checklist",
+    "j"
+   ],
+   [
+    "lastDone",
+    "d"
+   ],
+   [
+    "history",
+    "j"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_firewall_policies",
+  "doc": "^netline/v1/projects/[^/]+/fw/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Firewall policies. (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "seq",
+    "n"
+   ],
+   [
+    "srcZone",
+    "t"
+   ],
+   [
+    "src",
+    "t"
+   ],
+   [
+    "dstZone",
+    "t"
+   ],
+   [
+    "dst",
+    "t"
+   ],
+   [
+    "service",
+    "t"
+   ],
+   [
+    "action",
+    "t"
+   ],
+   [
+    "nat",
+    "t"
+   ],
+   [
+    "log",
+    "t"
+   ],
+   [
+    "enabled",
+    "t"
+   ],
+   [
+    "purpose",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_port_forwards",
+  "doc": "^netline/v1/projects/[^/]+/nat/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Port forwards (NAT). (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "protocol",
+    "t"
+   ],
+   [
+    "publicIp",
+    "t"
+   ],
+   [
+    "publicPort",
+    "t"
+   ],
+   [
+    "internalIp",
+    "t"
+   ],
+   [
+    "internalPort",
+    "t"
+   ],
+   [
+    "allowedSrc",
+    "t"
+   ],
+   [
+    "enabled",
+    "t"
+   ],
+   [
+    "purpose",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_vpns",
+  "doc": "^netline/v1/projects/[^/]+/vpns/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "VPN tunnels. (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "type",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "peer",
+    "t"
+   ],
+   [
+    "peerIp",
+    "t"
+   ],
+   [
+    "localNets",
+    "t"
+   ],
+   [
+    "remoteNets",
+    "t"
+   ],
+   [
+    "auth",
+    "t"
+   ],
+   [
+    "credRef",
+    "t"
+   ],
+   [
+    "users",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_dns_records",
+  "doc": "^netline/v1/projects/[^/]+/dns/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "DNS records. (Network docs)",
+  "cols": [
+   [
+    "zone",
+    "t"
+   ],
+   [
+    "name",
+    "t"
+   ],
+   [
+    "type",
+    "t"
+   ],
+   [
+    "value",
+    "t"
+   ],
+   [
+    "ttl",
+    "t"
+   ],
+   [
+    "scope",
+    "t"
+   ],
+   [
+    "host",
+    "t"
+   ],
+   [
+    "purpose",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_cloud_services",
+  "doc": "^netline/v1/projects/[^/]+/cloud/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Cloud and SaaS services. (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "category",
+    "t"
+   ],
+   [
+    "account",
+    "t"
+   ],
+   [
+    "url",
+    "t"
+   ],
+   [
+    "adminContact",
+    "t"
+   ],
+   [
+    "credRef",
+    "t"
+   ],
+   [
+    "mfa",
+    "t"
+   ],
+   [
+    "renewal",
+    "t"
+   ],
+   [
+    "seats",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_contacts",
+  "doc": "^netline/v1/projects/[^/]+/contacts/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Contacts and escalation order. (Network docs)",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "org",
+    "t"
+   ],
+   [
+    "role",
+    "t"
+   ],
+   [
+    "phone",
+    "t"
+   ],
+   [
+    "email",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "hours",
+    "t"
+   ],
+   [
+    "escalation",
+    "n"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_runbooks",
+  "doc": "^netline/v1/projects/[^/]+/runbooks/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Runbooks. (Network docs)",
+  "cols": [
+   [
+    "title",
+    "t"
+   ],
+   [
+    "category",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "owner",
+    "t"
+   ],
+   [
+    "reviewed",
+    "t"
+   ],
+   [
+    "steps",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_power_feeds",
+  "doc": "^netline/v1/projects/[^/]+/power/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Which power outlet feeds each device. (Network docs)",
+  "cols": [
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "feed",
+    "t"
+   ],
+   [
+    "srcId",
+    "t"
+   ],
+   [
+    "outlet",
+    "t"
+   ],
+   [
+    "circuit",
+    "t"
+   ],
+   [
+    "watts",
+    "n"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_power_sources",
+  "doc": "^netline/v1/projects/[^/]+/psrc/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "UPS units and PDUs. (Network docs)",
+  "cols": [
+   [
+    "deviceId",
+    "t"
+   ],
+   [
+    "kind",
+    "t"
+   ],
+   [
+    "capW",
+    "n"
+   ],
+   [
+    "outlets",
+    "n"
+   ],
+   [
+    "circuit",
+    "t"
+   ],
+   [
+    "runtime",
+    "n"
+   ],
+   [
+    "battery",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_time_entries",
+  "doc": "^netline/v1/projects/[^/]+/time/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Time logged on network tickets. (Network docs)",
+  "cols": [
+   [
+    "date",
+    "t"
+   ],
+   [
+    "minutes",
+    "n"
+   ],
+   [
+    "tech",
+    "t"
+   ],
+   [
+    "billable",
+    "t"
+   ],
+   [
+    "note",
+    "t"
+   ],
+   [
+    "ticketId",
+    "t"
+   ],
+   [
+    "invoiceId",
+    "t"
+   ],
+   [
+    "at",
+    "ts"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "net_invoices",
+  "doc": "^netline/v1/projects/[^/]+/invoices/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Network billing (invoices and billing files). (Network docs)",
+  "cols": [
+   [
+    "no",
+    "t"
+   ],
+   [
+    "date",
+    "d"
+   ],
+   [
+    "due",
+    "d"
+   ],
+   [
+    "billTo",
+    "t"
+   ],
+   [
+    "note",
+    "t"
+   ],
+   [
+    "from",
+    "d"
+   ],
+   [
+    "to",
+    "d"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "via",
+    "t"
+   ],
+   [
+    "taxRate",
+    "n"
+   ],
+   [
+    "minutes",
+    "n"
+   ],
+   [
+    "subtotal",
+    "n"
+   ],
+   [
+    "tax",
+    "n"
+   ],
+   [
+    "total",
+    "n"
+   ],
+   [
+    "entryIds",
+    "j"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": [
+   {
+    "table": "net_invoice_lines",
+    "field": "lines",
+    "key": null,
+    "parent": "invoice_id",
+    "comment": "Lines on each network invoice.",
+    "cols": [
+     [
+      "ticket",
+      "t"
+     ],
+     [
+      "title",
+      "t"
+     ],
+     [
+      "site",
+      "t"
+     ],
+     [
+      "date",
+      "d"
+     ],
+     [
+      "tech",
+      "t"
+     ],
+     [
+      "minutes",
+      "n"
+     ],
+     [
+      "rate",
+      "n"
+     ],
+     [
+      "note",
+      "t"
+     ],
+     [
+      "amount",
+      "n"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "table": "net_activity",
+  "doc": "^netline/v1/projects/[^/]+/activity/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": true,
+  "comment": "Change history for each network. (Network docs)",
+  "cols": [
+   [
+    "ts",
+    "ts"
+   ],
+   [
+    "uid",
+    "t",
+    "user_id"
+   ],
+   [
+    "text",
+    "t"
+   ],
+   [
+    "updatedAt",
+    "ts"
+   ],
+   [
+    "updatedBy",
+    "t"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ],
+  "children": []
+ },
+ {
+  "table": "networks",
+  "doc": "^netline/v1/projects/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "net": false,
+  "comment": "Documented networks (one per client or campus).",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "client",
+    "t"
+   ],
+   [
+    "engineer",
+    "t"
+   ],
+   [
+    "rev",
+    "t"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "rate",
+    "n"
+   ],
+   [
+    "incr",
+    "n"
+   ],
+   [
+    "terms",
+    "t"
+   ],
+   [
+    "taxRate",
+    "n"
+   ],
+   [
+    "billTo",
+    "t"
+   ],
+   [
+    "billVia",
+    "t"
+   ],
+   [
+    "invNote",
+    "t"
+   ],
+   [
+    "account",
+    "t"
+   ],
+   [
+    "ent",
+    "j"
+   ],
+   [
+    "createdAt",
+    "ts"
+   ]
+  ]
+ },
+ {
+  "table": "net_subscription_plans",
+  "doc": "^netline/v1/admin/cfg/plans/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "admin": true,
+  "comment": "Network docs plans sold to customers (admins only).",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "price",
+    "n"
+   ],
+   [
+    "networks",
+    "n"
+   ],
+   [
+    "seats",
+    "n"
+   ],
+   [
+    "order",
+    "n"
+   ],
+   [
+    "modules",
+    "j"
+   ]
+  ]
+ },
+ {
+  "table": "net_customer_accounts",
+  "doc": "^netline/v1/admin/cfg/accounts/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "admin": true,
+  "comment": "Network docs customer accounts (admins only).",
+  "cols": [
+   [
+    "name",
+    "t"
+   ],
+   [
+    "contact",
+    "t"
+   ],
+   [
+    "email",
+    "t"
+   ],
+   [
+    "phone",
+    "t"
+   ],
+   [
+    "plan",
+    "t"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "cycle",
+    "t"
+   ],
+   [
+    "seats",
+    "n"
+   ],
+   [
+    "trialEnds",
+    "d"
+   ],
+   [
+    "overrides",
+    "j"
+   ],
+   [
+    "notes",
+    "t"
+   ],
+   [
+    "created",
+    "t"
+   ]
+  ]
+ },
+ {
+  "table": "net_portal_requests",
+  "doc": "^netline/v1/portal/inbox/requests/[^/]+$",
+  "arr": null,
+  "key": "id",
+  "comment": "Service requests sent from the client portal.",
+  "cols": [
+   [
+    "pid",
+    "t",
+    "network"
+   ],
+   [
+    "title",
+    "t"
+   ],
+   [
+    "description",
+    "t"
+   ],
+   [
+    "priority",
+    "t"
+   ],
+   [
+    "siteId",
+    "t"
+   ],
+   [
+    "requester",
+    "t"
+   ],
+   [
+    "contact",
+    "t"
+   ],
+   [
+    "created",
+    "ts"
+   ],
+   [
+    "by",
+    "t",
+    "sent_by"
+   ],
+   [
+    "status",
+    "t"
+   ],
+   [
+    "ticketId",
+    "t"
+   ]
+  ]
+ }
+]
