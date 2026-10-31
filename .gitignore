@@ -1,0 +1,10 @@
+# screenshots and generated output from test runs
+*.png
+!assets/*.png
+*.pdf
+__pycache__/
+node_modules/
+.DS_Store
+# working backups
+*.bak
+v[0-9]*.html
