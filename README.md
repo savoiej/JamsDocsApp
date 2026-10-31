@@ -12,10 +12,12 @@ AV design, proposals, projects, service contracts, time & invoicing and network 
 | `site/index.html` | Marketing website for Jams Docs and Designs. | — |
 | `assets/logo.png` | Company logo. | — |
 | `tests/` | Browser checks (Playwright) for JamsNET. | — |
+| `web/` | **JamsNET as a Next.js site on Supabase**: sign-in, admin and user roles, all data in Supabase. See `web/README.md`. | — |
+| `supabase/migrations/` | Database tables, roles, row-level security and file storage for `web/`. | — |
 
 ## Data
 
-Each app saves to its artifact's own database when opened on claude.ai, or to the browser when opened as a plain file. JamsNET keeps network docs under `netline/v1/…` so they never mix with projects, clients and invoices.
+The Next.js site (`web/`) saves everything to Supabase. The claude.ai artifacts each save to its artifact's own database when opened on claude.ai, or to the browser when opened as a plain file. JamsNET keeps network docs under `netline/v1/…` so they never mix with projects, clients and invoices.
 
 ## Running the checks
 

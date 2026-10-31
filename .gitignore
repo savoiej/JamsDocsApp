@@ -1,6 +1,7 @@
 # screenshots and generated output from test runs
 *.png
 !assets/*.png
+!web/public/*.png
 *.pdf
 __pycache__/
 node_modules/
