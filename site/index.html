@@ -369,6 +369,43 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
+
+/* what you receive */
+.getrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 32px;margin-top:40px}
+.getrow div{display:flex;flex-direction:column;gap:6px;padding-top:16px;border-top:3px solid var(--accent);min-width:0}
+.getrow b{font:600 20px/1.1 var(--f-display);letter-spacing:.02em;text-transform:uppercase}
+.getrow span{color:var(--muted);font-size:14px}
+.svcways{margin-top:48px}
+/* the app band */
+.appband{background:var(--gear);color:var(--gear-ink);padding:88px 0;position:relative;overflow:hidden}
+.appband::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.appband .wrap{position:relative;display:flex;flex-direction:column;gap:20px;align-items:flex-start}
+.appband .eyebrow{color:color-mix(in srgb,var(--gear-ink) 70%,transparent)}
+.appband .eyebrow .tag{color:#f0a252}
+.appband h2{color:#fff;max-width:20ch}
+.appband .lead{color:color-mix(in srgb,var(--gear-ink) 80%,transparent);max-width:62ch}
+.btn.ghostlight{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.btn.ghostlight:hover{border-color:#fff}
+.links a.navapp{border-left:1px solid var(--line);padding-left:18px}
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:stretch}
+.plan{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:32px;display:flex;flex-direction:column;gap:14px;min-width:0;position:relative}
+.plan.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset,0 18px 40px -24px rgba(20,40,80,.45)}
+.pbadge{position:absolute;top:-12px;left:32px;margin:0;background:var(--accent);color:var(--accent-ink);font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.plan h3{font-size:30px;text-transform:uppercase}
+.price{margin:0;display:flex;align-items:baseline;gap:6px}
+.price b{font:700 52px/1 var(--f-display);letter-spacing:-.01em}
+.price span{color:var(--muted);font-size:15px}
+.pdesc{margin:0;color:var(--muted);font-size:15px}
+.plimit{margin:0;font:600 12px var(--f-mono);letter-spacing:.04em;color:var(--ink);padding:8px 10px;background:var(--sunk);border-radius:6px}
+.plan ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+.plan li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;font-size:15px}
+.plan li svg{margin-top:4px;color:var(--node)}
+.plan .btn{align-self:stretch;text-align:center;justify-content:center;margin-top:auto}
+.pnote{margin:28px 0 0;color:var(--muted);font-size:14px;max-width:80ch}
+.pnote a{color:var(--accent)}
+@media (max-width:980px){.plans{grid-template-columns:minmax(0,1fr)}.getrow{grid-template-columns:repeat(2,minmax(0,1fr))}.appband{padding:64px 0}}
+@media (max-width:560px){.getrow{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -380,10 +417,11 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
       <span><b>Jams Docs and Designs</b><small>AV &amp; network documentation</small></span>
     </a>
     <nav class="links" aria-label="Sections">
+      <a href="#deliverables">Drawing set</a>
       <a href="#services">Services</a>
-      <a href="#demo">See it work</a>
-      <a href="#deliverables">Deliverables</a>
-      <a href="#netline">Netline</a>
+      <a href="#process">How we work</a>
+      <a href="#app" class="navapp">The app</a>
+      <a href="#pricing">Pricing</a>
     </nav>
     <a class="btn primary" href="#contact">Start a project</a>
   </div>
@@ -393,12 +431,12 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
 <section class="hero">
   <div class="wrap">
     <div class="hero-copy">
-      <p class="eyebrow"><span class="tag">●</span> AV design · network documentation · proposals</p>
+      <p class="eyebrow"><span class="tag">●</span> AV &amp; network design · drawing sets · on-site support</p>
       <h1><span>Every cable <span class="c1" style="display:inline">drawn.</span></span><span>Every rack <span class="c2" style="display:inline">documented.</span></span><span>Every job <span class="c3" style="display:inline">signed.</span></span></h1>
-      <p class="lead">Jams Docs and Designs turns a site walk into a complete drawing set, a priced proposal your client signs online, and a live record your techs can open on their phone years later.</p>
+      <p class="lead">We walk your site and deliver the complete drawing set your installer builds from: signal flow, rack elevations, floor plans, cable schedules and labels, with the proposal and network documentation to match. Then we stay on for installs and support.</p>
       <div class="hero-cta">
-        <a class="btn primary" href="#demo"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z" fill="currentColor"/></svg>Watch the app work</a>
-        <a class="btn" href="#contact">Start a project</a>
+        <a class="btn primary" href="#contact" data-pick="services">Start a project</a>
+        <a class="btn" href="#deliverables">See what's in the set</a>
       </div>
       <div class="hero-meta">
         <span class="sv"><i></i>Video</span><span class="sa"><i></i>Audio</span><span class="sn"><i></i>Network</span><span class="su"><i></i>USB</span><span class="sc"><i></i>Control</span>
@@ -467,12 +505,58 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
   </div>
 </section>
 
+
+
+
+
+
+
+
+<section class="sec" id="deliverables">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow"><span class="sheetno">S-100</span> What you receive</p>
+      <h2>A drawing set your installer can build from.</h2>
+      <p class="lead">Every job ends with a complete, consistent set: a sheet index, title blocks with revision history, and labels you print and stick on both ends of every cable. Nothing is left for the crew to guess.</p>
+    </div>
+    <div class="setgrid">
+      <div class="setidx rv">
+        <div class="hd">Sheet index <span>Conf Rm 3B · Rev C</span></div>
+        <table>
+          <tr style="--c:var(--muted)"><td class="s">E-001</td><td><b>Cover, legend &amp; symbols</b><small>Signal color key, abbreviations, project contacts</small></td></tr>
+          <tr class="sv"><td class="s">E-101</td><td><b>Signal flow</b><small>Every device, port and labeled cable by system</small></td></tr>
+          <tr class="sn"><td class="s">E-201</td><td><b>Rack elevations</b><small>Front view to the U, with power, heat and weight</small></td></tr>
+          <tr class="sa"><td class="s">E-301</td><td><b>Floor plan &amp; device locations</b><small>Mic and speaker coverage, display sightlines, cable runs</small></td></tr>
+          <tr class="su"><td class="s">E-401</td><td><b>Cable schedule</b><small>Source, destination, type, length and pull status</small></td></tr>
+          <tr class="sc"><td class="s">E-501</td><td><b>Wire labels</b><small>Print-ready labels for both ends of each cable</small></td></tr>
+          <tr style="--c:var(--accent)"><td class="s">P-1042</td><td><b>Proposal &amp; bill of materials</b><small>Grouped by system, with labor and e-signature</small></td></tr>
+        </table>
+      </div>
+      <div class="setside">
+        <p class="eyebrow">From sheet E-501</p>
+        <div class="labels">
+          <div class="wl sv rv"><b>V-101</b><span>PC-1 HDMI OUT</span><br>→ SW-1 IN 1 · HDMI · 6 ft</div>
+          <div class="wl sv rv"><b>V-102</b><span>SW-1 OUT A</span><br>→ DS-1 HDMI 1 · HDBaseT · 42 ft</div>
+          <div class="wl sa rv"><b>A-101</b><span>MIC-1 DANTE</span><br>→ DSP-1 PRI · Cat6 · 38 ft</div>
+          <div class="wl sn rv"><b>N-101</b><span>SW-1 LAN</span><br>→ NS-1 Gi1/0/12 · Cat6 · 3 ft</div>
+        </div>
+        <p class="lead" style="font-size:15px">Labels, schedule and drawing come from the same data. Rename a cable on the sheet and the label and schedule change with it.</p>
+      </div>
+    </div>
+    <div class="getrow">
+      <div class="rv"><b>PDF drawing set</b><span>Every sheet with your project's title block, ready to print or share.</span></div>
+      <div class="rv"><b>Cable schedule</b><span>Also as a CSV, so it drops straight into a pull sheet or spreadsheet.</span></div>
+      <div class="rv"><b>Print-ready labels</b><span>Wire labels that match the drawing and the schedule, cable for cable.</span></div>
+      <div class="rv"><b>Revisions</b><span>Changes after install are issued as a new revision, with what changed.</span></div>
+    </div>
+  </div>
+</section>
 <section class="sec" id="services">
   <div class="wrap">
     <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-100</span> Services</p>
-      <h2>Design and documentation for the systems behind the wall.</h2>
-      <p class="lead">Hire us to draw it, or run it yourself in the same app we use. Either way you get drawings, schedules and pricing that agree with each other, because they come from one model of the room.</p>
+      <p class="eyebrow"><span class="sheetno">S-200</span> Services</p>
+      <h2>Design, documentation and on&#8209;site support.</h2>
+      <p class="lead">For the systems behind the wall, from one room to a whole campus. Drawings, schedules and pricing always agree, because they all come from one model of the room.</p>
     </div>
     <div class="svc">
       <article class="sv rv">
@@ -501,24 +585,74 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
       </article>
       <article class="sc rv">
         <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="40" height="34" rx="2"/><path d="M4 17h40M14 4v8M34 4v8"/><path d="M10 25h10M10 31h16M24 25h14"/></svg>
-        <h3>Install project management</h3>
-        <p>Signed proposals become projects with tasks, a schedule, time tracking and budget against actuals, so install crews know what is next.</p>
-        <div class="deliv">Task board · schedule · cost tracking</div>
+        <h3>Install support</h3>
+        <p>We stay with the job through install: a task list and schedule for the crew, answers on site, and as-built updates when the field changes the plan.</p>
+        <div class="deliv">Task list · schedule · as-builts</div>
       </article>
       <article class="sv rv" style="--c:var(--node)">
         <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="14" y="3" width="20" height="42" rx="4"/><path d="M21 39h6"/><path d="M19 20l4 4 7-8"/></svg>
-        <h3>Service desk &amp; field support</h3>
-        <p>Tickets tied to the drawing. A tech on site sees the exact cable, the checklist and the history on their phone, then closes it out with photos and notes.</p>
-        <div class="deliv">Tickets · field tech view · service history</div>
+        <h3>Service contracts &amp; on-site support</h3>
+        <p>Ongoing agreements for on-site support, installs, and moves, adds and changes. Every visit is logged against the drawing, so the next tech knows exactly what was done.</p>
+        <div class="deliv">On-site visits · installs · service history</div>
       </article>
     </div>
   </div>
 </section>
-
+<section class="sec" id="process">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow"><span class="sheetno">S-300</span> How we work</p>
+      <h2>From site walk to signed set.</h2>
+      <p class="lead">A clear path for every job, whether it's one conference room or a multi-site rollout.</p>
+    </div>
+    <ol class="flow">
+      <span class="pulse" aria-hidden="true"></span>
+      <li class="sv"><span class="num">1</span><div><h3>Site walk</h3><p>We walk the space or work from your notes, photos and plans.</p></div></li>
+      <li class="su"><span class="num">2</span><div><h3>Design</h3><p>Gear chosen from real spec sheets, wired port to port.</p></div></li>
+      <li class="sn"><span class="num">3</span><div><h3>Drawing set</h3><p>The full set and a priced proposal you review and sign online.</p></div></li>
+      <li class="sc"><span class="num">4</span><div><h3>Install</h3><p>Support for the crew and as-built updates along the way.</p></div></li>
+      <li class="sa"><span class="num">5</span><div><h3>Support</h3><p>On-site service under contract, logged against the drawing.</p></div></li>
+    </ol>
+    <div class="ways svcways">
+      <div class="way rv">
+        <p class="eyebrow">Project work</p>
+        <h3>Quoted per project</h3>
+        <p class="lead" style="font-size:16px">After a short scope call you get a fixed price for the drawing set, schedules and proposal.</p>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>New AV rooms and system refreshes</li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>As-built documentation for existing sites</li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Network audits and MDF/IDF binders</li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Multi-site rollouts with repeatable templates</li>
+        </ul>
+        <a class="btn primary" href="#contact" data-pick="services">Request a quote</a>
+      </div>
+      <div class="way rv">
+        <p class="eyebrow">Ongoing</p>
+        <h3>Service contracts</h3>
+        <p class="lead" style="font-size:16px">A support agreement sized to your sites, billed on a regular cycle or as a block of prepaid hours.</p>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>On-site support visits</li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Installs, moves, adds and changes</li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Every visit logged with notes and photos</li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Drawings kept current as the site changes</li>
+        </ul>
+        <a class="btn" href="#contact" data-pick="services">Ask about a contract</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="appband" id="app">
+  <div class="wrap">
+    <p class="eyebrow"><span class="tag">●</span> Part two · The app</p>
+    <h2>The same app we draw in, for your own team.</h2>
+    <p class="lead">Every drawing set we deliver is built in Jams Docs and Designs. If you'd rather do the work in-house, your team can use it too: design, proposals, projects, service and network documentation in one place.</p>
+    <div class="hero-cta"><a class="btn primary" href="#demo">See how it works</a><a class="btn ghostlight" href="#pricing">View pricing</a></div>
+  </div>
+</section>
 <section class="sec demo" id="demo">
   <div class="wrap">
     <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-200</span> See it work</p>
+      <p class="eyebrow"><span class="sheetno">A-100</span> See it work</p>
       <h2>Four short clips. One room, start to finish.</h2>
       <p class="lead">Follow Conference Room 3B from the first device on the sheet to a service call after install. Pick a clip or let them play in order.</p>
     </div>
@@ -539,12 +673,11 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
     </div>
   </div>
 </section>
-
 <section class="sec" id="workflow">
   <div class="wrap">
     <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-300</span> How a job moves</p>
-      <h2>One model of the room, carried all the way through.</h2>
+      <p class="eyebrow"><span class="sheetno">A-200</span> How the app works</p>
+      <h2>Draw it once. Everything else follows.</h2>
       <p class="lead">Nothing gets retyped. The device you place on the drawing is the line on the proposal, the task on the install board and the asset on the service ticket.</p>
     </div>
     <ol class="flow">
@@ -557,41 +690,25 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
     </ol>
   </div>
 </section>
-
-<section class="sec" id="deliverables">
+<section class="sec" id="platform">
   <div class="wrap">
     <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-400</span> Deliverables</p>
-      <h2>The drawing set you hand to the installer.</h2>
-      <p class="lead">Every job ships with a consistent sheet index, title blocks with revision history, and labels you can print and stick on both ends of the cable.</p>
+      <p class="eyebrow"><span class="sheetno">A-300</span> Inside the app</p>
+      <h2>Built by an integrator, for the way integrators work.</h2>
+      <p class="lead">The pieces that usually live in five different tools, in one place that works on a laptop at the office or a phone in the ceiling.</p>
     </div>
-    <div class="setgrid">
-      <div class="setidx rv">
-        <div class="hd">Sheet index <span>Conf Rm 3B · Rev C</span></div>
-        <table>
-          <tr style="--c:var(--muted)"><td class="s">E-001</td><td><b>Cover, legend &amp; symbols</b><small>Signal color key, abbreviations, project contacts</small></td></tr>
-          <tr class="sv"><td class="s">E-101</td><td><b>Signal flow</b><small>Every device, port and labeled cable by system</small></td></tr>
-          <tr class="sn"><td class="s">E-201</td><td><b>Rack elevations</b><small>Front view to the U, with power, heat and weight</small></td></tr>
-          <tr class="sa"><td class="s">E-301</td><td><b>Floor plan &amp; device locations</b><small>Mic and speaker coverage, display sightlines, cable runs</small></td></tr>
-          <tr class="su"><td class="s">E-401</td><td><b>Cable schedule</b><small>Source, destination, type, length and pull status</small></td></tr>
-          <tr class="sc"><td class="s">E-501</td><td><b>Wire labels</b><small>Print-ready labels for both ends of each cable</small></td></tr>
-          <tr style="--c:var(--accent)"><td class="s">P-1042</td><td><b>Proposal &amp; bill of materials</b><small>Grouped by system, with labor and e-signature</small></td></tr>
-        </table>
-      </div>
-      <div class="setside">
-        <p class="eyebrow">From sheet E-501</p>
-        <div class="labels">
-          <div class="wl sv rv"><b>V-101</b><span>PC-1 HDMI OUT</span><br>→ SW-1 IN 1 · HDMI · 6 ft</div>
-          <div class="wl sv rv"><b>V-102</b><span>SW-1 OUT A</span><br>→ DS-1 HDMI 1 · HDBaseT · 42 ft</div>
-          <div class="wl sa rv"><b>A-101</b><span>MIC-1 DANTE</span><br>→ DSP-1 PRI · Cat6 · 38 ft</div>
-          <div class="wl sn rv"><b>N-101</b><span>SW-1 LAN</span><br>→ NS-1 Gi1/0/12 · Cat6 · 3 ft</div>
-        </div>
-        <p class="lead" style="font-size:15px">Labels, schedule and drawing come from the same data. Rename a cable on the sheet and the label and schedule change with it.</p>
-      </div>
+    <div class="feat">
+      <div class="rv"><b>Product library</b><span>Import manufacturer CSVs and spec sheets. Ports, power and rack units come with every device.</span></div>
+      <div class="rv"><b>AI assistant</b><span>Ask it to find a product, pull specs from the web, or check a design for missing connections.</span></div>
+      <div class="rv"><b>Multi-sheet drawings</b><span>Signal flow, rack elevations, floor plans and cable schedules that stay in sync.</span></div>
+      <div class="rv"><b>Labels &amp; exports</b><span>Wire labels, CSV schedules and PDF drawing sets with your title block.</span></div>
+      <div class="rv"><b>Clients &amp; invoices</b><span>Contacts, sites and billing tied to the projects you run for them.</span></div>
+      <div class="rv"><b>Inventory &amp; registers</b><span>Track spares, repairs and store systems across every location.</span></div>
+      <div class="rv"><b>Field tech view</b><span>A phone-first view of tickets, checklists, photos and voice notes.</span></div>
+      <div class="rv"><b>Saved everywhere</b><span>Your work follows you from the office to the job site on any device.</span></div>
     </div>
   </div>
 </section>
-
 <section class="sec" id="netline">
   <div class="wrap">
     <div class="netline rv">
@@ -641,67 +758,46 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
     </div>
   </div>
 </section>
-
-<section class="sec" id="platform">
+<section class="sec" id="pricing">
   <div class="wrap">
     <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-500</span> Inside the app</p>
-      <h2>Built by an integrator, for the way integrators work.</h2>
-      <p class="lead">The pieces that usually live in five different tools, in one place that works on a laptop at the office or a phone in the ceiling.</p>
+      <p class="eyebrow"><span class="sheetno">A-400</span> Pricing</p>
+      <h2>Plans for teams of every size.</h2>
+      <p class="lead">Every plan includes the core documentation tools: sites, devices, racks, cabling, topology, IP and VLANs, circuits, wireless, labels and the document set. Pick a plan for the extras your team needs.</p>
     </div>
-    <div class="feat">
-      <div class="rv"><b>Product library</b><span>Import manufacturer CSVs and spec sheets. Ports, power and rack units come with every device.</span></div>
-      <div class="rv"><b>AI assistant</b><span>Ask it to find a product, pull specs from the web, or check a design for missing connections.</span></div>
-      <div class="rv"><b>Multi-sheet drawings</b><span>Signal flow, rack elevations, floor plans and cable schedules that stay in sync.</span></div>
-      <div class="rv"><b>Labels &amp; exports</b><span>Wire labels, CSV schedules and PDF drawing sets with your title block.</span></div>
-      <div class="rv"><b>Clients &amp; invoices</b><span>Contacts, sites and billing tied to the projects you run for them.</span></div>
-      <div class="rv"><b>Inventory &amp; registers</b><span>Track spares, repairs and store systems across every location.</span></div>
-      <div class="rv"><b>Field tech view</b><span>A phone-first view of tickets, checklists, photos and voice notes.</span></div>
-      <div class="rv"><b>Saved everywhere</b><span>Your work follows you from the office to the job site on any device.</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="engage">
-  <div class="wrap">
-    <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-600</span> Work with us</p>
-      <h2>Two ways to get it done.</h2>
-      <p class="lead">Bring us a room, a building or a whole network. Or bring your own team into the app.</p>
-    </div>
-    <div class="ways">
-      <div class="way rv">
-        <p class="eyebrow">Done for you</p>
-        <h3>Documentation services</h3>
-        <p class="lead" style="font-size:16px">We walk the site or work from your notes, then deliver the complete drawing set, schedules and proposal.</p>
-        <ul>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>New AV rooms and system refreshes</li>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>As-built documentation for existing sites</li>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Network audits and MDF/IDF binders</li>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Multi-site rollouts with repeatable templates</li>
-        </ul>
-        <a class="btn primary" href="#contact" data-pick="services">Request a quote</a>
+    <div class="plans">
+      <div class="plan rv">
+        <h3>Starter</h3>
+        <p class="price"><b>$49</b><span>/ month</span></p>
+        <p class="pdesc">For a small team documenting a handful of sites.</p>
+        <p class="plimit">Up to 3 networks · 2 users</p>
+        <ul><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Core documentation</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Floor plans</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Wall jacks &amp; patch paths</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Site inventory</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Field view &amp; QR labels</li></ul>
+        <a class="btn" href="#contact" data-pick="platform">Start with Starter</a>
       </div>
-      <div class="way alt rv">
-        <p class="eyebrow" style="color:var(--accent)">Early access</p>
-        <h3>Use the platform</h3>
-        <p class="lead" style="font-size:16px">Run your own design, proposal and service work in Jams Docs and Designs, with Netline for your network team.</p>
-        <ul>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Design, BOM and proposals with e-signature</li>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Projects, service desk and field tech view</li>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Your logo and title block on every document</li>
-          <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Onboarding help importing your product library</li>
-        </ul>
-        <a class="btn" href="#contact" data-pick="platform">Join early access</a>
+      <div class="plan rv featured">
+        <p class="pbadge">Most popular</p><h3>Professional</h3>
+        <p class="price"><b>$149</b><span>/ month</span></p>
+        <p class="pdesc">For integrators running design, service and documentation every week.</p>
+        <p class="plimit">Up to 15 networks · 10 users</p>
+        <ul><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Everything in Starter</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Import from switches</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Lifecycle &amp; maintenance</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Power mapping</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Firewall, VPN, DNS &amp; cloud</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Service desk</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Contacts &amp; runbooks</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Revisions</li></ul>
+        <a class="btn primary" href="#contact" data-pick="platform">Choose Professional</a>
+      </div>
+      <div class="plan rv">
+        <h3>Enterprise</h3>
+        <p class="price"><b>$399</b><span>/ month</span></p>
+        <p class="pdesc">For larger teams and multi-site organizations.</p>
+        <p class="plimit">Unlimited networks · unlimited users</p>
+        <ul><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Everything in Professional</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Time &amp; billing</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Client portal for your customers</li></ul>
+        <a class="btn" href="#contact" data-pick="platform">Talk to us</a>
       </div>
     </div>
+    <p class="pnote">Prices in US dollars. The app is in early access, so sign up and we'll help you set up and import your product library. Want us to do the drawings instead? Documentation services are <a href="#process">quoted per project</a>.</p>
   </div>
 </section>
-
 <section class="sec" id="contact">
   <div class="wrap contact">
     <div class="contact-copy">
-      <p class="eyebrow"><span class="sheetno">S-700</span> Start a project</p>
+      <p class="eyebrow"><span class="sheetno">S-400</span> Start a project</p>
       <h2>Tell us about the room.</h2>
       <p class="lead">A few details are enough to start. We reply with questions, a scope and a price.</p>
       <ol class="steps">
