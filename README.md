@@ -1,5 +1,15 @@
 # JamsNET
 
+## Live sites (Vercel)
+
+| Site | Address | Built from |
+|---|---|---|
+| Jams Docs and Designs business website | https://jams-docs-and-designs.vercel.app | `site/` |
+| JamsNET app (sign-in, Supabase) | https://jams-docs-app.vercel.app | `web/` |
+
+Each push to `main` redeploys only the site whose folder changed.
+
+
 AV design, proposals, projects, service contracts, time & invoicing and network documentation for **Jams Docs and Designs** — one app, delivered as a single self-contained HTML page published as a claude.ai artifact.
 
 ## What's here
