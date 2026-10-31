@@ -1014,6 +1014,8 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .attn li{padding:12px 20px;border-bottom:1px solid var(--sunk);font-size:14px}
 .attn li:last-child{border-bottom:0}
 .attn li small{display:block;color:var(--muted);font-size:13px}
+/* draggable items: "all:unset" also clears the browser's drag setting, so turn it back on */
+[draggable="true"],[draggable="true"]:hover{-webkit-user-drag:element;user-select:none;-webkit-user-select:none}
 </style>
 
 <div class="app">

@@ -574,6 +574,8 @@ pre.cmd{margin:0;background:var(--sunk);border-radius:6px;padding:10px 12px;font
 }
 .mobsel{display:none}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+/* draggable items: "all:unset" also clears the browser's drag setting, so turn it back on */
+[draggable="true"],[draggable="true"]:hover{-webkit-user-drag:element;user-select:none;-webkit-user-select:none}
 </style>
 
 <div class="app">
