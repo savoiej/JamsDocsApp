@@ -7,14 +7,14 @@ JamsNET running as a Next.js site, with Supabase for sign-in, roles and all save
 ```bash
 cd web
 npm install
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3001
 ```
 
 `.env` holds the Supabase project URL and publishable key (see `.env.example`). It is not committed.
 
 **First sign-in:** go to `/signup`. The **first account becomes the admin** and is active straight away. Everyone after that signs up, confirms their email, and waits until an admin approves them on **Team & access** (`/admin/users`).
 
-In Supabase → Authentication → URL Configuration, set the Site URL to where the app runs and add `http://localhost:3000/**` to Redirect URLs, so confirmation emails come back here.
+In Supabase → Authentication → URL Configuration, set the Site URL to where the app runs and add `http://localhost:3001/**` to Redirect URLs, so confirmation emails come back here.
 
 ## Roles
 
