@@ -737,7 +737,7 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
           <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Every visit logged with notes and photos</li>
           <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Drawings kept current as the site changes</li>
         </ul>
-        <a class="btn" href="#contact" data-pick="services">Ask about a contract</a>
+        <a class="btn" href="#contact" data-pick="contract">Ask about a contract</a>
       </div>
     </div>
   </div>
@@ -919,6 +919,10 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
           <label class="sn"><input type="checkbox" id="n-rack" value="Rack elevations and cable schedules"><span>Racks &amp; cabling</span></label>
           <label class="su"><input type="checkbox" id="n-net" value="Network documentation"><span>Network docs</span></label>
           <label class="sa"><input type="checkbox" id="n-prop" value="Proposals and BOMs"><span>Proposals</span></label>
+          <label class="sc"><input type="checkbox" id="n-inst" value="Install support"><span>Install support</span></label>
+          <label class="sv"><input type="checkbox" id="n-onsite" value="On-site support, moves, adds and changes"><span>On-site support</span></label>
+          <label class="sn"><input type="checkbox" id="n-svc" value="Service contract"><span>Service contract</span></label>
+          <label class="su"><input type="checkbox" id="n-asb" value="As-built documentation"><span>As-builts</span></label>
           <label class="sc"><input type="checkbox" id="n-app" value="Platform early access"><span>App early access</span></label>
         </div>
       </div>
@@ -1378,7 +1382,7 @@ if('IntersectionObserver' in window&&!RM){
 }
 
 /* contact */
-document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{const id=a.dataset.pick==='platform'?'n-app':'n-av';const c=document.getElementById(id);if(c)c.checked=true}));
+document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{const id={platform:'n-app',contract:'n-svc'}[a.dataset.pick]||'n-av';const c=document.getElementById(id);if(c)c.checked=true}));
 const form=document.getElementById('form');let err=document.getElementById('err');const ORIG=form.innerHTML;
 form.addEventListener('submit',async e=>{
   e.preventDefault();
