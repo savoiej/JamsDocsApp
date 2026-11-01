@@ -4,10 +4,10 @@
 
 | Site | Address | Built from |
 |---|---|---|
-| Jams Docs and Designs business website | https://jams-docs-and-designs.vercel.app | `site/` |
-| JamsNET app (sign-in, Supabase) | https://jams-docs-app.vercel.app | `web/` |
+| Jams Docs and Designs business website | https://www.jamsdocsanddesigns.com (jamsdocsanddesigns.com forwards here; also jams-docs-and-designs.vercel.app) | `site/` |
+| JamsNET app (sign-in, Supabase) | https://app.jamsdocsanddesigns.com (also jams-docs-app.vercel.app) | `web/` |
 
-Each push to `main` redeploys only the site whose folder changed.
+Each push to `main` redeploys only the site whose folder changed. DNS is at GoDaddy: `www` and `app` are CNAMEs to `cname.vercel-dns.com`, and the bare domain uses GoDaddy forwarding to `https://www.jamsdocsanddesigns.com`. Leave the MX and TXT records alone (email).
 
 
 AV design, proposals, projects, service contracts, time & invoicing and network documentation for **Jams Docs and Designs** — one app, delivered as a single self-contained HTML page published as a claude.ai artifact.
