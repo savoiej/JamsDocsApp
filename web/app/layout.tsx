@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "JamsNET",
+  title: "Netline",
   description: "AV design, projects, service and network documentation for Jams Docs and Designs.",
 };
 

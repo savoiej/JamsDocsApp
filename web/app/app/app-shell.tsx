@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-/** JamsNET runs in a frame; it reaches Supabase through window.jamsBridge, which stands in for the claude.ai runtime it was built on. */
+/** Netline runs in a frame; it reaches Supabase through window.jamsBridge, which stands in for the claude.ai runtime it was built on. */
 export default function AppShell({ profile }: { profile: Profile }) {
   const [doc, setDoc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export default function AppShell({ profile }: { profile: Profile }) {
           "try{if(parent.location.hash)history.replaceState(null,'',parent.location.hash)}catch(e){}</script>";
         setDoc(html.replace("<head>", "<head>" + shim));
       })
-      .catch(() => alive && setError("JamsNET couldn’t load. Reload the page to try again."));
+      .catch(() => alive && setError("Netline couldn’t load. Reload the page to try again."));
     return () => {
       alive = false;
     };
@@ -39,7 +39,7 @@ export default function AppShell({ profile }: { profile: Profile }) {
   return (
     <div className="shell">
       <header className="shellbar">
-        <b>JamsNET</b>
+        <b>Netline</b>
         <span className="who">
           {profile.full_name || profile.email}
         </span>
@@ -52,9 +52,9 @@ export default function AppShell({ profile }: { profile: Profile }) {
       {error ? (
         <div className="loading" role="alert">{error}</div>
       ) : doc ? (
-        <iframe className="appframe" title="JamsNET" srcDoc={doc} />
+        <iframe className="appframe" title="Netline" srcDoc={doc} />
       ) : (
-        <div className="loading">Opening JamsNET…</div>
+        <div className="loading">Opening Netline…</div>
       )}
     </div>
   );

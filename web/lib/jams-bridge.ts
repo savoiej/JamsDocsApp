@@ -1,5 +1,5 @@
 /**
- * JamsNET was built on the claude.ai artifact runtime (window.claude.use("db" | "user" | "downloads" | "assets")).
+ * Netline was built on the claude.ai artifact runtime (window.claude.use("db" | "user" | "downloads" | "assets")).
  * This bridge gives it the same interface, backed by Supabase:
  *   db        → public.documents (one JSON document per path), live through Realtime
  *   user      → the signed-in person and public.profiles (admins are the "owner")

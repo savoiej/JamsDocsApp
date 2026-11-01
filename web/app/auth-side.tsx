@@ -5,7 +5,7 @@ export default function AuthSide() {
       <div className="mark">
         <img src="/logo.png" alt="" />
         <div>
-          <b>JamsNET</b>
+          <b>Netline</b>
           <div style={{ fontSize: 13, color: "#8FA6A8" }}>Jams Docs and Designs</div>
         </div>
       </div>
