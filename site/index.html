@@ -469,6 +469,29 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
 .sendrow{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
 .fnote{font-size:13px;color:var(--muted)}
 .form .btn[disabled]{opacity:.6;cursor:progress}
+
+/* plain-language + who + faq */
+.plainlead{color:var(--ink);font-weight:600}
+.plain{margin:0;font-size:14px;color:var(--ink);background:var(--paper);border-left:3px solid var(--c,var(--accent));padding:8px 10px;border-radius:0 6px 6px 0}
+.plain b{font-weight:600}
+.who{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.whocard{display:flex;flex-direction:column;gap:10px;padding:26px;background:var(--sheet);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:12px;color:var(--ink);text-decoration:none;transition:transform .2s,box-shadow .2s}
+.whocard:hover{transform:translateY(-3px);box-shadow:0 18px 36px -24px rgba(20,30,45,.5)}
+.whocard:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.whocard b{font:600 24px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.whocard span{color:var(--muted);font-size:15px}
+.whocard i{font-style:normal;font-weight:600;color:var(--accent);margin-top:auto;font-size:14px}
+.faq{display:flex;flex-direction:column;gap:10px;max-width:880px}
+.faq details{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:0 20px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 28px 18px 0;font-weight:600;font-size:17px;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:0;top:14px;font:400 26px/1 var(--f-mono);color:var(--accent)}
+.faq details[open] summary::after{content:"–"}
+.faq summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.faq details p{margin:0 0 18px;color:var(--muted);font-size:15px;max-width:72ch}
+@media (max-width:900px){.who{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion: reduce){.whocard{transition:none}.whocard:hover{transform:none}}
+@media (max-width:560px){header.top .btn{white-space:nowrap;padding:9px 12px;font-size:13px;flex:none}.brand{min-width:0}.brand span{min-width:0;overflow:hidden}.brand b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.brand small{display:none}}
 </style>
 </head>
 <body>
@@ -480,13 +503,13 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
       <span><b>Jams Docs and Designs</b><small>AV &amp; network documentation</small></span>
     </a>
     <nav class="links" aria-label="Sections">
-      <a href="#deliverables">Drawing set</a>
       <a href="#services">Services</a>
+      <a href="#deliverables">Drawing set</a>
       <a href="#process">How we work</a>
-      <a href="#app" class="navapp">The app</a>
-      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="/app" class="navapp">The app</a>
     </nav>
-    <a class="btn primary" href="#contact">Start a project</a>
+    <a class="btn primary" href="#contact">Request a quote</a>
   </div>
 </header>
 
@@ -496,9 +519,9 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
     <div class="hero-copy">
       <p class="eyebrow"><span class="tag">●</span> AV &amp; network design · drawing sets · on-site support</p>
       <h1><span>Every cable <span class="c1" style="display:inline">drawn.</span></span><span>Every rack <span class="c2" style="display:inline">documented.</span></span><span>Every job <span class="c3" style="display:inline">signed.</span></span></h1>
-      <p class="lead">We walk your site and deliver the complete drawing set your installer builds from: signal flow, rack elevations, floor plans, cable schedules and labels, with the proposal and network documentation to match. Then we stay on for installs and support.</p>
+      <p class="lead"><b class="plainlead">We design, document and support the AV and network systems in offices, conference rooms, classrooms and stores.</b> You get a complete drawing set your installer can build from, a fixed price before work starts, and a team that stays on for installs and on-site support.</p>
       <div class="hero-cta">
-        <a class="btn primary" href="#contact" data-pick="services">Start a project</a>
+        <a class="btn primary" href="#contact" data-pick="services">Request a quote</a>
         <a class="btn" href="#deliverables">See what's in the set</a>
       </div>
       <div class="hero-meta">
@@ -561,24 +584,83 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
         </g>
       </svg>
       <div class="floatcard" aria-hidden="true">
-        <span class="l">BOM · Conf Rm 3B</span>
+        <span class="l">Sample project · Conf Rm 3B</span>
         <b>$20,399</b><span class="ok">● 7 cables scheduled</span>
       </div>
     </figure>
   </div>
 </section>
-
-
-
-
-
-
-
-
+<section class="sec" id="who">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow">Who we work with</p>
+      <h2>For the people who own, install and run the room.</h2>
+      <p class="lead">Whether you're planning a new space, installing one, or taking care of one that's already built, we cover the drawings, the documentation and the support.</p>
+    </div>
+    <div class="who">
+      <a class="whocard rv sv" href="#services"><b>Businesses &amp; IT managers</b><span>Planning new conference rooms, classrooms or a network refresh? We design it, price it and document it so your installer gets it right the first time.</span><i>See our services →</i></a>
+      <a class="whocard rv sn" href="#deliverables"><b>AV &amp; IT contractors</b><span>Need drawings for a job you're installing? We produce the signal flow, rack elevations and cable schedule your crew builds from.</span><i>See what's in a drawing set →</i></a>
+      <a class="whocard rv sa" href="#process"><b>Property &amp; facilities managers</b><span>Inherited a building nobody documented? We walk the site, document what's there, and keep it current under a service contract.</span><i>See how we work →</i></a>
+    </div>
+  </div>
+</section>
+<section class="sec" id="services">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow">Services</p>
+      <h2>Design, documentation and on&#8209;site support.</h2>
+      <p class="lead">For the systems behind the wall, from one room to a whole campus. Drawings, schedules and pricing always agree, because they all come from one model of the room.</p>
+    </div>
+    <div class="svc">
+      <article class="sv rv">
+        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="8" width="14" height="10" rx="2"/><rect x="31" y="8" width="14" height="10" rx="2"/><rect x="17" y="30" width="14" height="10" rx="2"/><path d="M17 13h5v22h-5M31 13h-5v22h5"/></svg>
+        <h3>AV system design</h3>
+        <p>Signal flow for conference rooms, classrooms, lobbies and worship spaces. Gear chosen from real spec sheets, every port and connector accounted for.</p>
+        <p class="plain"><b>What it means for you:</b> A clear plan of every device and connection, so the room works the way you expect on day one.</p>
+        <div class="deliv">Signal flow sheets · device schedule</div>
+      </article>
+      <article class="sn rv">
+        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="10" y="3" width="28" height="42" rx="2"/><path d="M14 10h20M14 16h20M14 22h20M14 28h20M14 34h20M14 40h20"/></svg>
+        <h3>Rack elevations &amp; cable schedules</h3>
+        <p>Front views of the rack, unit by unit, with power, heat and weight totals. A cable schedule with source, destination, type and length for every run.</p>
+        <p class="plain"><b>What it means for you:</b> A picture of exactly what goes in the equipment rack and a list of every cable, so nothing is installed in the wrong place.</p>
+        <div class="deliv">Rack elevations · cable schedule · wire labels</div>
+      </article>
+      <article class="su rv">
+        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="18" y="4" width="12" height="9" rx="1.5"/><rect x="4" y="34" width="12" height="9" rx="1.5"/><rect x="18" y="34" width="12" height="9" rx="1.5"/><rect x="32" y="34" width="12" height="9" rx="1.5"/><path d="M24 13v21M24 24H10v10M24 24h14v10"/></svg>
+        <h3>Network documentation</h3>
+        <p>Every switch, port, VLAN, patch panel and closet on one map. Built for the network engineer who inherits the site next.</p>
+        <p class="plain"><b>What it means for you:</b> A map of your network anyone can follow, so problems get fixed faster and changes don't break things.</p>
+        <div class="deliv">Topology · port map · MDF/IDF binder</div>
+      </article>
+      <article class="sa rv">
+        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 4h20l8 8v32H10z"/><path d="M30 4v8h8M16 22h16M16 28h16M16 34h9"/><path d="M27 38c2-3 4-3 5 0s3 2 4-1"/></svg>
+        <h3>Proposals &amp; BOMs</h3>
+        <p>Priced bills of material grouped by system, with labor. Clients review and sign online, and you can watch when they open it.</p>
+        <p class="plain"><b>What it means for you:</b> One itemized price for equipment and labor that you review and approve online.</p>
+        <div class="deliv">Proposal · BOM · e-signature</div>
+      </article>
+      <article class="sc rv">
+        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="40" height="34" rx="2"/><path d="M4 17h40M14 4v8M34 4v8"/><path d="M10 25h10M10 31h16M24 25h14"/></svg>
+        <h3>Install support</h3>
+        <p>We stay with the job through install: a task list and schedule for the crew, answers on site, and as-built updates when the field changes the plan.</p>
+        <p class="plain"><b>What it means for you:</b> Someone who knows the design is on call while the crew puts it in.</p>
+        <div class="deliv">Task list · schedule · as-builts</div>
+      </article>
+      <article class="sv rv" style="--c:var(--node)">
+        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="14" y="3" width="20" height="42" rx="4"/><path d="M21 39h6"/><path d="M19 20l4 4 7-8"/></svg>
+        <h3>Service contracts &amp; on-site support</h3>
+        <p>Ongoing agreements for on-site support, installs, and moves, adds and changes. Every visit is logged against the drawing, so the next tech knows exactly what was done.</p>
+        <p class="plain"><b>What it means for you:</b> One call for support, moves and new installs, with a record of every visit.</p>
+        <div class="deliv">On-site visits · installs · service history</div>
+      </article>
+    </div>
+  </div>
+</section>
 <section class="sec" id="deliverables">
   <div class="wrap">
     <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-100</span> What you receive</p>
+      <p class="eyebrow">What you receive</p>
       <h2>A drawing set your installer can build from.</h2>
       <p class="lead">Every job ends with a complete, consistent set: a sheet index, title blocks with revision history, and labels you print and stick on both ends of every cable. Nothing is left for the crew to guess.</p>
     </div>
@@ -652,57 +734,10 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
     </div>
   </div>
 </section>
-<section class="sec" id="services">
-  <div class="wrap">
-    <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-200</span> Services</p>
-      <h2>Design, documentation and on&#8209;site support.</h2>
-      <p class="lead">For the systems behind the wall, from one room to a whole campus. Drawings, schedules and pricing always agree, because they all come from one model of the room.</p>
-    </div>
-    <div class="svc">
-      <article class="sv rv">
-        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="8" width="14" height="10" rx="2"/><rect x="31" y="8" width="14" height="10" rx="2"/><rect x="17" y="30" width="14" height="10" rx="2"/><path d="M17 13h5v22h-5M31 13h-5v22h5"/></svg>
-        <h3>AV system design</h3>
-        <p>Signal flow for conference rooms, classrooms, lobbies and worship spaces. Gear chosen from real spec sheets, every port and connector accounted for.</p>
-        <div class="deliv">Signal flow sheets · device schedule</div>
-      </article>
-      <article class="sn rv">
-        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="10" y="3" width="28" height="42" rx="2"/><path d="M14 10h20M14 16h20M14 22h20M14 28h20M14 34h20M14 40h20"/></svg>
-        <h3>Rack elevations &amp; cable schedules</h3>
-        <p>Front elevations to the U with power, heat and weight totals. A cable schedule with source, destination, type and length for every run.</p>
-        <div class="deliv">Rack elevations · cable schedule · wire labels</div>
-      </article>
-      <article class="su rv">
-        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="18" y="4" width="12" height="9" rx="1.5"/><rect x="4" y="34" width="12" height="9" rx="1.5"/><rect x="18" y="34" width="12" height="9" rx="1.5"/><rect x="32" y="34" width="12" height="9" rx="1.5"/><path d="M24 13v21M24 24H10v10M24 24h14v10"/></svg>
-        <h3>Network documentation</h3>
-        <p>Every switch, port, VLAN, patch panel and closet on one map. Built for the network engineer who inherits the site next.</p>
-        <div class="deliv">Topology · port map · MDF/IDF binder</div>
-      </article>
-      <article class="sa rv">
-        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 4h20l8 8v32H10z"/><path d="M30 4v8h8M16 22h16M16 28h16M16 34h9"/><path d="M27 38c2-3 4-3 5 0s3 2 4-1"/></svg>
-        <h3>Proposals &amp; BOMs</h3>
-        <p>Priced bills of material grouped by system, with labor. Clients review and sign online, and you can watch when they open it.</p>
-        <div class="deliv">Proposal · BOM · e-signature</div>
-      </article>
-      <article class="sc rv">
-        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="40" height="34" rx="2"/><path d="M4 17h40M14 4v8M34 4v8"/><path d="M10 25h10M10 31h16M24 25h14"/></svg>
-        <h3>Install support</h3>
-        <p>We stay with the job through install: a task list and schedule for the crew, answers on site, and as-built updates when the field changes the plan.</p>
-        <div class="deliv">Task list · schedule · as-builts</div>
-      </article>
-      <article class="sv rv" style="--c:var(--node)">
-        <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="14" y="3" width="20" height="42" rx="4"/><path d="M21 39h6"/><path d="M19 20l4 4 7-8"/></svg>
-        <h3>Service contracts &amp; on-site support</h3>
-        <p>Ongoing agreements for on-site support, installs, and moves, adds and changes. Every visit is logged against the drawing, so the next tech knows exactly what was done.</p>
-        <div class="deliv">On-site visits · installs · service history</div>
-      </article>
-    </div>
-  </div>
-</section>
 <section class="sec" id="process">
   <div class="wrap">
     <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">S-300</span> How we work</p>
+      <p class="eyebrow">How we work</p>
       <h2>From site walk to signed set.</h2>
       <p class="lead">A clear path for every job, whether it's one conference room or a multi-site rollout.</p>
     </div>
@@ -737,168 +772,41 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
           <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Every visit logged with notes and photos</li>
           <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Drawings kept current as the site changes</li>
         </ul>
-        <a class="btn" href="#contact" data-pick="contract">Ask about a contract</a>
+        <a class="btn" href="#contact" data-pick="contract">Request a quote</a>
       </div>
+    </div>
+  </div>
+</section>
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow">Questions</p>
+      <h2>Common questions.</h2>
+      <p class="lead">Don't see yours? Ask it in the request form below and we'll answer by email.</p>
+    </div>
+    <div class="faq">
+      <details class="rv"><summary>Do you install the equipment, or only do the drawings?</summary><p>Both. We can deliver the drawing set for your own installer, support the crew during the install, or handle installs and on-site work under a service contract.</p></details>
+      <details class="rv"><summary>What do I need to have ready?</summary><p>Whatever you have: floor plans, photos of the space, a list of rooms and what each one needs to do, and any existing equipment. If you have nothing, we start with a site walk.</p></details>
+      <details class="rv"><summary>How long does a drawing set take?</summary><p>It depends on the size of the job. You get a timeline along with your quote, before any work starts.</p></details>
+      <details class="rv"><summary>How is the work priced?</summary><p>Project work gets a fixed price after a short scope call. Service contracts are billed on a regular cycle or as a block of prepaid hours.</p></details>
+      <details class="rv"><summary>Can you document a site that's already built?</summary><p>Yes. We walk the site and produce as-built drawings, rack elevations and network documentation for what's there today.</p></details>
+      <details class="rv"><summary>What do I actually receive?</summary><p>A PDF drawing set with your project's title block, the cable schedule as a spreadsheet (CSV), and print-ready wire labels. Changes after install come as a new revision.</p></details>
+      <details class="rv"><summary>Do I need to use your app?</summary><p>No. Clients receive finished documents. The app is optional, for teams that want to do their own drawings.</p></details>
     </div>
   </div>
 </section>
 <section class="appband" id="app">
   <div class="wrap">
-    <p class="eyebrow"><span class="tag">●</span> Part two · The app</p>
-    <h2>The same app we draw in, for your own team.</h2>
-    <p class="lead">Every drawing set we deliver is built in Jams Docs and Designs. If you'd rather do the work in-house, your team can use it too: design, proposals, projects, service and network documentation in one place.</p>
-    <div class="hero-cta"><a class="btn primary" href="#demo">See how it works</a><a class="btn ghostlight" href="#pricing">View pricing</a></div>
-  </div>
-</section>
-<section class="sec demo" id="demo">
-  <div class="wrap">
-    <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">A-100</span> See it work</p>
-      <h2>Four short clips. One room, start to finish.</h2>
-      <p class="lead">Follow Conference Room 3B from the first device on the sheet to a service call after install. Pick a clip or let them play in order.</p>
-    </div>
-    <div class="player">
-      <div class="screen">
-        <div class="stage" id="stage">
-          <svg id="clipsvg" viewBox="0 0 960 540" role="img" aria-label="Animated walkthrough of the Jams Docs and Designs app"></svg>
-          <button class="bigplay" id="bigplay" type="button" aria-label="Play walkthrough" hidden><svg width="26" height="26" viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 1.5v11l9-5.5z" fill="currentColor"/></svg></button>
-        </div>
-        <div class="ctl">
-          <button class="pbtn" id="pp" type="button" aria-label="Play"></button>
-          <input class="scrub" id="scrub" type="range" min="0" max="1000" value="0" aria-label="Clip position">
-          <span class="tc" id="tc">00:00 / 00:16</span>
-        </div>
-        <p class="caption" id="cap" aria-live="off"></p>
-      </div>
-      <ol class="cliplist" id="cliplist"></ol>
-    </div>
-  </div>
-</section>
-<section class="sec" id="workflow">
-  <div class="wrap">
-    <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">A-200</span> How the app works</p>
-      <h2>Draw it once. Everything else follows.</h2>
-      <p class="lead">Nothing gets retyped. The device you place on the drawing is the line on the proposal, the task on the install board and the asset on the service ticket.</p>
-    </div>
-    <ol class="flow">
-      <span class="pulse" aria-hidden="true"></span>
-      <li class="sv"><span class="num">1</span><div><h3>Design</h3><p>Place gear from the product library and wire it port to port.</p></div></li>
-      <li class="su"><span class="num">2</span><div><h3>BOM</h3><p>Quantities, cables and connectors count themselves from the sheet.</p></div></li>
-      <li class="sn"><span class="num">3</span><div><h3>Proposal</h3><p>Price it, add labor, send it, and get it signed online.</p></div></li>
-      <li class="sc"><span class="num">4</span><div><h3>Project</h3><p>Signed work becomes tasks, a schedule and a budget.</p></div></li>
-      <li class="sa"><span class="num">5</span><div><h3>Service</h3><p>Techs open the as-built on site and log every visit.</p></div></li>
-    </ol>
-  </div>
-</section>
-<section class="sec" id="platform">
-  <div class="wrap">
-    <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">A-300</span> Inside the app</p>
-      <h2>Built by an integrator, for the way integrators work.</h2>
-      <p class="lead">The pieces that usually live in five different tools, in one place that works on a laptop at the office or a phone in the ceiling.</p>
-    </div>
-    <div class="feat">
-      <div class="rv"><b>Product library</b><span>Import manufacturer CSVs and spec sheets. Ports, power and rack units come with every device.</span></div>
-      <div class="rv"><b>AI assistant</b><span>Ask it to find a product, pull specs from the web, or check a design for missing connections.</span></div>
-      <div class="rv"><b>Multi-sheet drawings</b><span>Signal flow, rack elevations, floor plans and cable schedules that stay in sync.</span></div>
-      <div class="rv"><b>Labels &amp; exports</b><span>Wire labels, CSV schedules and PDF drawing sets with your title block.</span></div>
-      <div class="rv"><b>Clients &amp; invoices</b><span>Contacts, sites and billing tied to the projects you run for them.</span></div>
-      <div class="rv"><b>Inventory &amp; registers</b><span>Track spares, repairs and store systems across every location.</span></div>
-      <div class="rv"><b>Field tech view</b><span>A phone-first view of tickets, checklists, photos and voice notes.</span></div>
-      <div class="rv"><b>Saved everywhere</b><span>Your work follows you from the office to the job site on any device.</span></div>
-    </div>
-  </div>
-</section>
-<section class="sec" id="netline">
-  <div class="wrap">
-    <div class="netline rv">
-      <div class="copy">
-        <p class="eyebrow"><span class="tag">●</span> Netline · network documentation</p>
-        <h2>The whole network, on one page you can trust.</h2>
-        <p>Netline is the companion app for network engineers. Document a company's network the way it is actually built: closets, racks, switches, every port and what is plugged into it.</p>
-        <ul>
-          <li>Topology from core to edge, with uplinks and VLANs</li>
-          <li>Port-by-port maps for every switch and patch panel</li>
-          <li>MDF and IDF rack elevations that match the floor</li>
-          <li>A complete binder to hand over, or to come back to</li>
-        </ul>
-      </div>
-      <div class="netfig" aria-label="Animated network topology: core switch linked to three IDF switches serving access points, registers and phones">
-        <svg viewBox="0 0 560 420" preserveAspectRatio="xMidYMid slice" role="img" id="netsvg">
-          <defs><pattern id="ng" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" class="nt-grid"/></pattern></defs>
-          <rect width="560" height="420" fill="url(#ng)"/>
-          <path id="nl1" class="nt-link nt-up" d="M280 92V150H110V214"/>
-          <path id="nl2" class="nt-link nt-up" d="M280 92V214"/>
-          <path id="nl3" class="nt-link nt-up" d="M280 92V150H450V214"/>
-          <path id="nl4" class="nt-link" d="M80 262V320H50V352"/>
-          <path id="nl5" class="nt-link" d="M140 262V320H160V352"/>
-          <path id="nl6" class="nt-link" d="M270 262V352"/>
-          <path id="nl7" class="nt-link" d="M300 262V320H340V352"/>
-          <path id="nl8" class="nt-link" d="M450 262V352"/>
-          <g class="nt-node"><rect x="190" y="44" width="180" height="48" rx="4"/><text x="202" y="64">CORE-01</text><text class="s" x="202" y="80">MDF · 48p 10G · VLAN 10/20/30</text></g>
-          <g class="nt-node"><rect x="40" y="214" width="140" height="48" rx="4"/><text x="52" y="234">IDF-1</text><text class="s" x="52" y="250">Floor 1 · 24p PoE</text></g>
-          <g class="nt-node"><rect x="210" y="214" width="140" height="48" rx="4"/><text x="222" y="234">IDF-2</text><text class="s" x="222" y="250">Floor 2 · 24p PoE</text></g>
-          <g class="nt-node"><rect x="380" y="214" width="140" height="48" rx="4"/><text x="392" y="234">IDF-3</text><text class="s" x="392" y="250">Store · 24p PoE</text></g>
-          <g class="nt-node"><rect x="10" y="352" width="80" height="36" rx="4"/><text x="20" y="374">AP-101</text></g>
-          <g class="nt-node"><rect x="120" y="352" width="80" height="36" rx="4"/><text x="130" y="374">CAM-04</text></g>
-          <g class="nt-node"><rect x="230" y="352" width="80" height="36" rx="4"/><text x="240" y="374">AV-3B</text></g>
-          <g class="nt-node"><rect x="320" y="352" width="80" height="36" rx="4"/><text x="330" y="374">PH-212</text></g>
-          <g class="nt-node"><rect x="410" y="352" width="80" height="36" rx="4"/><text x="420" y="374">REG-07</text></g>
-          <g id="ports"></g>
-          <circle class="nt-pk" r="4"><animateMotion dur="2.2s" repeatCount="indefinite"><mpath href="#nl1"/></animateMotion></circle>
-          <circle class="nt-pk" r="4"><animateMotion dur="1.6s" repeatCount="indefinite" begin=".4s"><mpath href="#nl2"/></animateMotion></circle>
-          <circle class="nt-pk" r="4"><animateMotion dur="2.2s" repeatCount="indefinite" begin=".9s"><mpath href="#nl3"/></animateMotion></circle>
-          <circle class="nt-pk g" r="3.5"><animateMotion dur="1.4s" repeatCount="indefinite" begin=".2s"><mpath href="#nl4"/></animateMotion></circle>
-          <circle class="nt-pk b" r="3.5"><animateMotion dur="1.4s" repeatCount="indefinite" begin=".7s"><mpath href="#nl5"/></animateMotion></circle>
-          <circle class="nt-pk b" r="3.5"><animateMotion dur="1.2s" repeatCount="indefinite" begin="1s"><mpath href="#nl6"/></animateMotion></circle>
-          <circle class="nt-pk g" r="3.5"><animateMotion dur="1.4s" repeatCount="indefinite" begin=".5s"><mpath href="#nl7"/></animateMotion></circle>
-          <circle class="nt-pk g" r="3.5"><animateMotion dur="1.2s" repeatCount="indefinite" begin="1.3s"><mpath href="#nl8"/></animateMotion></circle>
-        </svg>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="sec" id="pricing">
-  <div class="wrap">
-    <div class="sechead">
-      <p class="eyebrow"><span class="sheetno">A-400</span> Pricing</p>
-      <h2>Plans for teams of every size.</h2>
-      <p class="lead">Every plan includes the core documentation tools: sites, devices, racks, cabling, topology, IP and VLANs, circuits, wireless, labels and the document set. Pick a plan for the extras your team needs.</p>
-    </div>
-    <div class="plans">
-      <div class="plan rv">
-        <h3>Starter</h3>
-        <p class="price"><b>$49</b><span>/ month</span></p>
-        <p class="pdesc">For a small team documenting a handful of sites.</p>
-        <p class="plimit">Up to 3 networks · 2 users</p>
-        <ul><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Core documentation</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Floor plans</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Wall jacks &amp; patch paths</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Site inventory</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Field view &amp; QR labels</li></ul>
-        <a class="btn" href="#contact" data-pick="platform">Start with Starter</a>
-      </div>
-      <div class="plan rv featured">
-        <p class="pbadge">Most popular</p><h3>Professional</h3>
-        <p class="price"><b>$149</b><span>/ month</span></p>
-        <p class="pdesc">For integrators running design, service and documentation every week.</p>
-        <p class="plimit">Up to 15 networks · 10 users</p>
-        <ul><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Everything in Starter</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Import from switches</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Lifecycle &amp; maintenance</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Power mapping</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Firewall, VPN, DNS &amp; cloud</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Service desk</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Contacts &amp; runbooks</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Revisions</li></ul>
-        <a class="btn primary" href="#contact" data-pick="platform">Choose Professional</a>
-      </div>
-      <div class="plan rv">
-        <h3>Enterprise</h3>
-        <p class="price"><b>$399</b><span>/ month</span></p>
-        <p class="pdesc">For larger teams and multi-site organizations.</p>
-        <p class="plimit">Unlimited networks · unlimited users</p>
-        <ul><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Everything in Professional</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Time &amp; billing</li><li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9.5l4 4 8-9"/></svg>Client portal for your customers</li></ul>
-        <a class="btn" href="#contact" data-pick="platform">Talk to us</a>
-      </div>
-    </div>
-    <p class="pnote">Prices in US dollars. The app is in early access, so sign up and we'll help you set up and import your product library. Want us to do the drawings instead? Documentation services are <a href="#process">quoted per project</a>.</p>
+    <p class="eyebrow"><span class="tag">●</span> Prefer to do it yourself?</p>
+    <h2>Use JamsNET, the app we draw in.</h2>
+    <p class="lead">Every drawing set we deliver is built in JamsNET. Teams that want to do their own design, proposals, service and network documentation can use it too.</p>
+    <div class="hero-cta"><a class="btn primary" href="/app">See the app</a><a class="btn ghostlight" href="/app#pricing">App pricing</a></div>
   </div>
 </section>
 <section class="sec" id="contact">
   <div class="wrap contact">
     <div class="contact-copy">
-      <p class="eyebrow"><span class="sheetno">S-400</span> Start a project</p>
+      <p class="eyebrow">Request a quote</p>
       <h2>Tell us about the room.</h2>
       <p class="lead">A few details are enough to start. Send the form and we'll reply with questions, a scope and a price.</p>
       <ol class="steps">
@@ -941,7 +849,7 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
 <footer>
   <div class="wrap">
     <a class="brand" href="#top"><img src="data:image/png;base64,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" alt=""><span><b>Jams Docs and Designs</b><small>Drawn · documented · signed</small></span></a>
-    <p><a class="fmail" href="#contact">Start a project</a> · © 2026 Jams Docs and Designs · Example project data shown in demos</p>
+    <p><a class="fmail" href="/#contact">Request a quote</a> · <a class="fmail" href="/app">JamsNET app</a> · © 2026 Jams Docs and Designs · Example project data shown in demos</p>
   </div>
 </footer>
 
@@ -1311,6 +1219,7 @@ const CLIPS=[
 ];
 
 const svg=document.getElementById('clipsvg');
+if(svg){
 const list=document.getElementById('cliplist');
 const pp=document.getElementById('pp'),scrub=document.getElementById('scrub'),tc=document.getElementById('tc'),cap=document.getElementById('cap'),big=document.getElementById('bigplay');
 const P={i:0,t:0,playing:false,upd:null,userPaused:false,last:0};
@@ -1367,13 +1276,16 @@ if('IntersectionObserver' in window){
   })},{threshold:.45}).observe(stageEl);
 }else if(!RM){P.t=0;play(false)}
 
+}
 /* network ports */
 const ports=document.getElementById('ports');
+if(ports){
 [[40,214],[210,214],[380,214]].forEach(([x,y],n)=>{for(let i=0;i<12;i++){const r=el('rect',{x:x+64+(i%6)*12,y:y+30+(i<6?0:8),width:9,height:6,rx:1,class:'nt-port'+(i===0?' up':((i*7+n*3)%5<3?' on':''))},ports);r.dataset.i=i+n*12}});
 for(let i=0;i<24;i++){el('rect',{x:300+(i%12)*5.5,y:i<12?50:57,width:4,height:5,class:'nt-port'+(i<3?' up':((i*5)%4<2?' on':''))},ports)}
 const portEls=[...ports.querySelectorAll('.nt-port.on')];
 if(!RM)setInterval(()=>{const p=portEls[Math.floor(Math.random()*portEls.length)];p.style.opacity='.35';setTimeout(()=>p.style.opacity='',160)},140);
-if(RM){['netsvg'].forEach(id=>{const s=document.getElementById(id);s.pauseAnimations&&s.pauseAnimations()});document.querySelectorAll('.sheetfig svg').forEach(s=>s.pauseAnimations&&s.pauseAnimations())}
+}
+if(RM){['netsvg'].forEach(id=>{const s=document.getElementById(id);s&&s.pauseAnimations&&s.pauseAnimations()});document.querySelectorAll('.sheetfig svg').forEach(s=>s.pauseAnimations&&s.pauseAnimations())}
 
 /* reveal */
 if('IntersectionObserver' in window&&!RM){
@@ -1382,9 +1294,10 @@ if('IntersectionObserver' in window&&!RM){
 }
 
 /* contact */
+{const need=new URLSearchParams(location.search).get('need');const c=need&&document.getElementById({app:'n-app',contract:'n-svc'}[need]||'');if(c)c.checked=true}
 document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{const id={platform:'n-app',contract:'n-svc'}[a.dataset.pick]||'n-av';const c=document.getElementById(id);if(c)c.checked=true}));
-const form=document.getElementById('form');let err=document.getElementById('err');const ORIG=form.innerHTML;
-form.addEventListener('submit',async e=>{
+const form=document.getElementById('form');let err=document.getElementById('err');const ORIG=form?form.innerHTML:'';
+if(form)form.addEventListener('submit',async e=>{
   e.preventDefault();
   const v=id=>(document.getElementById(id)||{value:''}).value.trim();
   const name=v('f-name'),email=v('f-email');
