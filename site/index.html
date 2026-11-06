@@ -492,6 +492,21 @@ footer p{margin:0;font:500 12px var(--f-mono);color:var(--muted);letter-spacing:
 @media (max-width:900px){.who{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion: reduce){.whocard{transition:none}.whocard:hover{transform:none}}
 @media (max-width:560px){header.top .btn{white-space:nowrap;padding:9px 12px;font-size:13px;flex:none}.brand{min-width:0}.brand span{min-width:0;overflow:hidden}.brand b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.brand small{display:none}}
+
+/* tasteskill polish: one screen per section on desktop, no scroll reveal, press feedback */
+:root{--navh:67px}
+.rv.in{animation:none!important}
+.btn:active{transform:translateY(1px)}
+.whocard:hover{transform:translateY(-2px)}
+.dscard:hover .dsthumb{transform:translateY(-2px)}
+@media (min-width:900px) and (min-height:640px){
+  .hero{min-height:calc(100svh - var(--navh));display:flex;align-items:center}
+  .hero>.wrap{width:100%;padding-block:40px}
+  main>.sec{min-height:calc(100svh - var(--navh));box-sizing:border-box}
+}
+.top .links a,.top .btn{white-space:nowrap}
+@media (max-width:1180px){.top .links a{padding:8px 8px}}
+@media (prefers-reduced-motion: reduce){.btn:active{transform:none}}
 </style>
 </head>
 <body>
