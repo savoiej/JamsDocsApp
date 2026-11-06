@@ -1165,6 +1165,35 @@ body{background:var(--bg);font-family:var(--f-ui);-webkit-font-smoothing:antiali
 .tkform .tkckrow input[type=checkbox]{width:auto!important;flex:none;margin:0}
 @media (max-width:640px){.tkctl{width:100%}.tkpanel .tkwho{flex:1}.tkpanel .tkwho select{flex:1}}
 
+/* team week + team settings */
+.twlabel{margin:0;padding:10px 16px 0;font-size:12px;color:var(--muted)}
+.tweek{display:grid;grid-template-columns:180px repeat(7,minmax(0,1fr));min-width:calc(180px + 7 * 118px);width:100%;box-sizing:border-box;padding:10px 16px 16px;gap:0}
+.tweek .twh{font-size:12px;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:1px}
+.tweek .twh b{color:var(--fg);font-weight:600}
+.tweek .twh.today b,.tweek .twh.today{color:var(--accent)}
+.tweek .twh.we,.tweek .twc.we{opacity:.7}
+.tweek .twh.corner{justify-content:flex-end}
+.twp{display:flex;gap:8px;align-items:flex-start;padding:10px 8px;border-bottom:1px solid var(--line);position:sticky;left:0;background:var(--surface);z-index:1}
+.twp span:last-child{display:flex;flex-direction:column;min-width:0}
+.twp b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.twp small{font-size:11px;color:var(--muted)}
+.twc{border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:6px;display:flex;flex-direction:column;gap:4px;min-height:64px;min-width:0}
+.twc.today{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.twc.busy{background:color-mix(in srgb,var(--warn) 9%,transparent)}
+.twt{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:1px;padding:5px 7px;border-radius:5px;background:var(--sunk);border-left:3px solid var(--muted);font-size:12px;min-width:0}
+.twt b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.twt small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.twt.doing{border-left-color:var(--accent)}.twt.blocked{border-left-color:var(--warn)}.twt.over{border-left-color:var(--bad)}
+.twt.urgent b{color:var(--bad)}
+.twt:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+@media (hover:hover) and (pointer:fine){.twt:hover{background:color-mix(in srgb,var(--accent) 10%,var(--sunk))}}
+.tkteamlnk{align-self:flex-start;margin-top:4px;font-size:12px}
+.teamlist{display:flex;flex-direction:column;gap:8px}
+.teamrow,.teamadd{display:grid;grid-template-columns:28px minmax(0,1.3fr) 70px minmax(150px,1.3fr) auto;gap:8px;align-items:end}
+.teamadd{grid-template-columns:minmax(0,1.3fr) 70px minmax(150px,1.3fr) auto;padding-top:10px;border-top:1px solid var(--line)}
+.teamrow .av{margin-bottom:8px}
+@media (max-width:640px){.teamrow{grid-template-columns:28px 1fr 70px}.teamrow .field:nth-of-type(3),.teamrow .btn{grid-column:2 / -1}.teamadd{grid-template-columns:1fr 70px}.teamadd .field:nth-of-type(3),.teamadd .btn{grid-column:1 / -1}}
+
 /* mobile-native: feel like an installed app on phones */
 html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 html,body{overscroll-behavior:none}
@@ -1211,7 +1240,7 @@ button:not(:disabled):active{filter:brightness(.92)}
 const $=(s,r=document)=>r.querySelector(s);
 const LOGO_DEFAULT=(document.querySelector('.brand img')||{getAttribute:()=>''}).getAttribute('src')||'';
 const DEFAULT_SETTINGS={name:'Jams Docs and Designs',tagline:'Design · Integration · Service',address:'Honolulu, Hawaiʻi',phone:'',email:'',website:'',license:'',logo:'',
-  markup:35,laborRate:115,laborPct:18,tax:4.712,internalRate:52,terms:'Net 30',deposit:50,validDays:30,payNote:'Pay by ACH or check. Please include the invoice number with your payment.'};
+  markup:35,laborRate:115,laborPct:18,tax:4.712,internalRate:52,terms:'Net 30',deposit:50,validDays:30,payNote:'Pay by ACH or check. Please include the invoice number with your payment.',team:[]};
 let SETTINGS={...DEFAULT_SETTINGS};
 const firm=()=>String(SETTINGS.name||'').trim()||DEFAULT_SETTINGS.name;
 const logoSrc=()=>SETTINGS.logo||LOGO_DEFAULT;
@@ -1395,7 +1424,18 @@ function tkNorm(t){if(!t)return t;if(!t.sd){const st=+t.start||0,du=Math.max(1,+
   if(!['Low','Normal','High','Urgent'].includes(t.pri))t.pri='Normal';if(!Array.isArray(t.ck))t.ck=[];if(!t.col)t.col='todo';return t}
 function tkNormAll(){(S.tasks||[]).forEach(tkNorm);(PJ.list||[]).forEach(e=>{if(e.id!==PJ.cur&&Array.isArray(e.tasks))e.tasks.forEach(tkNorm)})}
 function tkIni(w){w=String(w||'').trim();if(!w)return '—';return w.length<=3?w.toUpperCase():w.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()}
-function tkPeople(){const set=new Set();PJ.list.forEach(e=>{(e.id===PJ.cur?S.tasks:(e.tasks||[])).forEach(t=>t.who&&set.add(t.who));(e.id===PJ.cur?S.time:(e.time||[])).forEach(t=>t.who&&set.add(t.who))});['DL','KM','AP','JS'].forEach(x=>set.add(x));return [...set].sort()}
+function tkTeam(){return Array.isArray(SETTINGS.team)?SETTINGS.team.filter(m=>m&&m.ini):[]}
+function tkUsed(){const set=new Set();PJ.list.forEach(e=>{(e.id===PJ.cur?S.tasks:(e.tasks||[])).forEach(t=>t.who&&set.add(t.who));(e.id===PJ.cur?S.time:(e.time||[])).forEach(t=>t.who&&set.add(t.who))});return set}
+/* people to pick from: the team in Settings, plus anyone already assigned who isn't on it */
+function tkPeopleFull(){const team=tkTeam(),used=tkUsed(),out=team.map(m=>({ini:m.ini,name:m.name||m.ini,role:m.role||'',team:true}));
+  used.forEach(w=>{if(!out.some(p=>p.ini===w))out.push({ini:w,name:w,role:'',team:false})});
+  if(!out.length)['DL','KM','AP','JS'].forEach(w=>out.push({ini:w,name:w,role:'',team:false}));return out}
+function tkPeople(){return tkPeopleFull().map(p=>p.ini)}
+function tkName(w){const m=tkTeam().find(x=>x.ini===w);return m?(m.name||w):(w||'')}
+function tkPeopleOpts(sel,blank){const ps=tkPeopleFull(),team=ps.filter(p=>p.team),other=ps.filter(p=>!p.team);
+  const o=p=>`<option value="${esc(p.ini)}" ${p.ini===sel?'selected':''}>${esc(p.name===p.ini?p.ini:p.name+' ('+p.ini+')')}</option>`;
+  return (blank!=null?`<option value="">${esc(blank)}</option>`:'')+(team.length?team.map(o).join('')+(other.length?`<optgroup label="${tkTeam().length?'Not on your team':'Assigned before'}">${other.map(o).join('')}</optgroup>`:''):other.map(o).join(''))}
+function tkFitTeam(arr){const team=tkTeam();if(!team.length)return;arr.forEach(t=>{if(t.who&&!team.some(m=>m.ini===t.who))t.who=''})}
 function tkPriIx(t){return ['Low','Normal','High','Urgent'].indexOf(t.pri)}
 function tkOver(t){return t.col!=='done'&&t.dd<tkIso(0)}
 function tkSetCol(t,col){t.col=col;if(col!=='blocked')delete t.note;else t.note=t.note||'';if(col==='done')t.doneAt=Date.now();else delete t.doneAt;saveProjects();R.projects()}
@@ -1422,7 +1462,7 @@ function createProject(f){
   const e={id:'pj'+Date.now().toString(36),job:nextJob(),site:f.site,created:dayFmt(0)};
   const no=nextNo();PJ.list.push(e);PJ.cur=e.id;
   S.prop={no,client:f.client,project:f.project,markup:+f.markup,laborMethod:base.laborMethod,laborRate:+f.rate,laborPct:base.laborPct,tax:+f.tax,status:'Draft',log:[],signedTotal:null,signer:null,link:null};
-  S.tasks=f.tasks?(f.taskList||STD_TASKS).map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})})):[];S.tasks.forEach(tkNorm);
+  S.tasks=f.tasks?(f.taskList||STD_TASKS).map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})})):[];S.tasks.forEach(tkNorm);tkFitTeam(S.tasks);
   S.time=[];S.photos=[];
   if(src){S.design=src;uidc=srcU;S.design.cables.forEach(c=>{delete c.status;delete c.note});S.design.plan.room.name=f.project}
   else{S.design=JSON.parse(JSON.stringify(S.design));loadTemplate(f.start);const r=S.design.racks[0];if(r&&+f.rack>r.size){r.size=+f.rack;if(f.start!=='blank')autoArrange(r)}if(f.start==='blank'&&r)r.name='Equipment rack'}
@@ -3801,7 +3841,7 @@ R.projects=function(){
   <header class="vh"><div><p class="eyebrow">${esc(cliName(S.prop))} · Job ${esc(curPj().job)}${curPj().site?' · '+esc(curPj().site):''} ${(S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).some(k=>k==='proposal'||k==='design')?' · '+chip(S.prop.status==='Signed'?'Signed':'Awaiting signature'):''}</p><h1>${esc(S.prop.project)}</h1></div>
    <div class="actions"><select class="inp" id="pjSel2" aria-label="Open project" style="width:auto">${projOptions()}</select><button class="btn" data-act="newProject">+ New project</button>
    ${S.tasks.length||!pjTaskList(S.prop.ptype||'av').length?'':'<button class="btn" data-act="addStdTasks">Add standard tasks</button>'}
-   <div class="seg" role="group" aria-label="Task view"><button data-pm="kanban" aria-pressed="${S.projMode==='kanban'}">Board</button><button data-pm="list" aria-pressed="${S.projMode==='list'}">List</button><button data-pm="gantt" aria-pressed="${S.projMode==='gantt'}">Timeline</button></div></div></header>
+   <div class="seg" role="group" aria-label="Task view"><button data-pm="kanban" aria-pressed="${S.projMode==='kanban'}">Board</button><button data-pm="list" aria-pressed="${S.projMode==='list'}">List</button><button data-pm="gantt" aria-pressed="${S.projMode==='gantt'}">Timeline</button><button data-pm="week" aria-pressed="${S.projMode==='week'}">Team week</button></div></div></header>
   ${pjDetailsHTML()}
   ${(S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).some(k=>k==='proposal'||k==='design')?`  <div class="panel cost">
    <div><div class="l">Contract value</div><div class="v">${money(contract)}</div><div class="muted" style="font-size:12px">From proposal, before tax</div></div>
@@ -3815,7 +3855,7 @@ R.projects=function(){
     <label class="field" for="tTask">Task<select id="tTask">${S.tasks.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join('')}</select></label>
     <label class="field" for="tType">Labor type<select id="tType"><option>Install</option><option>Programming</option><option>Site visit</option><option>Commute</option><option>Office</option></select></label>
     <label class="field" for="tHrs" style="flex:0 1 110px">Hours<input id="tHrs" type="number" min="0.25" step="0.25" value="2"></label>
-    <label class="field" for="tWho" style="flex:0 1 110px">Tech<select id="tWho"><option>DL</option><option>KM</option><option>AP</option><option>JS</option></select></label>
+    <label class="field" for="tWho" style="flex:0 1 180px">Tech<select id="tWho">${tkPeopleOpts(S.ui.tkWho||tkPeople()[0])}</select></label>
     <button class="btn primary" data-act="logTime">Add entry</button></div>
    <div class="scroll"><table class="t"><thead><tr><th>Tech</th><th>Task</th><th>Type</th><th class="n">Hours</th></tr></thead><tbody>
     ${S.time.slice().reverse().slice(0,6).map(t=>`<tr><td><span class="av">${esc(t.who)}</span></td><td>${esc(S.tasks.find(x=>x.id===t.task)?.title)}</td><td class="muted">${esc(t.type)}</td><td class="n">${t.hrs}</td></tr>`).join('')}</tbody></table></div>
@@ -3825,18 +3865,19 @@ R.projects=function(){
 
 /* ---------- task manager views ---------- */
 function tkRenderBody(){const b=$('#pmBody');if(!b)return;
+  if(S.projMode==='week'){b.innerHTML=tkWeek();return}
   const who=S.ui.tkWho||'',today=tkIso(0),wk=tkIso(7),all=S.tasks,list=all.filter(t=>!who||t.who===who);
   const open=all.filter(t=>t.col!=='done'),over=open.filter(t=>t.dd<today),soon=open.filter(t=>t.dd>=today&&t.dd<=wk),people=tkPeople();
   const bar=`<div class="tkbar"><div class="tkstats"><span><b>${open.length}</b>open</span><span class="${over.length?'bad':''}"><b>${over.length}</b>overdue</span><span><b>${soon.length}</b>due in 7 days</span><span><b>${all.length-open.length}</b>done</span></div>
-   <div class="tkctl"><label class="field tkwho" for="tkWho">Assigned to<select id="tkWho" class="inp"><option value="">Everyone</option>${people.map(p=>`<option ${p===who?'selected':''}>${esc(p)}</option>`).join('')}</select></label><button class="btn primary" data-act="taskNew">+ New task</button></div></div>`;
+   <div class="tkctl"><label class="field tkwho" for="tkWho">Assigned to<select id="tkWho" class="inp">${tkPeopleOpts(who,'Everyone')}</select></label><button class="btn primary" data-act="taskNew">+ New task</button></div></div>`;
   if(!all.length){b.innerHTML=`<div class="panel tkpanel">${bar}<div class="pb"><p class="muted" style="margin:0">No tasks yet. Add one, or start from the standard task list for this project type.</p></div></div>`;return}
   const body=S.projMode==='list'?tkList(list):S.projMode==='gantt'?tkTimeline(list):tkBoard(list);
-  b.innerHTML=`<div class="panel tkpanel">${bar}${list.length?body:`<div class="pb"><p class="muted" style="margin:0">Nothing assigned to ${esc(who)}.</p></div>`}</div>`}
+  b.innerHTML=`<div class="panel tkpanel">${bar}${list.length?body:`<div class="pb"><p class="muted" style="margin:0">Nothing assigned to ${esc(tkName(who))}.</p></div>`}</div>`}
 function tkCard(t,ci){const ov=tkOver(t),cd=t.ck.filter(c=>c.done).length;
   return `<div class="card tcard${t.col==='blocked'?' blocked':''}${ov?' over':''}" draggable="true" data-tid="${esc(t.id)}">
    <b class="tkopen" role="button" tabindex="0" data-act="taskEdit" data-id="${esc(t.id)}">${esc(t.title)}</b>
    ${t.col==='blocked'&&t.note?`<span class="muted" style="font-size:12px">${esc(t.note)}</span>`:''}
-   <div class="meta"><span class="av" title="${esc(t.who||'Unassigned')}">${esc(tkIni(t.who))}</span><span class="tkdue${ov?' over':''}">${ov?'Overdue · ':'Due '}${tkDate(t.dd)}</span>${t.pri!=='Normal'?`<span class="tkpri ${t.pri.toLowerCase()}">${t.pri}</span>`:''}${t.ck.length?`<span class="tkck">✓ ${cd}/${t.ck.length}</span>`:''}</div>
+   <div class="meta"><span class="av" title="${esc(tkName(t.who)||'Unassigned')}">${esc(tkIni(t.who))}</span><span class="tkdue${ov?' over':''}">${ov?'Overdue · ':'Due '}${tkDate(t.dd)}</span>${t.pri!=='Normal'?`<span class="tkpri ${t.pri.toLowerCase()}">${t.pri}</span>`:''}${t.ck.length?`<span class="tkck">✓ ${cd}/${t.ck.length}</span>`:''}</div>
    ${t.ev?`<span class="muted" style="font-size:12px">${esc(t.ev)}</span>`:''}
    <div class="mv"><button class="btn sm" data-act="mvTask" data-id="${esc(t.id)}" data-d="-1" ${ci===0?'disabled':''} aria-label="Move left">←</button><button class="btn sm" data-act="mvTask" data-id="${esc(t.id)}" data-d="1" ${ci===COLS.length-1?'disabled':''} aria-label="Move right">→</button></div></div>`}
 function tkBoard(list){return `<div class="kan">${COLS.map(([k,l],ci)=>{const ts=list.filter(t=>t.col===k).sort((a,b)=>tkPriIx(b)-tkPriIx(a)||a.dd.localeCompare(b.dd));
@@ -3845,7 +3886,7 @@ function tkList(list){const rows=list.slice().sort((a,b)=>(a.col==='done')-(b.co
   return `<div class="scroll tkwrap"><table class="t tklist"><thead><tr><th aria-label="Done"></th><th>Task</th><th>Assigned</th><th>Priority</th><th>Start</th><th>Due</th><th>Status</th></tr></thead><tbody>
    ${rows.map(t=>{const ov=tkOver(t),cd=t.ck.filter(c=>c.done).length;return `<tr class="${t.col==='done'?'tkdone':''}"><td><input type="checkbox" data-tkdone="${esc(t.id)}" ${t.col==='done'?'checked':''} aria-label="Mark ${esc(t.title)} done"></td>
     <td><button class="tkttl" data-act="taskEdit" data-id="${esc(t.id)}">${esc(t.title)}</button>${t.ck.length?` <span class="tkck">✓ ${cd}/${t.ck.length}</span>`:''}${t.col==='blocked'&&t.note?`<br><span class="muted" style="font-size:12px">${esc(t.note)}</span>`:''}</td>
-    <td><span class="tkwhoc"><span class="av">${esc(tkIni(t.who))}</span>${esc(t.who&&t.who.length>3?t.who:'')}</span></td><td><span class="tkpri ${t.pri.toLowerCase()}">${t.pri}</span></td>
+    <td><span class="tkwhoc"><span class="av">${esc(tkIni(t.who))}</span>${esc(tkName(t.who)!==t.who?tkName(t.who):(t.who&&t.who.length>3?t.who:''))}</span></td><td><span class="tkpri ${t.pri.toLowerCase()}">${t.pri}</span></td>
     <td>${tkDate(t.sd)}</td><td class="${ov?'tkdue over':''}">${tkDate(t.dd)}</td>
     <td><select class="inp tksel" data-tkcol="${esc(t.id)}" aria-label="Status of ${esc(t.title)}">${COLS.map(([k,l])=>`<option value="${k}" ${k===t.col?'selected':''}>${l}</option>`).join('')}</select></td></tr>`}).join('')}</tbody></table></div>`}
 function tkTimeline(list){const DW=36,ts=list.slice().sort((a,b)=>a.sd.localeCompare(b.sd));
@@ -3853,20 +3894,20 @@ function tkTimeline(list){const DW=36,ts=list.slice().sort((a,b)=>a.sd.localeCom
   let g=`<div class="gantt" style="grid-template-columns:200px repeat(${days},${DW}px)"><div class="gl" style="font-weight:600">Task</div>`;
   for(let d=lo;d<=hi;d++){const dt=new Date();dt.setDate(dt.getDate()+d);const we=dt.getDay()===0||dt.getDay()===6;
     g+=`<div class="gd${d===0?' today':''}${we?' we':''}">${dt.getDate()===1||d===lo?dt.toLocaleDateString('en-US',{month:'short'}):dt.toLocaleDateString('en-US',{weekday:'short'}).slice(0,2)}<br>${dt.getDate()}</div>`}
-  ts.forEach(t=>{const ov=tkOver(t);g+=`<div class="gl"><button class="tkopen" data-act="taskEdit" data-id="${esc(t.id)}" title="${esc(t.title)}">${esc(t.title)}</button></div><div class="gc" style="grid-column:span ${days}"><div class="gnow" style="left:${(0-lo)*DW+17}px"></div><div class="gbar ${t.col}${ov?' over':''}" data-tid="${esc(t.id)}" style="left:${(t.start-lo)*DW+3}px;width:${t.dur*DW-6}px" title="${esc(t.title)} · ${tkDate(t.sd)} – ${tkDate(t.dd)}${t.who?' · '+esc(t.who):''}"><i class="gh" aria-hidden="true"></i></div></div>`});
+  ts.forEach(t=>{const ov=tkOver(t);g+=`<div class="gl"><button class="tkopen" data-act="taskEdit" data-id="${esc(t.id)}" title="${esc(t.title)}">${esc(t.title)}</button></div><div class="gc" style="grid-column:span ${days}"><div class="gnow" style="left:${(0-lo)*DW+17}px"></div><div class="gbar ${t.col}${ov?' over':''}" data-tid="${esc(t.id)}" style="left:${(t.start-lo)*DW+3}px;width:${t.dur*DW-6}px" title="${esc(t.title)} · ${tkDate(t.sd)} – ${tkDate(t.dd)}${t.who?' · '+esc(tkName(t.who)):''}"><i class="gh" aria-hidden="true"></i></div></div>`});
   return `<div class="scroll tkwrap">${g}</div></div><p class="muted tkhint">Drag a bar to move the task, or drag its right edge to change the due date. Click it to edit.</p>`}
 function tkCkHTML(){const ck=(S.tkf&&S.tkf.ck)||[];return ck.length?ck.map((c,i)=>`<div class="tkckrow"><label><input type="checkbox" data-tkck="${i}" ${c.done?'checked':''}> <span>${esc(c.t)}</span></label><button class="lnk" data-act="taskCkDel" data-i="${i}" aria-label="Remove ${esc(c.t)}">Remove</button></div>`).join(''):'<p class="muted" style="margin:0;font-size:13px">No checklist items.</p>'}
-function tkOpen(id,col){const t=id?S.tasks.find(x=>x.id===id):null;if(id&&!t)return;
+function tkOpen(id,col,pid){const pe=pjById(pid||PJ.cur)||curPj(),arr=pjTasks(pe),t=id?arr.find(x=>x.id===id):null;if(id&&!t)return;if(t)tkNorm(t);
   const d=t?JSON.parse(JSON.stringify(t)):{id:null,title:'',who:S.ui.tkWho||'',col:col||'todo',sd:tkIso(0),dd:tkIso(0),pri:'Normal',ev:'',desc:'',note:'',ck:[]};
-  S.tkf=d;S.tkDel=false;const ov=$('#overlay'),hrs=t?S.time.filter(x=>x.task===t.id).reduce((a,x)=>a+(+x.hrs||0),0):0;
+  d.pid=pe.id;S.tkf=d;S.tkDel=false;const ov=$('#overlay'),hrs=t?pjTimeArr(pe).filter(x=>x.task===t.id).reduce((a,x)=>a+(+x.hrs||0),0):0;
   ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="tkH">
-   <div class="dlgtop"><span>${t?'TASK':'NEW TASK'} · ${esc(S.prop.project||'')}</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
+   <div class="dlgtop"><span>${t?'TASK':'NEW TASK'} · ${esc(pjProp(pe).project||'')}</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
    <div class="bform tkform">
     <h2 id="tkH" style="margin:0;font-family:var(--f-display);font-size:24px">${t?'Edit task':'New task'}</h2>
     <label class="field" for="tkT">Task<input id="tkT" class="inp" value="${esc(d.title)}" placeholder="Pull Cat6 to Conf Rm 3B" maxlength="140"></label>
     <div class="row2"><label class="field" for="tkS">Status<select id="tkS" class="inp">${COLS.map(([k,l])=>`<option value="${k}" ${k===d.col?'selected':''}>${l}</option>`).join('')}</select></label>
      <label class="field" for="tkP">Priority<select id="tkP" class="inp">${['Low','Normal','High','Urgent'].map(p=>`<option ${p===d.pri?'selected':''}>${p}</option>`).join('')}</select></label></div>
-    <div class="row2"><label class="field" for="tkA">Assigned to<input id="tkA" class="inp" list="tkPeople" value="${esc(d.who||'')}" placeholder="Initials or name" autocomplete="off"><datalist id="tkPeople">${tkPeople().map(p=>`<option value="${esc(p)}">`).join('')}</datalist></label>
+    <div class="row2"><label class="field" for="tkA">Assigned to<select id="tkA" class="inp">${tkPeopleOpts(d.who||'','Unassigned')}</select><button class="lnk tkteamlnk" data-act="taskTeam">Edit team</button></label>
      <label class="field" for="tkE">Calendar note<input id="tkE" class="inp" value="${esc(d.ev||'')}" placeholder="Install day, 8:00 AM"></label></div>
     <div class="row2"><label class="field" for="tkSd">Start<input id="tkSd" type="date" class="inp" value="${d.sd}"></label><label class="field" for="tkDd">Due<input id="tkDd" type="date" class="inp" value="${d.dd}"></label></div>
     <label class="field" for="tkN" id="tkNw" style="${d.col==='blocked'?'':'display:none'}">What’s blocking it<input id="tkN" class="inp" value="${esc(d.note||'')}" placeholder="Waiting on electrical rough-in"></label>
@@ -3894,6 +3935,40 @@ document.addEventListener('drop',e=>{const col=e.target.closest&&e.target.closes
   const t=S.tasks.find(x=>x.id===id);if(t&&t.col!==col.dataset.tcol)tkSetCol(t,col.dataset.tcol);else tkRenderBody()});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='tkCkNew'){e.preventDefault();A.taskCkAdd();return}
   if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.matches&&e.target.matches('.tkopen[role="button"]')){e.preventDefault();e.target.click()}});
+
+/* ---------- Team week: every person's tasks across all projects ---------- */
+function tkWeekStart(off){const d=new Date();d.setHours(12,0,0,0);const dow=(d.getDay()+6)%7;d.setDate(d.getDate()-dow+7*(off||0));return d.toISOString().slice(0,10)}
+function tkWeek(){const off=S.ui.tkWk||0,ws=tkWeekStart(off),days=[...Array(7)].map((_,i)=>tkShift(ws,i)),we=days[6],today=tkIso(0);
+  const items=[];PJ.list.forEach(e=>{const P=pjProp(e);pjTasks(e).forEach(t=>{tkNorm(t);if(t.col==='done')return;if(t.dd<ws||t.sd>we)return;items.push({t,e,P})})});
+  const over=[];PJ.list.forEach(e=>pjTasks(e).forEach(t=>{if(tkOver(t))over.push(t)}));
+  const ppl=tkPeopleFull().filter(p=>p.team||items.some(x=>x.t.who===p.ini));if(items.some(x=>!x.t.who))ppl.push({ini:'',name:'Unassigned',team:false});
+  const head=days.map(d=>{const dt=new Date(d+'T12:00:00');return `<div class="twh${d===today?' today':''}${dt.getDay()===0||dt.getDay()===6?' we':''}"><b>${dt.toLocaleDateString('en-US',{weekday:'short'})}</b><span>${dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span></div>`}).join('');
+  const rows=ppl.map(p=>{const mine=items.filter(x=>(x.t.who||'')===p.ini);const load=days.map(d=>mine.filter(x=>x.t.sd<=d&&x.t.dd>=d));
+    return `<div class="twp"><span class="av">${esc(p.ini?tkIni(p.ini):'—')}</span><span><b>${esc(p.name)}</b>${p.role?`<small>${esc(p.role)}</small>`:''}<small>${mine.length} task${mine.length===1?'':'s'}</small></span></div>`+
+     load.map((L,i)=>`<div class="twc${days[i]===today?' today':''}${L.length>2?' busy':''}">${L.map(({t,e,P})=>`<button class="twt ${t.col}${tkOver(t)?' over':''} ${t.pri.toLowerCase()}" data-act="taskEdit" data-id="${esc(t.id)}" data-pid="${esc(e.id)}" title="${esc(t.title)} · ${esc(P.project||'')} · ${tkDate(t.sd)} – ${tkDate(t.dd)}"><b>${esc(t.title)}</b><small>${esc(P.project||'Project')}${e.job?' · '+esc(e.job):''}</small></button>`).join('')}</div>`).join('')}).join('');
+  const label=`${new Date(ws+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${new Date(we+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+  return `<div class="panel tkpanel"><div class="tkbar"><div class="tkstats"><span><b>${items.length}</b>scheduled this week</span><span><b>${PJ.list.length}</b>projects</span><span class="${over.length?'bad':''}"><b>${over.length}</b>overdue overall</span></div>
+   <div class="tkctl"><div class="seg" role="group" aria-label="Week"><button data-act="taskWk" data-d="-1" aria-label="Previous week">←</button><button data-act="taskWk" data-d="0" aria-pressed="${off===0}">This week</button><button data-act="taskWk" data-d="1" aria-label="Next week">→</button></div><button class="btn" data-act="taskTeam">Edit team</button></div></div>
+   <p class="twlabel">Week of ${label} · all projects · done tasks hidden</p>
+   ${ppl.length?`<div class="scroll tkwrap"><div class="tweek"><div class="twh corner">Person</div>${head}${rows}</div></div>`:`<div class="pb"><p class="muted" style="margin:0">Add your team in Settings to see everyone’s week.</p></div>`}</div>`}
+/* ---------- team list in Settings ---------- */
+const TEAM_ROLES=['Technician','Lead technician','Project manager','Designer','Programmer','Office','Subcontractor'];
+function teamIni(name){return String(name||'').trim().split(/\s+/).filter(Boolean).map(w=>w[0]).join('').slice(0,3).toUpperCase()}
+function teamPanelHTML(){const team=tkTeam();
+  return `<div class="panel" id="teamPanel"><div class="ph"><h2>Team</h2><span class="muted" style="font-size:12px">${team.length} ${team.length===1?'person':'people'}</span></div><div class="fields">
+   <p class="note" style="margin:0">The people you assign tasks and time to. Initials show on task cards, the timeline and time entries.</p>
+   ${team.length?`<div class="teamlist">${team.map((m,i)=>`<div class="teamrow"><span class="av">${esc(m.ini)}</span>
+     <label class="field" for="tm-n${i}">Name<input id="tm-n${i}" class="inp" data-team="${i}" data-tk="name" value="${esc(m.name||'')}" autocomplete="off"></label>
+     <label class="field tmini" for="tm-i${i}">Initials<input id="tm-i${i}" class="inp" data-team="${i}" data-tk="ini" value="${esc(m.ini)}" maxlength="3" autocomplete="off"></label>
+     <label class="field" for="tm-r${i}">Role<select id="tm-r${i}" class="inp" data-team="${i}" data-tk="role">${TEAM_ROLES.map(r=>`<option ${r===m.role?'selected':''}>${r}</option>`).join('')}</select></label>
+     <button class="btn sm" data-act="teamDel" data-i="${i}" aria-label="Remove ${esc(m.name||m.ini)}">Remove</button></div>`).join('')}</div>`:'<p class="muted" style="margin:0;font-size:13px">No one yet. Until you add people, tasks use the sample initials DL, KM, AP and JS.</p>'}
+   <div class="teamadd"><label class="field" for="tmName">Add a person<input id="tmName" class="inp" placeholder="Full name" autocomplete="off"></label>
+    <label class="field tmini" for="tmIni">Initials<input id="tmIni" class="inp" placeholder="Auto" maxlength="3" autocomplete="off"></label>
+    <label class="field" for="tmRole">Role<select id="tmRole" class="inp">${TEAM_ROLES.map(r=>`<option>${r}</option>`).join('')}</select></label>
+    <button class="btn primary" data-act="teamAdd">Add</button></div>
+   ${tkTeam().length?'':(()=>{const used=[...tkUsed()].filter(w=>w&&w.length<=3);return used.length?`<p class="note" style="margin:0">Tasks are already assigned to ${used.map(esc).join(', ')}. Add a person with the same initials and those tasks become theirs.</p>`:''})()}
+  </div></div>`}
+let teamRQ=0;function teamRefresh(){if(teamRQ)return;teamRQ=setTimeout(()=>{teamRQ=0;const p=$('#teamPanel');if(p&&p.isConnected)p.outerHTML=teamPanelHTML()},0)}
 
 /* ================= CLIENTS (CRM) ================= */
 const CKEY='rackline-clients-v1';
@@ -4445,8 +4520,18 @@ function pjDetailsHTML(){const P=S.prop,B=P.billing||{},ty=pjTypeOf(P.ptype||'av
    <div class="actions"><button class="btn sm" data-act="editProjectDetails">Edit details</button>${(P.services||ty.svc).includes('design')?'<button class="btn sm" data-go="design">Drawings</button>':''}${(P.services||ty.svc).some(k=>k==='proposal'||k==='design')?'<button class="btn sm" data-go="proposal">Proposal</button>':''}<button class="btn sm" data-go="billing">Time &amp; invoicing</button>${(P.services||ty.svc).some(k=>k==='netdoc'||k==='network')?'<button class="btn sm" data-nlgo="overview">Network docs</button>':''}</div></div>`}
 function closeOverlay(){const ov=$('#overlay');ov.hidden=true;ov.innerHTML='';if(S.bld&&!S.bld.saved&&(S.bld.up||[]).length){const ups=S.bld.up.map(a=>({asset:a}));S.bld=null;dropAssets(ups)}S.bld=null;S.iv=null;if(S.rg){S.rg=null;if(S.view==='registers')R.registers()}if(S.iv2){S.iv2=null;if(S.view==='inventory')R.inventory()}if(S.tk){stopDictation();S.tk=null;if(S.view==='service')R.service()}if(S.view==='proposal')propParts()}
 const A={
+  taskWk(el){const d=+el.dataset.d;S.ui.tkWk=d===0?0:(S.ui.tkWk||0)+d;tkRenderBody()},
+  taskTeam(){if(S.tkf)closeOverlay();S.tkf=null;go('settings');setTimeout(()=>{const p=$('#teamPanel');if(p){p.scrollIntoView({block:'start'});const i=$('#tmName');if(i)i.focus({preventScroll:true})}},60)},
+  teamAdd(){const name=($('#tmName').value||'').trim();let ini=(($('#tmIni').value||'').trim()||teamIni(name)).toUpperCase();
+    if(!name){toast('Enter the person’s name.');$('#tmName').focus();return}
+    if(!/^[A-Z0-9]{1,3}$/.test(ini)){toast('Initials are 1 to 3 letters.');$('#tmIni').focus();return}
+    const team=tkTeam();if(team.some(m=>m.ini===ini)){toast(`${ini} is already on your team. Use different initials.`);$('#tmIni').focus();return}
+    SETTINGS.team=[...team,{id:'tm'+Date.now().toString(36),name,ini,role:$('#tmRole').value}];saveSettings();teamRefresh();toast(`${name} (${ini}) added to your team.`);setTimeout(()=>{const i=$('#tmName');if(i)i.focus()},20)},
+  teamDel(el){const team=tkTeam(),m=team[+el.dataset.i];if(!m)return;
+    if(el.dataset.sure!=='1'){el.dataset.sure='1';el.textContent='Click again';el.classList.add('danger');return}
+    SETTINGS.team=team.filter((_,i)=>i!==+el.dataset.i);saveSettings();teamRefresh();toast(`${m.name||m.ini} removed. Their tasks keep the initials ${m.ini}.`)},
   taskNew(el){tkOpen(null,el&&el.dataset.col)},
-  taskEdit(el){tkOpen(el.dataset.id)},
+  taskEdit(el){tkOpen(el.dataset.id,null,el.dataset.pid)},
   taskCkAdd(){const i=$('#tkCkNew');if(!i||!S.tkf)return;const v=i.value.trim();if(!v)return;S.tkf.ck.push({id:'c'+Date.now().toString(36),t:v,done:false});i.value='';$('#tkCk').innerHTML=tkCkHTML();i.focus()},
   taskCkDel(el){if(!S.tkf)return;S.tkf.ck.splice(+el.dataset.i,1);$('#tkCk').innerHTML=tkCkHTML()},
   taskSave(){const f=S.tkf;if(!f)return;const v=id=>($('#'+id).value||'').trim(),title=v('tkT');if(!title){toast('Give the task a name.');$('#tkT').focus();return}
@@ -4454,13 +4539,13 @@ const A={
     const pending=v('tkCkNew');if(pending)f.ck.push({id:'c'+Date.now().toString(36),t:pending,done:false});
     const col=$('#tkS').value,o={title,who:v('tkA'),col,pri:$('#tkP').value,sd,dd,ev:v('tkE'),desc:v('tkD'),ck:f.ck};
     if(col==='blocked')o.note=v('tkN');
-    let t=f.id?S.tasks.find(x=>x.id===f.id):null;const isNew=!t;
+    const pe=pjById(f.pid)||curPj();if(pe.id!==PJ.cur&&!Array.isArray(pe.tasks))pe.tasks=[];const arr=pjTasks(pe);let t=f.id?arr.find(x=>x.id===f.id):null;const isNew=!t;
     if(!o.ev)delete o.ev;
     if(t){const was=t.col;Object.assign(t,o);if(!o.ev)delete t.ev;if(col!=='blocked')delete t.note;if(col==='done'&&was!=='done')t.doneAt=Date.now();if(col!=='done')delete t.doneAt}
-    else{t={id:'k'+Date.now().toString(36),created:Date.now(),...o};if(col==='done')t.doneAt=Date.now();S.tasks.push(t)}
+    else{t={id:'k'+Date.now().toString(36),created:Date.now(),...o};if(col==='done')t.doneAt=Date.now();arr.push(t)}
     tkNorm(t);saveProjects();S.tkf=null;closeOverlay();R.projects();toast(isNew?`Added “${title}”.`:`Saved “${title}”.`)},
   taskDelete(el){const f=S.tkf;if(!f||!f.id)return;if(!S.tkDel){S.tkDel=true;el.textContent='Click again to delete';el.classList.add('danger');return}
-    const t=S.tasks.find(x=>x.id===f.id);S.tasks=S.tasks.filter(x=>x.id!==f.id);saveProjects();S.tkf=null;closeOverlay();R.projects();toast(`Deleted “${t?t.title:'task'}”.`)},
+    const pe=pjById(f.pid)||curPj(),arr=pjTasks(pe),t=arr.find(x=>x.id===f.id),i=arr.indexOf(t);if(i>=0)arr.splice(i,1);saveProjects();S.tkf=null;closeOverlay();R.projects();toast(`Deleted “${t?t.title:'task'}”.`)},
   loadTpl(){const v=$('#tplSel').value;mut(()=>loadTemplate(v));cams.flow.init=false;cams.rack.init=false;cams.plan.init=false;refreshDesign();requestAnimationFrame(()=>{fit(v==='blank');cam.init=true});toast(v==='blank'?'Blank drawing set. Your previous drawings are one undo away.':'Template loaded on both sheets. Undo brings back your previous drawings.')},
   addNode(el){const c=viewCenter();placeNode(el.dataset.pid,c.x-W/2,c.y-40)},
   delSel(){deleteSel()},dupSel(){duplicateSel()},
@@ -4636,7 +4721,7 @@ const A={
     const cl=ensureClient(client);S.prop.client=cl.name;S.prop.project=project;curPj().site=v('npS');Object.assign(S.prop,extra);if(!extra.billRate)delete S.prop.billRate;
     saveProjects();closeOverlay();renderProjSwitch();if(S.view==='projects')R.projects();toast('Project details saved.')},
   openProject(el){const id=el.dataset.id,to=el.dataset.to;if(id!==PJ.cur){switchProject(id);toast(`Opened ${S.prop.project} for ${S.prop.client}.`)}go(to||S.view)},
-  addStdTasks(){S.tasks=pjTaskList(S.prop.ptype||'av').map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})}));S.tasks.forEach(tkNorm);saveProjects();R.projects();toast('Added the standard install tasks.')},
+  addStdTasks(){S.tasks=pjTaskList(S.prop.ptype||'av').map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})}));S.tasks.forEach(tkNorm);tkFitTeam(S.tasks);saveProjects();R.projects();toast('Added the standard install tasks.')},
   newBlockLib(){openBuilder();S.bld.fromLib=true},
   bpBulk(){const b=S.bld,pv=bulkPreview(b);if(!pv.n){toast('Enter how many ports to add (1–96).');$('#bkC').focus();return}
     if(b.ports.length+pv.n>256){toast('That would make more than 256 ports. Add fewer at a time.');return}
@@ -5163,6 +5248,11 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{const t=e.target;
   if(t.id==='tkWho'){S.ui.tkWho=t.value;tkRenderBody();return}
+  if(t.dataset&&t.dataset.team!=null&&t.dataset.tk){const team=tkTeam(),m=team[+t.dataset.team];if(!m)return;const k=t.dataset.tk;let v=String(t.value).trim();
+    if(k==='ini'){v=v.toUpperCase();if(!/^[A-Z0-9]{1,3}$/.test(v)||team.some((x,i)=>i!==+t.dataset.team&&x.ini===v)){toast(!v?'Initials can’t be empty.':'Those initials are taken or not valid.');t.value=m.ini;return}
+      const old=m.ini;if(old!==v){PJ.list.forEach(e=>{pjTasks(e).forEach(x=>{if(x.who===old)x.who=v});pjTimeArr(e).forEach(x=>{if(x.who===old)x.who=v})});saveProjects();toast(`Tasks and time for ${old} now show ${v}.`)}}
+    if(k==='name'&&!v){toast('Name can’t be empty.');t.value=m.name;return}
+    m[k]=v;SETTINGS.team=team;saveSettings();if(k==='ini')teamRefresh();return}
   if(t.dataset&&t.dataset.tkdone){const k=S.tasks.find(x=>x.id===t.dataset.tkdone);if(k)tkSetCol(k,t.checked?'done':'todo');return}
   if(t.dataset&&t.dataset.tkcol){const k=S.tasks.find(x=>x.id===t.dataset.tkcol);if(k)tkSetCol(k,t.value);return}
   if(t.dataset&&t.dataset.tkck!=null&&S.tkf){const c=S.tkf.ck[+t.dataset.tkck];if(c)c.done=t.checked;return}
@@ -5705,6 +5795,7 @@ R.settings=function(){
     <div class="row2">${f('website','Website')}${f('license','Contractor license no.')}</div>
     <p class="note" id="stPrev">On documents: ${esc([SETTINGS.tagline,contactLine()].filter(Boolean).join(' · ')||'add your contact details')}</p>
    </div></div>
+   ${teamPanelHTML()}
    <div class="panel"><div class="ph"><h2>Pricing and terms</h2></div><div class="fields">
     <p class="note" style="margin:0">Defaults for new projects. Each proposal can still be adjusted on its own.</p>
     <div class="row3">${f('markup','Markup (%)','','number')}${f('laborRate','Labor rate ($/h)','','number')}${f('tax','Tax (%)','','number')}</div>
