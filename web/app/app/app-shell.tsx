@@ -13,7 +13,7 @@ declare global {
 /** Netline runs in a frame; it reaches Supabase through window.jamsBridge, which stands in for the claude.ai runtime it was built on. */
 const APPS = {
   netline: { name: "Netline", src: "/api/jamsnet", ns: "", href: "/app" },
-  jamsos: { name: "JamsOS", src: "/api/jamsos", ns: "jamsos", href: "/jamsos" },
+  jamsos: { name: "Jams Operations", src: "/api/jamsos", ns: "jamsos", href: "/operations" },
 } as const;
 type AppKey = keyof typeof APPS;
 

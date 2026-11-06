@@ -3,7 +3,7 @@ import path from "node:path";
 import { type NextRequest } from "next/server";
 import { getViewer } from "@/lib/supabase/server";
 
-/* JamsOS keeps its browser storage under its own prefix, so it never mixes with Netline on the same site. */
+/* Jams Operations keeps its browser storage under its own prefix, so it never mixes with Netline on the same site. */
 const STORAGE_SHIM =
   "(function(){var P='jamsos:',S;try{S=window.localStorage}catch(e){return}" +
   "function ks(){var a=[];for(var j=0;j<S.length;j++){var k=S.key(j);if(k&&k.indexOf(P)===0)a.push(k.slice(P.length))}return a}" +
@@ -15,15 +15,15 @@ const STORAGE_SHIM =
 /** Adds the storage prefix to the page and to its embedded network module, and points artifact links at this site. */
 function prepareJamsOS(html: string, origin: string) {
   return html
-    .replaceAll("https://claude.ai/artifact/Rp5GENCYKRYw6nnA2LJdE8", `${origin}/jamsos`)
-    .replaceAll("https://claude.ai/artifact/XqWiKrqY6AnbRVYwFpFqmw", `${origin}/jamsos`)
+    .replaceAll("https://claude.ai/artifact/Rp5GENCYKRYw6nnA2LJdE8", `${origin}/operations`)
+    .replaceAll("https://claude.ai/artifact/XqWiKrqY6AnbRVYwFpFqmw", `${origin}/operations`)
     .replaceAll("https://claude.ai/artifact/HTnSSukvAoNNfVikhxhhqs", `${origin}/app`)
     .replaceAll("https://claude.ai/artifact/1du4BSTFvnCX4tamvmsKuG", `${origin}/app`)
     .replace("<head>", `<head><script>${STORAGE_SHIM}</script>`)
     .replace("const shim=`<script>window.NL_EMBED=", "const shim=`<script>" + STORAGE_SHIM + "window.NL_EMBED=");
 }
 
-// The JamsOS page itself, only for signed-in, approved team members.
+// The Jams Operations page itself, only for signed-in, approved team members.
 export async function GET(request: NextRequest) {
   const { userId, profile } = await getViewer();
   if (!userId) return new Response("Sign in first.", { status: 401 });
