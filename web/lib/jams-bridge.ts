@@ -70,7 +70,10 @@ function compare(a: unknown, op: string, b: unknown): boolean {
   }
 }
 
-export function createBridge(profile: Profile) {
+export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
+  /* A namespace keeps one app's documents apart from another's in the shared table (JamsOS lives under "jamsos/"). */
+  const ns = clean(opts.ns || "");
+  const P = (p: string) => (!ns || p === ns || p.startsWith(ns + "/") ? p : `${ns}/${p}`);
   const supabase = createClient();
   const listeners = new Set<{ match: (path: string, collection: string) => boolean; fire: () => void }>();
 
@@ -112,7 +115,7 @@ export function createBridge(profile: Profile) {
 
   /* ---------- documents ---------- */
   function doc(rawPath: string): DocRef {
-    const path = clean(rawPath);
+    const path = P(clean(rawPath));
     const ref: DocRef = {
       id: lastOf(path),
       path,
@@ -242,7 +245,7 @@ export function createBridge(profile: Profile) {
   }
 
   function collection(rawPath: string) {
-    const path = clean(rawPath);
+    const path = P(clean(rawPath));
     return {
       ...query({ path, where: [], order: null, limit: null }),
       path,

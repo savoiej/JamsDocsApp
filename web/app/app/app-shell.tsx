@@ -11,14 +11,22 @@ declare global {
 }
 
 /** Netline runs in a frame; it reaches Supabase through window.jamsBridge, which stands in for the claude.ai runtime it was built on. */
-export default function AppShell({ profile }: { profile: Profile }) {
+const APPS = {
+  netline: { name: "Netline", src: "/api/jamsnet", ns: "", href: "/app" },
+  jamsos: { name: "JamsOS", src: "/api/jamsos", ns: "jamsos", href: "/jamsos" },
+} as const;
+type AppKey = keyof typeof APPS;
+
+export default function AppShell({ profile, app = "netline" }: { profile: Profile; app?: AppKey }) {
+  const A = APPS[app];
+  const other = APPS[app === "netline" ? "jamsos" : "netline"];
   const [doc, setDoc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    window.jamsBridge = createBridge(profile);
+    window.jamsBridge = createBridge(profile, { ns: A.ns });
     let alive = true;
-    fetch("/api/jamsnet", { cache: "no-store" })
+    fetch(A.src, { cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw new Error(String(r.status));
         return r.text();
@@ -30,16 +38,17 @@ export default function AppShell({ profile }: { profile: Profile }) {
           "try{if(parent.location.hash)history.replaceState(null,'',parent.location.hash)}catch(e){}</script>";
         setDoc(html.replace("<head>", "<head>" + shim));
       })
-      .catch(() => alive && setError("Netline couldn’t load. Reload the page to try again."));
+      .catch(() => alive && setError(`${A.name} couldn’t load. Reload the page to try again.`));
     return () => {
       alive = false;
     };
-  }, [profile]);
+  }, [profile, A]);
 
   return (
     <div className="shell">
       <header className="shellbar">
-        <b>Netline</b>
+        <b>{A.name}</b>
+        <a href={other.href}>Open {other.name}</a>
         <span className="who">
           {profile.full_name || profile.email}
         </span>
@@ -52,9 +61,9 @@ export default function AppShell({ profile }: { profile: Profile }) {
       {error ? (
         <div className="loading" role="alert">{error}</div>
       ) : doc ? (
-        <iframe className="appframe" title="Netline" srcDoc={doc} />
+        <iframe className="appframe" title={A.name} srcDoc={doc} />
       ) : (
-        <div className="loading">Opening Netline…</div>
+        <div className="loading">Opening {A.name}…</div>
       )}
     </div>
   );
