@@ -3,7 +3,7 @@ import path from "node:path";
 import { type NextRequest } from "next/server";
 import { getViewer } from "@/lib/supabase/server";
 
-/* Jams Operations keeps its browser storage under its own prefix, so it never mixes with Netline on the same site. */
+/* Jams Operations keeps its browser storage under its own prefix, so it never mixes with SITREP on the same site. */
 const STORAGE_SHIM =
   "(function(){var P='jamsos:',S;try{S=window.localStorage}catch(e){return}" +
   "function ks(){var a=[];for(var j=0;j<S.length;j++){var k=S.key(j);if(k&&k.indexOf(P)===0)a.push(k.slice(P.length))}return a}" +

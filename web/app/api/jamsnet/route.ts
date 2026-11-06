@@ -3,7 +3,7 @@ import path from "node:path";
 import { type NextRequest } from "next/server";
 import { getViewer } from "@/lib/supabase/server";
 
-// The Netline page itself, only for signed-in, approved team members.
+// The SITREP page itself, only for signed-in, approved team members.
 export async function GET(request: NextRequest) {
   const { userId, profile } = await getViewer();
   if (!userId) return new Response("Sign in first.", { status: 401 });

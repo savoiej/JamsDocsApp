@@ -13,7 +13,7 @@ export default async function UsersPage() {
     <main className="page">
       <div className="row" style={{ justifyContent: "space-between" }}>
         <div>
-          <a href="/app">Back to Netline</a>
+          <a href="/app">Back to SITREP</a>
           <h1>Team &amp; access</h1>
           <p className="muted" style={{ margin: "4px 0 0" }}>
             {waiting ? `${waiting} waiting for approval. ` : ""}Admins manage the team and see the admin console; users work in the app.

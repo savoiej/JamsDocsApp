@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs Netline against a stand-in Supabase (no network needed): saves a client, loads the
+# Runs SITREP against a stand-in Supabase (no network needed): saves a client, loads the
 # example network, then opens a second window as a basic user and checks it sees the data.
 set -euo pipefail
 cd "$(dirname "$0")/.."

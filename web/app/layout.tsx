@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Netline",
+  title: "SITREP",
   description: "AV design, projects, service and network documentation for Jams Docs and Designs.",
 };
 

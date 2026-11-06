@@ -9,7 +9,7 @@ export default function LoginForm({ next, notice }: { next: string; notice?: str
   return (
     <form action={action} className="auth-card">
       <h2>Sign in</h2>
-      <p>Use the email and password for your Netline account.</p>
+      <p>Use the email and password for your SITREP account.</p>
       {notice && <div className="msg ok">{notice}</div>}
       {state?.error && <div className="msg err" role="alert">{state.error}</div>}
       <input type="hidden" name="next" value={next} />

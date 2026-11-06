@@ -1,6 +1,6 @@
-# Netline web app (Next.js + Supabase)
+# SITREP web app (Next.js + Supabase)
 
-Netline running as a Next.js site, with Supabase for sign-in, roles and all saved data.
+SITREP running as a Next.js site, with Supabase for sign-in, roles and all saved data.
 
 ## Run it locally
 
@@ -20,7 +20,7 @@ In Supabase → Authentication → URL Configuration, set the Site URL to where 
 
 | | Admin | User |
 |---|---|---|
-| Use Netline (clients, projects, contracts, time, network docs…) | ✓ | ✓ |
+| Use SITREP (clients, projects, contracts, time, network docs…) | ✓ | ✓ |
 | Network docs admin console (plans, customer accounts) | ✓ | — |
 | Team & access: approve people, turn access off, make admins | ✓ | — |
 
@@ -30,8 +30,8 @@ New accounts can't see any data until an admin approves them. The database enfor
 
 - `app/login`, `app/signup`, `app/auth/*` — sign-in with email and password (`@supabase/ssr`, cookies).
 - `proxy.ts` — refreshes the session on every request and sends signed-out visitors to `/login`.
-- `app/app` — the Netline app. `jamsnet/index.html` is the app page; `app/api/jamsnet` serves it only to approved members.
-- `lib/jams-bridge.ts` — Netline was built for the claude.ai runtime (`window.claude.use(...)`). The bridge provides the same `db`, `user`, `assets` and `downloads` interfaces on Supabase:
+- `app/app` — the SITREP app. `jamsnet/index.html` is the app page; `app/api/jamsnet` serves it only to approved members.
+- `lib/jams-bridge.ts` — SITREP was built for the claude.ai runtime (`window.claude.use(...)`). The bridge provides the same `db`, `user`, `assets` and `downloads` interfaces on Supabase:
   - **db** → `public.documents`, one JSON document per path (`meta/clients`, `projects/<id>`, `netline/v1/projects/<id>/devices/<id>`…), live across windows through Realtime.
   - **assets** → private Storage bucket `assets`, served at `/_blob/<id>` (`app/api/blob/[id]` signs a short-lived link).
   - **user** → the signed-in profile; admins are the app's "owner".
@@ -46,5 +46,5 @@ After changing `apps/jamsnet/index.html` at the repo root, copy it into `web/jam
 ```bash
 npm run lint
 npm run build
-tests/run-bridge-test.sh   # Netline against a stand-in Supabase, no network needed
+tests/run-bridge-test.sh   # SITREP against a stand-in Supabase, no network needed
 ```
