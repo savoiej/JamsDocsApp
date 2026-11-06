@@ -1121,6 +1121,50 @@ body{background:var(--bg);font-family:var(--f-ui);-webkit-font-smoothing:antiali
   .rail .nav button[aria-current="page"]::before{left:8px;right:8px;top:auto;bottom:0;width:auto;height:3px}}
 @media (prefers-reduced-motion: reduce){.tbtime i{animation:none}}
 
+/* task manager */
+.tkpanel{padding:0;overflow:hidden}
+.tkbar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.tkstats{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13px;color:var(--muted);align-items:baseline}
+.tkstats b{color:var(--fg);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;margin-right:5px}
+.tkstats .bad,.tkstats .bad b{color:var(--bad)}
+.tkctl{display:flex;gap:10px;align-items:center;flex:0 0 auto}
+.tkpanel .tkwho{flex:0 0 auto;flex-direction:row;align-items:center;gap:8px;white-space:nowrap}
+.tkpanel .tkwho select{width:auto;min-width:130px}
+.tkpanel .kan{padding:14px 16px}
+.tcard{cursor:grab}
+.tcard.dragging{opacity:.45}
+.tcard.over{border-color:color-mix(in srgb,var(--bad) 50%,var(--line))}
+.col.dropok{outline:2px dashed var(--accent);outline-offset:-2px}
+.tkopen{all:unset;cursor:pointer;display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.tkopen:focus-visible,.tkttl:focus-visible,.tkadd:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.tkttl{all:unset;cursor:pointer;font-weight:600;font-size:14px;color:var(--fg)}
+.tkdue.over{color:var(--bad);font-weight:600}
+.tkpri{font:600 10px var(--f-mono);padding:1px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.tkpri.high{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.tkpri.urgent{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.tkck{font:500 11px var(--f-mono);color:var(--muted)}
+.tkadd{all:unset;cursor:pointer;font-size:13px;color:var(--muted);padding:6px 4px;border-radius:6px}
+@media (hover:hover) and (pointer:fine){.tkadd:hover{color:var(--accent)}.tkttl:hover,.tkopen:hover{color:var(--accent)}}
+.tkwrap{padding:0 0 4px}
+.tklist td{vertical-align:middle}
+.tklist tr.tkdone .tkttl{text-decoration:line-through;color:var(--muted)}
+.tklist .tksel{width:auto;padding:4px 6px;font-size:13px}
+.tkwhoc{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.gbar[data-tid]{cursor:grab;touch-action:none}
+.gbar[data-tid]:active{cursor:grabbing}
+.gbar.over{background:var(--bad)}
+.gbar .gh{position:absolute;right:0;top:0;bottom:0;width:9px;cursor:ew-resize;border-radius:0 3px 3px 0}
+.gantt .gd.we{opacity:.5}
+.gantt .gl .tkopen{font-size:12px}
+.tkhint{margin:0;padding:8px 16px 14px;font-size:12px}
+.tkform{padding:18px;max-height:calc(100dvh - 180px);overflow:auto;display:flex;flex-direction:column;gap:12px}
+.tkform textarea.inp{resize:vertical;font:inherit;font-size:14px}
+.tkckadd{display:flex;gap:8px;margin-top:6px}
+.tkckrow{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;color:var(--fg)}
+.tkform .tkckrow label{display:flex!important;flex-direction:row!important;justify-content:flex-start!important;gap:8px;align-items:center;flex:1;min-width:0;font-size:14px;color:var(--fg);margin:0}
+.tkform .tkckrow input[type=checkbox]{width:auto!important;flex:none;margin:0}
+@media (max-width:640px){.tkctl{width:100%}.tkpanel .tkwho{flex:1}.tkpanel .tkwho select{flex:1}}
+
 /* mobile-native: feel like an installed app on phones */
 html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 html,body{overscroll-behavior:none}
@@ -1340,7 +1384,21 @@ const cliName=pr=>(pr&&String(pr.client||'').trim())||'No client yet';
 function saveProjects(){try{localStorage.setItem(PKEY,JSON.stringify({cur:PJ.cur,list:PJ.list.map(e=>e.id===PJ.cur?{...e,prop:S.prop,tasks:S.tasks,time:S.time,photos:S.photos,design:null}:e)}))}catch(e){}cloudMark()}
 function loadProjects(){try{const o=JSON.parse(localStorage.getItem(PKEY)||'null');if(!o||!Array.isArray(o.list)||!o.list.length)return;
   PJ.list=o.list;PJ.cur=pjById(o.cur)?o.cur:o.list[0].id;const e=curPj();
-  if(e.prop)S.prop=e.prop;if(Array.isArray(e.tasks))S.tasks=e.tasks;if(Array.isArray(e.time))S.time=e.time;if(Array.isArray(e.photos))S.photos=e.photos}catch(e){}}
+  if(e.prop)S.prop=e.prop;if(Array.isArray(e.tasks))S.tasks=e.tasks;if(Array.isArray(e.time))S.time=e.time;if(Array.isArray(e.photos))S.photos=e.photos;tkNormAll()}catch(e){}}
+/* ---------- task manager: real dates, priority, checklist (tasks keep start/dur for older readers) ---------- */
+function tkIso(off){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+(off||0));return d.toISOString().slice(0,10)}
+function tkShift(iso,n){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function tkOff(iso){const a=new Date(iso+'T12:00:00'),b=new Date();b.setHours(12,0,0,0);return Math.round((a-b)/864e5)}
+function tkDate(iso){return iso?new Date(iso+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—'}
+function tkNorm(t){if(!t)return t;if(!t.sd){const st=+t.start||0,du=Math.max(1,+t.dur||1);t.sd=tkIso(st);t.dd=tkIso(st+du-1)}
+  if(!t.dd||t.dd<t.sd)t.dd=t.sd;t.start=tkOff(t.sd);t.dur=Math.max(1,tkOff(t.dd)-t.start+1);
+  if(!['Low','Normal','High','Urgent'].includes(t.pri))t.pri='Normal';if(!Array.isArray(t.ck))t.ck=[];if(!t.col)t.col='todo';return t}
+function tkNormAll(){(S.tasks||[]).forEach(tkNorm);(PJ.list||[]).forEach(e=>{if(e.id!==PJ.cur&&Array.isArray(e.tasks))e.tasks.forEach(tkNorm)})}
+function tkIni(w){w=String(w||'').trim();if(!w)return '—';return w.length<=3?w.toUpperCase():w.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()}
+function tkPeople(){const set=new Set();PJ.list.forEach(e=>{(e.id===PJ.cur?S.tasks:(e.tasks||[])).forEach(t=>t.who&&set.add(t.who));(e.id===PJ.cur?S.time:(e.time||[])).forEach(t=>t.who&&set.add(t.who))});['DL','KM','AP','JS'].forEach(x=>set.add(x));return [...set].sort()}
+function tkPriIx(t){return ['Low','Normal','High','Urgent'].indexOf(t.pri)}
+function tkOver(t){return t.col!=='done'&&t.dd<tkIso(0)}
+function tkSetCol(t,col){t.col=col;if(col!=='blocked')delete t.note;else t.note=t.note||'';if(col==='done')t.doneAt=Date.now();else delete t.doneAt;saveProjects();R.projects()}
 function nextNo(){const n=Math.max(...PJ.list.map(e=>e.id===PJ.cur?S.prop.no:(e.prop||{}).no).map(x=>parseInt(String(x||'').split('-').pop(),10)||0));return 'P-'+new Date().getFullYear()+'-'+String(n+1).padStart(4,'0')}
 function nextJob(){const n=Math.max(...PJ.list.map(e=>parseInt(String(e.job||'').split('-').pop(),10)||0));return String(new Date().getFullYear()).slice(2)+'-'+(n+1)}
 const STD_TASKS=[['Site survey and measurements','KM',0,1,'Site visit, 9:00 AM'],['Submit equipment order','JS',1,1],['Pre-wire Cat6 and conduit','DL',7,3,'Pre-wire crew, 7:30 AM'],['Rack build and bench test','DL',10,2],['Display mount and install','KM',12,1,'Install day, 8:00 AM'],['DSP tuning and AEC','AP',13,1],['Control programming','AP',13,2],['Client training','JS',16,1,'Training, 2:00 PM'],['As-builts and closeout','JS',17,2]];
@@ -1354,7 +1412,7 @@ function switchProject(id){
   to.design=null;PJ.cur=id;
   if(!d){S.design.racks=S.design.racks||[];}
   if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
-  cleanRacks();
+  cleanRacks();tkNormAll();
   H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.padd=false;S.ui.pform=null;
   Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch)c.init=false});
   save();return true}
@@ -1364,7 +1422,7 @@ function createProject(f){
   const e={id:'pj'+Date.now().toString(36),job:nextJob(),site:f.site,created:dayFmt(0)};
   const no=nextNo();PJ.list.push(e);PJ.cur=e.id;
   S.prop={no,client:f.client,project:f.project,markup:+f.markup,laborMethod:base.laborMethod,laborRate:+f.rate,laborPct:base.laborPct,tax:+f.tax,status:'Draft',log:[],signedTotal:null,signer:null,link:null};
-  S.tasks=f.tasks?(f.taskList||STD_TASKS).map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})})):[];
+  S.tasks=f.tasks?(f.taskList||STD_TASKS).map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})})):[];S.tasks.forEach(tkNorm);
   S.time=[];S.photos=[];
   if(src){S.design=src;uidc=srcU;S.design.cables.forEach(c=>{delete c.status;delete c.note});S.design.plan.room.name=f.project}
   else{S.design=JSON.parse(JSON.stringify(S.design));loadTemplate(f.start);const r=S.design.racks[0];if(r&&+f.rack>r.size){r.size=+f.rack;if(f.start!=='blank')autoArrange(r)}if(f.start==='blank'&&r)r.name='Equipment rack'}
@@ -3735,6 +3793,7 @@ async function downloadProposalPdf(btn){
 /* ================= PROJECTS ================= */
 const COLS=[['todo','To do'],['doing','In progress'],['blocked','Blocked'],['done','Done']];
 R.projects=function(){
+  tkNormAll();
   const q=quote(),used=S.time.reduce((s,t)=>s+t.hrs,0),budget=q.hrs||1;
   const contract=q.equip+q.labor,projLabor=Math.max(used,budget)*(+SETTINGS.internalRate||52),gm=contract-q.cost-projLabor;
   const pct=Math.min(100,used/budget*100);
@@ -3742,7 +3801,7 @@ R.projects=function(){
   <header class="vh"><div><p class="eyebrow">${esc(cliName(S.prop))} · Job ${esc(curPj().job)}${curPj().site?' · '+esc(curPj().site):''} ${(S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).some(k=>k==='proposal'||k==='design')?' · '+chip(S.prop.status==='Signed'?'Signed':'Awaiting signature'):''}</p><h1>${esc(S.prop.project)}</h1></div>
    <div class="actions"><select class="inp" id="pjSel2" aria-label="Open project" style="width:auto">${projOptions()}</select><button class="btn" data-act="newProject">+ New project</button>
    ${S.tasks.length||!pjTaskList(S.prop.ptype||'av').length?'':'<button class="btn" data-act="addStdTasks">Add standard tasks</button>'}
-   <div class="seg" role="group" aria-label="Task view"><button data-pm="kanban" aria-pressed="${S.projMode==='kanban'}">Board</button><button data-pm="gantt" aria-pressed="${S.projMode==='gantt'}">Timeline</button></div></div></header>
+   <div class="seg" role="group" aria-label="Task view"><button data-pm="kanban" aria-pressed="${S.projMode==='kanban'}">Board</button><button data-pm="list" aria-pressed="${S.projMode==='list'}">List</button><button data-pm="gantt" aria-pressed="${S.projMode==='gantt'}">Timeline</button></div></div></header>
   ${pjDetailsHTML()}
   ${(S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).some(k=>k==='proposal'||k==='design')?`  <div class="panel cost">
    <div><div class="l">Contract value</div><div class="v">${money(contract)}</div><div class="muted" style="font-size:12px">From proposal, before tax</div></div>
@@ -3761,21 +3820,80 @@ R.projects=function(){
    <div class="scroll"><table class="t"><thead><tr><th>Tech</th><th>Task</th><th>Type</th><th class="n">Hours</th></tr></thead><tbody>
     ${S.time.slice().reverse().slice(0,6).map(t=>`<tr><td><span class="av">${esc(t.who)}</span></td><td>${esc(S.tasks.find(x=>x.id===t.task)?.title)}</td><td class="muted">${esc(t.type)}</td><td class="n">${t.hrs}</td></tr>`).join('')}</tbody></table></div>
   </div></div>`;
-  const b=$('#pmBody');
-  if(S.projMode==='kanban'){
-    b.innerHTML=`<div class="kan">${COLS.map(([k,l],ci)=>{const ts=S.tasks.filter(t=>t.col===k);return `<div class="col"><div class="colh"><span>${l}</span><span>${ts.length}</span></div>
-     ${ts.map(t=>`<div class="card ${k==='blocked'?'blocked':''}"><b>${esc(t.title)}</b>${t.note?`<span class="muted" style="font-size:12px">${esc(t.note)}</span>`:''}
-      <div class="meta"><span class="av">${esc(t.who)}</span><span>Due ${dayFmt(t.start+t.dur-1)}</span>${t.ev?`<span>· ${esc(t.ev)}</span>`:''}</div>
-      <div class="mv"><button class="btn sm" data-act="mvTask" data-id="${t.id}" data-d="-1" ${ci===0?'disabled':''} aria-label="Move left">←</button><button class="btn sm" data-act="mvTask" data-id="${t.id}" data-d="1" ${ci===COLS.length-1?'disabled':''} aria-label="Move right">→</button></div></div>`).join('')||'<p class="muted" style="padding:4px;font-size:12px">Nothing here.</p>'}
-     </div>`}).join('')}</div>`;
-  } else {
-    const from=-7,to=10,days=to-from+1;
-    let g=`<div class="gantt" style="grid-template-columns:200px repeat(${days},36px)"><div class="gl" style="font-weight:600">Task</div>`;
-    for(let d=from;d<=to;d++)g+=`<div class="gd ${d===0?'today':''}">${dowFmt(d).slice(0,2)}<br>${new Date(Date.now()+d*864e5).getDate()}</div>`;
-    S.tasks.forEach(t=>{g+=`<div class="gl">${esc(t.title)}</div><div class="gc" style="grid-column:span ${days}"><div class="gnow" style="left:${(0-from)*36+17}px"></div><div class="gbar ${t.col}" style="left:${(t.start-from)*36+3}px;width:${t.dur*36-6}px" title="${esc(t.title)}"></div></div>`});
-    b.innerHTML=`<div class="panel scroll">${g}</div></div>`;
-  }
+  tkRenderBody();
 };
+
+/* ---------- task manager views ---------- */
+function tkRenderBody(){const b=$('#pmBody');if(!b)return;
+  const who=S.ui.tkWho||'',today=tkIso(0),wk=tkIso(7),all=S.tasks,list=all.filter(t=>!who||t.who===who);
+  const open=all.filter(t=>t.col!=='done'),over=open.filter(t=>t.dd<today),soon=open.filter(t=>t.dd>=today&&t.dd<=wk),people=tkPeople();
+  const bar=`<div class="tkbar"><div class="tkstats"><span><b>${open.length}</b>open</span><span class="${over.length?'bad':''}"><b>${over.length}</b>overdue</span><span><b>${soon.length}</b>due in 7 days</span><span><b>${all.length-open.length}</b>done</span></div>
+   <div class="tkctl"><label class="field tkwho" for="tkWho">Assigned to<select id="tkWho" class="inp"><option value="">Everyone</option>${people.map(p=>`<option ${p===who?'selected':''}>${esc(p)}</option>`).join('')}</select></label><button class="btn primary" data-act="taskNew">+ New task</button></div></div>`;
+  if(!all.length){b.innerHTML=`<div class="panel tkpanel">${bar}<div class="pb"><p class="muted" style="margin:0">No tasks yet. Add one, or start from the standard task list for this project type.</p></div></div>`;return}
+  const body=S.projMode==='list'?tkList(list):S.projMode==='gantt'?tkTimeline(list):tkBoard(list);
+  b.innerHTML=`<div class="panel tkpanel">${bar}${list.length?body:`<div class="pb"><p class="muted" style="margin:0">Nothing assigned to ${esc(who)}.</p></div>`}</div>`}
+function tkCard(t,ci){const ov=tkOver(t),cd=t.ck.filter(c=>c.done).length;
+  return `<div class="card tcard${t.col==='blocked'?' blocked':''}${ov?' over':''}" draggable="true" data-tid="${esc(t.id)}">
+   <b class="tkopen" role="button" tabindex="0" data-act="taskEdit" data-id="${esc(t.id)}">${esc(t.title)}</b>
+   ${t.col==='blocked'&&t.note?`<span class="muted" style="font-size:12px">${esc(t.note)}</span>`:''}
+   <div class="meta"><span class="av" title="${esc(t.who||'Unassigned')}">${esc(tkIni(t.who))}</span><span class="tkdue${ov?' over':''}">${ov?'Overdue · ':'Due '}${tkDate(t.dd)}</span>${t.pri!=='Normal'?`<span class="tkpri ${t.pri.toLowerCase()}">${t.pri}</span>`:''}${t.ck.length?`<span class="tkck">✓ ${cd}/${t.ck.length}</span>`:''}</div>
+   ${t.ev?`<span class="muted" style="font-size:12px">${esc(t.ev)}</span>`:''}
+   <div class="mv"><button class="btn sm" data-act="mvTask" data-id="${esc(t.id)}" data-d="-1" ${ci===0?'disabled':''} aria-label="Move left">←</button><button class="btn sm" data-act="mvTask" data-id="${esc(t.id)}" data-d="1" ${ci===COLS.length-1?'disabled':''} aria-label="Move right">→</button></div></div>`}
+function tkBoard(list){return `<div class="kan">${COLS.map(([k,l],ci)=>{const ts=list.filter(t=>t.col===k).sort((a,b)=>tkPriIx(b)-tkPriIx(a)||a.dd.localeCompare(b.dd));
+  return `<div class="col" data-tcol="${k}"><div class="colh"><span>${l}</span><span>${ts.length}</span></div>${ts.map(t=>tkCard(t,ci)).join('')}<button class="tkadd" data-act="taskNew" data-col="${k}">+ Add task</button></div>`}).join('')}</div>`}
+function tkList(list){const rows=list.slice().sort((a,b)=>(a.col==='done')-(b.col==='done')||a.dd.localeCompare(b.dd)||tkPriIx(b)-tkPriIx(a));
+  return `<div class="scroll tkwrap"><table class="t tklist"><thead><tr><th aria-label="Done"></th><th>Task</th><th>Assigned</th><th>Priority</th><th>Start</th><th>Due</th><th>Status</th></tr></thead><tbody>
+   ${rows.map(t=>{const ov=tkOver(t),cd=t.ck.filter(c=>c.done).length;return `<tr class="${t.col==='done'?'tkdone':''}"><td><input type="checkbox" data-tkdone="${esc(t.id)}" ${t.col==='done'?'checked':''} aria-label="Mark ${esc(t.title)} done"></td>
+    <td><button class="tkttl" data-act="taskEdit" data-id="${esc(t.id)}">${esc(t.title)}</button>${t.ck.length?` <span class="tkck">✓ ${cd}/${t.ck.length}</span>`:''}${t.col==='blocked'&&t.note?`<br><span class="muted" style="font-size:12px">${esc(t.note)}</span>`:''}</td>
+    <td><span class="tkwhoc"><span class="av">${esc(tkIni(t.who))}</span>${esc(t.who&&t.who.length>3?t.who:'')}</span></td><td><span class="tkpri ${t.pri.toLowerCase()}">${t.pri}</span></td>
+    <td>${tkDate(t.sd)}</td><td class="${ov?'tkdue over':''}">${tkDate(t.dd)}</td>
+    <td><select class="inp tksel" data-tkcol="${esc(t.id)}" aria-label="Status of ${esc(t.title)}">${COLS.map(([k,l])=>`<option value="${k}" ${k===t.col?'selected':''}>${l}</option>`).join('')}</select></td></tr>`}).join('')}</tbody></table></div>`}
+function tkTimeline(list){const DW=36,ts=list.slice().sort((a,b)=>a.sd.localeCompare(b.sd));
+  let lo=Math.min(-3,...ts.map(t=>t.start)),hi=Math.max(14,...ts.map(t=>t.start+t.dur));lo=Math.max(lo,-90);hi=Math.min(hi,lo+150);const days=hi-lo+1;
+  let g=`<div class="gantt" style="grid-template-columns:200px repeat(${days},${DW}px)"><div class="gl" style="font-weight:600">Task</div>`;
+  for(let d=lo;d<=hi;d++){const dt=new Date();dt.setDate(dt.getDate()+d);const we=dt.getDay()===0||dt.getDay()===6;
+    g+=`<div class="gd${d===0?' today':''}${we?' we':''}">${dt.getDate()===1||d===lo?dt.toLocaleDateString('en-US',{month:'short'}):dt.toLocaleDateString('en-US',{weekday:'short'}).slice(0,2)}<br>${dt.getDate()}</div>`}
+  ts.forEach(t=>{const ov=tkOver(t);g+=`<div class="gl"><button class="tkopen" data-act="taskEdit" data-id="${esc(t.id)}" title="${esc(t.title)}">${esc(t.title)}</button></div><div class="gc" style="grid-column:span ${days}"><div class="gnow" style="left:${(0-lo)*DW+17}px"></div><div class="gbar ${t.col}${ov?' over':''}" data-tid="${esc(t.id)}" style="left:${(t.start-lo)*DW+3}px;width:${t.dur*DW-6}px" title="${esc(t.title)} · ${tkDate(t.sd)} – ${tkDate(t.dd)}${t.who?' · '+esc(t.who):''}"><i class="gh" aria-hidden="true"></i></div></div>`});
+  return `<div class="scroll tkwrap">${g}</div></div><p class="muted tkhint">Drag a bar to move the task, or drag its right edge to change the due date. Click it to edit.</p>`}
+function tkCkHTML(){const ck=(S.tkf&&S.tkf.ck)||[];return ck.length?ck.map((c,i)=>`<div class="tkckrow"><label><input type="checkbox" data-tkck="${i}" ${c.done?'checked':''}> <span>${esc(c.t)}</span></label><button class="lnk" data-act="taskCkDel" data-i="${i}" aria-label="Remove ${esc(c.t)}">Remove</button></div>`).join(''):'<p class="muted" style="margin:0;font-size:13px">No checklist items.</p>'}
+function tkOpen(id,col){const t=id?S.tasks.find(x=>x.id===id):null;if(id&&!t)return;
+  const d=t?JSON.parse(JSON.stringify(t)):{id:null,title:'',who:S.ui.tkWho||'',col:col||'todo',sd:tkIso(0),dd:tkIso(0),pri:'Normal',ev:'',desc:'',note:'',ck:[]};
+  S.tkf=d;S.tkDel=false;const ov=$('#overlay'),hrs=t?S.time.filter(x=>x.task===t.id).reduce((a,x)=>a+(+x.hrs||0),0):0;
+  ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="tkH">
+   <div class="dlgtop"><span>${t?'TASK':'NEW TASK'} · ${esc(S.prop.project||'')}</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
+   <div class="bform tkform">
+    <h2 id="tkH" style="margin:0;font-family:var(--f-display);font-size:24px">${t?'Edit task':'New task'}</h2>
+    <label class="field" for="tkT">Task<input id="tkT" class="inp" value="${esc(d.title)}" placeholder="Pull Cat6 to Conf Rm 3B" maxlength="140"></label>
+    <div class="row2"><label class="field" for="tkS">Status<select id="tkS" class="inp">${COLS.map(([k,l])=>`<option value="${k}" ${k===d.col?'selected':''}>${l}</option>`).join('')}</select></label>
+     <label class="field" for="tkP">Priority<select id="tkP" class="inp">${['Low','Normal','High','Urgent'].map(p=>`<option ${p===d.pri?'selected':''}>${p}</option>`).join('')}</select></label></div>
+    <div class="row2"><label class="field" for="tkA">Assigned to<input id="tkA" class="inp" list="tkPeople" value="${esc(d.who||'')}" placeholder="Initials or name" autocomplete="off"><datalist id="tkPeople">${tkPeople().map(p=>`<option value="${esc(p)}">`).join('')}</datalist></label>
+     <label class="field" for="tkE">Calendar note<input id="tkE" class="inp" value="${esc(d.ev||'')}" placeholder="Install day, 8:00 AM"></label></div>
+    <div class="row2"><label class="field" for="tkSd">Start<input id="tkSd" type="date" class="inp" value="${d.sd}"></label><label class="field" for="tkDd">Due<input id="tkDd" type="date" class="inp" value="${d.dd}"></label></div>
+    <label class="field" for="tkN" id="tkNw" style="${d.col==='blocked'?'':'display:none'}">What’s blocking it<input id="tkN" class="inp" value="${esc(d.note||'')}" placeholder="Waiting on electrical rough-in"></label>
+    <label class="field" for="tkD">Details<textarea id="tkD" class="inp" rows="3" placeholder="Scope, access notes, parts to bring">${esc(d.desc||'')}</textarea></label>
+    <div class="field"><span>Checklist</span><div id="tkCk">${tkCkHTML()}</div><div class="tkckadd"><input id="tkCkNew" class="inp" placeholder="Add a checklist item" maxlength="120" aria-label="New checklist item"><button class="btn sm" data-act="taskCkAdd">Add</button></div></div>
+    ${t&&hrs?`<p class="muted" style="margin:0;font-size:13px">${hrs.toFixed(2).replace(/\.?0+$/,'')} h logged on this task.</p>`:''}
+   </div>
+   <div class="dlgfoot">${t?'<button class="btn" data-act="taskDelete" style="margin-right:auto">Delete</button>':''}<button class="btn" data-act="closeOverlay">Cancel</button><button class="btn primary" data-act="taskSave">${t?'Save task':'Add task'}</button></div></div>`;
+  ov.hidden=false;setTimeout(()=>{const i=$('#tkT');if(i&&!t)i.focus()},0)}
+let TKD=null;
+document.addEventListener('pointerdown',e=>{const bar=e.target.closest&&e.target.closest('.gbar[data-tid]');if(!bar||e.button!==0)return;const t=S.tasks.find(x=>x.id===bar.dataset.tid);if(!t)return;
+  TKD={bar,t,x:e.clientX,rs:!!e.target.closest('.gh'),w:bar.offsetWidth,moved:false,d:0};try{bar.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault()});
+document.addEventListener('pointermove',e=>{if(!TKD)return;const dx=e.clientX-TKD.x;if(Math.abs(dx)>4)TKD.moved=true;if(!TKD.moved)return;const d=Math.round(dx/36);TKD.d=d;
+  if(TKD.rs)TKD.bar.style.width=Math.max(30,TKD.w+d*36)+'px';else TKD.bar.style.transform=`translateX(${d*36}px)`});
+document.addEventListener('pointerup',()=>{if(!TKD)return;const k=TKD;TKD=null;if(!k.moved){tkOpen(k.t.id);return}
+  if(!k.d){tkRenderBody();return}
+  if(k.rs){const nd=tkShift(k.t.dd,k.d);k.t.dd=nd<k.t.sd?k.t.sd:nd}else{k.t.sd=tkShift(k.t.sd,k.d);k.t.dd=tkShift(k.t.dd,k.d)}
+  tkNorm(k.t);saveProjects();tkRenderBody();toast(`${k.t.title}: ${tkDate(k.t.sd)} – ${tkDate(k.t.dd)}`)});
+document.addEventListener('pointercancel',()=>{if(TKD){TKD=null;tkRenderBody()}});
+document.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('.tcard[data-tid]');if(!c)return;e.dataTransfer.setData('text/x-task',c.dataset.tid);e.dataTransfer.effectAllowed='move';c.classList.add('dragging')});
+document.addEventListener('dragend',()=>{document.querySelectorAll('.tcard.dragging').forEach(x=>x.classList.remove('dragging'));document.querySelectorAll('.col.dropok').forEach(x=>x.classList.remove('dropok'))});
+document.addEventListener('dragover',e=>{const col=e.target.closest&&e.target.closest('.col[data-tcol]');if(!col||!e.dataTransfer||![...e.dataTransfer.types].includes('text/x-task'))return;e.preventDefault();e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.col.dropok').forEach(x=>{if(x!==col)x.classList.remove('dropok')});col.classList.add('dropok')});
+document.addEventListener('drop',e=>{const col=e.target.closest&&e.target.closest('.col[data-tcol]');if(!col)return;const id=e.dataTransfer.getData('text/x-task');if(!id)return;e.preventDefault();
+  const t=S.tasks.find(x=>x.id===id);if(t&&t.col!==col.dataset.tcol)tkSetCol(t,col.dataset.tcol);else tkRenderBody()});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='tkCkNew'){e.preventDefault();A.taskCkAdd();return}
+  if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.matches&&e.target.matches('.tkopen[role="button"]')){e.preventDefault();e.target.click()}});
 
 /* ================= CLIENTS (CRM) ================= */
 const CKEY='rackline-clients-v1';
@@ -4327,6 +4445,22 @@ function pjDetailsHTML(){const P=S.prop,B=P.billing||{},ty=pjTypeOf(P.ptype||'av
    <div class="actions"><button class="btn sm" data-act="editProjectDetails">Edit details</button>${(P.services||ty.svc).includes('design')?'<button class="btn sm" data-go="design">Drawings</button>':''}${(P.services||ty.svc).some(k=>k==='proposal'||k==='design')?'<button class="btn sm" data-go="proposal">Proposal</button>':''}<button class="btn sm" data-go="billing">Time &amp; invoicing</button>${(P.services||ty.svc).some(k=>k==='netdoc'||k==='network')?'<button class="btn sm" data-nlgo="overview">Network docs</button>':''}</div></div>`}
 function closeOverlay(){const ov=$('#overlay');ov.hidden=true;ov.innerHTML='';if(S.bld&&!S.bld.saved&&(S.bld.up||[]).length){const ups=S.bld.up.map(a=>({asset:a}));S.bld=null;dropAssets(ups)}S.bld=null;S.iv=null;if(S.rg){S.rg=null;if(S.view==='registers')R.registers()}if(S.iv2){S.iv2=null;if(S.view==='inventory')R.inventory()}if(S.tk){stopDictation();S.tk=null;if(S.view==='service')R.service()}if(S.view==='proposal')propParts()}
 const A={
+  taskNew(el){tkOpen(null,el&&el.dataset.col)},
+  taskEdit(el){tkOpen(el.dataset.id)},
+  taskCkAdd(){const i=$('#tkCkNew');if(!i||!S.tkf)return;const v=i.value.trim();if(!v)return;S.tkf.ck.push({id:'c'+Date.now().toString(36),t:v,done:false});i.value='';$('#tkCk').innerHTML=tkCkHTML();i.focus()},
+  taskCkDel(el){if(!S.tkf)return;S.tkf.ck.splice(+el.dataset.i,1);$('#tkCk').innerHTML=tkCkHTML()},
+  taskSave(){const f=S.tkf;if(!f)return;const v=id=>($('#'+id).value||'').trim(),title=v('tkT');if(!title){toast('Give the task a name.');$('#tkT').focus();return}
+    const sd=v('tkSd')||tkIso(0);let dd=v('tkDd')||sd;if(dd<sd){toast('The due date is before the start date.');$('#tkDd').focus();return}
+    const pending=v('tkCkNew');if(pending)f.ck.push({id:'c'+Date.now().toString(36),t:pending,done:false});
+    const col=$('#tkS').value,o={title,who:v('tkA'),col,pri:$('#tkP').value,sd,dd,ev:v('tkE'),desc:v('tkD'),ck:f.ck};
+    if(col==='blocked')o.note=v('tkN');
+    let t=f.id?S.tasks.find(x=>x.id===f.id):null;const isNew=!t;
+    if(!o.ev)delete o.ev;
+    if(t){const was=t.col;Object.assign(t,o);if(!o.ev)delete t.ev;if(col!=='blocked')delete t.note;if(col==='done'&&was!=='done')t.doneAt=Date.now();if(col!=='done')delete t.doneAt}
+    else{t={id:'k'+Date.now().toString(36),created:Date.now(),...o};if(col==='done')t.doneAt=Date.now();S.tasks.push(t)}
+    tkNorm(t);saveProjects();S.tkf=null;closeOverlay();R.projects();toast(isNew?`Added “${title}”.`:`Saved “${title}”.`)},
+  taskDelete(el){const f=S.tkf;if(!f||!f.id)return;if(!S.tkDel){S.tkDel=true;el.textContent='Click again to delete';el.classList.add('danger');return}
+    const t=S.tasks.find(x=>x.id===f.id);S.tasks=S.tasks.filter(x=>x.id!==f.id);saveProjects();S.tkf=null;closeOverlay();R.projects();toast(`Deleted “${t?t.title:'task'}”.`)},
   loadTpl(){const v=$('#tplSel').value;mut(()=>loadTemplate(v));cams.flow.init=false;cams.rack.init=false;cams.plan.init=false;refreshDesign();requestAnimationFrame(()=>{fit(v==='blank');cam.init=true});toast(v==='blank'?'Blank drawing set. Your previous drawings are one undo away.':'Template loaded on both sheets. Undo brings back your previous drawings.')},
   addNode(el){const c=viewCenter();placeNode(el.dataset.pid,c.x-W/2,c.y-40)},
   delSel(){deleteSel()},dupSel(){duplicateSel()},
@@ -4502,7 +4636,7 @@ const A={
     const cl=ensureClient(client);S.prop.client=cl.name;S.prop.project=project;curPj().site=v('npS');Object.assign(S.prop,extra);if(!extra.billRate)delete S.prop.billRate;
     saveProjects();closeOverlay();renderProjSwitch();if(S.view==='projects')R.projects();toast('Project details saved.')},
   openProject(el){const id=el.dataset.id,to=el.dataset.to;if(id!==PJ.cur){switchProject(id);toast(`Opened ${S.prop.project} for ${S.prop.client}.`)}go(to||S.view)},
-  addStdTasks(){S.tasks=pjTaskList(S.prop.ptype||'av').map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})}));saveProjects();R.projects();toast('Added the standard install tasks.')},
+  addStdTasks(){S.tasks=pjTaskList(S.prop.ptype||'av').map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})}));S.tasks.forEach(tkNorm);saveProjects();R.projects();toast('Added the standard install tasks.')},
   newBlockLib(){openBuilder();S.bld.fromLib=true},
   bpBulk(){const b=S.bld,pv=bulkPreview(b);if(!pv.n){toast('Enter how many ports to add (1–96).');$('#bkC').focus();return}
     if(b.ports.length+pv.n>256){toast('That would make more than 256 ports. Add fewer at a time.');return}
@@ -5028,6 +5162,12 @@ document.addEventListener('click',e=>{
   if(e.target.id==='overlay')closeOverlay();
 });
 document.addEventListener('change',e=>{const t=e.target;
+  if(t.id==='tkWho'){S.ui.tkWho=t.value;tkRenderBody();return}
+  if(t.dataset&&t.dataset.tkdone){const k=S.tasks.find(x=>x.id===t.dataset.tkdone);if(k)tkSetCol(k,t.checked?'done':'todo');return}
+  if(t.dataset&&t.dataset.tkcol){const k=S.tasks.find(x=>x.id===t.dataset.tkcol);if(k)tkSetCol(k,t.value);return}
+  if(t.dataset&&t.dataset.tkck!=null&&S.tkf){const c=S.tkf.ck[+t.dataset.tkck];if(c)c.done=t.checked;return}
+  if(t.id==='tkS'){const w=$('#tkNw');if(w)w.style.display=t.value==='blocked'?'':'none';return}
+  if(t.id==='tkSd'){const dd=$('#tkDd');if(dd&&dd.value&&dd.value<t.value)dd.value=t.value;return}
   if(t.id==='bgFile'||t.id==='bgFile2'){handleBgFile(t.files&&t.files[0]);t.value='';return}
   if(t.dataset&&t.dataset.cl){onClientChange(t);return}
   if(t.dataset&&t.dataset.pinfo){const k=t.dataset.pinfo,v=t.value.trim(),P=S.prop;
@@ -5522,7 +5662,7 @@ function applyCloud(meta,pjs){
   if(list.length){const idx=meta.index?P(meta.index):null,ord=idx&&Array.isArray(idx.order)?idx.order:[];
     list.sort((a,b)=>{const ia=ord.indexOf(a.id),ib=ord.indexOf(b.id);return (ia<0?1e9:ia)-(ib<0?1e9:ib)});
     PJ.list=list;PJ.cur=idx&&list.some(e=>e.id===idx.cur)?idx.cur:list[0].id;
-    const e=curPj();if(e.prop)S.prop=e.prop;S.tasks=Array.isArray(e.tasks)?e.tasks:[];S.time=Array.isArray(e.time)?e.time:[];S.photos=Array.isArray(e.photos)?e.photos:[];
+    const e=curPj();if(e.prop)S.prop=e.prop;S.tasks=Array.isArray(e.tasks)?e.tasks:[];S.time=Array.isArray(e.time)?e.time:[];S.photos=Array.isArray(e.photos)?e.photos:[];tkNormAll();
     const d=normDesign(e.design);if(d)S.design=d;e.design=null;if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
     uidc=Math.max(uidc,+e.u||0,maxUid());cleanRacks();H.past=[];H.future=[];S.sel=null;S.wire=null;S.liveSet=null;
     Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch)c.init=false})}
