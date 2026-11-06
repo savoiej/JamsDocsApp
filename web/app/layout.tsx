@@ -1,9 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Netline",
   description: "AV design, projects, service and network documentation for Jams Docs and Designs.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+  // the shell's top bar is basalt in both schemes, so the status bar matches it either way
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#14252A" },
+    { media: "(prefers-color-scheme: dark)", color: "#14252A" },
+  ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
