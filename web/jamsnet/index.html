@@ -1058,6 +1058,7 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .pogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
 .pobrands{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .chip.Received{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}.chip.Partially-received{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.ipt tr.iperr td,.t tr.iperr td{background:color-mix(in srgb,var(--bad) 7%,transparent)}.ipt .cellin{min-width:0}.ipt td:first-child,.ipt td:nth-child(9){white-space:nowrap}.ipt select.cellin{min-width:128px}
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -1381,9 +1382,10 @@ const DEFAULT_META3={dwg:'E-301',title:'Floor plan'};
 const DEFAULT_META4={dwg:'E-401',title:'Cable schedule'};
 const DEFAULT_META5={dwg:'E-202',title:'Patch panels'};
 const DEFAULT_META6={dwg:'E-501',title:'Bill of materials',price:'none'};
+const DEFAULT_META7={dwg:'E-601',title:'IP & VLAN schedule'};
 const S={
   view:'overview',
-  design:{nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta:{...DEFAULT_META},meta2:{...DEFAULT_META2},meta3:{...DEFAULT_META3},meta4:{...DEFAULT_META4},meta5:{...DEFAULT_META5},meta6:{...DEFAULT_META6},plan:null},
+  design:{nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta:{...DEFAULT_META},meta2:{...DEFAULT_META2},meta3:{...DEFAULT_META3},meta4:{...DEFAULT_META4},meta5:{...DEFAULT_META5},meta6:{...DEFAULT_META6},meta7:{...DEFAULT_META7},plan:null},
   ui:{route:'curved',labels:'mid',hide:{},tab:'props',sheet:'flow',cov:true,runs:true},
   sel:null,wire:null,drag:null,rdrag:null,pdrag:null,planTool:null,pan:null,bld:null,
   prop:{no:'P-'+new Date().getFullYear()+'-0001',client:'',project:'First project',markup:35,laborMethod:'hours',laborRate:115,laborPct:18,tax:4.712,status:'Draft',log:[],signedTotal:null,signer:null,link:null},
@@ -1421,7 +1423,7 @@ function normDesign(d){if(!d||!Array.isArray(d.nodes))return null;const o={d};
   o.d.meta=Object.assign({...DEFAULT_META},o.d.meta||{});o.d.meta2=Object.assign({...DEFAULT_META2},o.d.meta2||{});
   o.d.extras=o.d.extras||[];o.d.seq=o.d.seq||{};o.d.racks=o.d.racks||[];
   o.d.meta3=Object.assign({...DEFAULT_META3},o.d.meta3||{});o.d.meta4=Object.assign({...DEFAULT_META4},o.d.meta4||{});
-  o.d.meta5=Object.assign({...DEFAULT_META5},o.d.meta5||{});o.d.meta6=Object.assign({...DEFAULT_META6},o.d.meta6||{});o.d.panels=Array.isArray(o.d.panels)?o.d.panels:[];o.d.panels.forEach(p=>{p.map=p.map||{}});if(!o.d.plan)o.d.plan=newPlan(S.prop.project,6,4.5);
+  o.d.meta5=Object.assign({...DEFAULT_META5},o.d.meta5||{});o.d.meta6=Object.assign({...DEFAULT_META6},o.d.meta6||{});o.d.meta7=Object.assign({...DEFAULT_META7},o.d.meta7||{});o.d.panels=Array.isArray(o.d.panels)?o.d.panels:[];o.d.panels.forEach(p=>{p.map=p.map||{}});if(!o.d.plan)o.d.plan=newPlan(S.prop.project,6,4.5);
   return o.d}
 function loadSaved(){try{const raw=localStorage.getItem(KEY);if(!raw)return false;const o=JSON.parse(raw);
   (o.lib||[]).forEach(p=>{if(!byId(p.id))lib.push(p)});
@@ -1484,7 +1486,7 @@ function switchProject(id){
   if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
   cleanRacks();tkNormAll();
   H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.padd=false;S.ui.pform=null;
-  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom)c.init=false});
+  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});
   save();return true}
 function createProject(f){
   const cur=curPj(),base=S.prop,src=f.start==='copy'?JSON.parse(JSON.stringify(S.design)):null,srcU=uidc;
@@ -1498,7 +1500,7 @@ function createProject(f){
   else{S.design=JSON.parse(JSON.stringify(S.design));loadTemplate(f.start);const r=S.design.racks[0];if(r&&+f.rack>r.size){r.size=+f.rack;if(f.start!=='blank')autoArrange(r)}if(f.start==='blank'&&r)r.name='Equipment rack'}
   S.design.meta.rev='A';
   H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.sheet='flow';
-  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom)c.init=false});
+  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});
   save();return e}
 
 /* ---------- signal-flow model ---------- */
@@ -1754,8 +1756,8 @@ function deviceOptions(){const tg=tags(),out=[];
   return out.sort((a,b)=>tg[a.ep.uid].localeCompare(tg[b.ep.uid],undefined,{numeric:true})||(a.t==='net'?0:1)-(b.t==='net'?0:1))}
 
 function loadTemplate(kind){
-  const meta=S.design.meta||{...DEFAULT_META},meta2=S.design.meta2||{...DEFAULT_META2},meta3=S.design.meta3||{...DEFAULT_META3},meta4=S.design.meta4||{...DEFAULT_META4},meta5=S.design.meta5||{...DEFAULT_META5},meta6=S.design.meta6||{...DEFAULT_META6};
-  S.design={nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta,meta2,meta3,meta4,meta5,meta6,plan:newPlan(S.prop.project,6,4.5)};S.sel=null;S.wire=null;S.planTool=null;
+  const meta=S.design.meta||{...DEFAULT_META},meta2=S.design.meta2||{...DEFAULT_META2},meta3=S.design.meta3||{...DEFAULT_META3},meta4=S.design.meta4||{...DEFAULT_META4},meta5=S.design.meta5||{...DEFAULT_META5},meta6=S.design.meta6||{...DEFAULT_META6},meta7=S.design.meta7||{...DEFAULT_META7};
+  S.design={nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta,meta2,meta3,meta4,meta5,meta6,meta7,plan:newPlan(S.prop.project,6,4.5)};S.sel=null;S.wire=null;S.planTool=null;
   const a=(pid,x,y)=>{const n={uid:nid(),pid,x,y};S.design.nodes.push(n);return n.uid};
   const at=(uid,xm,ym,rot)=>{node(uid).fp={x:RO.x+xm*100,y:RO.y+ym*100,rot:rot||0}};
   const c=(au,ai,bu,bi)=>connectRaw({uid:au,dir:'out',i:ai},{uid:bu,dir:'in',i:bi});
@@ -1875,7 +1877,7 @@ R.overview=function(){
 };
 
 /* ================= DESIGN EDITOR ================= */
-const cams={flow:{x:0,y:0,k:1,init:false},rack:{x:0,y:0,k:1,init:false},plan:{x:0,y:0,k:1,init:false},sched:{x:0,y:0,k:1,init:true},patch:{x:0,y:0,k:1,init:true},bom:{x:0,y:0,k:1,init:true}};
+const cams={flow:{x:0,y:0,k:1,init:false},rack:{x:0,y:0,k:1,init:false},plan:{x:0,y:0,k:1,init:false},sched:{x:0,y:0,k:1,init:true},patch:{x:0,y:0,k:1,init:true},bom:{x:0,y:0,k:1,init:true},ip:{x:0,y:0,k:1,init:true}};
 let cam=cams.flow;
 const ptrs=new Map();let pinch=null;
 const isSel=(k,id)=>S.sel&&S.sel.kind===k&&S.sel.id===id;
@@ -1888,26 +1890,27 @@ const onPatch=()=>S.ui.sheet==='patch';
 R.design=function(){R.design0();fsApply()};
 R.design0=function(){
   cam=cams[S.ui.sheet]||cams.flow;
-  if(!S.design.meta6)S.design.meta6={...DEFAULT_META6};
-  const m=S.design.meta,m2=S.design.meta2,m3=S.design.meta3,m4=S.design.meta4,m5=S.design.meta5,m6=S.design.meta6,rk=onRack(),pn=onPlan(),sc=onSched(),pp=onPatch(),bm=onBom(),cur=rk?m2:pn?m3:sc?m4:pp?m5:bm?m6:m;
+  if(!S.design.meta6)S.design.meta6={...DEFAULT_META6};if(!S.design.meta7)S.design.meta7={...DEFAULT_META7};
+  const m=S.design.meta,m2=S.design.meta2,m3=S.design.meta3,m4=S.design.meta4,m5=S.design.meta5,m6=S.design.meta6,m7=S.design.meta7,rk=onRack(),pn=onPlan(),sc=onSched(),pp=onPatch(),bm=onBom(),ipv=onIp(),cur=rk?m2:pn?m3:sc?m4:pp?m5:bm?m6:ipv?m7:m;
   $('#v-design').innerHTML=`
   <header class="vh"><div><p class="eyebrow">${esc(cliName(S.prop))} · ${esc(S.prop.project)} · DWG ${esc(cur.dwg)} rev ${esc(m.rev)}</p><h1>${esc(cur.title)}</h1></div>
    <div class="actions">
     <select class="inp" id="tplSel" aria-label="Room template" style="width:auto"><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="blank">Blank drawing set</option></select>
     <button class="btn" data-act="loadTpl">Load</button>
-    ${rk||pn||sc||pp||bm?'':'<button class="btn" data-act="newBlock">New device block</button>'}
+    ${rk||pn||sc||pp||bm||ipv?'':'<button class="btn" data-act="newBlock">New device block</button>'}
     <button class="btn" data-act="fsToggle" title="Work on this sheet full screen (F)">⤢ Full screen</button>
     <button class="btn primary" data-go="proposal">Build proposal →</button></div></header>
-  ${fsBarHTML(cur,!(sc||pp||bm))}
+  ${fsBarHTML(cur,!(sc||pp||bm||ipv))}
   <div class="sheets" role="tablist" aria-label="Drawing sheets">
-   <button role="tab" data-sheet="flow" aria-selected="${!rk&&!pn&&!sc&&!pp&&!bm}"><span>${esc(m.dwg)}</span><b>${esc(m.title)}</b></button>
+   <button role="tab" data-sheet="flow" aria-selected="${!rk&&!pn&&!sc&&!pp&&!bm&&!ipv}"><span>${esc(m.dwg)}</span><b>${esc(m.title)}</b></button>
    <button role="tab" data-sheet="rack" aria-selected="${rk}"><span>${esc(m2.dwg)}</span><b>${esc(m2.title)}</b></button>
    <button role="tab" data-sheet="patch" aria-selected="${pp}"><span>${esc(m5.dwg)}</span><b>${esc(m5.title)}</b></button>
    <button role="tab" data-sheet="plan" aria-selected="${pn}"><span>${esc(m3.dwg)}</span><b>${esc(m3.title)}</b></button>
    <button role="tab" data-sheet="sched" aria-selected="${sc}"><span>${esc(m4.dwg)}</span><b>${esc(m4.title)}</b></button>
    <button role="tab" data-sheet="bom" aria-selected="${bm}"><span>${esc(m6.dwg)}</span><b>${esc(m6.title)}</b></button>
+   <button role="tab" data-sheet="ip" aria-selected="${ipv}"><span>${esc(m7.dwg)}</span><b>${esc(m7.title)}</b></button>
   </div>
-  ${sc?schedShellHTML():pp?patchShellHTML():bm?bomShellHTML():`<div class="dgrid">
+  ${sc?schedShellHTML():pp?patchShellHTML():bm?bomShellHTML():ipv?ipShellHTML():`<div class="dgrid">
    <aside class="panel pal"><div class="ph"><h2>${rk?'Rack equipment':pn?'Room devices':'Devices'}</h2><span class="muted" style="font-size:12px">${rk?'Drag onto a rack':pn?'Drag onto the plan':'Drag onto sheet'}</span></div><div class="pb">
     <input class="inp" id="palQ" placeholder="${rk?'Search rack gear':pn?'Search devices and racks':'Search model, brand, type'}" aria-label="Search devices">
     <div class="palList" id="palList"></div>
@@ -1931,6 +1934,7 @@ R.design0=function(){
   if(sc){bindSched();renderSched();return}
   if(pp){renderPatch();return}
   if(bm){bindBom();renderBom();return}
+  if(ipv){bindIp();renderIp();return}
   renderToolbar();renderPal();renderCanvas();renderInspector();renderRackConn();applyCam();
   const sv=$('#cv');
   sv.addEventListener('pointerdown',onDown);
@@ -1953,7 +1957,7 @@ function setSheet(s,selId){
   S.ui.sheet=s;S.wire=null;S.rdrag=null;S.drag=null;S.pdrag=null;if(s!=='plan')S.planTool=null;S.sel=selId||null;cam=cams[s];save();
   if(S.view!=='design')go('design');else R.design();
 }
-function refreshDesign(){if(S.view==='design'&&onBom()){renderBom();badges();return}if(S.view==='design'&&onSched()){renderSched();badges();return}if(S.view==='design'&&onPatch()){renderPatch();badges();return}if(!designOn()){badges();return}renderCanvas();renderInspector();renderToolbar();renderPal();renderRackConn();badges()}
+function refreshDesign(){if(S.view==='design'&&onIp()){renderIp();badges();return}if(S.view==='design'&&onBom()){renderBom();badges();return}if(S.view==='design'&&onSched()){renderSched();badges();return}if(S.view==='design'&&onPatch()){renderPatch();badges();return}if(!designOn()){badges();return}renderCanvas();renderInspector();renderToolbar();renderPal();renderRackConn();badges()}
 function renderToolbar(){renderToolbar0();const t=$('#tbar');if(t)t.insertAdjacentHTML('beforeend',fsBtnHTML())}
 function renderToolbar0(){
   const t=$('#tbar');if(!t)return;
@@ -4035,10 +4039,110 @@ async function poPdf(po){
   const blob=doc.output('blob'),r=await saveFile(blob,`${po.no} ${po.vendor}.pdf`.replace(/[\\/:*?"<>|]+/g,' '));
   toast(r==='saved'?'PDF ready.':r==='declined'?'Download cancelled.':'PDF ready.')}
 
+/* ================= IP & VLAN SCHEDULE SHEET =================
+   E-601 lists every device on the drawings that has a network port: its VLAN, IP, hostname,
+   addressing mode, MAC, the switch and port it's cabled to (read from the signal flow), and
+   PoE draw. VLANs, addresses and switch PoE budgets are kept in the design (S.design.ipam)
+   so they undo, save and go out with the drawing set like every other sheet. */
+const onIp=()=>S.ui.sheet==='ip';
+const IP_MODES=['Static','DHCP reservation','DHCP'];
+const ipam=()=>{const d=S.design;if(!d.ipam||typeof d.ipam!=='object')d.ipam={};const m=d.ipam;if(!Array.isArray(m.vlans))m.vlans=[];if(!m.hosts||typeof m.hosts!=='object')m.hosts={};if(!m.poe||typeof m.poe!=='object')m.poe={};return m};
+const ip2n=s=>{const m=String(s||'').trim().match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);if(!m)return null;const o=m.slice(1).map(Number);if(o.some(x=>x>255))return null;return ((o[0]<<24)>>>0)+(o[1]<<16)+(o[2]<<8)+o[3]};
+const n2ip=n=>[n>>>24,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+function cidr(s){const m=String(s||'').trim().match(/^([\d.]+)\/(\d{1,2})$/);if(!m)return null;const b=ip2n(m[1]),bits=+m[2];if(b==null||bits<8||bits>30)return null;
+  const mask=bits===0?0:(0xFFFFFFFF<<(32-bits))>>>0,net=(b&mask)>>>0;return {net,bits,mask,first:net+1,last:(net|(~mask>>>0))-1,bcast:(net|(~mask>>>0))>>>0}}
+const inNet=(n,c)=>c&&n!=null&&n>=c.first&&n<=c.last;
+const maskTxt=bits=>n2ip(bits===0?0:(0xFFFFFFFF<<(32-bits))>>>0);
+const isSwitch=p=>p&&p.cat==='Network';
+const netPortsOf=p=>[...(p.ins||[]).map((x,i)=>({...x,dir:'in',i})),...(p.outs||[]).map((x,i)=>({...x,dir:'out',i}))].filter(x=>x.t==='net');
+const isPoE=(n,p)=>!isSwitch(p)&&(netPortsOf(p).some(x=>/poe/i.test(x.n))||/\bpoe\+?\b/i.test(p.desc||''));
+/* the switch and port a device's network port is cabled to, read from the signal flow */
+function ipLink(n){const out=[];S.design.cables.forEach(c=>{if(c.type!=='net')return;
+  const mine=c.a.uid===n.uid?c.a:c.b.uid===n.uid?c.b:null;if(!mine)return;const other=mine===c.a?c.b:c.a,on=node(other.uid);if(!on)return;const op=prod(on);
+  out.push({other:on,op,port:pDef(other),mine:pDef(mine),sw:isSwitch(op)})});return out}
+function ipRows(){const tg=tags(),m=ipam(),vl=new Map(m.vlans.map(v=>[String(v.id),v]));
+  const rows=S.design.nodes.map(n=>({n,p:prod(n)})).filter(({p})=>netPortsOf(p).length).map(({n,p})=>{
+    const h=m.hosts[n.uid]||{},links=ipLink(n),sw=links.find(l=>l.sw)||null,v=vl.get(String(h.vlan||''))||null;
+    return {n,p,tag:tg[n.uid]||'',loc:endLoc(n.uid),h,v,links,sw,poe:isSwitch(p)?0:h.poe!=null&&h.poe!==''?Math.max(0,+h.poe||0):isPoE(n,p)?(+p.watts||0):0,isSw:isSwitch(p)}});
+  /* problems: duplicate address, outside its VLAN, no VLAN */
+  const seen=new Map();rows.forEach(r=>{const a=ip2n(r.h.ip);if(a!=null){if(!seen.has(a))seen.set(a,[]);seen.get(a).push(r)}});
+  rows.forEach(r=>{const a=ip2n(r.h.ip),c=r.v&&cidr(r.v.subnet);r.err=[];
+    if(r.h.ip&&a==null)r.err.push('Not a valid address');
+    if(a!=null&&seen.get(a).length>1)r.err.push(`Same address as ${seen.get(a).filter(x=>x!==r).map(x=>x.tag).join(', ')}`);
+    if(a!=null&&c&&!inNet(a,c))r.err.push(`Outside VLAN ${r.v.id} (${r.v.subnet})`);
+    if(a!=null&&r.v&&ip2n(r.v.gateway)===a)r.err.push('Same as the gateway');
+    if(!r.v&&!r.isSw)r.err.push('No VLAN')});
+  return rows.sort((a,b)=>String(a.tag).localeCompare(String(b.tag),undefined,{numeric:true}))}
+function ipSwitches(rows){return rows.filter(r=>r.isSw).map(r=>{const ports=netPortsOf(r.p),used=new Set(),devs=[];
+  S.design.cables.forEach(c=>{if(c.type!=='net')return;[[c.a,c.b],[c.b,c.a]].forEach(([me,ot])=>{if(me.uid!==r.n.uid)return;used.add(me.dir+me.i);const or=rows.find(x=>x.n.uid===ot.uid);if(or&&or.poe)devs.push(or)})});
+  const draw=devs.reduce((s,d)=>s+d.poe,0),budget=+ipam().poe[r.n.uid]||0;return {r,ports:ports.length,used:used.size,draw,budget,devs}})}
+const swTxt=r=>r.isSw?'—':r.sw?`${r.sw.other?tags()[r.sw.other.uid]:''} · ${r.sw.port?r.sw.port.n:'?'}`:r.links.length?`via ${tags()[r.links[0].other.uid]||r.links[0].op.model}`:'Not cabled';
+function ipShellHTML(){const m7=S.design.meta7;
+  return `<div class="schedbar"><input class="inp grow" id="ipQ" placeholder="Search tag, device, IP, VLAN, hostname" value="${esc(S.ui.iq||'')}" aria-label="Search the IP schedule">
+    <span id="ipHist"></span><button class="btn" data-act="ipSuggest">Suggest VLANs</button><button class="btn primary" data-act="ipFill">Fill in addresses</button><button class="btn" data-act="copyIp">Copy as CSV</button></div>
+  <div id="ipSum"></div>
+  <div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>VLANs</h2><span class="tgrow"></span><button class="btn sm" data-act="vlanAdd">+ Add VLAN</button></div><div id="ipVlans"></div></div>
+  <div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>${esc(m7.dwg)} · ${esc(m7.title)}</h2><span class="muted" style="font-size:12px" id="ipCount"></span><span class="tgrow"></span>
+    <label class="field inl" for="m7T">Sheet title<input class="inp" id="m7T" data-m7prop="title" value="${esc(m7.title)}"></label><label class="field inl" for="m7D">Drawing no.<input class="inp" id="m7D" data-m7prop="dwg" value="${esc(m7.dwg)}" style="width:90px"></label></div>
+   <div class="schedwrap" id="ipTable"></div></div>
+  <div class="panel"><div class="ph"><h2>Switch ports and PoE</h2><span class="muted" style="font-size:12px">From the network cables on the signal flow</span></div><div id="ipSw"></div></div>`}
+function ipTableHTML(rows,edit){const vl=ipam().vlans;
+  const cell=(r,k,ph,w)=>edit?`<input class="cellin${k==='ip'||k==='mac'?' mono':''}" data-iph="${k}" data-uid="${r.n.uid}" value="${esc(r.h[k]||'')}" placeholder="${esc(ph)}" style="width:${w}px" aria-label="${k} for ${esc(r.tag)}" spellcheck="false" autocomplete="off">`:`<span class="${k==='ip'||k==='mac'?'mono':''}">${esc(r.h[k]||'')}</span>`;
+  return `<table class="t ipt"><thead><tr><th>Tag</th><th>Device</th><th>Location</th><th>VLAN</th><th>IP address</th><th>Hostname</th><th>Addressing</th><th>MAC</th><th>Switch · port</th><th class="n">PoE W</th></tr></thead><tbody>
+   ${rows.map(r=>`<tr${r.err.length?' class="iperr"':''}><td class="mono"><b>${esc(r.tag)}</b></td><td>${esc(r.p.model)} <span class="muted">${esc(r.p.mfr)}</span>${r.err.length?`<br><span class="bad sm">${esc(r.err.join(' · '))}</span>`:''}</td><td class="sm">${esc(r.loc||'')}</td>
+    <td>${edit?`<select class="cellin" data-iph="vlan" data-uid="${r.n.uid}" aria-label="VLAN for ${esc(r.tag)}"><option value="">—</option>${vl.map(v=>`<option value="${esc(v.id)}" ${String(r.h.vlan)===String(v.id)?'selected':''}>${esc(v.id)} ${esc(v.name)}</option>`).join('')}</select>`:esc(r.v?`${r.v.id} ${r.v.name}`:'')}</td>
+    <td>${cell(r,'ip','10.10.10.11',118)}</td><td>${cell(r,'host',String(r.tag).toLowerCase(),120)}</td>
+    <td>${edit?`<select class="cellin" data-iph="mode" data-uid="${r.n.uid}" aria-label="Addressing for ${esc(r.tag)}">${IP_MODES.map(x=>`<option ${(r.h.mode||'Static')===x?'selected':''}>${x}</option>`).join('')}</select>`:esc(r.h.mode||'Static')}</td>
+    <td>${cell(r,'mac','Add later',140)}</td><td class="sm mono">${esc(swTxt(r))}</td><td class="n">${r.isSw?'—':edit?`<input class="cellin num" type="number" min="0" step="1" data-iph="poe" data-uid="${r.n.uid}" value="${r.poe||''}" placeholder="0" style="width:60px" aria-label="PoE watts for ${esc(r.tag)}">`:(r.poe||'—')}</td></tr>`).join('')
+    ||'<tr><td colspan="10" class="muted">No devices with a network port on the drawings yet.</td></tr>'}</tbody></table>`}
+function renderIp(){if(!$('#ipTable'))return;const m=ipam(),all=ipRows(),q=(S.ui.iq||'').toLowerCase();
+  const rows=all.filter(r=>!q||[r.tag,r.p.model,r.p.mfr,r.h.ip,r.h.host,r.h.mac,r.v&&r.v.id,r.v&&r.v.name,r.loc].join(' ').toLowerCase().includes(q));
+  $('#ipHist').innerHTML=`<span class="seg" role="group" aria-label="History"><button data-act="undo" ${H.past.length?'':'disabled'}>↶ Undo</button><button data-act="redo" ${H.future.length?'':'disabled'}>Redo ↷</button></span>`;
+  const errs=all.filter(r=>r.err.length).length,noIp=all.filter(r=>!r.h.ip&&(r.h.mode||'Static')!=='DHCP').length,sws=ipSwitches(all),over=sws.filter(s=>s.budget&&s.draw>s.budget).length;
+  $('#ipSum').innerHTML=`<div class="schedcards">
+   <div class="panel kpi"><div class="l">Network devices</div><div class="v">${all.length}</div><div class="s"><span>${plural(m.vlans.length,'VLAN')}</span><span>${plural(sws.length,'switch','switches')}</span></div></div>
+   <div class="panel kpi"><div class="l">Need an address</div><div class="v">${noIp}</div><div class="s"><span>${errs?`<span class="bad">${plural(errs,'problem')}</span>`:'No conflicts'}</span></div></div>
+   <div class="panel kpi"><div class="l">PoE draw</div><div class="v">${all.reduce((s,r)=>s+r.poe,0)} W</div><div class="s"><span>${over?`<span class="bad">${plural(over,'switch','switches')} over budget</span>`:'Within switch budgets'}</span></div></div></div>`;
+  $('#ipVlans').innerHTML=m.vlans.length?`<div class="scroll"><table class="t"><thead><tr><th>VLAN ID</th><th>Name</th><th>Subnet</th><th>Mask</th><th>Gateway</th><th class="n">Devices</th><th></th></tr></thead><tbody>
+    ${m.vlans.map((v,i)=>{const c=cidr(v.subnet);return `<tr><td><input class="cellin num" type="number" min="1" max="4094" data-vl="id" data-i="${i}" value="${esc(v.id)}" style="width:72px" aria-label="VLAN ID"></td><td><input class="cellin" data-vl="name" data-i="${i}" value="${esc(v.name)}" aria-label="VLAN name"></td>
+     <td><input class="cellin mono" data-vl="subnet" data-i="${i}" value="${esc(v.subnet)}" placeholder="10.10.10.0/24" style="width:130px" aria-label="Subnet">${v.subnet&&!c?'<br><span class="bad sm">Use a.b.c.d/24</span>':''}</td><td class="mono sm">${c?maskTxt(c.bits):'—'}</td>
+     <td><input class="cellin mono" data-vl="gateway" data-i="${i}" value="${esc(v.gateway||'')}" placeholder="10.10.10.1" style="width:118px" aria-label="Gateway"></td><td class="n">${all.filter(r=>String(r.h.vlan)===String(v.id)).length}</td><td><button class="lnk" data-act="vlanDel" data-i="${i}">remove</button></td></tr>`}).join('')}</tbody></table></div>`
+    :'<div class="pb"><p class="muted" style="margin:0">No VLANs yet. <b>Suggest VLANs</b> sets up AV, Audio (Dante) and Management networks and puts each device on one, or add your own.</p></div>';
+  $('#ipCount').textContent=rows.length===all.length?plural(all.length,'device'):`${rows.length} of ${all.length} devices`;
+  $('#ipTable').innerHTML=ipTableHTML(rows,true);
+  $('#ipSw').innerHTML=sws.length?`<div class="scroll"><table class="t"><thead><tr><th>Switch</th><th class="n">Network ports used</th><th class="n">PoE draw</th><th class="n">PoE budget (W)</th><th>Powered devices</th></tr></thead><tbody>
+    ${sws.map(s=>`<tr${s.budget&&s.draw>s.budget?' class="iperr"':''}><td><b class="mono">${esc(s.r.tag)}</b> ${esc(s.r.p.model)}</td><td class="n">${s.used} of ${s.ports}</td><td class="n"><b>${s.draw} W</b>${s.budget&&s.draw>s.budget?` <span class="bad sm">over by ${s.draw-s.budget} W</span>`:''}</td>
+     <td class="n"><input class="cellin num" type="number" min="0" step="1" data-poe="${s.r.n.uid}" value="${s.budget||''}" placeholder="e.g. 120" style="width:80px" aria-label="PoE budget for ${esc(s.r.tag)}"></td><td class="sm">${esc(s.devs.map(d=>`${d.tag} ${d.poe} W`).join(', ')||'—')}</td></tr>`).join('')}</tbody></table></div>`
+    :'<div class="pb"><p class="muted" style="margin:0">No network switch on the drawings. Add one from the library (category Network) and cable devices to it.</p></div>'}
+function bindIp(){
+  $('#ipQ').addEventListener('input',e=>{S.ui.iq=e.target.value;renderIp()});
+  const v=$('#v-design');if(v.dataset.ipb)return;v.dataset.ipb=1;
+  v.addEventListener('change',e=>{if(!onIp())return;const t=e.target,m=ipam();
+    if(t.dataset.iph){const k=t.dataset.iph,uid=t.dataset.uid,val=t.value.trim();mut(()=>{const h=m.hosts[uid]=m.hosts[uid]||{};if(val)h[k]=k==='mac'?val.toUpperCase():val;else delete h[k]});renderIp();return}
+    if(t.dataset.vl){const v2=m.vlans[+t.dataset.i];if(!v2)return;const k=t.dataset.vl,val=t.value.trim();
+      mut(()=>{if(k==='id'){const nid=String(Math.max(1,Math.min(4094,parseInt(val)||1)));Object.values(m.hosts).forEach(h=>{if(String(h.vlan)===String(v2.id))h.vlan=nid});v2.id=nid}else v2[k]=val});renderIp();return}
+    if(t.dataset.poe){const uid=t.dataset.poe,val=Math.max(0,+t.value||0);mut(()=>{if(val)m.poe[uid]=val;else delete m.poe[uid]});renderIp();return}
+    if(t.dataset.m7prop){const val=t.value.trim();if(!val)return;mut(()=>S.design.meta7[t.dataset.m7prop]=val);R.design()}})}
+/* AV-sensible starting plan: control/video, Dante audio, and switch management */
+const IP_AUDIO=['DSP','Microphone','Amplifier','Speaker','Soundbar'];
+function ipSuggest(){const m=ipam();if(!m.vlans.length)m.vlans.push({id:'10',name:'AV',subnet:'10.10.10.0/24',gateway:'10.10.10.1'},{id:'20',name:'Audio (Dante)',subnet:'10.10.20.0/24',gateway:'10.10.20.1'},{id:'99',name:'Management',subnet:'10.10.99.0/24',gateway:'10.10.99.1'});
+  const has=id=>m.vlans.some(v=>String(v.id)===id),pick=p=>isSwitch(p)&&has('99')?'99':IP_AUDIO.includes(p.cat)&&has('20')?'20':has('10')?'10':String(m.vlans[0].id);let n=0;
+  ipRows().forEach(r=>{const h=m.hosts[r.n.uid]=m.hosts[r.n.uid]||{};if(!h.vlan){h.vlan=pick(r.p);n++}});return n}
+function ipFill(){const m=ipam(),rows=ipRows(),used=new Set(rows.map(r=>ip2n(r.h.ip)).filter(x=>x!=null));let n=0,skipped=0;
+  m.vlans.forEach(v=>{const g=ip2n(v.gateway);if(g!=null)used.add(g)});
+  rows.forEach(r=>{const h=m.hosts[r.n.uid]=m.hosts[r.n.uid]||{};if(!h.host)h.host=String(r.tag).toLowerCase();
+    if(h.ip||(h.mode||'Static')==='DHCP')return;const v=r.v,c=v&&cidr(v.subnet);if(!c){skipped++;return}
+    let a=c.first+(r.isSw?1:10);while(a<=c.last&&used.has(a))a++;if(a>c.last){skipped++;return}h.ip=n2ip(a);used.add(a);n++});return {n,skipped}}
+function ipCSV(){const q=v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  return [['Tag','Manufacturer','Model','Location','VLAN','VLAN name','IP','Mask','Gateway','Hostname','Addressing','MAC','Switch port','PoE W'],...ipRows().map(r=>{const c=r.v&&cidr(r.v.subnet);return [r.tag,r.p.mfr,r.p.model,r.loc,r.v?r.v.id:'',r.v?r.v.name:'',r.h.ip||'',c?maskTxt(c.bits):'',r.v?r.v.gateway||'':'',r.h.host||'',r.h.mode||'Static',r.h.mac||'',swTxt(r),r.poe||'']})].map(r=>r.map(q).join(',')).join('\n')}
+function snapIp(){const rows=ipRows();if(!rows.length)return {html:'<p class="muted">No network devices yet.</p>',sum:'No network devices'};const m=ipam();
+  const vt=m.vlans.length?`<table class="t"><thead><tr><th>VLAN</th><th>Name</th><th>Subnet</th><th>Gateway</th></tr></thead><tbody>${m.vlans.map(v=>`<tr><td>${esc(v.id)}</td><td>${esc(v.name)}</td><td class="mono">${esc(v.subnet)}</td><td class="mono">${esc(v.gateway||'')}</td></tr>`).join('')}</tbody></table>`:'';
+  return {html:vt+ipTableHTML(rows,false),sum:`${plural(rows.length,'device')} · ${plural(m.vlans.length,'VLAN')}`}}
+
 /* ================= PROPOSAL ================= */
 /* ---------- drawing set attached to proposals ----------
    Captured when the proposal is sent (and again on a change order), so the client sees the sheets exactly as proposed. */
-const DSHEETS=[['flow','meta'],['rack','meta2'],['patch','meta5'],['plan','meta3'],['sched','meta4'],['bom','meta6']];
+const DSHEETS=[['flow','meta'],['rack','meta2'],['patch','meta5'],['plan','meta3'],['sched','meta4'],['bom','meta6'],['ip','meta7']];
 const snapDefs=()=>`<defs>${logoSym()}<pattern id="gmin" width="20" height="20" patternUnits="userSpaceOnUse"><path class="gmin" d="M20 0H0V20"/></pattern><pattern id="gmaj" width="100" height="100" patternUnits="userSpaceOnUse"><path class="gmaj" d="M100 0H0V100"/></pattern></defs>`;
 /* draws one canvas sheet off-screen with the editor's own renderer and returns its SVG markup */
 function snapCanvas(sheet){
@@ -4066,7 +4170,7 @@ function snapSched(){const rows=schedRows().sort((a,b)=>a.id.localeCompare(b.id,
     sum:`${plural(rows.length,'cable run')} · ${tot} m`}}
 function drawingSet(){const d=S.design,at=S.prop.attach||{};
   return {at:dayFmt(0)+' '+nowT(),rev:d.meta.rev,sheets:DSHEETS.filter(([k])=>at[k]!==false).map(([k,mk])=>{const m=d[mk],x={k,dwg:m.dwg,title:m.title};
-    if(k==='patch'){const p=snapPatch();x.html=p.html;x.sum=p.sum}else if(k==='sched'){const p=snapSched();x.html=p.html;x.sum=p.sum}else if(k==='bom'){const p=snapBom();x.html=p.html;x.sum=p.sum}else x.svg=snapCanvas(k);return x})}}
+    if(k==='patch'){const p=snapPatch();x.html=p.html;x.sum=p.sum}else if(k==='sched'){const p=snapSched();x.html=p.html;x.sum=p.sum}else if(k==='bom'){const p=snapBom();x.html=p.html;x.sum=p.sum}else if(k==='ip'){const p=snapIp();x.html=p.html;x.sum=p.sum}else x.svg=snapCanvas(k);return x})}}
 const sheetSet=()=>S.prop.drawings||S.liveSet||(S.liveSet=drawingSet());
 const sheetList=set=>set.sheets.map(s=>s.dwg).join(', ');
 function sheetBody(sh){return sh.svg!=null?`<svg class="dsheet" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="${esc(sh.dwg+' '+sh.title)}">${snapDefs()}${sh.svg}</svg>`
@@ -4388,6 +4492,13 @@ async function buildProposalPdf(){
         didDrawPage:()=>sheetHead(sh)});
       const y2=doc.lastAutoTable.finalY+14;doc.setFontSize(8);doc.setTextColor(...MUTED);
       doc.text(pt(`${plural(rows.length,'line')} · ${plural(rows.reduce((s,r)=>s+r.qty,0),'piece')}${np?'':` · ${pr==='sell'?'sell':'dealer'} total ${money2(rows.reduce((s,r)=>s+r.unit[pr]*r.qty,0))}`}`),LM,Math.min(y2,LH-30))}
+    else if(sh.k==='ip'){sheetHead(sh);const rows=ipRows(),m=ipam();let y0=52;
+      if(m.vlans.length){doc.autoTable({startY:y0,margin:{left:LM,right:LM,top:52,bottom:40},head:[['VLAN','Name','Subnet','Mask','Gateway']],body:m.vlans.map(v=>{const c=cidr(v.subnet);return [String(v.id),pt(v.name),pt(v.subnet),c?maskTxt(c.bits):'',pt(v.gateway||'')]}),theme:'grid',styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:INK},tableWidth:380,didDrawPage:()=>sheetHead(sh)});y0=doc.lastAutoTable.finalY+14}
+      doc.autoTable({startY:y0,margin:{left:LM,right:LM,top:52,bottom:40},head:[['Tag','Device','Location','VLAN','IP address','Hostname','Addressing','MAC','Switch port','PoE W']],
+        body:rows.map(r=>[pt(r.tag),pt(`${r.p.mfr} ${r.p.model}`),pt(r.loc||''),r.v?String(r.v.id):'',pt(r.h.ip||''),pt(r.h.host||''),pt(r.h.mode||'Static'),pt(r.h.mac||''),pt(swTxt(r)),r.poe?String(r.poe):'']),
+        theme:'striped',styles:{fontSize:7.5,cellPadding:3},headStyles:{fillColor:INK},columnStyles:{9:{halign:'right'}},didDrawPage:()=>sheetHead(sh)});
+      const sws=ipSwitches(rows);let y2=doc.lastAutoTable.finalY+14;
+      if(sws.length&&y2<LH-80){doc.autoTable({startY:y2,margin:{left:LM,right:LM,top:52,bottom:40},head:[['Switch','Ports used','PoE draw','PoE budget']],body:sws.map(x=>[pt(`${x.r.tag} ${x.r.p.model}`),`${x.used} of ${x.ports}`,`${x.draw} W`,x.budget?`${x.budget} W`:'-']),theme:'grid',styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:INK},tableWidth:380,didDrawPage:()=>sheetHead(sh)})}}
   }
   /* --- footers --- */
   const n=doc.getNumberOfPages();
@@ -5138,7 +5249,7 @@ const A={
   sheet(el){setSheet(el.dataset.sheet)},
   openRack(){S.ui.sheet='rack';cam=cams.rack;S.sel=null;save();go('design')},
   openFlow(){S.ui.sheet='flow';cam=cams.flow;S.sel=null;save();go('design')},
-  selCable(el){if(onRack()||onSched()||onPatch()||onBom()){setSheet('flow',{kind:'cable',id:el.dataset.id});return}S.sel={kind:'cable',id:el.dataset.id};S.wire=null;renderCanvas();renderInspector()},
+  selCable(el){if(onRack()||onSched()||onPatch()||onBom()||onIp()){setSheet('flow',{kind:'cable',id:el.dataset.id});return}S.sel={kind:'cable',id:el.dataset.id};S.wire=null;renderCanvas();renderInspector()},
   selNode(el){const sel={kind:'node',id:el.dataset.id};S.ui.tab='props';if(S.view!=='design'||S.ui.sheet!=='flow'){S.ui.sheet='flow';cam=cams.flow;S.sel=sel;save();go('design');return}S.sel=sel;S.wire=null;renderCanvas();renderInspector()},
   selRack(el){select('rack',el.dataset.id)},
   showOnFlow(el){setSheet('flow',{kind:'node',id:el.dataset.id})},
@@ -5249,6 +5360,11 @@ const A={
   poPdf(el){const po=poAll().find(p=>p.id===el.dataset.id);if(po)poPdf(po).catch(()=>toast('Couldn’t build the PDF. Check your connection and try again.'))},
   vendAdd(){vendors().push({name:'New vendor',contact:'',email:'',phone:'',account:''});saveSettings();S.ui.poVend=true;R.purchasing();requestAnimationFrame(()=>{const i=document.querySelector(`[data-vend="name"][data-i="${vendors().length-1}"]`);if(i){i.focus();i.select()}})},
   vendDel(el){const v=vendors()[+el.dataset.i];if(!v)return;vendors().splice(+el.dataset.i,1);const m=SETTINGS.brandVendor||{};Object.keys(m).forEach(b=>{if(m[b]===v.name)delete m[b]});saveSettings();R.purchasing()},
+  ipSuggest(){let n=0;mut(()=>{n=ipSuggest()});renderIp();toast(n?`${plural(n,'device')} put on a VLAN. Check them, then Fill in addresses.`:'Every device already has a VLAN.')},
+  ipFill(){let r={n:0,skipped:0};mut(()=>{r=ipFill()});renderIp();toast(r.n?`${plural(r.n,'address','addresses')} filled in.${r.skipped?` ${r.skipped} skipped: give their VLAN a subnet first.`:''}`:r.skipped?'Give each VLAN a subnet (like 10.10.10.0/24) first.':'Every device already has an address.')},
+  copyIp(){copyText(ipCSV(),'IP schedule')},
+  vlanAdd(){mut(()=>{const m=ipam(),ids=m.vlans.map(v=>+v.id||0),id=String(Math.max(0,...ids)+10),o=10+m.vlans.length;m.vlans.push({id,name:'New VLAN',subnet:`10.10.${Math.min(254,+id)}.0/24`,gateway:`10.10.${Math.min(254,+id)}.1`})});renderIp()},
+  vlanDel(el){mut(()=>{const m=ipam(),v=m.vlans[+el.dataset.i];if(!v)return;m.vlans.splice(+el.dataset.i,1);Object.values(m.hosts).forEach(h=>{if(String(h.vlan)===String(v.id))delete h.vlan})});renderIp()},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -6387,7 +6503,7 @@ function applyCloud(meta,pjs){
     const e=curPj();if(e.prop)S.prop=e.prop;S.tasks=Array.isArray(e.tasks)?e.tasks:[];S.time=Array.isArray(e.time)?e.time:[];S.photos=Array.isArray(e.photos)?e.photos:[];tkNormAll();
     const d=normDesign(e.design);if(d)S.design=d;e.design=null;if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
     uidc=Math.max(uidc,+e.u||0,maxUid());cleanRacks();H.past=[];H.future=[];S.sel=null;S.wire=null;S.liveSet=null;
-    Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom)c.init=false})}
+    Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false})}
   purgeSamples();
   /* mirror into this browser so it opens fast next time */
   save();saveClients();saveInvoices();try{localStorage.setItem(CTKEY,JSON.stringify(S.contracts||[]))}catch(e){}try{localStorage.setItem(SVKEY,JSON.stringify({tickets:S.tickets,agreements:S.agreements,tseq:S.tseq}))}catch(e){}
