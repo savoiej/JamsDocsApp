@@ -4960,7 +4960,7 @@ function renderInvList(){const box=$('#ivList');if(!box)return;const q=(S.ui.iq|
 /* --- invoice editor / viewer (overlay) --- */
 function newInvoiceDraft(clientId,pjId){const c=clientById(clientId)||S.clients[0];const terms=(c&&TERM_DAYS[c.terms]!=null)?c.terms:'Net 30';
   const pjs=c?clientProjects(c):[],pj=pjId||((pjs[0]||{}).id)||null,pq=pj?projQuote(pj):null;
-  return {id:'iv'+Date.now().toString(36),no:nextInvNo(),clientId:c?c.id:null,pj,project:pj?(pjs.find(x=>x.id===pj)||{}).name||'':'',issued:isoDay(0),terms,due:addDays(isoDay(0),TERM_DAYS[terms]),
+  return {id:'iv'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),no:nextInvNo(),clientId:c?c.id:null,pj,project:pj?(pjs.find(x=>x.id===pj)||{}).name||'':'',issued:isoDay(0),terms,due:addDays(isoDay(0),TERM_DAYS[terms]),
     lines:[{desc:'',qty:1,rate:0,tax:false}],taxPct:pq?+pq.prop.tax||0:+S.prop.tax||0,payments:[],sentAt:null,notes:'',void:false}}
 function openInvoice(id){const v=invById(id);if(!v)return;S.iv=invStatus(v)==='Draft'?{id,draft:JSON.parse(JSON.stringify(v)),mode:'edit'}:{id,draft:null,mode:'view'};renderInvoice()}
 const ivCur=()=>S.iv&&(S.iv.draft||invById(S.iv.id));
@@ -5751,7 +5751,7 @@ function ctPeriodsDue(c){if(!ctLive(c)||!['retainer'].includes(c.type))return []
 const ctUnbilledVisits=c=>(c.visits||[]).filter(v=>!v.inv||!(()=>{const x=invById(v.inv);return x&&!x.void})());
 function ctBar(used,incl){if(!incl)return `<span class="muted">${tbHrs(used)} h</span>`;const pct=Math.min(100,used/incl*100);return `<div style="min-width:120px"><span style="font-size:12px">${tbHrs(used)} of ${tbHrs(incl)} h</span><div class="bar"><i class="${used>incl?'over':''}" style="width:${pct}%"></i></div></div>`}
 
-R.contracts=function(){const el=$('#v-contracts');const id=S.ui.ctId&&ctFind(S.ui.ctId)?S.ui.ctId:null;if(id){el.innerHTML=ctDetailHTML(ctFind(id));return}
+R.contracts=function(){const el=$('#v-contracts');{const n=ctPmSweep();if(n)setTimeout(()=>toast(`${plural(n,'maintenance ticket')} opened in the AV service desk.`),50)}const id=S.ui.ctId&&ctFind(S.ui.ctId)?S.ui.ctId:null;if(id){el.innerHTML=ctDetailHTML(ctFind(id));return}
   const C=S.contracts,live=C.filter(ctLive),mrr=live.reduce((s,c)=>s+ctMRR(c),0),m=ctMonth();
   const hrsM=C.reduce((s,c)=>s+ctHrs(c,m+'-01',m+'-31'),0),renew=C.filter(c=>ctStatus(c)==='Expiring');
   const att=[];live.forEach(c=>{const u=ctUsage(c);if(u.incl&&u.used>=u.incl*0.9)att.push([c,u.used>u.incl?`is over its hours: ${tbHrs(u.used)} of ${tbHrs(u.incl)} h ${c.type==='block'?'in the block':'this period'}`:`has used ${Math.round(u.used/u.incl*100)}% of its hours`]);
@@ -5765,12 +5765,47 @@ R.contracts=function(){const el=$('#v-contracts');const id=S.ui.ctId&&ctFind(S.u
    <div class="panel kpi"><div class="l">Recurring revenue</div><div class="v">${money(mrr)}/mo</div><div class="s">${money(mrr*12)} a year from retainers</div></div>
    <div class="panel kpi"><div class="l">Service hours this month</div><div class="v">${tbHrs(hrsM)} h</div><div class="s">across all contracts</div></div>
    <div class="panel kpi"><div class="l">Renewals coming up</div><div class="v">${renew.length}</div><div class="s">ending in the next 60 days</div></div></div>
+  ${ctRunHTML()}
   ${att.length?`<div class="panel"><div class="ph"><h2>Needs attention</h2></div><div class="pb"><ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">${att.map(([c,t])=>`<li><button class="rowlnk" data-act="ctOpen" data-id="${c.id}" style="color:var(--accent);font-weight:600">${esc(c.client)} · ${esc(c.title||c.no)}</button> ${esc(t)}</li>`).join('')}</ul></div></div>`:''}
   <div class="panel"><div class="ph"><h2>Contracts</h2><select class="inp" id="ctF" aria-label="Show" style="width:auto">${[['live','Active'],['Expiring','Expiring soon'],['Draft','Drafts'],['Expired','Expired'],['Cancelled','Cancelled'],['all','All']].map(([k,l])=>`<option value="${k}"${k===f?' selected':''}>${l}</option>`).join('')}</select></div>
    ${rows.length?`<div class="scroll"><table class="t"><thead><tr><th>Company</th><th>Contract</th><th>Type</th><th>Covers</th><th>Term</th><th>Hours this period</th><th class="n">Monthly</th><th>Status</th></tr></thead><tbody>
     ${rows.map(c=>{const u=ctUsage(c),st=ctStatus(c);return `<tr class="click" data-act="ctOpen" data-id="${c.id}"><td><b>${esc(c.client)}</b></td><td>${esc(c.title||'')}<span class="muted mono" style="display:block;font-size:11px">${esc(c.no)}</span></td><td>${esc(CT_TYPE(c.type)[1])}</td><td><span style="font-size:12px">${esc((c.services||[]).slice(0,3).join(', '))}${(c.services||[]).length>3?` +${c.services.length-3}`:''}</span></td><td class="m">${c.start?fmtD(c.start):'—'}<br><span class="muted">to ${c.end?fmtD(c.end):'open-ended'}</span></td><td>${c.type==='fixed'?'<span class="muted">—</span>':ctBar(u.used,u.incl)}</td><td class="n">${ctMRR(c)?money(ctMRR(c)):'—'}</td><td>${chip(st)}</td></tr>`}).join('')}</tbody></table></div>`
    :`<div class="pb"><p class="muted" style="margin:0 0 10px">${C.length?'No contracts match.':'No service contracts yet. Add each company you have an agreement with: what you cover, the hours included and how you bill.'}</p>${C.length?'':'<div class="actions"><button class="btn primary" data-act="ctEdit">+ New contract</button><button class="btn" data-act="ctSample">Add an example contract</button></div>'}</div>`}</div>`}
 
+/* ---------- recurring billing run and preventive maintenance ---------- */
+const CT_PM={None:0,Monthly:1,Quarterly:3,'Twice a year':6,Annually:12};
+function addMonths(d,m){const x=new Date(d+'T12:00:00'),day=x.getDate();x.setDate(1);x.setMonth(x.getMonth()+m);const last=new Date(x.getFullYear(),x.getMonth()+1,0).getDate();x.setDate(Math.min(day,last));return x.toISOString().slice(0,10)}
+/* every invoice the contracts say is due today: retainer periods (in advance, or after each period ends) and unbilled time-and-materials visits */
+function ctRunItems(){const t=isoDay(0),out=[];
+  S.contracts.filter(ctLive).forEach(c=>{
+    if(c.type==='retainer')ctPeriodsDue(c).filter(p=>c.billWhen==='end'?p.to<t:p.from<=t).forEach(p=>{const o={period:p,fee:true,from:p.from,to:p.to,block:false,feeOnly:p.to>=t};
+      let {lines}=ctBillCalc(c,o);if(o.feeOnly)lines=lines.slice(0,1);if(lines.length)out.push({c,o,label:p.label+(o.feeOnly?' · in advance':''),total:lines.reduce((s,l)=>s+l.qty*l.rate,0)})});
+    else if(c.type==='tm'){const vis=ctUnbilledVisits(c).filter(v=>v.day<=t);if(!vis.length)return;const from=vis.map(v=>v.day).sort()[0],o={period:null,fee:false,from,to:t,block:false};
+      const {lines}=ctBillCalc(c,o);if(lines.length)out.push({c,o,label:`Visits ${fmtD(from)} – ${fmtD(t)}`,total:lines.reduce((s,l)=>s+l.qty*l.rate,0)})}});
+  return out}
+function ctDraft(c,o){let {lines,used}=ctBillCalc(c,o);if(o.feeOnly){lines=lines.slice(0,1);used=[]}if(!lines.length)return null;
+  let cl=ctClient(c);if(!cl){cl={id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),name:c.client,type:'Other',status:'Active',address:'',phone:'',email:'',website:'',terms:SETTINGS.terms||'Net 30',contacts:[],log:[],created:dayFmt(0)};S.clients.push(cl)}
+  const v=newInvoiceDraft(cl.id,null),label=o.period?o.period.label:`${fmtD(o.from)} – ${fmtD(o.to)}`;
+  while(S.invoices.some(x=>x.id===v.id))v.id='iv'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  Object.assign(v,{pj:null,project:`${c.title||'Service contract'} · ${c.no}`,lines,taxPct:0,notes:`${c.no}${c.po?' · PO '+c.po:''} · ${label}.`,src:{app:'Contract',ct:c.id,no:c.no,label,from:o.from,to:o.to,at:Date.now(),run:true}});
+  const prev=S.iv;S.iv={id:null,draft:v,mode:'edit'};ivStore(v);S.iv=prev&&prev.id?prev:null;
+  used.forEach(x=>{x.inv=v.id});c.billed=c.billed||[];if(o.period&&o.fee)c.billed.push({key:o.period.key,inv:v.id});
+  clog(cl,`Draft ${v.no} created by the billing run from ${c.no} · ${label} (${money2(invCalc(v).total)})`);return v}
+/* maintenance visits become AV service desk tickets two weeks ahead, one per visit */
+function ctPmSweep(){const soon=isoDay(14),old=isoDay(-30);let n=0;
+  S.contracts.filter(ctLive).forEach(c=>{const m=CT_PM[c.pm||'None'];if(!m||!c.pmNext)return;let g=0;
+    while(c.pmNext&&c.pmNext<=soon&&g++<48){const due=c.pmNext,key=c.id+'|'+due;
+      if(due>=old&&!S.tickets.some(x=>x.pm===key)){const site=String(c.sites||'').split(/\n|,|;/)[0].trim();
+        S.tickets.unshift({id:'SR-'+(S.tseq++),site:site?`${c.client} · ${site}`:c.client,issue:`Preventive maintenance visit · ${c.no}${c.title?' · '+c.title:''}`,desc:`Scheduled ${String(c.pm).toLowerCase()} maintenance under ${c.no}, due ${fmtD(due)}.`,pri:'Medium',tech:'',col:'Open',when:'',due,cat:'Maintenance',pm:key,ct:c.id,log:[]});n++}
+      const nx=addMonths(due,m);c.pmNext=c.end&&!c.autoRenew&&nx>c.end?'':nx}});
+  if(n){saveService();saveContracts();badges()}return n}
+function ctRunHTML(){const items=ctRunItems(),pmC=S.contracts.filter(c=>ctLive(c)&&CT_PM[c.pm||'None']);
+  const run=items.length?`<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Billing run</h2><span class="muted" style="font-size:12px">${plural(items.length,'invoice')} due · ${money2(items.reduce((s,i)=>s+i.total,0))}</span><span class="tgrow"></span><button class="btn primary" data-act="ctRun">Draft ${plural(items.length,'invoice')}</button></div>
+    <div class="scroll"><table class="t"><thead><tr><th>Company</th><th>Contract</th><th>For</th><th class="n">Amount</th></tr></thead><tbody>${items.map(i=>`<tr class="click" data-act="ctOpen" data-id="${i.c.id}"><td><b>${esc(i.c.client)}</b></td><td>${esc(i.c.title||'')} <span class="muted mono" style="font-size:11px">${esc(i.c.no)}</span></td><td>${esc(i.label)}</td><td class="n">${money2(i.total)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="pb" style="padding-top:8px"><p class="note" style="margin:0">Invoices are drafted, not sent. Review each one under Clients &amp; invoices, then send it.</p></div></div>`:'';
+  const pm=pmC.length?`<div class="panel"><div class="ph"><h2>Maintenance visits</h2><span class="muted" style="font-size:12px">A service-desk ticket opens two weeks before each visit</span></div>
+    <div class="scroll"><table class="t"><thead><tr><th>Company</th><th>Contract</th><th>Every</th><th>Next visit</th><th class="n">Open PM tickets</th></tr></thead><tbody>${pmC.map(c=>{const open=S.tickets.filter(t=>t.ct===c.id&&t.pm&&TK_OPEN(t)).length;return `<tr class="click" data-act="ctOpen" data-id="${c.id}"><td><b>${esc(c.client)}</b></td><td>${esc(c.title||'')} <span class="muted mono" style="font-size:11px">${esc(c.no)}</span></td><td>${esc(c.pm)}</td><td>${c.pmNext?esc(fmtD(c.pmNext)):'<span class="muted">Not scheduled</span>'}</td><td class="n">${open||'—'}</td></tr>`}).join('')}</tbody></table></div></div>`:'';
+  return run+pm}
 function ctDetailHTML(c){const st=ctStatus(c),p=ctPeriodOf(c),u=ctUsage(c,p),T=CT_TYPE(c.type),vis=(c.visits||[]).slice().sort((a,b)=>b.day.localeCompare(a.day));
   const invs=S.invoices.filter(v=>v.src&&v.src.app==='Contract'&&v.src.ct===c.id).sort((a,b)=>b.issued.localeCompare(a.issued));
   const tix=S.tickets.filter(t=>String(t.site||'').toLowerCase().startsWith(String(c.client).toLowerCase())&&TK_OPEN(t));
@@ -5815,6 +5850,9 @@ function ctEditDialog(id,ask){const c=id?JSON.parse(JSON.stringify(ctFind(id))):
     <div class="row3"><label class="field ct-f" for="ceFee" data-for="retainer block fixed"><span id="ceFeeL">${ty==='block'?'Block price':ty==='fixed'?'Contract price':'Fee per billing period'}</span><input id="ceFee" type="number" min="0" step="1" value="${esc(c.fee||'')}"></label>
      <label class="field ct-f" for="ceCy" data-for="retainer">Billed<select id="ceCy">${Object.keys(CT_CYCLES).map(x=>`<option${x===(c.cycle||'Monthly')?' selected':''}>${x}</option>`).join('')}</select></label>
      <label class="field ct-f" for="ceH2" data-for="retainer block"><span id="ceHL">${ty==='block'?'Hours in the block':'Hours included each period'}</span><input id="ceH2" type="number" min="0" step="0.5" value="${esc(c.hours||'')}"></label></div>
+    <div class="row3"><label class="field ct-f" for="ceBw" data-for="retainer">Invoice<select id="ceBw"><option value="start"${c.billWhen!=='end'?' selected':''}>At the start of each period</option><option value="end"${c.billWhen==='end'?' selected':''}>After each period ends</option></select></label>
+     <label class="field" for="cePm">Maintenance visits<select id="cePm">${Object.keys(CT_PM).map(x=>`<option${x===(c.pm||'None')?' selected':''}>${x}</option>`).join('')}</select></label>
+     <label class="field" for="cePmN">Next visit<input id="cePmN" type="date" value="${esc(c.pmNext||'')}"></label></div>
     <div class="row2"><label class="field ct-f" for="ceRt" data-for="retainer block tm"><span id="ceRL">Hourly rate${ty==='tm'?'':' (extra hours)'}</span><input id="ceRt" type="number" min="0" step="1" value="${esc(c.rate||'')}" placeholder="${esc(String(+SETTINGS.billRate||+SETTINGS.laborRate||''))}"></label>
      <label class="field ct-f" for="ceAh" data-for="retainer block tm">After-hours rate<input id="ceAh" type="number" min="0" step="1" value="${esc(c.ahRate||'')}" placeholder="1.5 × rate"></label></div>
     <div class="plh">Services covered</div>
@@ -5891,7 +5929,7 @@ Object.assign(A,{
   ctSave(){const id=S.ctd&&S.ctd.id,o=id?ctFind(id):{id:'ct'+Date.now().toString(36),no:ctNo(),visits:[],billed:[],created:Date.now()};const client=$('#ceC').value.trim();if(!client){toast('Name the company.');return}
     const n=s=>$(s).value===''?'':r2(+$(s).value);
     Object.assign(o,{client,title:$('#ceT').value.trim(),type:$('#ceY').value,status:$('#ceS').value,po:$('#cePO').value.trim(),start:$('#ceA').value,end:$('#ceB').value,autoRenew:$('#ceR').checked,fee:n('#ceFee'),cycle:$('#ceCy').value,hours:n('#ceH2'),rate:n('#ceRt'),ahRate:n('#ceAh'),
-      services:[...document.querySelectorAll('[data-ctsvc]')].filter(x=>x.checked).map(x=>x.dataset.ctsvc),sla:{Urgent:n('#ceU'),High:n('#ceHi'),Normal:n('#ceNo')},coverage:$('#ceCov').value.trim(),sites:$('#ceSi').value.trim(),contact:$('#ceCt').value.trim(),scope:$('#ceSc').value.trim()});
+      services:[...document.querySelectorAll('[data-ctsvc]')].filter(x=>x.checked).map(x=>x.dataset.ctsvc),sla:{Urgent:n('#ceU'),High:n('#ceHi'),Normal:n('#ceNo')},coverage:$('#ceCov').value.trim(),billWhen:$('#ceBw').value,pm:$('#cePm').value,pmNext:$('#cePm').value==='None'?'':($('#cePmN').value||(CT_PM[$('#cePm').value]?addMonths($('#ceA').value||isoDay(0),CT_PM[$('#cePm').value]):'')),sites:$('#ceSi').value.trim(),contact:$('#ceCt').value.trim(),scope:$('#ceSc').value.trim()});
     if(o.end&&o.start&&o.end<o.start){toast('The end date is before the start.');return}
     if(!id)S.contracts.push(o);
     let cl=clientByName(client);if(!cl){cl={id:'c'+Date.now().toString(36),name:client,type:'Other',status:'Active',address:'',phone:'',email:'',website:'',terms:SETTINGS.terms||'Net 30',contacts:[],log:[],created:dayFmt(0)};S.clients.push(cl)}
@@ -5908,6 +5946,9 @@ Object.assign(A,{
     saveContracts();closeOverlay();if(S.view==='contracts')R.contracts();const u=ctUsage(c);toast(`Logged ${tbHrs(v.hrs)} h on ${c.no}.${u.incl&&u.used>u.incl?` ${c.client} is ${tbHrs(u.used-u.incl)} h over the included hours.`:''}`)},
   ctVisitDel(){const o=S.ctv,c=ctFind(o.cid);if(!c)return;c.visits=(c.visits||[]).filter(v=>v.id!==o.vid);saveContracts();closeOverlay();R.contracts();toast('Visit deleted.')},
   ctBill(el){ctBillDialog(el.dataset.id)},
+  ctRun(){const items=ctRunItems();if(!items.length)return;const made=[];items.forEach(i=>{const v=ctDraft(i.c,i.o);if(v)made.push(v)});
+    saveClients();saveContracts();saveInvoices();badges();R.contracts();toast(`${plural(made.length,'draft invoice')} created (${money2(made.reduce((s,v)=>s+invCalc(v).total,0))}). Review and send them under Clients & invoices.`)},
+
   ctMakeInv(){const o=S.ctb,c=ctFind(o.id);const {lines,used}=ctBillCalc(c,o);if(!lines.length)return;
     let cl=ctClient(c);if(!cl){cl={id:'c'+Date.now().toString(36),name:c.client,type:'Other',status:'Active',address:'',phone:'',email:'',website:'',terms:SETTINGS.terms||'Net 30',contacts:[],log:[],created:dayFmt(0)};S.clients.push(cl)}
     const v=newInvoiceDraft(cl.id,null),label=o.period?o.period.label:`${fmtD(o.from)} – ${fmtD(o.to)}`;
@@ -7429,7 +7470,7 @@ const tkWhere=t=>{const r=devResolve(t.dev);return r?r.label:(t.devLabel||'')};
 
 /* ---------- service desk page ---------- */
 const TK_FILT=[['open','Open tickets'],['all','All tickets'],...TCOLS.map(c=>[c,c])];
-R.service=function(){
+R.service=function(){{const n=ctPmSweep();if(n)setTimeout(()=>toast(`${plural(n,'maintenance ticket')} opened from service contracts.`),50)}
   const tab=S.ui.svTab||'queue',all=S.tickets,open=all.filter(TK_OPEN),today=isoDay(0),wk=Date.now()-7*864e5,mo=Date.now()-30*864e5;
   const done30=all.filter(t=>t.col==='Completed'&&t.closed&&t.closed>=mo&&t.opened),avg=done30.length?done30.reduce((s,t)=>s+(t.closed-t.opened),0)/done30.length:0;
   const over=open.filter(t=>t.due&&t.due<today).length,techs=uniq(all.map(t=>t.tech));
