@@ -1064,6 +1064,7 @@ body.tech .money{display:none!important}
 .fdev-h{display:flex;flex-direction:column;gap:2px}.fdev-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
 .fdin{display:flex;gap:6px;align-items:center}.fdin .inp{flex:1;min-width:0}.fdev-a{display:flex;gap:8px}
 .colist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.colist li{display:flex;gap:8px;align-items:baseline}.colist .cok{width:16px;color:var(--muted);font-weight:700}.colist li.ok .cok{color:var(--ok)}
+.paybox{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--sunk)}.paybox .addrow{display:flex;gap:8px}.paybox .addrow .inp{flex:1;min-width:0;font-size:12px}
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -5176,6 +5177,7 @@ function invDocHTML(v){const c=clientById(v.clientId)||{name:'—',contacts:[]},
    ${(v.payments||[]).map(p=>`<tr class="tot"><td colspan="3">Payment · ${fmtD(p.date)} · ${esc(p.method)}${p.ref?' '+esc(p.ref):''}</td><td class="n">−${money2(+p.amount)}</td></tr>`).join('')}
    <tr class="grand"><td colspan="3">Balance due</td><td class="n">${money2(st==='Void'?0:k.bal)}</td></tr></tbody></table></div>
    ${v.notes?`<p class="note" style="margin-top:12px">${esc(v.notes)}</p>`:''}
+   ${v.payToken&&st!=='Void'&&st!=='Draft'&&k.bal>0.005?`<p style="font-size:13px;margin:14px 0 0"><b>Pay online by card or bank transfer:</b> <a href="${esc(payLink(v))}" target="_blank" rel="noopener">${esc(payLink(v))}</a></p>`:''}
    <p class="muted" style="font-size:12px;margin:14px 0 0">${esc(SETTINGS.payNote||'')} <span class="mono">${esc(v.no)}</span></p></div>`}
 function invFormHTML(v){const c=clientById(v.clientId),pjs=c?clientProjects(c):[],pq=v.pj?projQuote(v.pj):null;
   const prior=v.pj?invoicedFor(v.pj,v.id):0,bal=pq?r2(pq.q.total-prior):0;
@@ -5194,6 +5196,26 @@ function invFormHTML(v){const c=clientById(v.clientId),pjs=c?clientProjects(c):[
    <div class="ivfoot"><label class="field" for="ivN" style="flex:1">Note on invoice<input id="ivN" data-iv="notes" value="${esc(v.notes)}" placeholder="Optional · shows on the invoice"></label><div class="kv ivtot" id="ivTot"></div></div>
   </div>`}
 function ivTotals(){const v=ivCur(),b=$('#ivTot');if(!v||!b)return;const k=invCalc(v);b.innerHTML=`<span>Subtotal</span><b>${money2(k.sub)}</b><span>Tax</span><b>${money2(k.tax)}</b><span>Total</span><b>${money2(k.total)}</b>`}
+/* ---------- online payment (Stripe Checkout through app.jamsdocsanddesigns.com) ---------- */
+const PAY_BASE='https://app.jamsdocsanddesigns.com/pay/';
+const payTok=()=>{const a=new Uint8Array(18);crypto.getRandomValues(a);return [...a].map(b=>'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b%57]).join('')};
+const payLink=v=>v&&v.payToken?PAY_BASE+v.id+'.'+v.payToken:'';
+let STRIPEPAY=new Map(),STRIPEPAY_UNSUB=null;
+/* payments the Stripe webhook recorded: paid ones land on the invoice once (by payment reference); processing ACH shows as pending */
+function stripeApply(docs){const m=new Map();let n=0;
+  docs.forEach(d=>{if(!d||!d.invoiceId)return;if(!m.has(d.invoiceId))m.set(d.invoiceId,[]);m.get(d.invoiceId).push(d);
+    if(d.status!=='paid')return;const v=invById(d.invoiceId);if(!v)return;v.payments=v.payments||[];const ref=d.pi||d.sessionId;
+    if(v.payments.some(p=>p.ref===ref||p.stripe===d.sessionId))return;
+    v.payments.push({date:d.date||isoDay(0),amount:+d.amount||0,method:d.method||'Online payment',ref,stripe:d.sessionId});n++;
+    const c=clientById(v.clientId);if(c)clog(c,`Online payment of ${money2(+d.amount||0)} received on ${v.no} (${d.method||'Stripe'})`)});
+  STRIPEPAY=m;if(n){saveInvoices();saveClients();toast(`${plural(n,'online payment')} recorded.`)}
+  if(S.view==='clients')try{R.clients()}catch(e){}if(S.iv&&!$('#overlay').hidden)try{renderInvoice()}catch(e){}}
+function stripeSync(){if(!DBX||S.tech||STRIPEPAY_UNSUB)return;try{STRIPEPAY_UNSUB=DBX.collection('stripepay').onSnapshot(snap=>stripeApply(snap.docs.map(d=>d.data())),()=>{})}catch(e){}}
+function payBoxHTML(v,k,st){if(st==='Void'||st==='Draft'||k.bal<=0.005)return '';const pend=(STRIPEPAY.get(v.id)||[]),proc=pend.filter(d=>d.status==='processing'),fail=pend.filter(d=>d.status==='failed');
+  return `<div class="paybox"><div><b>Pay online</b> <span class="muted sm">Card or US bank account (ACH) through Stripe. Payments land on this invoice automatically.</span></div>
+   ${v.payToken?`<div class="addrow"><input class="inp mono" id="payLinkIn" readonly value="${esc(payLink(v))}" aria-label="Payment link for ${esc(v.no)}"><button class="btn" data-act="ivPayCopy">Copy link</button></div>`:`<button class="btn" data-act="ivPayLink" style="align-self:flex-start">Create a payment link</button>`}
+   ${proc.map(d=>`<p class="note" style="margin:0">ACH payment of ${money2(+d.amount||0)} processing since ${esc(fmtD(d.date))}. It’s added to the invoice once the bank confirms it, usually in a few business days.</p>`).join('')}
+   ${fail.map(d=>`<p class="note bad" style="margin:0">An ACH payment of ${money2(+d.amount||0)} on ${esc(fmtD(d.date))} failed. The client can pay again with the same link.</p>`).join('')}</div>`}
 function renderInvoice(){
   const ov=$('#overlay'),v=ivCur();if(!v){closeOverlay();return}
   const st=invStatus(v),k=invCalc(v),edit=S.iv.mode==='edit',saved=!!invById(v.id);
@@ -5203,7 +5225,7 @@ function renderInvoice(){
   const pay=S.iv.pay&&!edit?`<div class="payform"><div class="plh">Record a payment</div><div class="row3"><label class="field" for="pyA">Amount ($)<input id="pyA" type="number" min="0.01" step="0.01" value="${k.bal}"></label><label class="field" for="pyD">Date<input id="pyD" type="date" value="${isoDay(0)}"></label><label class="field" for="pyM">Method<select id="pyM">${PAY_METHODS.map(m=>`<option>${m}</option>`).join('')}</select></label></div><div class="addrow"><input class="inp" id="pyR" placeholder="Reference · check no. or transaction ID (optional)"><button class="btn" data-act="ivPayCancel">Cancel</button><button class="btn primary" data-act="ivPay">Save payment</button></div></div>`:'';
   ov.innerHTML=`<div class="dlg wide" role="dialog" aria-modal="true" aria-label="Invoice ${esc(v.no)}">
    <div class="dlgtop"><span>INVOICE ${esc(v.no)} · ${esc(st.toUpperCase())}${v.sentAt?' · SENT '+esc(fmtD(v.sentAt).toUpperCase()):''}</span><button class="btn sm" data-act="ivClose">Close</button></div>
-   ${edit?invFormHTML(v):`<div style="padding:18px;display:flex;flex-direction:column;gap:14px">${pay}${invDocHTML(v)}</div>`}
+   ${edit?invFormHTML(v):`<div style="padding:18px;display:flex;flex-direction:column;gap:14px">${pay}${payBoxHTML(v,k,st)}${invDocHTML(v)}</div>`}
    <div class="dlgfoot">${foot}</div></div>`;
   ov.hidden=false;ivTotals();
   const dlg=ov.querySelector('.dlg');
@@ -5578,6 +5600,8 @@ const A={
   estConsDel(el){estP().consExtra.splice(+el.dataset.i,1);saveProjects();R.estimate()},
   estConsReset(el){delete estP().cq[el.dataset.k];saveProjects();R.estimate()},
   estDefaults(){S.ui.estDef=!S.ui.estDef;R.estimate()},
+  ivPayLink(){const v=invById(S.iv&&S.iv.id);if(!v)return;v.payToken=payTok();saveInvoices();renderInvoice();toast('Payment link created. Copy it into your email to the client.')},
+  ivPayCopy(){const i=$('#payLinkIn');if(i)copyText(i.value,'Payment link')},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -5626,7 +5650,7 @@ const A={
     if(!c){toast('Pick a client.');return}if(!v.pj&&!String(v.project||'').trim()&&!v.lines.some(l=>String(l.desc).trim())){toast('Describe what the invoice is for.');return}
     if(v.lines.some(l=>(+l.qty||0)*(+l.rate||0)!==0&&!String(l.desc).trim())){toast('Every line with an amount needs a description.');return}
     if(!(k.total>0)){toast('The invoice total must be more than $0.');return}if(!v.due||v.due<v.issued){toast('The due date can’t be before the issue date.');return}
-    v.lines=v.lines.filter(l=>String(l.desc).trim()||(+l.qty||0)*(+l.rate||0));v.sentAt=isoDay(0);ivStore(v);
+    v.lines=v.lines.filter(l=>String(l.desc).trim()||(+l.qty||0)*(+l.rate||0));v.sentAt=isoDay(0);if(!v.payToken)v.payToken=payTok();ivStore(v);
     const pc=primaryOf(c);clog(c,`Invoice ${v.no} sent for ${money2(k.total)}${pc&&pc.email?` to ${pc.email}`:''}`);saveClients();
     S.iv={id:v.id,draft:null,mode:'view'};renderInvoice();invRefresh();toast(`${v.no} sent${pc&&pc.email?` to ${pc.email}`:''}. Due ${fmtD(v.due)}.`)},
   ivDelete(){const v=ivCur();S.invoices=S.invoices.filter(i=>i.id!==v.id);saveInvoices();S.iv=null;closeOverlay();invRefresh();toast(`Draft ${v.no} deleted.`)},
@@ -6778,7 +6802,7 @@ async function cloudBoot(){
     const meta={};ms.docs.forEach(d=>{const x=d.data();if(x&&typeof x.json==='string')meta[d.id]=x.json});
     const pjs=ps.docs.map(d=>{const x=d.data();return x&&typeof x.json==='string'?[d.id,x.json]:null}).filter(Boolean);
     if(!pjs.length&&!Object.keys(meta).length){CLOUD.ready=true;await cloudFlush();toast('Your projects, clients and invoices now save to the app, so they follow you to any device.');return}
-    applyCloud(meta,pjs);CLOUD.ready=true;setSync('live','Saved to the app');renderBrand();go(S.view);cloudFlush();
+    applyCloud(meta,pjs);CLOUD.ready=true;setSync('live','Saved to the app');renderBrand();go(S.view);cloudFlush();stripeSync();
   }catch(e){setSync('err','Couldn’t load saved work · using this browser');DBX=null}
 }
 async function backupAll(){
