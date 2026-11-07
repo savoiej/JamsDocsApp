@@ -1060,6 +1060,9 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .chip.Received{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}.chip.Partially-received{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
 .ipt tr.iperr td,.t tr.iperr td{background:color-mix(in srgb,var(--bad) 7%,transparent)}.ipt .cellin{min-width:0}.ipt td:first-child,.ipt td:nth-child(9){white-space:nowrap}.ipt select.cellin{min-width:128px}
 body.tech .money{display:none!important}
+.fdev{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}.fdev.done .fdev-h b{color:var(--ok)}
+.fdev-h{display:flex;flex-direction:column;gap:2px}.fdev-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.fdin{display:flex;gap:6px;align-items:center}.fdin .inp{flex:1;min-width:0}.fdev-a{display:flex;gap:8px}
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -6763,6 +6766,7 @@ R.field=function(){
    <div class="panel"><div class="ph"><h2>Tasks</h2><span class="muted mono" style="font-size:12px">${done} of ${tasks.length} done</span></div>
     ${tasks.length?tasks.map(t=>`<div class="ftask"><div><b>${esc(t.title)}</b><div class="muted" style="font-size:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:3px"><span class="av">${esc(t.who)}</span>Due ${dayFmt(t.start+t.dur-1)} ${chip(COLS.find(c=>c[0]===t.col)[1])}${t.note?` · ${esc(t.note)}`:''}</div></div><div class="actions" style="gap:6px;justify-content:flex-end">${nextBtns(t)}</div></div>`).join('')
      :`<div class="pb"><p class="muted" style="margin:0 0 10px">No tasks on this project yet.</p><button class="btn" data-act="addStdTasks">Add the standard install tasks</button></div>`}</div>
+   ${fieldDevHTML()}
    <div class="panel"><div class="ph"><h2>Cable sign-off</h2><span class="muted mono" style="font-size:12px">${tested} of ${cs.length} tested</span></div>
     <div class="pb" style="padding-bottom:4px">${meterBar(tested,cs.length||1)}</div>
     ${cs.length?cs.map(c=>{const st=c.status||PULL[0];return `<div class="fcab"><div class="fcab-h ${SIG[c.type].cls}"><span class="dot"></span><b class="mono">${esc(c.id)}</b><span class="muted" style="font-size:12px">${esc(tg[c.a.uid])} ${esc((pDef(c.a)||{}).n||'')} → ${esc(tg[c.b.uid])} ${esc((pDef(c.b)||{}).n||'')} · ${lenOf(c)} m</span></div>
@@ -6777,7 +6781,46 @@ R.field=function(){
       <figcaption class="cap"><b>${esc(p.uid&&node(p.uid)?tg[p.uid]:p.tag||'Site')}</b>${p.caption?`<span>${esc(p.caption)}</span>`:''}<span class="muted">${esc(new Date(p.at).toLocaleDateString('en-US',{month:'short',day:'numeric'}))}${p.who?' · '+esc(p.who):''}</span>${ASSETS?`<button class="lnk" data-act="fieldPhotoDel" data-id="${esc(p.id)}" style="text-align:left">Delete</button>`:''}</figcaption></figure>`).join('')}</div>`:''}
    </div></div>
   </div>`;
-  clearInterval(fieldTimer);if(on)fieldTimer=setInterval(()=>{const el=$('#clkEl');const c=clockGet();if(!el||!c||S.view!=='field'){clearInterval(fieldTimer);return}el.textContent=fmtDur(Date.now()-c.start)},20000)};
+  bindField();clearInterval(fieldTimer);if(on)fieldTimer=setInterval(()=>{const el=$('#clkEl');const c=clockGet();if(!el||!c||S.view!=='field'){clearInterval(fieldTimer);return}el.textContent=fmtDur(Date.now()-c.start)},20000)};
+/* ---------- field: device check-in (installed, serial, MAC) with barcode scanning ---------- */
+const fdMacNorm=v=>{const h=String(v||'').replace(/[^0-9a-f]/gi,'');return h.length===12?h.toUpperCase().match(/../g).join(':'):String(v||'').trim().toUpperCase()};
+const fdIsMac=v=>/^([0-9a-f]{2}[:\-.]?){5}[0-9a-f]{2}$/i.test(String(v||'').replace(/^(mac|eth\d?|lan)[:\s]*/i,'').trim())||/^[0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4}$/i.test(String(v||'').trim());
+const fdMac=uid=>{const h=S.design.ipam&&S.design.ipam.hosts&&S.design.ipam.hosts[uid];return h&&h.mac||''};
+function fieldDevHTML(){const tg=tags(),devs=S.design.nodes.slice().sort((a,b)=>String(tg[a.uid]).localeCompare(String(tg[b.uid]),undefined,{numeric:true}));
+  if(!devs.length)return '';const inst=devs.filter(n=>n.inst).length,ph=new Map();(S.photos||[]).forEach(p=>{if(p.uid)ph.set(p.uid,(ph.get(p.uid)||0)+1)});
+  const q=(S.ui.fdq||'').toLowerCase(),show=devs.filter(n=>!q||[tg[n.uid],prod(n).model,prod(n).mfr,n.serial,fdMac(n.uid),endLoc(n.uid)].join(' ').toLowerCase().includes(q));
+  return `<div class="panel"><div class="ph"><h2>Device check-in</h2><span class="muted mono" style="font-size:12px">${inst} of ${devs.length} installed</span></div>
+   <div class="pb" style="padding-bottom:4px">${meterBar(inst,devs.length)}<input class="inp" id="fdQ" placeholder="Find a device: tag, model, serial" value="${esc(S.ui.fdq||'')}" aria-label="Find a device" style="margin-top:10px"></div>
+   ${show.map(n=>{const p=prod(n),net=netPortsOf(p).length>0,mac=fdMac(n.uid),cnt=ph.get(n.uid)||0;
+    return `<div class="fdev${n.inst?' done':''}"><div class="fdev-h"><label class="check"><input type="checkbox" data-fd="inst" data-uid="${n.uid}" ${n.inst?'checked':''}> <span><b class="mono">${esc(tg[n.uid])}</b> ${esc(p.model)}</span></label>
+      <span class="muted sm">${esc(endLoc(n.uid)||p.mfr)}${n.inst&&n.inst.at?` · installed ${esc(dayFmtIso(n.inst.at))}${n.inst.who?' by '+esc(n.inst.who):''}`:''}</span></div>
+     <div class="fdev-f"><label class="field" for="fds-${n.uid}">Serial number<span class="fdin"><input class="inp mono" id="fds-${n.uid}" data-fd="serial" data-uid="${n.uid}" value="${esc(n.serial||'')}" autocomplete="off" autocapitalize="characters" spellcheck="false"><label class="btn sm filebtn" title="Photograph the serial number barcode">Scan<input type="file" accept="image/*" capture="environment" data-scan="serial" data-uid="${n.uid}" aria-label="Scan the serial number of ${esc(tg[n.uid])}"></label></span></label>
+      ${net?`<label class="field" for="fdm-${n.uid}">MAC address<span class="fdin"><input class="inp mono" id="fdm-${n.uid}" data-fd="mac" data-uid="${n.uid}" value="${esc(mac)}" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AA:BB:CC:DD:EE:FF"><label class="btn sm filebtn" title="Photograph the MAC address barcode">Scan<input type="file" accept="image/*" capture="environment" data-scan="mac" data-uid="${n.uid}" aria-label="Scan the MAC address of ${esc(tg[n.uid])}"></label></span></label>`:''}</div>
+     ${ASSETS?`<div class="fdev-a"><label class="btn sm filebtn">${cnt?`Photos · ${cnt}`:'Add install photo'}<input type="file" accept="image/*" data-fdphoto="${n.uid}" aria-label="Install photo of ${esc(tg[n.uid])}"></label></div>`:''}</div>`}).join('')||'<p class="pb muted" style="margin:0">No devices match.</p>'}</div>`}
+async function scanBarcode(file,want){
+  const img=await createImageBitmap(file).catch(()=>null);if(!img)throw new Error('img');let vals=[];
+  if('BarcodeDetector' in window){try{const d=new window.BarcodeDetector();vals=(await d.detect(img)).map(x=>x.rawValue).filter(Boolean)}catch(e){vals=[]}}
+  if(!vals.length){
+    if(!window.ZXing)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';s.onload=res;s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)});
+    const c=document.createElement('canvas'),k=Math.min(1,2000/Math.max(img.width,img.height));c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    const hints=new Map();hints.set(window.ZXing.DecodeHintType.TRY_HARDER,true);const r=new window.ZXing.BrowserMultiFormatReader(hints);
+    try{const res=await r.decodeFromImageUrl(c.toDataURL('image/png'));if(res&&res.getText())vals=[res.getText()]}catch(e){}}
+  vals=[...new Set(vals.map(v=>String(v).trim()))];if(!vals.length)return null;
+  if(want==='mac'){const m=vals.find(fdIsMac);return m?fdMacNorm(m.replace(/^(mac|eth\d?|lan)[:\s]*/i,'')):null}
+  return (vals.find(v=>!fdIsMac(v))||vals[0]).replace(/^(s\/?n|serial(\s*no\.?)?)[:\s#]*/i,'')}
+function fdSet(uid,k,v){const n=node(uid);if(!n)return;
+  mut(()=>{if(k==='mac'){const m=ipam();const h=m.hosts[uid]=m.hosts[uid]||{};if(v)h.mac=fdMacNorm(v);else delete h.mac}
+    else if(k==='serial'){if(v)n.serial=v.trim();else delete n.serial}
+    else if(k==='inst'){if(v)n.inst={at:isoDay(0),who:S.ui.fwho||($('#fWho')||{}).value||''};else delete n.inst}})}
+function bindField(){const el=$('#v-field');if(!el||el.dataset.fdb)return;el.dataset.fdb=1;
+  el.addEventListener('input',e=>{if(e.target.id==='fdQ'){S.ui.fdq=e.target.value;const pos=e.target.selectionStart;R.field();const q=$('#fdQ');if(q){q.focus();q.setSelectionRange(pos,pos)}}});
+  el.addEventListener('change',async e=>{const t=e.target;
+    if(t.dataset.fd){const k=t.dataset.fd;fdSet(t.dataset.uid,k,k==='inst'?t.checked:t.value);if(k==='inst'){R.field();toast(t.checked?`${tags()[t.dataset.uid]} marked installed.`:'Unmarked.')}else if(k==='mac')t.value=fdMac(t.dataset.uid);return}
+    if(t.dataset.scan){const f=t.files&&t.files[0],uid=t.dataset.uid,want=t.dataset.scan;t.value='';if(!f)return;toast('Reading the barcode…');
+      try{const v=await scanBarcode(f,want);if(!v){toast(want==='mac'?'No MAC address barcode found. Get closer to the label, or type it in.':'No barcode found. Get closer to the label, or type it in.');return}
+        fdSet(uid,want,v);R.field();toast(`${tags()[uid]} ${want==='mac'?'MAC':'serial'}: ${want==='mac'?fdMacNorm(v):v}`)}
+      catch(err){toast(err&&err.message==='load'?'Couldn’t load the barcode reader. Check your connection, or type it in.':'Couldn’t read that photo. Try again, or type it in.')}return}
+    if(t.dataset.fdphoto){const f=t.files&&t.files[0],uid=t.dataset.fdphoto;t.value='';if(!f)return;const sel=$('#fDev');if(sel)sel.value=uid;await addPhoto(f);return}})}
 async function addPhoto(file){
   if(!file)return;if(!ASSETS){toast('Photo uploads need edit access to this app.');return}
   if(!/^image\//.test(file.type)){toast('That isn’t an image.');return}
