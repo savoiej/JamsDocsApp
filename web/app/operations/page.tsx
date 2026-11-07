@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/supabase/server";
 import AppShell from "../app/app-shell";
 
-export const metadata: Metadata = { title: "Jams Operations · Jams Docs and Designs" };
+export const metadata: Metadata = { title: "Jams Operations ver1 · Jams Docs and Designs" };
 
 export default async function OperationsPage() {
   const { userId, profile } = await getViewer();

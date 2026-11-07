@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/supabase/server";
 import AppShell from "./app-shell";
+
+export const metadata: Metadata = { title: "SITREP - Operations · Jams Docs and Designs" };
 
 export default async function AppPage() {
   const { userId, profile } = await getViewer();

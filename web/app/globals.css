@@ -63,3 +63,8 @@ html,body{overscroll-behavior:none}
 @media (pointer:coarse){input,textarea,select{font-size:16px}}
 button,a,[role="button"]{touch-action:manipulation}
 button,[role="button"]{-webkit-user-select:none;user-select:none}
+
+/* longer app names: keep the top bar on one line on phones */
+.shellbar{min-width:0;overflow-x:auto}
+.shellbar b,.shellbar a,.shellbar button{white-space:nowrap;flex:none}
+@media (max-width:640px){.shellbar{gap:8px;padding-left:10px;padding-right:10px}.shellbar .who{display:none}.shellbar a,.shellbar button{padding:4px 8px;font-size:12px}.shellbar a:first-of-type{margin-left:auto}}
