@@ -12,9 +12,9 @@ declare global {
 
 /** SITREP runs in a frame; it reaches Supabase through window.jamsBridge, which stands in for the claude.ai runtime it was built on. */
 const APPS = {
-  netline: { name: "SITREP - Operations", src: "/api/jamsnet", ns: "", href: "/app", links: ["jamsos"] },
-  jamsos: { name: "Jams Operations ver1", src: "/api/jamsos", ns: "jamsos", href: "/operations", links: ["client"] },
-  client: { name: "SITREP · Client App", src: "/api/client", ns: "client", href: "/client", links: ["jamsos"] },
+  netline: { name: "SITREP - Operations", src: "/api/jamsnet", ns: "", href: "/app", links: ["client"] },
+  jamsos: { name: "Jams Operations ver1", src: "/api/jamsos", ns: "jamsos", href: "/operations", links: ["netline"] },
+  client: { name: "SITREP · Client App", src: "/api/client", ns: "client", href: "/client", links: ["netline"] },
 } as const;
 type AppKey = keyof typeof APPS;
 
@@ -50,7 +50,7 @@ export default function AppShell({ profile, app = "netline" }: { profile: Profil
         <b>{A.name}</b>
         {A.links.map((k) => (
           <a key={k} href={APPS[k].href}>
-            {k === "jamsos" ? `Back to ${APPS[k].name}` : `Open ${APPS[k].name}`}
+            {k === "netline" ? `Back to ${APPS[k].name}` : `Open ${APPS[k].name}`}
           </a>
         ))}
         <span className="who">

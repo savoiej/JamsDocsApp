@@ -4,7 +4,7 @@ import { getViewer } from "@/lib/supabase/server";
 
 export default async function PendingPage() {
   const { profile } = await getViewer();
-  if (profile?.active) redirect("/operations");
+  if (profile?.active) redirect("/app");
   return (
     <main className="auth">
       <AuthSide />
@@ -17,7 +17,7 @@ export default async function PendingPage() {
           </p>
           <p>Once they do, reload this page.</p>
           <div className="row">
-            <a className="btn primary" href="/operations">Check again</a>
+            <a className="btn primary" href="/app">Check again</a>
             <form action="/auth/signout" method="post"><button className="btn">Sign out</button></form>
           </div>
         </div>

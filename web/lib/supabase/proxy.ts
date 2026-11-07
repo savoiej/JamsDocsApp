@@ -35,13 +35,13 @@ export async function updateSession(request: NextRequest) {
     }
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.search = path === "/" || path === "/operations" ? "" : `?next=${encodeURIComponent(path)}`;
+    url.search = path === "/" || path === "/app" ? "" : `?next=${encodeURIComponent(path)}`;
     return NextResponse.redirect(url);
   }
 
   if (signedIn && (path === "/login" || path === "/signup")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/operations";
+    url.pathname = "/app";
     url.search = "";
     return NextResponse.redirect(url);
   }
