@@ -1249,17 +1249,6 @@ button:not(:disabled):active{filter:brightness(.92)}
 :root[data-palette="hfh"] .btn.primary{background:var(--lime)!important;border-color:var(--lime)!important;color:#111210!important}
 :root[data-palette="hfh"] .kpis .kpi:first-child::before{background:var(--lime)}
 :root[data-palette="hfh"] :focus-visible{outline-color:var(--accent)!important}
-:root[data-palette="hfh"] .rail :focus-visible{outline-color:var(--lime)!important}
-:root[data-palette="hfh"] .rail{color:#E4E6E0;scrollbar-color:#33362F transparent}
-:root[data-palette="hfh"] .rail .brand small,:root[data-palette="hfh"] .rail .navgroup,:root[data-palette="hfh"] .rail label.navgroup,:root[data-palette="hfh"] .rail .railfoot,:root[data-palette="hfh"] .rail .railfoot *{color:var(--hfgray)!important}
-:root[data-palette="hfh"] .rail .inp,:root[data-palette="hfh"] .rail select,:root[data-palette="hfh"] .rail .pjsw .btn{border-color:#33362F!important;color:#F0F2EC!important}
-:root[data-palette="hfh"] .rail .nav button{color:#C9CCC4!important}
-:root[data-palette="hfh"] .rail .nav button[aria-current="page"]{background:rgba(156,203,25,.16)!important;color:#fff!important}
-:root[data-palette="hfh"] .rail .nvi,:root[data-palette="hfh"] .rail .nav .k{color:#8D9088!important}
-:root[data-palette="hfh"] .rail .nav [aria-current="page"] .nvi{color:var(--lime)!important}
-:root[data-palette="hfh"] .rail .navsub,:root[data-palette="hfh"] .rail .chev{border-left-color:#33362F!important}
-:root[data-palette="hfh"] .rail .nlhd,:root[data-palette="hfh"] .rail .nav .nlhd{border-top-color:#33362F!important}
-:root[data-palette="hfh"] .rail .nav button.locked::after{background:rgba(156,203,25,.16)!important;color:var(--lime)!important}
 :root[data-palette="hfh"] .admhero{background:linear-gradient(135deg,#111210,#2E4A05)!important}
 :root[data-palette="hfh"] .tbtime{background:color-mix(in srgb,var(--lime) 22%,var(--surface));border-color:color-mix(in srgb,var(--lime) 60%,var(--line))}
 :root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}
@@ -1272,6 +1261,30 @@ button:not(:disabled):active{filter:brightness(.92)}
 .palsw{display:flex;border-radius:6px;overflow:hidden;border:1px solid rgba(0,0,0,.15)}.palsw i{display:block;width:16px;height:22px}
 .palbtn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;touch-action:manipulation}
 .palbtn .palsw i{width:9px;height:12px}
+
+/* Hands Free Help sidebar: the logo's lime green with black text */
+:root[data-palette="hfh"]{--hfrail:#9CCB19;--hfink:#111210;--hfink2:#2A350C}
+@media (prefers-color-scheme: dark){:root[data-palette="hfh"]:not([data-theme="light"]){--hfrail:#86B014}}
+:root[data-palette="hfh"][data-theme="dark"]{--hfrail:#86B014}
+:root[data-palette="hfh"] .rail{background:var(--hfrail)!important;color:var(--hfink)!important;scrollbar-color:rgba(17,18,16,.35) transparent}
+:root[data-palette="hfh"] .rail .brand .bn b,:root[data-palette="hfh"] #brandName{color:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .brand small,:root[data-palette="hfh"] .rail .navgroup,:root[data-palette="hfh"] .rail label.navgroup,:root[data-palette="hfh"] .rail .railfoot,:root[data-palette="hfh"] .rail .railfoot *{color:var(--hfink2)!important}
+:root[data-palette="hfh"] .rail .inp,:root[data-palette="hfh"] .rail select,:root[data-palette="hfh"] .rail .pjsw .btn{background:rgba(255,255,255,.5)!important;border-color:rgba(17,18,16,.3)!important;color:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .pjsw .btn:hover{border-color:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .nav button,:root[data-palette="hfh"] .rail .nav .navhd{color:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .nav button:hover{background:rgba(17,18,16,.09)!important;color:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .nav button[aria-current="page"]{background:var(--hfink)!important;color:#fff!important}
+:root[data-palette="hfh"] .rail .nav button[aria-current="page"]::before{background:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .nvi,:root[data-palette="hfh"] .rail .nav .k{color:var(--hfink2)!important}
+:root[data-palette="hfh"] .rail .nav [aria-current="page"] .nvi{color:var(--lime)!important}
+:root[data-palette="hfh"] .rail .nav [aria-current="page"] .badge{background:rgba(255,255,255,.16)!important;color:#fff!important}
+:root[data-palette="hfh"] .rail .navsub,:root[data-palette="hfh"] .rail .chev{border-left-color:rgba(17,18,16,.35)!important}
+:root[data-palette="hfh"] .rail .nlhd,:root[data-palette="hfh"] .rail .nav .nlhd{border-top-color:rgba(17,18,16,.25)!important}
+:root[data-palette="hfh"] .rail .nav .badge{background:rgba(17,18,16,.12)!important;color:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .nav .badge.bad{background:#B3261E!important;color:#fff!important}
+:root[data-palette="hfh"] .rail .nvdot{background:var(--hfink)!important}
+:root[data-palette="hfh"] .rail .nav button.locked::after{background:var(--hfink)!important;color:var(--lime)!important}
+:root[data-palette="hfh"] .rail :focus-visible,:root[data-palette="hfh"] .railfoot .modebtn:focus-visible{outline-color:var(--hfink)!important}
 </style>
 <div class="app">
   <aside class="rail">
@@ -6941,7 +6954,7 @@ async function backupAll(){
 
 /* ---------- business settings ---------- */
 /* ---------- color theme: SITREP (default) or Hands Free Help (lime, gray, black) ---------- */
-const PALETTES=[{id:'sitrep',name:'SITREP',sw:['#14252A','#0B7A83','#F2B11B']},{id:'hfh',name:'Hands Free Help',sw:['#111210','#9CCB19','#A9ACA6']}];
+const PALETTES=[{id:'sitrep',name:'SITREP',sw:['#14252A','#0B7A83','#F2B11B']},{id:'hfh',name:'Hands Free Help',sw:['#9CCB19','#111210','#A9ACA6']}];
 const PAL_KEY='sitrep-palette';
 function palGet(){let v='';try{v=localStorage.getItem(PAL_KEY)||''}catch(e){}return PALETTES.some(p=>p.id===v)?v:'sitrep'}
 function palApplyTo(doc,id){if(!doc||!doc.documentElement)return;if(id==='sitrep')doc.documentElement.removeAttribute('data-palette');else doc.documentElement.setAttribute('data-palette',id)}
