@@ -1241,6 +1241,26 @@ button:not(:disabled):active{filter:brightness(.92)}
 <style>.pclean{margin-left:auto;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;color:var(--fg);cursor:pointer}.pimg figcaption{flex-wrap:wrap;row-gap:4px}.pimg figcaption>:first-child{flex:1 0 100%;text-align:center;justify-content:center}
 .pimg img{background-color:#fff;background-image:linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%),linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%);background-size:12px 12px;background-position:0 0,6px 6px}
 </style>
+<style>.sow ol{margin:0 0 4px;padding-left:22px;display:flex;flex-direction:column;gap:2px}.sow li>ul,.sow li>ol{margin:2px 0 0}.sow u{text-underline-offset:2px}
+.sowtb{position:sticky;top:66px;z-index:6;display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:5px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+@media (max-width:860px){.sowtb{top:calc(var(--railh,0px) + 6px)}}
+.sowtb-b{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;border-radius:7px;color:var(--fg);cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background 100ms}
+.sowtb-b svg{width:18px;height:18px}
+@media (hover:hover) and (pointer:fine){.sowtb-b:hover{background:var(--sunk)}}
+.sowtb-b:active{background:var(--line)}
+.sowtb-b[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.sowtb-b:focus-visible,.sowtb-sel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.sowtb-sep{display:block;width:1px;height:22px;background:var(--line);margin:0 4px}
+.sowtb-sel{height:34px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--fg);font:500 14px var(--f-ui);padding:0 8px}
+.sowed-h{flex-wrap:nowrap}.sowed-h .check{flex:none}.sowed-t{flex:1;min-width:0;font-weight:650;font-size:15px;height:34px}
+.sowed-h .actions{display:flex;gap:4px;align-items:center;flex:none}.btn.icon{min-width:32px;padding-inline:0;justify-content:center}
+.sowrt{min-height:72px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);outline:none;cursor:text;gap:6px;font-size:16px;line-height:1.5}
+@media (min-width:861px){.sowrt{font-size:14px}}
+.sowrt:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sowrt:empty::before{content:attr(data-ph);color:var(--muted)}
+.sowrt h5{font-size:11px}
+@media (max-width:560px){.sowed-h{flex-wrap:wrap}.sowed-t{flex-basis:calc(100% - 40px)}.sowed-h .actions{width:100%;justify-content:flex-end}}
+</style>
 <style id="palHfh">/* ===== Hands Free Help palette: lime, gray, black (from the company logo). On when <html data-palette="hfh"> ===== */
 :root[data-palette="hfh"]{--lime:#9CCB19;--hfgray:#A9ACA6;--basalt:#111210;--basalt2:#1D1F1B;--amber:#9CCB19;--lagoon:#4F7A00}
 :root[data-palette="hfh"],:root[data-palette="hfh"][data-theme="light"]{--bg:#F3F4F1;--surface:#FFFFFF;--sunk:#E9EBE6;--line:#D5D8D0;--fg:#111210;--muted:#585B54;--accent:#4A7300;--accent-ink:#111210;--accent-soft:#ECF5D2;--ok:#2F7D32;--ok-soft:#E1F1DF;--sheet:#FBFCFA;--grid:#E8EAE4;--gridmaj:#D8DBD3}
@@ -4587,30 +4607,127 @@ function sowGenerate(){
   return {overview,system:sys.join('\n'),work,owner,excl,sched,deliv};
 }
 /* the sections as they will be sent: generated text, with the user's edits and exclusions applied */
+/* every section in order: the generated ones, then your own; titles can be renamed and sections moved */
+function sowList(){const P=S.prop,base=SOW_KEYS.map(([k,title])=>({k,title,custom:false})),own=(P.sowCustom||[]).map(c=>({k:c.k,title:c.title,custom:true}));
+  const all=[...base,...own],ord=(P.sowOrder||[]).filter(k=>all.some(x=>x.k===k));all.forEach(x=>{if(!ord.includes(x.k))ord.push(x.k)});
+  const tt=P.sowTitles||{};return ord.map(k=>{const x=all.find(y=>y.k===k);return {...x,title:(tt[k]||'').trim()||x.title}})}
 function sowSections(){const g=sowGenerate(),P=S.prop,ed=P.sowEdits||{},off=P.sowOff||{};
-  return SOW_KEYS.filter(([k])=>!off[k]).map(([k,title])=>({k,title,body:ed[k]!=null?ed[k]:g[k],edited:ed[k]!=null}))}
+  return sowList().filter(x=>!off[x.k]).map(x=>({k:x.k,title:x.title,body:ed[x.k]!=null?ed[x.k]:(g[x.k]||''),edited:ed[x.k]!=null}))}
+/* Scope text format, one line each: "## " sub-heading, "- " bullet, "1. " numbered item, two leading spaces per list level;
+   inside a line **bold**, *italic*, __underline__. Plain text written before this still reads the same. */
+function sowLines(txt){const out=[];String(txt||'').replace(/\r/g,'').split('\n').forEach(raw=>{
+  const lead=(raw.match(/^ */)||[''])[0].length,l=raw.trim();if(!l){out.push({t:'gap'});return}
+  const lv=Math.min(3,Math.floor(lead/2));let m;
+  if(l.startsWith('## '))out.push({t:'h',text:l.slice(3)});
+  else if(/^[-•*] /.test(l)&&!/^\*\*/.test(l)||/^- /.test(l))out.push({t:'li',ord:false,lv,text:l.slice(2)});
+  else if((m=/^(\d{1,3})[.)] (.*)$/.exec(l)))out.push({t:'li',ord:true,lv,text:m[2]});
+  else out.push({t:'p',text:l})});return out}
+/* split a line into runs of text with their bold / italic / underline state */
+function sowRuns(text){const s=String(text||'');const cnt=re=>(s.match(re)||[]).length;
+  const okB=cnt(/\*\*/g)%2===0,okU=cnt(/__/g)%2===0,okI=(cnt(/\*/g)-2*cnt(/\*\*/g))%2===0;
+  const runs=[];let b=false,i=false,u=false,buf='';const push=()=>{if(buf){runs.push({text:buf,b,i,u});buf=''}};
+  for(let k=0;k<s.length;k++){
+    if(okB&&s.startsWith('**',k)){push();b=!b;k++;continue}
+    if(okU&&s.startsWith('__',k)){push();u=!u;k++;continue}
+    if(okI&&s[k]==='*'){push();i=!i;continue}
+    buf+=s[k]}push();return runs}
+function sowInline(text){return sowRuns(text).map(r=>{let h=esc(r.text);if(r.u)h=`<u>${h}</u>`;if(r.i)h=`<em>${h}</em>`;if(r.b)h=`<strong>${h}</strong>`;return h}).join('')}
 const sowCurrent=()=>S.prop.sowSent||sowSections();
-function sowBody(txt){let h='',ul=false;String(txt||'').split('\n').forEach(raw=>{const l=raw.trim();if(!l){if(ul){h+='</ul>';ul=false}return}
-  if(l.startsWith('- ')){if(!ul){h+='<ul>';ul=true}h+=`<li>${esc(l.slice(2))}</li>`;return}if(ul){h+='</ul>';ul=false}
-  h+=l.startsWith('## ')?`<h5>${esc(l.slice(3))}</h5>`:`<p>${esc(l)}</p>`});return h+(ul?'</ul>':'')}
+function sowBody(txt){let h='';const st=[]; // open lists: {ord,lv}
+  const close=lv=>{while(st.length&&st[st.length-1].lv>=lv){const x=st.pop();h+=`</li></${x.ord?'ol':'ul'}>`}};
+  sowLines(txt).forEach(L=>{
+    if(L.t!=='li'){close(0);if(L.t==='h')h+=`<h5>${sowInline(L.text)}</h5>`;else if(L.t==='p')h+=`<p>${sowInline(L.text)}</p>`;return}
+    const top=st[st.length-1];
+    if(top&&top.lv===L.lv&&top.ord!==L.ord)close(L.lv);
+    const t2=st[st.length-1];
+    if(t2&&t2.lv>L.lv)close(L.lv+1);
+    const t3=st[st.length-1];
+    if(t3&&t3.lv===L.lv&&t3.ord===L.ord)h+=`</li><li>${sowInline(L.text)}`;
+    else if(t3&&t3.lv===L.lv)/* type changed */{close(L.lv);h+=`<${L.ord?'ol':'ul'}><li>${sowInline(L.text)}`;st.push({ord:L.ord,lv:L.lv})}
+    else{h+=`<${L.ord?'ol':'ul'}><li>${sowInline(L.text)}`;st.push({ord:L.ord,lv:L.lv})}});
+  close(0);return h}
+/* editor HTML -> scope text */
+function sowFromHTML(root){const lines=[];
+  const inline=node=>{const runs=[];const walk=(n,f)=>{
+      if(n.nodeType===3){runs.push({text:n.nodeValue.replace(/\u00a0/g,' ').replace(/[\n\t]+/g,' '),...f});return}
+      if(n.nodeType!==1)return;const tag=n.tagName;if(tag==='BR'){runs.push({br:true});return}if(tag==='UL'||tag==='OL')return;
+      const st=n.getAttribute('style')||'',g={...f};
+      if(tag==='B'||tag==='STRONG'||/font-weight:\s*(bold|[6-9]00)/.test(st))g.b=true;
+      if(tag==='I'||tag==='EM'||/font-style:\s*italic/.test(st))g.i=true;
+      if(tag==='U'||/text-decoration[^;]*underline/.test(st))g.u=true;
+      n.childNodes.forEach(c=>walk(c,g))};
+    node.childNodes.forEach(c=>walk(c,{b:false,i:false,u:false}));
+    const parts=[[]];runs.forEach(r=>{if(r.br)parts.push([]);else parts[parts.length-1].push(r)});
+    return parts.map(rs=>{const m=[];rs.forEach(r=>{const l=m[m.length-1];if(l&&l.b===r.b&&l.i===r.i&&l.u===r.u)l.text+=r.text;else m.push({...r})});
+      return m.map(r=>{const a=r.text.match(/^\s*/)[0],z=r.text.slice(a.length).match(/\s*$/)[0],core=r.text.trim();if(!core)return r.text;
+        let w=core;if(r.i)w=`*${w}*`;if(r.b)w=`**${w}**`;if(r.u)w=`__${w}__`;return a+w+z}).join('').replace(/\s+/g,' ').trim()})};
+  const list=(el,lv)=>{let n=0;el.childNodes.forEach(li=>{if(li.nodeType!==1)return;
+      if(li.tagName==='UL'||li.tagName==='OL'){list(li,lv+1);return}
+      if(li.tagName!=='LI')return;n++;const ord=el.tagName==='OL';
+      lines.push('  '.repeat(lv)+(ord?n+'. ':'- ')+inline(li).filter(Boolean).join(' '));
+      li.childNodes.forEach(c=>{if(c.nodeType===1&&(c.tagName==='UL'||c.tagName==='OL'))list(c,lv+1)})})};
+  const BLK=/^(P|DIV|UL|OL|H[1-6]|BLOCKQUOTE|LI|SECTION|PRE)$/;
+  const block=el=>{let buf=[];const flush=()=>{if(!buf.length)return;const w=document.createElement('span');buf.forEach(n=>w.appendChild(n.cloneNode(true)));buf=[];inline(w).forEach(t=>{if(t)lines.push(t)})};
+    el.childNodes.forEach(n=>{
+      if(n.nodeType===3||(n.nodeType===1&&!BLK.test(n.tagName)&&n.tagName!=='BR')){buf.push(n);return}
+      if(n.nodeType!==1)return;flush();const tag=n.tagName;
+      if(tag==='BR'){return}
+      if(tag==='UL'||tag==='OL'){list(n,0);return}
+      if(/^H[1-6]$/.test(tag)){const t=inline(n).join(' ').replace(/\*\*|__|\*/g,'').trim();if(t)lines.push('## '+t);return}
+      if(n.querySelector('p,div,ul,ol,h1,h2,h3,h4,h5,h6,blockquote')){block(n);return}
+      inline(n).forEach(t=>lines.push(t))});flush()};
+  block(root);
+  return lines.join('\n').replace(/\n{3,}/g,'\n\n').trim()}
 function sowHTML(list){return `<div class="sow">${list.map((s,i)=>`<section><h4>${i+1}. ${esc(s.title)}</h4>${sowBody(s.body)}</section>`).join('')}</div>`}
 function sowBlock(){const P=S.prop,sent=!!P.sowSent,edit=S.ui.sowEdit&&!sent;
   const head=`<div class="dsec-h sowh"><b>Scope of work</b><span class="actions">${sent?`<span class="muted">As sent</span>`:edit?`<button class="btn sm" data-act="sowRegen">Regenerate all from design</button><button class="btn sm primary" data-act="sowEditDone">Done</button>`:`<span class="muted">Written from the design</span>${SAMPLE?'<button class="btn sm" data-act="sowAI">Polish with AI</button>':''}<button class="btn sm" data-act="sowEdit">Edit scope</button>`}</span></div>`;
   if(!edit)return `<div class="dsec sowsec">${head}${sowHTML(sowCurrent())}</div>`;
-  const g=sowGenerate(),ed=P.sowEdits||{},off=P.sowOff||{};
-  return `<div class="dsec sowsec">${head}<p class="note" style="margin:0">Lines starting with “- ” become bullets and “## ” starts a sub-heading. Edited sections keep your text when the design changes; Reset brings back the generated text.</p>
-   ${SOW_KEYS.map(([k,title])=>`<div class="sowed${off[k]?' off':''}"><div class="sowed-h"><label class="check"><input type="checkbox" data-sowon="${k}" ${off[k]?'':'checked'}> <b>${esc(title)}</b></label>${ed[k]!=null?`<span class="actions"><span class="muted" style="font-size:12px">Edited</span><button class="btn sm" data-act="sowReset" data-k="${k}">Reset</button></span>`:''}</div>
-    ${off[k]?'<p class="muted" style="margin:0;font-size:12px">Left out of the proposal.</p>':`<textarea class="inp" data-sow="${k}" rows="${Math.min(16,Math.max(3,String(ed[k]!=null?ed[k]:g[k]).split('\n').length+1))}" aria-label="${esc(title)}">${esc(ed[k]!=null?ed[k]:g[k])}</textarea>`}</div>`).join('')}</div>`}
+  const g=sowGenerate(),ed=P.sowEdits||{},off=P.sowOff||{},L=sowList();
+  const B=(cmd,label,ico,key)=>`<button type="button" class="sowtb-b" data-act="sowCmd" data-cmd="${cmd}" aria-label="${label}${key?` (${key})`:''}" title="${label}${key?` · ${key}`:''}" aria-pressed="false">${ico}</button>`;
+  const sv=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const mod=/Mac|iPhone|iPad/.test(navigator.platform||'')?'⌘':'Ctrl+';
+  const tb=`<div class="sowtb" role="toolbar" aria-label="Formatting">
+    ${B('undo','Undo',sv('<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),mod+'Z')}${B('redo','Redo',sv('<path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>'),mod+'Shift+Z')}<i class="sowtb-sep"></i>
+    <select class="sowtb-sel" data-sowblock aria-label="Text style"><option value="p">Paragraph</option><option value="h5">Sub-heading</option></select><i class="sowtb-sep"></i>
+    ${B('bold','Bold','<b style="font:800 15px/1 var(--f-ui)">B</b>',mod+'B')}${B('italic','Italic','<i style="font:italic 600 15px/1 Georgia,serif">I</i>',mod+'I')}${B('underline','Underline','<u style="font:600 15px/1 var(--f-ui)">U</u>',mod+'U')}<i class="sowtb-sep"></i>
+    ${B('insertUnorderedList','Bulleted list',sv('<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/>'))}${B('insertOrderedList','Numbered list',sv('<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 4h1v4M4 8h2M4 14.5c0-.8.6-1.2 1.2-1.2.7 0 1.1.5 1.1 1 0 .9-2.3 1.8-2.3 3.2h2.4" stroke-width="1.6"/>'))}
+    ${B('outdent','Decrease indent',sv('<path d="M21 6H11M21 12H11M21 18H11"/><path d="m7 9-3 3 3 3"/>'),'Shift+Tab')}${B('indent','Increase indent',sv('<path d="M21 6H11M21 12H11M21 18H11"/><path d="m4 9 3 3-3 3"/>'),'Tab')}<i class="sowtb-sep"></i>
+    ${B('removeFormat','Clear formatting',sv('<path d="M4 7V5h11v2M9.5 5 7 19M5 19h5"/><path d="m15 13 6 6M21 13l-6 6"/>'))}</div>`;
+  return `<div class="dsec sowsec">${head}<p class="note" style="margin:0">Format with the toolbar or shortcuts. Rename, move, leave out or add sections. Edited sections keep your text when the design changes; Reset brings back the generated text.</p>
+   ${tb}
+   ${L.map((x,ix)=>{const k=x.k,body=ed[k]!=null?ed[k]:(g[k]||''),def=x.custom?x.title:(SOW_KEYS.find(y=>y[0]===k)||[])[1];return `<div class="sowed${off[k]?' off':''}" data-sowsec="${k}"><div class="sowed-h">
+     <label class="check" title="Include this section"><input type="checkbox" data-sowon="${k}" ${off[k]?'':'checked'} aria-label="Include ${esc(x.title)}"></label>
+     <input class="inp sowed-t" data-sowtitle="${k}" value="${esc(x.title)}" aria-label="Section title" placeholder="${esc(def||'Section title')}">
+     <span class="actions">${!x.custom&&ed[k]!=null?`<span class="muted" style="font-size:12px">Edited</span><button class="btn sm" data-act="sowReset" data-k="${k}">Reset</button>`:''}
+      <button class="btn sm icon" data-act="sowMove" data-k="${k}" data-d="-1" ${ix?'':'disabled'} aria-label="Move ${esc(x.title)} up" title="Move up">↑</button><button class="btn sm icon" data-act="sowMove" data-k="${k}" data-d="1" ${ix<L.length-1?'':'disabled'} aria-label="Move ${esc(x.title)} down" title="Move down">↓</button>
+      ${x.custom?`<button class="btn sm danger" data-act="sowDel" data-k="${k}" aria-label="Delete ${esc(x.title)}">Delete</button>`:''}</span></div>
+    ${off[k]?'<p class="muted" style="margin:0;font-size:12px">Left out of the proposal.</p>':`<div class="sowrt sow" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-sowrt="${k}" aria-label="${esc(x.title)}" data-ph="Write this section…">${sowBody(body)}</div>`}</div>`}).join('')}
+   <button class="btn" data-act="sowAdd">+ Add a section</button></div>`}
 /* scope of work in the PDF */
+/* one line of scope text into the PDF with its bold, italic and underline; returns y below it */
+function pdfRichLayout(doc,text,W){const words=[];sowRuns(text).forEach(r=>{const st=r.b&&r.i?'bolditalic':r.b?'bold':r.i?'italic':'normal';
+    pt(r.text).split(/(\s+)/).forEach(w=>{if(w)words.push({w,st,u:r.u,sp:/^\s+$/.test(w)})})});
+  const lines=[[]];let x=0;words.forEach(o=>{doc.setFont('helvetica',o.st);const ww=doc.getTextWidth(o.sp?' ':o.w);
+    if(o.sp){if(x>0){lines[lines.length-1].push({...o,w:' ',x,ww});x+=ww}return}
+    if(x+ww>W&&x>0){const ln=lines[lines.length-1];while(ln.length&&ln[ln.length-1].sp)ln.pop();lines.push([]);x=0}
+    lines[lines.length-1].push({...o,x,ww});x+=ww});return lines}
+function pdfRichH(doc,text,W,lh){return pdfRichLayout(doc,text,W).length*lh}
+function pdfRich(doc,text,X,y,W,lh){const lines=pdfRichLayout(doc,text,W);
+  lines.forEach((ln,n)=>{const yy=y+n*lh,seg=[];ln.forEach(o=>{const l=seg[seg.length-1];if(l&&l.st===o.st&&l.u===o.u){l.w+=o.w;l.ww+=o.ww}else seg.push({...o})});
+    seg.forEach(o=>{doc.setFont('helvetica',o.st);const t=o.w.replace(/\s+$/,'');if(t.trim())doc.text(t,X+o.x,yy);if(o.u&&t.trim()){doc.setLineWidth(.5);doc.setDrawColor(40,40,40);doc.line(X+o.x,yy+1.5,X+o.x+doc.getTextWidth(t),yy+1.5)}})});
+  doc.setFont('helvetica','normal');return y+lines.length*lh}
+
 function pdfSow(doc,y,M,PW,INK,MUTED){
   const W=PW-2*M,need=h=>{if(y+h>740){doc.addPage('letter','portrait');y=64}};
   need(40);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);doc.text('Scope of work',M,y);y+=20;
   sowCurrent().forEach((s,i)=>{need(36);doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(...INK);doc.text(pt(`${i+1}. ${s.title}`),M,y);y+=15;
-    String(s.body||'').split('\n').forEach(raw=>{const l=raw.trim();if(!l){y+=4;return}
-      if(l.startsWith('## ')){need(24);y+=3;doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text(pt(l.slice(3).toUpperCase()),M,y);y+=12;return}
-      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...INK);
-      if(l.startsWith('- ')){const ls=doc.splitTextToSize(pt(l.slice(2)),W-14);need(ls.length*11.5);doc.text('•',M+3,y);doc.text(ls,M+14,y);y+=ls.length*11.5+1.5;return}
-      const ls=doc.splitTextToSize(pt(l),W);need(ls.length*12);doc.text(ls,M,y);y+=ls.length*12+4});
+    const nums=[0,0,0,0];
+    sowLines(s.body).forEach(L=>{if(L.t==='gap'){y+=4;nums.fill(0);return}
+      if(L.t==='h'){need(24);y+=3;doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text(pt(sowRuns(L.text).map(r=>r.text).join('').toUpperCase()),M,y);y+=12;nums.fill(0);return}
+      doc.setFontSize(9);doc.setTextColor(...INK);
+      if(L.t==='li'){const ind=M+L.lv*14;for(let q=L.lv+1;q<4;q++)nums[q]=0;let mark='•';if(L.ord){nums[L.lv]++;mark=nums[L.lv]+'.'}else nums[L.lv]=0;
+        doc.setFont('helvetica','normal');const h=pdfRichH(doc,L.text,W-(ind-M)-16,11.5);need(h);doc.text(mark,ind+3,y);y=pdfRich(doc,L.text,ind+16,y,W-(ind-M)-16,11.5)+1.5;return}
+      nums.fill(0);const h=pdfRichH(doc,L.text,W,12);need(h);y=pdfRich(doc,L.text,M,y,W,12)+4});
     y+=8});
   return y}
 
@@ -5896,10 +6013,16 @@ const A={
   clientView(){openClient()},
   viewSheet(el){openSheetViewer(+el.dataset.i)},
   propPdf(el){downloadProposalPdf(el)},
-  sowEdit(){S.ui.sowEdit=true;propParts();const t=document.querySelector('[data-sow]');if(t)t.focus()},
-  sowEditDone(){S.ui.sowEdit=false;saveProjects();propParts();toast('Scope of work updated.')},
+  sowEdit(){S.ui.sowEdit=true;propParts();const t=document.querySelector('[data-sowrt]');if(t)t.focus()},
+  sowEditDone(){sowFlush();S.ui.sowEdit=false;saveProjects();propParts();toast('Scope of work updated.')},
   sowReset(el){const P=S.prop;if(P.sowEdits)delete P.sowEdits[el.dataset.k];saveProjects();propParts()},
-  sowRegen(){S.prop.sowEdits={};saveProjects();propParts();toast('Every section is back to the text generated from the design.')},
+  sowRegen(){const P=S.prop,keep={};Object.entries(P.sowEdits||{}).forEach(([k,v])=>{if(/^c_/.test(k))keep[k]=v});P.sowEdits=keep;saveProjects();propParts();toast('Every generated section is back to the text from the design. Your own sections were kept.')},
+  sowCmd(el){sowCmd(el.dataset.cmd)},
+  sowAdd(){const P=S.prop;P.sowCustom=P.sowCustom||[];const k='c_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);P.sowCustom.push({k,title:'New section'});P.sowEdits=P.sowEdits||{};P.sowEdits[k]='';
+    saveProjects();propParts();const t=document.querySelector(`[data-sowtitle="${k}"]`);if(t){t.focus();t.select();t.scrollIntoView({block:'center'})}},
+  sowDel(el){const P=S.prop,k=el.dataset.k;P.sowCustom=(P.sowCustom||[]).filter(c=>c.k!==k);if(P.sowEdits)delete P.sowEdits[k];if(P.sowOff)delete P.sowOff[k];if(P.sowTitles)delete P.sowTitles[k];P.sowOrder=(P.sowOrder||[]).filter(x=>x!==k);saveProjects();propParts();toast('Section deleted.')},
+  sowMove(el){const P=S.prop,ord=sowList().map(x=>x.k),i=ord.indexOf(el.dataset.k),j=i+(+el.dataset.d);if(i<0||j<0||j>=ord.length)return;[ord[i],ord[j]]=[ord[j],ord[i]];P.sowOrder=ord;saveProjects();propParts();
+    const b=document.querySelector(`[data-act="sowMove"][data-k="${el.dataset.k}"][data-d="${el.dataset.d}"]`);if(b&&!b.disabled)b.focus();else{const t=document.querySelector(`[data-sowtitle="${el.dataset.k}"]`);if(t)t.focus()}},
   svStep(el){if(!S.sv)return;S.sv.i=Math.max(0,Math.min(S.sv.set.sheets.length-1,S.sv.i+ +el.dataset.d));renderSheetViewer()},
   svClose(){S.sv=null;renderSheetViewer()},
   clearSig(){const c=$('#sigPad');c.getContext('2d').clearRect(0,0,c.width,c.height);sigInk=false;checkSign()},
@@ -6454,7 +6577,52 @@ document.addEventListener('change',e=>{const t=e.target;
   if(t.dataset&&t.dataset.ripos){moveRItemTo(t);return}
   if(t.dataset&&(t.dataset.nprop||t.dataset.cprop||t.dataset.mprop||t.dataset.m2prop||t.dataset.m3prop||t.dataset.plprop||t.dataset.rprop))onPropChange(t)});
 /* scope edits save as you type, without redrawing the proposal under the cursor */
-let sowT;document.addEventListener('input',e=>{const t=e.target;if(!t.dataset||!t.dataset.sow)return;const P=S.prop;P.sowEdits=P.sowEdits||{};P.sowEdits[t.dataset.sow]=t.value;clearTimeout(sowT);sowT=setTimeout(saveProjects,400)});
+let sowT,SOWRT=null;
+function sowStore(el){const P=S.prop;if(!P||P.sowSent||!el.isConnected)return;const k=el.dataset.sowrt;P.sowEdits=P.sowEdits||{};P.sowEdits[k]=sowFromHTML(el)}
+function sowFlush(){document.querySelectorAll('[data-sowrt]').forEach(sowStore);clearTimeout(sowT)}
+document.addEventListener('input',e=>{const t=e.target;if(!t.dataset)return;const P=S.prop;
+  if(t.dataset.sowrt!=null){sowStore(t);if(!t.textContent.trim()&&!t.querySelector('li'))t.innerHTML='';clearTimeout(sowT);sowT=setTimeout(saveProjects,400);sowTbState();return}
+  if(t.dataset.sowtitle){P.sowTitles=P.sowTitles||{};const k=t.dataset.sowtitle,v=t.value.slice(0,120);const cu=(P.sowCustom||[]).find(c=>c.k===k);if(cu)cu.title=v.trim()||'New section';else P.sowTitles[k]=v;const ed=document.querySelector(`[data-sowrt="${k}"]`);if(ed)ed.setAttribute('aria-label',v);clearTimeout(sowT);sowT=setTimeout(saveProjects,400);return}
+  if(t.dataset.sow){P.sowEdits=P.sowEdits||{};P.sowEdits[t.dataset.sow]=t.value;clearTimeout(sowT);sowT=setTimeout(saveProjects,400)}});
+/* the formatting toolbar acts on the section you were last typing in, without stealing its cursor */
+document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.sowrt!=null){SOWRT=t;try{document.execCommand('defaultParagraphSeparator',false,'p');document.execCommand('styleWithCSS',false,false)}catch(x){}sowTbState()}});
+document.addEventListener('mousedown',e=>{if(e.target.closest&&e.target.closest('.sowtb-b'))e.preventDefault()});
+function sowTarget(){if(SOWRT&&SOWRT.isConnected)return SOWRT;const f=document.querySelector('[data-sowrt]');return f}
+function sowCmd(cmd){const el=sowTarget();if(!el)return;sowRestore(el);
+  if(cmd==='removeFormat'){document.execCommand('removeFormat');document.execCommand('formatBlock',false,'p')}else document.execCommand(cmd,false,null);
+  sowStore(el);clearTimeout(sowT);sowT=setTimeout(saveProjects,400);sowTbState()}
+document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||t.dataset.sowblock==null)return;const el=sowTarget();if(!el)return;sowRestore(el);
+  sowSetBlock(el,t.value==='h5'?'H5':'P');sowStore(el);clearTimeout(sowT);sowT=setTimeout(saveProjects,400);sowTbState()});
+/* make the line with the cursor a sub-heading or a paragraph; a list item is lifted out of its list, splitting it */
+/* on a phone the menu bar sits on top; the toolbar parks just under it */
+try{const rl=document.querySelector('.rail');if(rl&&window.ResizeObserver)new ResizeObserver(()=>{const st=getComputedStyle(rl);document.documentElement.style.setProperty('--railh',(st.position==='sticky'&&st.flexDirection==='row'?rl.offsetHeight:0)+'px')}).observe(rl)}catch(e){}
+function sowSetBlock(el,tag){const sel=getSelection();if(!sel.rangeCount)return;let n=sel.anchorNode,blk=null;
+  while(n&&n!==el){if(n.nodeType===1&&/^(P|DIV|LI|H[1-6])$/.test(n.tagName)){blk=n;break}n=n.parentNode}
+  if(!blk){document.execCommand('formatBlock',false,tag.toLowerCase());return}
+  if(blk.tagName===tag)return;
+  const nw=document.createElement(tag);[...blk.childNodes].filter(c=>!(c.nodeType===1&&/^(UL|OL)$/.test(c.tagName))).forEach(c=>nw.appendChild(c));
+  if(!nw.textContent.length)nw.appendChild(document.createElement('br'));
+  if(blk.tagName==='LI'){const par=blk.parentNode;let top=par;while(top.parentNode&&top.parentNode!==el&&/^(UL|OL|LI)$/.test(top.parentNode.tagName))top=top.parentNode;
+    const rest=document.createElement(par.tagName);let x=blk.nextSibling;while(x){const nx=x.nextSibling;rest.appendChild(x);x=nx}
+    [...blk.childNodes].filter(c=>c.nodeType===1&&/^(UL|OL)$/.test(c.tagName)).forEach(c=>{[...c.childNodes].reverse().forEach(li=>rest.insertBefore(li,rest.firstChild))});
+    blk.remove();const host=top.parentNode;host.insertBefore(nw,top.nextSibling);if(rest.childNodes.length)host.insertBefore(rest,nw.nextSibling);
+    if(!par.querySelector('li')){let e=par;while(e!==host&&e.parentNode&&!e.parentNode.querySelector('li'))e=e.parentNode;if(e!==host)e.remove();else par.remove()}}
+  else blk.replaceWith(nw);
+  const r=document.createRange();r.selectNodeContents(nw);r.collapse(false);sel.removeAllRanges();sel.addRange(r)}
+function sowTbState(){const tb=document.querySelector('.sowtb');if(!tb)return;const sel=getSelection(),el=SOWRT&&SOWRT.isConnected?SOWRT:null;const inside=!!(el&&sel.rangeCount&&el.contains(sel.anchorNode));if(!inside&&tb.contains(document.activeElement))return;
+  tb.querySelectorAll('.sowtb-b').forEach(b=>{const c=b.dataset.cmd;if(!/^(bold|italic|underline|insertUnorderedList|insertOrderedList)$/.test(c))return;let on=false;try{on=inside&&document.queryCommandState(c)}catch(x){}b.setAttribute('aria-pressed',String(on))});
+  const s=tb.querySelector('[data-sowblock]');if(s){let v='p';if(inside){let n=sel.anchorNode;while(n&&n!==el){if(n.nodeType===1&&/^H[1-6]$/.test(n.tagName)){v='h5';break}n=n.parentNode}}s.value=v}}
+let SOWRANGE=null;
+document.addEventListener('selectionchange',()=>{if(!(SOWRT&&SOWRT.isConnected))return;const sel=getSelection();if(sel.rangeCount&&SOWRT.contains(sel.anchorNode))SOWRANGE=sel.getRangeAt(0).cloneRange();sowTbState()});
+function sowRestore(el){const sel=getSelection();if(sel.rangeCount&&el.contains(sel.anchorNode))return;el.focus({preventScroll:true});sel.removeAllRanges();
+  if(SOWRANGE&&el.contains(SOWRANGE.startContainer))sel.addRange(SOWRANGE);else{const r=document.createRange();r.selectNodeContents(el);r.collapse(false);sel.addRange(r)}}
+/* paste as plain text so web pages and Word don't bring their styles in */
+document.addEventListener('paste',e=>{const t=e.target&&e.target.closest&&e.target.closest('[data-sowrt]');if(!t)return;e.preventDefault();
+  const txt=(e.clipboardData||window.clipboardData).getData('text/plain')||'';document.execCommand('insertText',false,txt.replace(/\r/g,''))});
+document.addEventListener('keydown',e=>{const t=e.target&&e.target.closest&&e.target.closest('[data-sowrt]');if(!t)return;
+  if(e.key==='Tab'){const sel=getSelection();let n=sel.anchorNode,li=false;while(n&&n!==t){if(n.nodeName==='LI'){li=true;break}n=n.parentNode}
+    if(li){e.preventDefault();document.execCommand(e.shiftKey?'outdent':'indent');sowStore(t);clearTimeout(sowT);sowT=setTimeout(saveProjects,400)}}
+  if((e.metaKey||e.ctrlKey)&&!e.altKey&&/^[biu]$/i.test(e.key)){setTimeout(()=>{sowStore(t);sowTbState()},0)}});
 document.addEventListener('keydown',e=>{
   if(S.sv){if(e.key==='Escape'){e.preventDefault();A.svClose();return}if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();A.svStep({dataset:{d:e.key==='ArrowRight'?1:-1}});return}}
   const ov=!$('#overlay').hidden;
@@ -7077,9 +7245,9 @@ function aiTools(){
     execute:()=>{const q=quote(),P=S.prop;return {proposal:P.no,client:P.client,project:P.project,status:P.status,markupPct:+P.markup,laborHours:q.hrs,equipment:Math.round(q.equip),labor:Math.round(q.labor),tax:Math.round(q.tax),total:Math.round(q.total),dealerCost:Math.round(q.cost),lines:q.lines.slice(0,80).map(l=>({qty:l.qty,item:`${l.p.mfr} ${l.p.model}`,category:l.p.cat,sell:Math.round(l.sell)}))}}},
    {name:'get_pipeline',description:'Returns every project and proposal with value and status, plus open service tickets.',inputSchema:obj(),
     execute:()=>({proposals:pipelineRows(quote()).map(r=>({client:r.client,project:r.project,value:Math.round(r.value),status:r.status,updated:r.updated})),openTickets:S.tickets.filter(t=>t.col!=='Completed').map(t=>({id:t.id,site:t.site,issue:t.issue,priority:t.pri,stage:t.col}))})},
-   {name:'set_scope_section',description:'Rewrites one section of the proposal’s scope of work. Sections: overview, system, work, owner, excl, sched, deliv. Lines starting "- " are bullets and "## " a sub-heading.',
-    inputSchema:obj({section:{type:'string',enum:SOW_KEYS.map(k=>k[0])},text:{type:'string'}},['section','text']),
-    execute:({section,text})=>{const P=S.prop;if(P.sowSent)return {error:'The proposal was already sent, so its scope is locked.'};if(!SOW_KEYS.some(k=>k[0]===section))return {error:'Unknown section'};
+   {name:'set_scope_section',description:'Rewrites one section of the proposal’s scope of work. Sections: '+sowList().map(x=>`${x.k} (${x.title})`).join(', ')+'. Lines starting "- " are bullets, "1. " numbered, "## " a sub-heading; **bold**, *italic* and __underline__ inside a line.',
+    inputSchema:obj({section:{type:'string',enum:sowList().map(x=>x.k)},text:{type:'string'}},['section','text']),
+    execute:({section,text})=>{const P=S.prop;if(P.sowSent)return {error:'The proposal was already sent, so its scope is locked.'};if(!sowList().some(x=>x.k===section))return {error:'Unknown section'};
       P.sowEdits=P.sowEdits||{};P.sowEdits[section]=String(text||'').slice(0,6000);saveProjects();AI.changed=true;return {ok:true}}}
   ]}
 function aiSystem(){return `You are the design assistant inside ${firm()}'s AV integration app. The app holds signal flow drawings, rack elevations, patch panels, a floor plan, a cable schedule, proposals, projects, clients, invoices and service tickets. The person you're helping is the integrator.
@@ -7107,16 +7275,16 @@ async function aiAsk(text){
 async function sowAI(btn){
   if(!SAMPLE){toast('The AI assistant isn’t available in this view.');return}const P=S.prop;if(P.sowSent){toast('This scope was already sent.');return}
   if(btn){btn.disabled=true;btn.textContent='Writing…'}
-  const cur=Object.fromEntries(sowSections().map(s=>[s.k,s.body]));
+  sowFlush();const cur=Object.fromEntries(sowSections().map(s=>[s.k,s.body]));
   try{const o=await SAMPLE.json(`${aiSystem()}
 
 Rewrite this proposal's scope of work so it reads like an experienced AV integrator wrote it for ${P.client}. Keep every fact, device, quantity, drawing number and date. Don't add equipment or promises that aren't there. Keep each section concise.
-Formatting inside each string: lines starting "- " are bullets, "## " starts a sub-heading, other lines are paragraphs. Separate lines with \\n.
-Return only a JSON object with exactly these string keys: ${SOW_KEYS.map(k=>k[0]).join(', ')}.
+Formatting inside each string: lines starting "- " are bullets, "1. " numbered steps, "## " starts a sub-heading, other lines are paragraphs. **bold** marks a key term; use it sparingly. Keep any formatting already there. Separate lines with \\n.
+Return only a JSON object with exactly these string keys: ${Object.keys(cur).join(', ')}.
 
 Current sections:
 ${JSON.stringify(cur,null,1)}`,{modelTier:'default',cache:false});
-    const ed={};SOW_KEYS.forEach(([k])=>{if(o&&typeof o[k]==='string'&&o[k].trim()&&cur[k]!==undefined)ed[k]=o[k].trim().slice(0,6000)});
+    const ed={};Object.keys(cur).forEach(k=>{if(o&&typeof o[k]==='string'&&o[k].trim()&&cur[k]!==undefined)ed[k]=o[k].trim().slice(0,6000)});
     if(!Object.keys(ed).length)throw new Error('empty');
     P.sowEdits={...(P.sowEdits||{}),...ed};saveProjects();S.ui.sowEdit=true;propParts();toast('Scope of work rewritten. Review each section, then press Done.')}
   catch(e){if(e&&e.code==='not_granted'){SAMPLE=null;toast('The AI assistant wasn’t allowed.')}else toast(e&&e.code==='rate_limited'?'The assistant is busy. Try again in a minute.':'Couldn’t rewrite the scope. Try again.');if(btn&&btn.isConnected){btn.disabled=false;btn.textContent='Polish with AI'}}}
