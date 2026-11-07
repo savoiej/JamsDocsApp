@@ -345,7 +345,7 @@ export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
 
   /* ---------- sample (Claude, through /api/ai) ---------- */
   type SampleTool = { name: string; description?: string; inputSchema?: unknown; execute: (input: unknown) => unknown };
-  type SampleOpts = { onText?: (t: { text: string; delta: string }) => void; signal?: AbortSignal; tools?: SampleTool[]; images?: Blob[]; modelTier?: string; maxTokens?: number };
+  type SampleOpts = { onText?: (t: { text: string; delta: string }) => void; signal?: AbortSignal; tools?: SampleTool[]; images?: Blob[]; modelTier?: string; maxTokens?: number; web?: boolean };
   type SampleMsg = { role: "user" | "assistant"; content: unknown };
   const sErr = (code: string, message: string) => Object.assign(new Error(message), { code, message });
   const b64 = async (b: Blob) => {
@@ -362,6 +362,7 @@ export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
         messages,
         tier: opts.modelTier || "default",
         maxTokens: opts.maxTokens,
+        web: !!opts.web,
         tools: tools?.map((t) => ({ name: t.name, description: t.description || t.name, input_schema: t.inputSchema || { type: "object", properties: {} } })),
       }),
       signal: opts.signal,
@@ -396,6 +397,11 @@ export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
       if (said) {
         text += (text ? "\n\n" : "") + said;
         opts.onText?.({ text, delta: said });
+      }
+      // a long web search turn can pause; send it back unchanged to let it continue
+      if (res.stop_reason === "pause_turn") {
+        msgs.push({ role: "assistant", content: res.content });
+        continue;
       }
       const uses = res.content.filter((b) => b.type === "tool_use");
       if (res.stop_reason !== "tool_use" || !uses.length || !tools) return { text, truncated: res.stop_reason === "max_tokens" };
@@ -435,6 +441,8 @@ export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
     }
   };
   sample.limits = async () => ({ images: true, maxImages: 8 });
+  // this site can search and read the web itself (Anthropic web search / web fetch)
+  sample.web = true;
   // only offered when this site has an API key; otherwise the app hides its AI features as before
   const sampleReady = fetch("/api/ai").then((r) => (r.ok ? r.json() : { ready: false })).then((d) => !!d.ready).catch(() => false);
 

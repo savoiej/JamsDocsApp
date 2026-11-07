@@ -7,7 +7,7 @@ import { getViewer } from "@/lib/supabase/server";
  * The browser bridge (lib/jams-bridge.ts) runs any tool loop; this route only relays a turn.
  * Needs ANTHROPIC_API_KEY (or ClaudeSITREP) in the Vercel project. Only signed-in, approved people can call it.
  */
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const MODELS: Record<string, string> = {
   quick: process.env.ANTHROPIC_MODEL_QUICK || "claude-haiku-5-5",
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   const key = apiKey();
   if (!key) return NextResponse.json({ code: "not_configured", message: "The assistant isn't set up on this site yet." }, { status: 503 });
 
-  let body: { messages?: Msg[]; system?: string; tools?: unknown[]; tier?: string; maxTokens?: number };
+  let body: { messages?: Msg[]; system?: string; tools?: unknown[]; tier?: string; maxTokens?: number; web?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -51,14 +51,24 @@ export async function POST(request: NextRequest) {
     messages,
   };
   if (typeof body.system === "string" && body.system.trim()) payload.system = body.system.slice(0, 100_000);
-  if (Array.isArray(body.tools) && body.tools.length) payload.tools = body.tools.slice(0, 32);
+  const tools: unknown[] = Array.isArray(body.tools) ? body.tools.slice(0, 32) : [];
+  // Anthropic's own web search and page/PDF fetch, run on Anthropic's side (used by Find a device on this site)
+  if (body.web) tools.push({ type: "web_search_20250305", name: "web_search", max_uses: 8 }, { type: "web_fetch_20250910", name: "web_fetch", max_uses: 6, max_content_tokens: 40000 });
+  if (tools.length) payload.tools = tools;
 
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify(payload),
-    signal: request.signal,
-  }).catch(() => null);
+  const send = (beta: boolean) =>
+    fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", ...(beta ? { "anthropic-beta": "web-fetch-2025-09-10" } : {}) },
+      body: JSON.stringify(payload),
+      signal: request.signal,
+    }).catch(() => null);
+  let r = await send(false);
+  // older API setups still need the web fetch beta flag; retry once with it
+  if (r && r.status === 400 && body.web) {
+    const t = await r.clone().text().catch(() => "");
+    if (/web_fetch|beta/i.test(t)) r = await send(true);
+  }
   if (!r) return NextResponse.json({ code: "unavailable", message: "Couldn't reach the assistant." }, { status: 502 });
   const data = await r.json().catch(() => null);
   if (!r.ok || !data) {
