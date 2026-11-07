@@ -5,7 +5,7 @@ import { getViewer } from "@/lib/supabase/server";
  * /api/ai — one Claude turn for SITREP's assistant features (reading spec sheets, drafting
  * scopes of work, the assistant chat) when the app runs on this site instead of claude.ai.
  * The browser bridge (lib/jams-bridge.ts) runs any tool loop; this route only relays a turn.
- * Needs ANTHROPIC_API_KEY in the Vercel project. Only signed-in, approved people can call it.
+ * Needs ANTHROPIC_API_KEY (or ClaudeSITREP) in the Vercel project. Only signed-in, approved people can call it.
  */
 export const maxDuration = 120;
 
@@ -15,6 +15,8 @@ const MODELS: Record<string, string> = {
   complex: process.env.ANTHROPIC_MODEL_COMPLEX || "claude-opus-5-5",
 };
 
+const apiKey = () => process.env.ANTHROPIC_API_KEY || process.env.ClaudeSITREP || "";
+
 async function allowed() {
   const { userId, profile } = await getViewer();
   return !!userId && !!profile?.active;
@@ -22,7 +24,7 @@ async function allowed() {
 
 export async function GET() {
   if (!(await allowed())) return NextResponse.json({ ready: false }, { status: 403 });
-  return NextResponse.json({ ready: !!process.env.ANTHROPIC_API_KEY });
+  return NextResponse.json({ ready: !!apiKey() });
 }
 
 type Block = { type: string; [k: string]: unknown };
@@ -30,7 +32,7 @@ type Msg = { role: "user" | "assistant"; content: string | Block[] };
 
 export async function POST(request: NextRequest) {
   if (!(await allowed())) return NextResponse.json({ code: "not_granted", message: "Sign in to use the assistant." }, { status: 403 });
-  const key = process.env.ANTHROPIC_API_KEY;
+  const key = apiKey();
   if (!key) return NextResponse.json({ code: "not_configured", message: "The assistant isn't set up on this site yet." }, { status: 503 });
 
   let body: { messages?: Msg[]; system?: string; tools?: unknown[]; tier?: string; maxTokens?: number };
