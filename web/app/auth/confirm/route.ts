@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) ok = !(await supabase.auth.verifyOtp({ type, token_hash })).error;
   else if (code) ok = !(await supabase.auth.exchangeCodeForSession(code)).error;
 
-  to.pathname = ok ? "/app" : "/login";
+  to.pathname = ok ? "/operations" : "/login";
   if (!ok) to.searchParams.set("error", "link");
   return NextResponse.redirect(to);
 }

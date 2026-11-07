@@ -12,14 +12,14 @@ declare global {
 
 /** SITREP runs in a frame; it reaches Supabase through window.jamsBridge, which stands in for the claude.ai runtime it was built on. */
 const APPS = {
-  netline: { name: "SITREP - Operations", src: "/api/jamsnet", ns: "", href: "/app" },
-  jamsos: { name: "Jams Operations ver1", src: "/api/jamsos", ns: "jamsos", href: "/operations" },
+  netline: { name: "SITREP - Operations", src: "/api/jamsnet", ns: "", href: "/app", links: ["jamsos"] },
+  jamsos: { name: "Jams Operations ver1", src: "/api/jamsos", ns: "jamsos", href: "/operations", links: ["client"] },
+  client: { name: "SITREP · Client App", src: "/api/client", ns: "client", href: "/client", links: ["jamsos"] },
 } as const;
 type AppKey = keyof typeof APPS;
 
 export default function AppShell({ profile, app = "netline" }: { profile: Profile; app?: AppKey }) {
   const A = APPS[app];
-  const other = APPS[app === "netline" ? "jamsos" : "netline"];
   const [doc, setDoc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +48,11 @@ export default function AppShell({ profile, app = "netline" }: { profile: Profil
     <div className="shell">
       <header className="shellbar">
         <b>{A.name}</b>
-        <a href={other.href}>Open {other.name}</a>
+        {A.links.map((k) => (
+          <a key={k} href={APPS[k].href}>
+            {k === "jamsos" ? `Back to ${APPS[k].name}` : `Open ${APPS[k].name}`}
+          </a>
+        ))}
         <span className="who">
           {profile.full_name || profile.email}
         </span>

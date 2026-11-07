@@ -8,7 +8,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <main className="auth">
       <AuthSide />
       <div className="auth-main">
-        <LoginForm next={sp.next || "/app"} notice={notice} />
+        <LoginForm next={sp.next || "/operations"} notice={notice} />
       </div>
     </main>
   );
