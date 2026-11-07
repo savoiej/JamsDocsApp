@@ -1237,6 +1237,36 @@ button,[role="button"],[draggable="true"]{-webkit-user-select:none;user-select:n
 button:not(:disabled):active{filter:brightness(.92)}
 @media (pointer:coarse){input,textarea,select{font-size:16px!important}}
 </style>
+<script>try{if(localStorage.getItem("sitrep-palette")==="hfh")document.documentElement.setAttribute("data-palette","hfh")}catch(e){}</script>
+<style id="palHfh">/* ===== Hands Free Help palette: lime, gray, black (from the company logo). On when <html data-palette="hfh"> ===== */
+:root[data-palette="hfh"]{--lime:#9CCB19;--hfgray:#A9ACA6;--basalt:#111210;--basalt2:#1D1F1B;--amber:#9CCB19;--lagoon:#4F7A00}
+:root[data-palette="hfh"],:root[data-palette="hfh"][data-theme="light"]{--bg:#F3F4F1;--surface:#FFFFFF;--sunk:#E9EBE6;--line:#D5D8D0;--fg:#111210;--muted:#585B54;--accent:#4A7300;--accent-ink:#111210;--accent-soft:#ECF5D2;--ok:#2F7D32;--ok-soft:#E1F1DF;--sheet:#FBFCFA;--grid:#E8EAE4;--gridmaj:#D8DBD3}
+@media (prefers-color-scheme: dark){:root[data-palette="hfh"]:not([data-theme="light"]){--bg:#0D0E0C;--surface:#171915;--sunk:#0A0B09;--line:#2B2E27;--fg:#ECEEE8;--muted:#A3A69E;--accent:#A8D62A;--accent-ink:#0E120A;--accent-soft:#25300D;--ok:#6FCB6A;--ok-soft:#16301A;--sheet:#121411;--grid:#1A1C18;--gridmaj:#252821;--basalt:#070807;--basalt2:#171915}}
+:root[data-palette="hfh"][data-theme="dark"]{--bg:#0D0E0C;--surface:#171915;--sunk:#0A0B09;--line:#2B2E27;--fg:#ECEEE8;--muted:#A3A69E;--accent:#A8D62A;--accent-ink:#0E120A;--accent-soft:#25300D;--ok:#6FCB6A;--ok-soft:#16301A;--sheet:#121411;--grid:#1A1C18;--gridmaj:#252821;--basalt:#070807;--basalt2:#171915}
+:root[data-palette="hfh"] .btn.primary{background:var(--lime)!important;border-color:var(--lime)!important;color:#111210!important}
+:root[data-palette="hfh"] .kpis .kpi:first-child::before{background:var(--lime)}
+:root[data-palette="hfh"] :focus-visible{outline-color:var(--accent)!important}
+:root[data-palette="hfh"] .rail :focus-visible{outline-color:var(--lime)!important}
+:root[data-palette="hfh"] .rail{color:#E4E6E0;scrollbar-color:#33362F transparent}
+:root[data-palette="hfh"] .rail .brand small,:root[data-palette="hfh"] .rail .navgroup,:root[data-palette="hfh"] .rail label.navgroup,:root[data-palette="hfh"] .rail .railfoot,:root[data-palette="hfh"] .rail .railfoot *{color:var(--hfgray)!important}
+:root[data-palette="hfh"] .rail .inp,:root[data-palette="hfh"] .rail select,:root[data-palette="hfh"] .rail .pjsw .btn{border-color:#33362F!important;color:#F0F2EC!important}
+:root[data-palette="hfh"] .rail .nav button{color:#C9CCC4!important}
+:root[data-palette="hfh"] .rail .nav button[aria-current="page"]{background:rgba(156,203,25,.16)!important;color:#fff!important}
+:root[data-palette="hfh"] .rail .nvi,:root[data-palette="hfh"] .rail .nav .k{color:#8D9088!important}
+:root[data-palette="hfh"] .rail .nav [aria-current="page"] .nvi{color:var(--lime)!important}
+:root[data-palette="hfh"] .rail .navsub,:root[data-palette="hfh"] .rail .chev{border-left-color:#33362F!important}
+:root[data-palette="hfh"] .rail .nlhd,:root[data-palette="hfh"] .rail .nav .nlhd{border-top-color:#33362F!important}
+:root[data-palette="hfh"] .rail .nav button.locked::after{background:rgba(156,203,25,.16)!important;color:var(--lime)!important}
+:root[data-palette="hfh"] .admhero{background:linear-gradient(135deg,#111210,#2E4A05)!important}
+:root[data-palette="hfh"] .tbtime{background:color-mix(in srgb,var(--lime) 22%,var(--surface));border-color:color-mix(in srgb,var(--lime) 60%,var(--line))}
+.palpick{display:flex;gap:10px;flex-wrap:wrap}
+.palopt{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);font-weight:600;font-size:14px;color:var(--fg);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.palopt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.palopt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.palsw{display:flex;border-radius:6px;overflow:hidden;border:1px solid rgba(0,0,0,.15)}.palsw i{display:block;width:16px;height:22px}
+.palbtn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;touch-action:manipulation}
+.palbtn .palsw i{width:9px;height:12px}
+</style>
 <div class="app">
   <aside class="rail">
     <div class="brand">
@@ -1245,7 +1275,7 @@ button:not(:disabled):active{filter:brightness(.92)}
     </div>
     <div class="pjsw" id="pjsw"></div>
     <nav class="nav" id="nav" aria-label="Main menu"></nav>
-    <div class="railfoot"><span class="sync" id="sync"><i></i><span>Saved in this browser</span></span></div>
+    <div class="railfoot"><span class="sync" id="sync"><i></i><span>Saved in this browser</span></span><button type="button" class="palbtn" id="palBtn" data-act="colorToggle" aria-label="Switch color theme"></button></div>
   </aside>
   <main>
     <div class="topbar" id="topbar"></div>
@@ -5124,7 +5154,7 @@ navBuild();
 function nlEnsure(){if(NLF)return;const src=$('#nlsrc').textContent.replace(/<\\(\/?script|!--)/gi,'<$1');
   const shim=`<script>window.NL_EMBED={appUrl:${JSON.stringify(NL_URL)},hash:${JSON.stringify(NL_HASH0)},route:h=>parent.nlRoute(h),go:v=>parent.nlGo(v),bill:o=>parent.nlBill(o),nav:st=>parent.nlNav(JSON.parse(JSON.stringify(st)))};try{Object.defineProperty(window,'claude',{value:{use:n=>parent.nlUse(n)},configurable:true})}catch(e){window.claude={use:n=>parent.nlUse(n)}}<\/script>`;
   const nlTheme="<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap\"><style>:root{--f-display:\"Bricolage Grotesque\",\"Instrument Sans\",sans-serif;--f-body:\"Instrument Sans\",system-ui,sans-serif;--f-mono:\"JetBrains Mono\",ui-monospace,Menlo,monospace;--amber:#F2B11B}\n:root,:root[data-theme=\"light\"]{--bg:#EEF2F1;--surface:#FFFFFF;--sunk:#E4EAE9;--line:#D3DCDA;--fg:#14232A;--muted:#55666B;--accent:#0B7A83;--accent-ink:#FFFFFF;--accent-soft:#DCEFF0;--ok:#1E7F4F;--warn:#A0670A;--bad:#C0392B;--ok-soft:#DDF0E5;--warn-soft:#FBEFD2;--bad-soft:#F8E1DD}\n@media (prefers-color-scheme: light){:root:not([data-theme=\"dark\"]){--bg:#EEF2F1;--surface:#FFFFFF;--sunk:#E4EAE9;--line:#D3DCDA;--fg:#14232A;--muted:#55666B;--accent:#0B7A83;--accent-soft:#DCEFF0}}\n@media (prefers-color-scheme: dark){:root:not([data-theme=\"light\"]){--bg:#0C1517;--surface:#131F23;--sunk:#0A1113;--line:#22353A;--fg:#E2EBEA;--muted:#93A5A8;--accent:#3DBAC3;--accent-ink:#06191B;--accent-soft:#12353A;--ok:#4CC08A;--warn:#E9B44C;--bad:#F07163;--ok-soft:#123222;--warn-soft:#382A10;--bad-soft:#3A1A17}}\nbody{font-family:var(--f-body);-webkit-font-smoothing:antialiased}\n.vh h1,.kpi .v,.admhero h1,.ghero h1,.lockv h2,.fhero h1{font-family:var(--f-display)!important;font-weight:700!important;letter-spacing:-.025em!important}\n.vh h1{font-size:clamp(28px,2.6vw,36px)!important}\n.ph h2{font:650 16px var(--f-body)!important;letter-spacing:0!important}\n.eyebrow,.kpi .l,.t th,.navgroup,.secthd,.field,.colh,.gtg p,.ghero p,.admhero p,.ovr .h,.facts span,.kv dt{text-transform:none!important;letter-spacing:0!important;font-family:var(--f-body)!important}\n.eyebrow{font-size:13px!important;font-weight:500!important}\n.kpi .l{font-size:13px!important;font-weight:500!important}\n.t th{font-size:12.5px!important;font-weight:600!important}\n.secthd{font-size:13px!important;font-weight:650!important;color:var(--fg)!important}\n.panel{border-radius:12px}\n.btn{border-radius:8px;font-weight:600}\n.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}\n.admhero{background:linear-gradient(135deg,#14252A,#0B4F56)!important}\n:focus-visible{outline:2px solid var(--amber)!important}\n</style>";
-  NLF=document.createElement('iframe');NLF.className='nlframe';NLF.addEventListener('load',()=>{try{NLF.contentDocument.addEventListener('click',blobClick,true)}catch(e){}});NLF.title='Network documentation';NLF.srcdoc=src.replace('<head>','<head>'+shim).replace('<div class="app">',nlTheme+'<div class="app">');$('#v-networks').appendChild(NLF)}
+  NLF=document.createElement('iframe');NLF.className='nlframe';NLF.addEventListener('load',()=>{try{NLF.contentDocument.addEventListener('click',blobClick,true);palApplyTo(NLF.contentDocument,palGet())}catch(e){}});NLF.title='Network documentation';const palCss=(document.getElementById('palHfh')||{}).outerHTML||'';NLF.srcdoc=src.replace('<head>','<head>'+shim).replace('<div class="app">',nlTheme+palCss+'<div class="app">');$('#v-networks').appendChild(NLF)}
 function nlOpen(v){const api=NLF&&NLF.contentWindow&&NLF.contentWindow.NL_API;if(!api)NL_HASH0=v;if(S.view!=='networks')go('networks');if(api)api.go(v);nlNavRender()}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-nlgo]');if(!b)return;e.preventDefault();nlOpen(b.dataset.nlgo)});
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='nlNet'){const v=e.target.value,api=NLF&&NLF.contentWindow&&NLF.contentWindow.NL_API;if(!api)return;if(S.view!=='networks')go('networks');api.net(v);if(v==='__new'&&NLST)e.target.value=NLST.pid||''}});
@@ -5602,6 +5632,8 @@ const A={
   estDefaults(){S.ui.estDef=!S.ui.estDef;R.estimate()},
   ivPayLink(){const v=invById(S.iv&&S.iv.id);if(!v)return;v.payToken=payTok();saveInvoices();renderInvoice();toast('Payment link created. Copy it into your email to the client.')},
   ivPayCopy(){const i=$('#payLinkIn');if(i)copyText(i.value,'Payment link')},
+  colorSet(el){palSet(el.dataset.pal);toast(PALETTES.find(p=>p.id===palGet()).name+' colors on')},
+  colorToggle(){palSet(palGet()==='hfh'?'sitrep':'hfh')},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -6844,6 +6876,15 @@ async function backupAll(){
   toast(r==='saved'?'Backup ready.':r==='declined'?'Download cancelled.':'Another download is waiting for you to confirm.')}
 
 /* ---------- business settings ---------- */
+/* ---------- color theme: SITREP (default) or Hands Free Help (lime, gray, black) ---------- */
+const PALETTES=[{id:'sitrep',name:'SITREP',sw:['#14252A','#0B7A83','#F2B11B']},{id:'hfh',name:'Hands Free Help',sw:['#111210','#9CCB19','#A9ACA6']}];
+const PAL_KEY='sitrep-palette';
+function palGet(){let v='';try{v=localStorage.getItem(PAL_KEY)||''}catch(e){}return PALETTES.some(p=>p.id===v)?v:'sitrep'}
+function palApplyTo(doc,id){if(!doc||!doc.documentElement)return;if(id==='sitrep')doc.documentElement.removeAttribute('data-palette');else doc.documentElement.setAttribute('data-palette',id)}
+function palApply(id){palApplyTo(document,id);try{if(NLF&&NLF.contentDocument)palApplyTo(NLF.contentDocument,id)}catch(e){}
+  const b=document.getElementById('palBtn');if(b){const o=PALETTES.find(p=>p.id!==id);b.innerHTML=`<span class="palsw" aria-hidden="true">${o.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span>${esc(o.name)} colors`;b.setAttribute('aria-label','Switch to the '+o.name+' colors')}
+  document.querySelectorAll('.palopt').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.pal===id)))}
+function palSet(id){if(!PALETTES.some(p=>p.id===id))return;try{localStorage.setItem(PAL_KEY,id)}catch(e){}palApply(id)}
 R.settings=function(){
   const f=(k,l,ph,type)=>`<label class="field" for="st-${k}">${l}<input id="st-${k}" ${type?`type="${type}"`:''} ${type==='number'?'step="any" min="0"':''} data-set="${k}" value="${esc(SETTINGS[k]??'')}" placeholder="${esc(ph||'')}" autocomplete="off"></label>`;
   $('#v-settings').innerHTML=`
@@ -6855,6 +6896,10 @@ R.settings=function(){
     <div class="row2">${f('phone','Phone','','tel')}${f('email','Email','','email')}</div>
     <div class="row2">${f('website','Website')}${f('license','Contractor license no.')}</div>
     <p class="note" id="stPrev">On documents: ${esc([SETTINGS.tagline,contactLine()].filter(Boolean).join(' · ')||'add your contact details')}</p>
+   </div></div>
+   <div class="panel"><div class="ph"><h2>Color theme</h2></div><div class="fields">
+    <p class="note" style="margin:0">Changes the app's colors on this device. Light and dark still follow your device setting.</p>
+    <div class="palpick" role="group" aria-label="Color theme">${PALETTES.map(p=>`<button type="button" class="palopt" data-act="colorSet" data-pal="${p.id}" aria-pressed="${palGet()===p.id}"><span class="palsw" aria-hidden="true">${p.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span>${esc(p.name)}</button>`).join('')}</div>
    </div></div>
    ${teamPanelHTML()}
    <div class="panel"><div class="ph"><h2>Pricing and terms</h2></div><div class="fields">
@@ -8257,6 +8302,7 @@ cam=cams[S.ui.sheet]||cams.flow;
 const h0=(location.hash||'').slice(1);if(/^scan-/.test(h0))NL_HASH0=h0;
 go(/^scan-/.test(h0)?'networks':VIEWS.includes(h0)?h0:'overview');setTimeout(()=>{nlEnsure();nlNavRender()},300);
 cloudBoot();
+try{palApply(palGet())}catch(e){}
 })();
 </script>
 
