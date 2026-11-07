@@ -5,7 +5,7 @@ import { getViewer } from "@/lib/supabase/server";
 
 export type ActionResult = { error?: string } | undefined;
 
-export async function updateMember(id: string, change: { role?: "admin" | "user"; active?: boolean }): Promise<ActionResult> {
+export async function updateMember(id: string, change: { role?: "admin" | "user" | "tech"; active?: boolean }): Promise<ActionResult> {
   const { supabase, profile } = await getViewer();
   if (profile?.role !== "admin" || !profile.active) return { error: "Only an admin can change access." };
   // The database also enforces this (RLS policy + role guard trigger), including keeping one active admin.

@@ -7,7 +7,7 @@ import { updateMember } from "./actions";
 export default function MemberRow({ person, isMe }: { person: Profile; isMe: boolean }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const run = (change: { role?: "admin" | "user"; active?: boolean }) =>
+  const run = (change: { role?: "admin" | "user" | "tech"; active?: boolean }) =>
     start(async () => {
       setError(null);
       const r = await updateMember(person.id, change);
@@ -26,10 +26,11 @@ export default function MemberRow({ person, isMe }: { person: Profile; isMe: boo
           aria-label={`Role for ${person.email}`}
           value={person.role}
           disabled={pending}
-          onChange={(e) => run({ role: e.target.value as "admin" | "user" })}
+          onChange={(e) => run({ role: e.target.value as "admin" | "user" | "tech" })}
           style={{ border: "1px solid var(--line)", borderRadius: 8, padding: "6px 8px", background: "var(--surface)" }}
         >
-          <option value="user">User</option>
+          <option value="user">Office (sees prices)</option>
+          <option value="tech">Technician (no prices)</option>
           <option value="admin">Admin</option>
         </select>
       </td>

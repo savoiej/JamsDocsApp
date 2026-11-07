@@ -279,7 +279,12 @@ export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
       return profile.active;
     },
     async can(name: string) {
+      // "pricing": techs (role 'tech') see no dealer costs, prices or billing
+      if (name === "pricing") return profile.active && profile.role !== "tech";
       return name === "data.write" ? profile.active : null;
+    },
+    async role() {
+      return profile.role;
     },
     async profiles(ids: string[]) {
       const out: Record<string, { id: string; name: string; email: string; guest: boolean }> = {};

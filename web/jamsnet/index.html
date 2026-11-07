@@ -1059,6 +1059,7 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .pobrands{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .chip.Received{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}.chip.Partially-received{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
 .ipt tr.iperr td,.t tr.iperr td{background:color-mix(in srgb,var(--bad) 7%,transparent)}.ipt .cellin{min-width:0}.ipt td:first-child,.ipt td:nth-child(9){white-space:nowrap}.ipt select.cellin{min-width:128px}
+body.tech .money{display:none!important}
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -1818,17 +1819,28 @@ const chip=s=>`<span class="chip ${esc(String(s).replace(/\s+/g,'-'))}">${esc(s)
 function renderProjSwitch(){const b=$('#pjsw');if(!b)return;
   b.innerHTML=`<label class="navgroup" for="pjSel">Project</label><select class="inp" id="pjSel" aria-label="Open project">${projOptions()}</select><button class="btn sm" data-act="newProject">+ New project</button>`}
 function projOptions(){return PJ.list.map(e=>{const pr=e.id===PJ.cur?S.prop:(e.prop||{});return `<option value="${e.id}" ${e.id===PJ.cur?'selected':''}>${esc([pr.client,pr.project].filter(Boolean).join(' · ')||'Untitled project')}</option>`}).join('')}
-function badges(){renderProjSwitch();{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}$('#bCl').textContent=S.clients.length;$('#bDesign').textContent=S.design.nodes.length;$('#bLib').textContent=lib.length;$('#bSvc').textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
+function badges(){renderProjSwitch();{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}($('#bCl')||{}).textContent=S.clients.length;($('#bDesign')||{}).textContent=S.design.nodes.length;($('#bLib')||{}).textContent=lib.length;($('#bSvc')||{}).textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
 const VIEWS=['overview','assistant','design','clients','library','purchasing','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
 function go(v){
   if(v==='clients'&&S.view==='clients'&&S.ui.cpage){S.ui.cpage=null}
   if(!VIEWS.includes(v))v='overview';
+  if(S.tech&&TECH_HIDE.includes(v))v='projects';
   if(S.view==='design'&&v!=='design'){S.wire=null;S.drag=null;S.rdrag=null;S.pan=null;if(S.ui.fs){S.ui.fs=false;if(S.fsNative&&document.fullscreenElement)document.exitFullscreen().catch(()=>{});S.fsNative=false;document.body.classList.remove('dfs')}}
   S.view=v;document.body.classList.toggle('nlmode',v==='networks');if(typeof nlNavRender==='function')nlNavRender();if(typeof renderTopbar==='function')renderTopbar();
   VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v);
   document.querySelectorAll('#nav [data-go]').forEach(b=>{if(b.dataset.go===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});navSync(v);
   R[v]();badges();window.scrollTo(0,0);
 }
+/* ================= ROLES: technicians see no money =================
+   An admin sets someone's role to Technician on the Admin > Users page. They keep projects,
+   drawings (without prices), the library (without costs), the field app and the service desk;
+   money pages are hidden and invoices and contracts never load or save for them (the database
+   refuses those records to techs too). */
+const TECH_HIDE=['overview','clients','proposal','billing','contracts','purchasing','assistant','settings'];
+const canPrice=()=>!S.tech;
+function techMode(){if(S.tech)return;S.tech=true;document.body.classList.add('tech');
+  if(S.design&&S.design.meta6)S.design.meta6.price='none';
+  try{navBuild()}catch(e){}if(TECH_HIDE.includes(S.view))go('projects');else try{R[S.view]()}catch(e){}}
 const R={};
 
 /* ================= OVERVIEW ================= */
@@ -1899,7 +1911,7 @@ R.design0=function(){
     <button class="btn" data-act="loadTpl">Load</button>
     ${rk||pn||sc||pp||bm||ipv?'':'<button class="btn" data-act="newBlock">New device block</button>'}
     <button class="btn" data-act="fsToggle" title="Work on this sheet full screen (F)">⤢ Full screen</button>
-    <button class="btn primary" data-go="proposal">Build proposal →</button></div></header>
+    <button class="btn primary money" data-go="proposal">Build proposal →</button></div></header>
   ${fsBarHTML(cur,!(sc||pp||bm||ipv))}
   <div class="sheets" role="tablist" aria-label="Drawing sheets">
    <button role="tab" data-sheet="flow" aria-selected="${!rk&&!pn&&!sc&&!pp&&!bm&&!ipv}"><span>${esc(m.dwg)}</span><b>${esc(m.title)}</b></button>
@@ -2019,7 +2031,7 @@ function renderPal(){
     h+=(ur.length+un.length)?ur.map(r=>`<div class="palItem" draggable="true" data-drop="prack:${r.id}" title="Drag onto the plan, or press +"><b>${esc(r.name)}</b><button class="plus" data-act="planPlace" data-kind="prack" data-ref="${r.id}" aria-label="Place ${esc(r.name)} on the plan">+</button><small>Rack · ${r.size}U · ${plural(r.items.filter(i=>i.kind==='dev').length,'device')}</small></div>`).join('')
       +un.map(n=>{const p=prod(n);return `<div class="palItem" draggable="true" data-drop="pnode:${n.uid}" title="Drag onto the plan, or press +"><b>${esc(tg[n.uid])} <span class="muted" style="font-weight:400">${esc(p.model)}</span></b><button class="plus" data-act="planPlace" data-kind="pnode" data-ref="${n.uid}" aria-label="Place ${esc(tg[n.uid])} on the plan">+</button><small>${esc(p.cat)}${n.loc?' · '+esc(n.loc):''}</small></div>`}).join('')
       :`<p class="palEmpty">${q?'No matches.':'Everything is on the plan. Racked gear sits at its rack.'}</p>`;
-    h+=`<div class="palcat">Add new from library · ${libs.length}</div>`+(libs.length?libs.map(p=>`<div class="palItem" draggable="true" data-drop="lib:${esc(p.id)}" title="Adds a new ${esc(p.model)} to the project and places it on the plan"><b>${esc(p.model)} <span class="muted" style="font-weight:400">${esc(p.cat)}</span></b><button class="plus" data-act="planPlace" data-kind="lib" data-ref="${esc(p.id)}" aria-label="Add a new ${esc(p.model)} to the plan">+</button><small>${esc(p.mfr)} · ${money(p.cost)}</small></div>`).join(''):'<p class="palEmpty">No matches.</p>');
+    h+=`<div class="palcat">Add new from library · ${libs.length}</div>`+(libs.length?libs.map(p=>`<div class="palItem" draggable="true" data-drop="lib:${esc(p.id)}" title="Adds a new ${esc(p.model)} to the project and places it on the plan"><b>${esc(p.model)} <span class="muted" style="font-weight:400">${esc(p.cat)}</span></b><button class="plus" data-act="planPlace" data-kind="lib" data-ref="${esc(p.id)}" aria-label="Add a new ${esc(p.model)} to the plan">+</button><small>${esc(p.mfr)}${canPrice()?' · '+money(p.cost):''}</small></div>`).join(''):'<p class="palEmpty">No matches.</p>');
     box.innerHTML=h;return;
   }
   if(onRack()){
@@ -2033,14 +2045,14 @@ function renderPal(){
     h+=lp.map(p=>`<div class="palItem" draggable="true" data-drop="panel:${p.id}" title="Drag onto a rack, or press +"><b>${esc(p.name)} <span class="muted" style="font-weight:400">Patch panel</span></b><button class="plus" data-act="rackPlace" data-kind="panel" data-ref="${p.id}" aria-label="Put ${esc(p.name)} in a rack">+</button><small>${p.ports}-port ${PANEL_OPTS[p.media].label} · ${usedPorts(p)} used</small></div>`).join('');
     h+=un.length||lp.length?un.map(n=>{const p=prod(n);return `<div class="palItem" draggable="true" data-drop="dev:${n.uid}" title="Drag onto a rack, or press +"><b>${esc(tg[n.uid])} <span class="muted" style="font-weight:400">${esc(p.model)}</span></b><button class="plus" data-act="rackPlace" data-kind="dev" data-ref="${n.uid}" aria-label="Place ${esc(tg[n.uid])} in a rack">+</button><small>${p.ru}U${p.mount==='shelf'?' on a shelf':''} · ${p.watts} W</small></div>`}).join('')
       :`<p class="palEmpty">${q?'No matches.':'Every rack-mount device in the design is placed.'}</p>`;
-    h+=`<div class="palcat">Patch panels</div>`+(np.length?np.map(({m,n,p})=>`<div class="palItem" draggable="true" data-drop="newpanel:${m}:${n}" title="Adds a new patch panel to the rack"><b>${esc(p.desc.replace(/, (\d)U$/,''))}</b><button class="plus" data-act="rackPlace" data-kind="newpanel" data-ref="${m}:${n}" aria-label="Add a ${esc(p.desc)}">+</button><small>${esc(p.model)} · ${panelHeight(n)}U · ${money(p.cost)}</small></div>`).join(''):'<p class="palEmpty">No matches.</p>');
-    h+=`<div class="palcat">Add new from library · ${libs.length}</div>`+(libs.length?libs.map(p=>`<div class="palItem" draggable="true" data-drop="lib:${esc(p.id)}" title="Adds a new ${esc(p.model)} to the project, racks it, and puts it on the signal flow"><b>${esc(p.model)} <span class="muted" style="font-weight:400">${esc(p.cat)}</span></b><button class="plus" data-act="rackPlace" data-kind="lib" data-ref="${esc(p.id)}" aria-label="Add a new ${esc(p.model)} to the rack">+</button><small>${esc(p.mfr)} · ${p.ru}U${p.mount==='shelf'?' shelf':''} · ${p.watts} W · ${money(p.cost)}</small></div>`).join(''):'<p class="palEmpty">No matches.</p>');
+    h+=`<div class="palcat">Patch panels</div>`+(np.length?np.map(({m,n,p})=>`<div class="palItem" draggable="true" data-drop="newpanel:${m}:${n}" title="Adds a new patch panel to the rack"><b>${esc(p.desc.replace(/, (\d)U$/,''))}</b><button class="plus" data-act="rackPlace" data-kind="newpanel" data-ref="${m}:${n}" aria-label="Add a ${esc(p.desc)}">+</button><small>${esc(p.model)} · ${panelHeight(n)}U${canPrice()?' · '+money(p.cost):''}</small></div>`).join(''):'<p class="palEmpty">No matches.</p>');
+    h+=`<div class="palcat">Add new from library · ${libs.length}</div>`+(libs.length?libs.map(p=>`<div class="palItem" draggable="true" data-drop="lib:${esc(p.id)}" title="Adds a new ${esc(p.model)} to the project, racks it, and puts it on the signal flow"><b>${esc(p.model)} <span class="muted" style="font-weight:400">${esc(p.cat)}</span></b><button class="plus" data-act="rackPlace" data-kind="lib" data-ref="${esc(p.id)}" aria-label="Add a new ${esc(p.model)} to the rack">+</button><small>${esc(p.mfr)} · ${p.ru}U${p.mount==='shelf'?' shelf':''} · ${p.watts} W${canPrice()?' · '+money(p.cost):''}</small></div>`).join(''):'<p class="palEmpty">No matches.</p>');
     const nsDev=S.design.nodes.filter(n=>sizable(prod(n))&&match(tg[n.uid]+' '+prod(n).model+' '+prod(n).cat+' '+prod(n).mfr));
     const nsLib=lib.filter(p=>sizable(p)&&match(p.mfr+' '+p.model+' '+p.cat+' '+p.desc)).sort((a,b)=>ci(a.cat)-ci(b.cat)||a.model.localeCompare(b.model));
     if(nsDev.length||nsLib.length)h+=`<div class="palcat">No rack size set yet · ${nsDev.length+nsLib.length}</div><p class="palEmpty" style="margin:0 0 4px">Add one and you’ll be asked how much rack space it takes. It’s saved to your library.</p>`
       +nsDev.map(n=>{const p=prod(n);return `<div class="palItem" draggable="true" data-drop="dev:${n.uid}" title="On the signal flow. Set its rack size and rack it"><b>${esc(tg[n.uid])} <span class="muted" style="font-weight:400">${esc(p.model)}</span></b><button class="plus" data-act="rackPlace" data-kind="dev" data-ref="${n.uid}" aria-label="Set the rack size of ${esc(tg[n.uid])} and rack it">+</button><small>From this design · size not set</small></div>`}).join('')
-      +nsLib.map(p=>`<div class="palItem" draggable="true" data-drop="lib:${esc(p.id)}" title="Set its rack size, then it’s added to the rack and the signal flow"><b>${esc(p.model)} <span class="muted" style="font-weight:400">${esc(p.cat)}</span></b><button class="plus" data-act="rackPlace" data-kind="lib" data-ref="${esc(p.id)}" aria-label="Set the rack size of ${esc(p.model)} and add it">+</button><small>${esc(p.mfr)} · size not set · ${money(p.cost)}</small></div>`).join('');
-    h+=`<div class="palcat">Accessories</div>`+(accs.length?accs.map(pid=>{const p=byId(pid);return `<div class="palItem" draggable="true" data-drop="acc:${pid}"><b>${esc(p.desc)}</b><button class="plus" data-act="rackPlace" data-kind="acc" data-ref="${pid}" aria-label="Add ${esc(p.desc)}">+</button><small>${esc(p.model)} · ${money(p.cost)}</small></div>`}).join(''):'<p class="palEmpty">No matches.</p>');
+      +nsLib.map(p=>`<div class="palItem" draggable="true" data-drop="lib:${esc(p.id)}" title="Set its rack size, then it’s added to the rack and the signal flow"><b>${esc(p.model)} <span class="muted" style="font-weight:400">${esc(p.cat)}</span></b><button class="plus" data-act="rackPlace" data-kind="lib" data-ref="${esc(p.id)}" aria-label="Set the rack size of ${esc(p.model)} and add it">+</button><small>${esc(p.mfr)} · size not set${canPrice()?' · '+money(p.cost):''}</small></div>`).join('');
+    h+=`<div class="palcat">Accessories</div>`+(accs.length?accs.map(pid=>{const p=byId(pid);return `<div class="palItem" draggable="true" data-drop="acc:${pid}"><b>${esc(p.desc)}</b><button class="plus" data-act="rackPlace" data-kind="acc" data-ref="${pid}" aria-label="Add ${esc(p.desc)}">+</button><small>${esc(p.model)}${canPrice()?' · '+money(p.cost):''}</small></div>`}).join(''):'<p class="palEmpty">No matches.</p>');
     box.innerHTML=h;return;
   }
   const q=($('#palQ')?.value||'').toLowerCase();
@@ -2833,7 +2845,7 @@ function nodePanel(n,tg){
     <label class="field" for="nLoc">Location<input id="nLoc" data-nprop="loc" value="${esc(n.loc||'')}" placeholder="e.g. Credenza rack"></label></div>
    ${idFields(n,false)}
    ${modRows(n)}
-   <label class="field" for="nPid">Model<select id="nPid" data-nprop="pid">${alts.map(q=>`<option value="${esc(q.id)}" ${q.id===p.id?'selected':''}>${esc(q.mfr)} ${esc(q.model)} · ${plural(portCount(q),'port')} · ${money(q.cost)}</option>`).join('')}</select></label>
+   <label class="field" for="nPid">Model<select id="nPid" data-nprop="pid">${alts.map(q=>`<option value="${esc(q.id)}" ${q.id===p.id?'selected':''}>${esc(q.mfr)} ${esc(q.model)} · ${plural(portCount(q),'port')}${canPrice()?' · '+money(q.cost):''}</option>`).join('')}</select></label>
    <div class="kv"><span>Dealer cost</span><b>${money2(p.cost)}</b><span>Install labor</span><b>${p.labor} h</b><span>Open ports</span><b>${open} of ${p.ins.length+p.outs.length}</b>
     ${p.ru?`<span>Rack</span><b>${rk?`${esc(rk.r.name)} · ${posLabel(rk.it.u,p.ru)}`:'Not placed yet'}</b>`:''}</div>
    <div class="actions">${p.ru?`<button class="btn sm" data-act="showInRack" data-id="${n.uid}">${rk?'Show in rack elevation':'Place in a rack'} →</button>`:''}<button class="btn sm" data-act="showOnPlan" data-id="${n.uid}">${(rk?rk.r.fp:n.fp)?'Show on floor plan':'Place on floor plan'} →</button></div>
@@ -2937,16 +2949,16 @@ function ritemPanel(f,tg){
     <div class="actions"><button class="btn" data-act="showOnFlow" data-id="${n.uid}">Show on signal flow</button><button class="btn" data-act="libEdit" data-id="${esc(p.id)}">Edit in library</button><button class="btn" data-act="delSel">Unrack</button><button class="btn danger" data-act="deleteDevice" data-id="${n.uid}">Delete from project</button></div></div>`}
   const p=byId(it.ref);
   return `<div class="ins-h"><p class="catchip">Rack accessory · ${h}U</p><h3>${esc(p.desc)}</h3><p>${esc(p.mfr)} ${esc(p.model)}</p></div>
-  <div class="fields">${posFields(f)}<div class="kv"><span>Rack</span><b>${esc(f.r.name)}</b><span>Dealer cost</span><b>${money2(p.cost)}</b></div>
+  <div class="fields">${posFields(f)}<div class="kv"><span>Rack</span><b>${esc(f.r.name)}</b>${canPrice()?`<span>Dealer cost</span><b>${money2(p.cost)}</b>`:''}</div>
   <div class="actions"><button class="btn danger" data-act="delSel">Remove</button></div></div>`;
 }
 function bomPanel(){
   const lines=bom(),tot=lines.reduce((s,l)=>s+l.p.cost*l.qty,0),open=`<div class="pb" style="padding-bottom:4px"><button class="btn sm" data-act="openBom">Open the bill of materials (${esc(S.design.meta6.dwg)}) →</button></div>`;
   if(!lines.length)return open+'<div class="pb"><p class="muted">Add devices to the sheet and the materials list builds itself.</p></div>';
   const ex=new Set(S.design.extras.map(e=>e.pid));
-  return open+`<div class="scroll"><table class="t"><thead><tr><th class="n">Qty</th><th>Item</th><th class="n">Dealer</th></tr></thead><tbody>
-   ${lines.map(l=>`<tr><td class="n">${l.qty}</td><td><b>${esc(l.p.model)}</b> <span class="catchip">${esc(l.p.cat)}</span><br><span class="muted">${esc(l.p.desc)}</span>${ex.has(l.p.id)?` <button class="lnk" data-act="rmExtra" data-pid="${esc(l.p.id)}">remove</button>`:''}</td><td class="n">${money(l.p.cost*l.qty)}</td></tr>`).join('')}
-   </tbody></table></div><div class="sideFoot"><span class="muted">At dealer cost</span><b>${money(tot)}</b></div>`;
+  return open+`<div class="scroll"><table class="t"><thead><tr><th class="n">Qty</th><th>Item</th><th class="n money">Dealer</th></tr></thead><tbody>
+   ${lines.map(l=>`<tr><td class="n">${l.qty}</td><td><b>${esc(l.p.model)}</b> <span class="catchip">${esc(l.p.cat)}</span><br><span class="muted">${esc(l.p.desc)}</span>${ex.has(l.p.id)?` <button class="lnk" data-act="rmExtra" data-pid="${esc(l.p.id)}">remove</button>`:''}</td><td class="n money">${money(l.p.cost*l.qty)}</td></tr>`).join('')}
+   </tbody></table></div><div class="sideFoot money"><span class="muted">At dealer cost</span><b>${money(tot)}</b></div>`;
 }
 function schedulePanel(tg){
   const cs=S.design.cables;
@@ -3023,7 +3035,7 @@ function addPanelHTML(){
     <label class="field" for="apR">Rack<select id="apR" data-pp="afRack">${S.design.racks.map(x=>`<option value="${x.id}" ${x.id===f.rid?'selected':''}>${esc(x.name)}</option>`).join('')}<option value="" ${f.rid?'':'selected'}>Don’t rack it yet</option></select></label></div>
    ${r?`<label class="field" for="apU">Position<select id="apU" data-pp="afU">${uOptions(r,panelHeight(size),f.u!=null&&fits(r,f.u,panelHeight(size))?f.u:null,null,true)}</select></label>`:''}
    <div class="row2"><label class="field" for="apN">Name<input id="apN" data-pp="afName" value="${esc(f.name)}" placeholder="Auto: PP-01, PP-02…" maxlength="24"></label>
-    <div class="kv" style="align-self:end"><span>Product</span><b>${esc(sku.model)} · ${money(sku.cost)}</b><span>Position</span><b>${r?(f.u!=null&&fits(r,f.u,panelHeight(size))?posLabel(f.u,panelHeight(size)):free!=null?posLabel(free,panelHeight(size))+', top free slot':'Rack is full'):'—'}</b></div></div>
+    <div class="kv" style="align-self:end"><span>Product</span><b>${esc(sku.model)}${canPrice()?' · '+money(sku.cost):''}</b><span>Position</span><b>${r?(f.u!=null&&fits(r,f.u,panelHeight(size))?posLabel(f.u,panelHeight(size)):free!=null?posLabel(free,panelHeight(size))+', top free slot':'Rack is full'):'—'}</b></div></div>
    <div class="actions"><button class="btn primary" data-act="pCreate">Add panel</button></div></div></div>`;
 }
 function panelSettingsHTML(p){
@@ -3034,7 +3046,7 @@ function panelSettingsHTML(p){
     <label class="field" for="ppS">Ports<select id="ppS" data-pp="pports">${PANEL_OPTS[p.media].sizes.map(n=>`<option value="${n}" ${n===p.ports?'selected':''}>${n}</option>`).join('')}</select></label></div>
    <label class="field" for="ppM">Type<select id="ppM" data-pp="pmedia">${Object.keys(PANEL_OPTS).map(m=>`<option value="${m}" ${m===p.media?'selected':''}>${PANEL_OPTS[m].label}</option>`).join('')}</select></label>
    ${loc?posFields({r:loc.r,it:loc.it}):''}
-   <div class="kv"><span>Ports used</span><b>${used} of ${p.ports}</b><span>Next free port</span><b>${ff==null?'None':ff}</b><span>Dealer cost</span><b>${money2(sku.cost)}</b></div>
+   <div class="kv"><span>Ports used</span><b>${used} of ${p.ports}</b><span>Next free port</span><b>${ff==null?'None':ff}</b>${canPrice()?`<span>Dealer cost</span><b>${money2(sku.cost)}</b>`:''}</div>
    ${loc&&un.length&&isCopper(p.media)?`<div class="banner"><span>${plural(un.length,'network cable')} ${un.length===1?'leaves':'leave'} ${esc(loc.r.name)} without a panel: ${un.map(c=>esc(c.id)).join(', ')}.</span><button class="btn sm primary" data-act="autoPatch" data-arg="${loc.r.id}">Auto-patch</button></div>`:''}
    <p class="note">Pick a port on the face or in the table to assign it. Front is the patch cord to gear in the rack; back is the permanent cable to the room, a wall jack, or another panel.</p>
    <div class="actions">${loc?`<button class="btn" data-act="showPanelRack" data-id="${p.id}">Show in rack elevation</button>`:`<button class="btn" data-act="rackPanel" data-arg="${p.id}">Put in a rack</button>`}
@@ -3313,7 +3325,7 @@ function renderBuilder(){
     ${photosHTML(b)}
     <div class="row2"><label class="field" for="bM">Manufacturer<input id="bM" data-bf="mfr" value="${esc(b.mfr)}" placeholder="e.g. Ostrava Signal"></label><label class="field" for="bMo">Model<input id="bMo" data-bf="model" value="${esc(b.model)}" placeholder="Required"></label></div>
     <div class="row2"><label class="field" for="bC">Category<select id="bC" data-bf="cat">${cats.map(c=>`<option ${c===b.cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label class="field" for="bD">Description<input id="bD" data-bf="desc" value="${esc(b.desc)}" placeholder="Shown on the proposal"></label></div>
-    <div class="row3"><label class="field" for="bCo">Dealer cost ($)<input id="bCo" type="number" min="0" step="0.01" data-bf="cost" value="${esc(b.cost)}"></label><label class="field" for="bMs">MSRP ($)<input id="bMs" type="number" min="0" step="0.01" data-bf="msrp" value="${esc(b.msrp??'')}" placeholder="Auto: cost × 1.45"></label><label class="field" for="bL">Install labor (h)<input id="bL" type="number" min="0" step="0.25" data-bf="labor" value="${esc(b.labor)}"></label></div>
+    <div class="row3"><label class="field money" for="bCo">Dealer cost ($)<input id="bCo" type="number" min="0" step="0.01" data-bf="cost" value="${esc(b.cost)}"></label><label class="field money" for="bMs">MSRP ($)<input id="bMs" type="number" min="0" step="0.01" data-bf="msrp" value="${esc(b.msrp??'')}" placeholder="Auto: cost × 1.45"></label><label class="field" for="bL">Install labor (h)<input id="bL" type="number" min="0" step="0.25" data-bf="labor" value="${esc(b.labor)}"></label></div>
     <div class="row3"><label class="field" for="bR">Rack space<select id="bR" data-bf="ru">${[0,1,2,3,4,5,6,7,8].map(u=>`<option value="${u}" ${String(u)===String(b.ru)?'selected':''}>${u?u+'U':'Not rack-mounted'}</option>`).join('')}</select></label>
      <label class="field" for="bMt">Mounting<select id="bMt" data-bf="mount"><option value="rack" ${b.mount==='rack'?'selected':''}>Rack ears</option><option value="shelf" ${b.mount==='shelf'?'selected':''}>Sits on a shelf</option></select></label>
      <label class="field" for="bW">Power (W)<input id="bW" type="number" min="0" data-bf="watts" value="${esc(b.watts)}"></label></div>
@@ -3455,24 +3467,24 @@ R.library=function(){
     :p.ctype?`<span class="dot ${SIG[p.ctype].cls}"></span> <span class="muted mono" style="font-size:11px">${SIG[p.ctype].short} cable</span>`
     :matOnly(p)?`<span class="chip" title="No ports yet, so it goes on the bill of materials but not the drawings.">Materials only</span> <button class="lnk" data-act="srFor" data-id="${esc(p.id)}" style="font-size:12px">${p.specUrl?'read its spec sheet':'add ports from a spec sheet'}</button>`:'<span class="muted">—</span>';
   const links=p=>`${p.spec?` <a class="lnk" data-act="openSpec" href="/_blob/${esc(p.spec)}" target="_blank" rel="noopener" style="font-size:11px">spec sheet</a>`:''}${p.src&&/^https?:\/\//.test(p.src)?` <a class="lnk" href="${esc(p.src)}" target="_blank" rel="noopener noreferrer" style="font-size:11px">source</a>`:''}${nameTwins(p).length?' <span class="chip Medium" title="Another product has the same model name. Open it to merge them.">same name</span>':''}`;
-  const table=`<div class="scroll"><table class="t"><thead><tr><th><span class="sr">Photo</span></th><th>Category</th><th>Product</th><th>Ports</th><th class="n">Rack</th><th class="n">Dealer</th><th class="n">MSRP</th><th class="n">Labor h</th><th></th></tr></thead><tbody>
+  const table=`<div class="scroll"><table class="t"><thead><tr><th><span class="sr">Photo</span></th><th>Category</th><th>Product</th><th>Ports</th><th class="n">Rack</th><th class="n money">Dealer</th><th class="n money">MSRP</th><th class="n">Labor h</th><th></th></tr></thead><tbody>
    ${shown.map(p=>`<tr class="click" data-act="libEdit" data-id="${esc(p.id)}" title="Edit ${esc(p.model)}"><td class="thumbcell">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><span class="catchip">${esc(p.cat)}</span></td><td><b>${esc(p.model)}</b> <span class="muted">${esc(p.mfr)}</span>${links(p)}<br><span class="muted">${esc(p.desc)}</span></td>
     <td>${portsCell(p)}</td>
     <td class="n">${placeable(p)&&!['Cable','Rack','Patch panel'].includes(p.cat)?`<select class="cellin libru" data-libru="${esc(p.id)}" aria-label="Rack space for ${esc(p.model)}"><option value="0" ${p.ru>0?'':'selected'}>Not racked</option>${[1,2,3,4,5,6,7,8].map(u=>`<option value="${u}" ${p.ru===u&&p.mount!=='shelf'?'selected':''}>${u}U</option><option value="${u}s" ${p.ru===u&&p.mount==='shelf'?'selected':''}>${u}U shelf</option>`).join('')}</select>`:(p.ru?p.ru+'U':'<span class="muted">—</span>')}</td>
-    <td class="n">${money2(p.cost)}</td><td class="n">${money2(p.msrp)}</td><td class="n">${p.labor}</td><td><button class="btn sm" data-act="libEdit" data-id="${esc(p.id)}">Edit</button></td></tr>`).join('')||'<tr><td colspan="9" class="muted">No products match.</td></tr>'}
+    <td class="n money">${money2(p.cost)}</td><td class="n money">${money2(p.msrp)}</td><td class="n">${p.labor}</td><td><button class="btn sm" data-act="libEdit" data-id="${esc(p.id)}">Edit</button></td></tr>`).join('')||'<tr><td colspan="9" class="muted">No products match.</td></tr>'}
    </tbody></table></div>`;
   const grid=`<div class="libcards">${shown.map(p=>{const u=pImg(p);return `<button class="libcard" data-act="libEdit" data-id="${esc(p.id)}" aria-label="Edit ${esc(p.mfr+' '+p.model)}">
      <span class="lcimg">${u?`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:`<span class="lcnone" aria-hidden="true">${esc(p.cat.slice(0,1))}</span>`}</span>
      <span class="lcb"><span class="lcm"><span class="catchip">${esc(p.cat)}</span>${matOnly(p)?'<span class="chip">Materials only</span>':''}</span><b>${esc(p.model)}</b><span class="muted">${esc(p.mfr)}</span><span class="lcd">${esc(clip(p.desc,80))}</span>
-     <span class="lcp"><span><small>Dealer</small>${money2(p.cost)}</span><span><small>MSRP</small>${money2(p.msrp)}</span></span></span></button>`}).join('')||'<p class="muted">No products match.</p>'}</div>`;
+     <span class="lcp money"><span><small>Dealer</small>${money2(p.cost)}</span><span><small>MSRP</small>${money2(p.msrp)}</span></span></span></button>`}).join('')||'<p class="muted">No products match.</p>'}</div>`;
   $('#v-library').innerHTML=`
   <header class="vh"><div><p class="eyebrow">My library · ${lib.length} products · ${brands.length} brands</p><h1>Equipment library</h1>
    <p class="sub">Every device carries its photos, ports, rack space, power, dealer cost and install labor, so drawings, the bill of materials and proposals stay in sync.</p></div>
-   <div class="actions"><button class="btn primary" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="srOpenA">Ports from spec sheets</button><button class="btn" data-act="newBlockLib">Build a custom device</button></div></header>
+   <div class="actions"><button class="btn primary money" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="srOpenA">Ports from spec sheets</button><button class="btn" data-act="newBlockLib">Build a custom device</button></div></header>
   <input type="file" id="srOne" hidden accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Spec sheet for this product">
-  ${S.pl||S.plOpen?plPanelHTML():''}
+  ${canPrice()&&(S.pl||S.plOpen)?plPanelHTML():''}
   ${S.sr&&S.sr.open?srPanelHTML():''}
-  ${pls.length?`<div class="panel"><div class="ph"><h2>Price lists</h2><span class="muted" style="font-size:12px">Import a newer list from the same brand to update its prices</span></div><div class="scroll"><table class="t"><thead><tr><th>Brand</th><th>List</th><th>Imported</th><th class="n">Products</th><th class="n">With photos</th><th class="n">Need ports</th><th></th></tr></thead><tbody>
+  ${pls.length&&canPrice()?`<div class="panel"><div class="ph"><h2>Price lists</h2><span class="muted" style="font-size:12px">Import a newer list from the same brand to update its prices</span></div><div class="scroll"><table class="t"><thead><tr><th>Brand</th><th>List</th><th>Imported</th><th class="n">Products</th><th class="n">With photos</th><th class="n">Need ports</th><th></th></tr></thead><tbody>
    ${pls.map((l,i)=>`<tr><td><b>${esc(l.brand)}</b></td><td class="mono" style="font-size:12px">${esc(clip(l.name,44))}</td><td>${esc(dayFmtIso(l.at))}</td><td class="n">${l.n}</td><td class="n">${l.photos}</td><td class="n">${l.need?`<button class="lnk" data-act="srList" data-i="${i}">${l.need}</button>`:'0'}</td><td style="white-space:nowrap"><button class="btn sm" data-act="libBrandShow" data-v="${esc(l.brand)}">Show</button> ${S.ui.plDel===i?`<span class="muted sm">Remove the ones no project uses?</span> <button class="btn sm danger" data-act="plDelGo" data-i="${i}">Remove</button> <button class="btn sm" data-act="plDelAsk" data-i="-1">Keep</button>`:`<button class="btn sm" data-act="plDelAsk" data-i="${i}">Remove…</button>`}</td></tr>`).join('')}
   </tbody></table></div></div>`:''}
   ${findHTML()}
@@ -3537,7 +3549,7 @@ function bomShellHTML(){
   return `<div class="schedbar">
     <input class="inp grow" id="bmQ" placeholder="Search model, brand, description, tag" value="${esc(S.ui.bq||'')}" aria-label="Search the bill of materials">
     <select class="inp" id="bmGr" aria-label="Group rows">${[['cat','Group by category'],['mfr','Group by brand'],['none','No grouping']].map(([k,l])=>`<option value="${k}" ${(S.ui.bgroup||'cat')===k?'selected':''}>${l}</option>`).join('')}</select>
-    <select class="inp" id="bmPr" aria-label="Prices on the sheet">${BOM_PRICE.map(([k,l])=>`<option value="${k}" ${(m6.price||'none')===k?'selected':''}>${l}</option>`).join('')}</select>
+    <select class="inp money" id="bmPr" aria-label="Prices on the sheet">${BOM_PRICE.map(([k,l])=>`<option value="${k}" ${(m6.price||'none')===k?'selected':''}>${l}</option>`).join('')}</select>
     <label class="check" style="white-space:nowrap"><input type="checkbox" id="bmImg" ${m6.photos===false?'':'checked'}> <span>Photos</span></label>
     <span id="bmHist"></span>
     <button class="btn" data-act="copyBom">Copy as CSV</button>
@@ -3550,7 +3562,7 @@ function bomShellHTML(){
    <div class="pb"><div class="bmadd"><input class="inp grow" id="bmAddQ" placeholder="Search the library" aria-label="Search the library to add materials" autocomplete="off" value="${esc(S.ui.baq||'')}"><div id="bmAddList" class="bmaddlist"></div></div></div></div>
   <textarea id="csvOut" class="inp" rows="6" hidden aria-label="CSV output"></textarea>`}
 function bomTableHTML(rows,opt){
-  const o=Object.assign({price:S.design.meta6.price||'none',photos:S.design.meta6.photos!==false,edit:true,group:S.ui.bgroup||'cat'},opt||{});
+  const o=Object.assign({price:canPrice()?S.design.meta6.price||'none':'none',photos:S.design.meta6.photos!==false,edit:true,group:S.ui.bgroup||'cat'},opt||{});
   const pr=o.price!=='none',cols=6+(o.photos?1:0)+(pr?2:0);
   const groups=[];if(o.group==='none')groups.push(['',rows]);else{const mp=new Map();rows.forEach(r=>{const k=o.group==='mfr'?r.p.mfr:r.p.cat;if(!mp.has(k))mp.set(k,[]);mp.get(k).push(r)});groups.push(...mp)}
   const row=r=>{const u=r.unit[o.price]||0;return `<tr${r.mod?' class="bmmod"':''}><td class="n m">${r.no}</td>${o.photos?`<td class="thumbcell">${thumb(r.p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td>`:''}
@@ -3571,7 +3583,7 @@ function renderBom(){
   $('#bmSum').innerHTML=`<div class="schedcards">
    <div class="panel kpi"><div class="l">Line items</div><div class="v">${all.length}</div><div class="s"><span>${plural(qty,'piece')} in total</span><span>${plural(brands,'brand')}</span></div></div>
    <div class="panel kpi"><div class="l">Devices on the drawings</div><div class="v">${S.design.nodes.length}</div><div class="s"><span>${plural(S.design.cables.length,'cable run')}</span><span>${plural(S.design.extras.reduce((s,e)=>s+e.qty,0),'added material')}</span></div></div>
-   <div class="panel kpi"><div class="l">Equipment</div><div class="v">${money(q.cost)}</div><div class="s"><span>dealer cost</span><span>${money(q.equip)} sell</span></div></div>
+   <div class="panel kpi money"><div class="l">Equipment</div><div class="v">${money(q.cost)}</div><div class="s"><span>dealer cost</span><span>${money(q.equip)} sell</span></div></div>
   </div>${noImg?`<p class="note" style="margin:0">${plural(noImg,'item')} ${noImg===1?'has':'have'} no photo. Add photos in the library, or import the brand’s price list with its images.</p>`:''}`;
   $('#bmCount').textContent=rows.length===all.length?plural(all.length,'line'):`${rows.length} of ${all.length} lines`;
   $('#bmTable').innerHTML=bomTableHTML(rows);
@@ -4536,14 +4548,14 @@ R.projects=function(){
    ${S.tasks.length||!pjTaskList(S.prop.ptype||'av').length?'':'<button class="btn" data-act="addStdTasks">Add standard tasks</button>'}
    <div class="seg" role="group" aria-label="Task view"><button data-pm="kanban" aria-pressed="${S.projMode==='kanban'}">Board</button><button data-pm="list" aria-pressed="${S.projMode==='list'}">List</button><button data-pm="gantt" aria-pressed="${S.projMode==='gantt'}">Timeline</button><button data-pm="week" aria-pressed="${S.projMode==='week'}">Team week</button></div></div></header>
   ${pjDetailsHTML()}
-  ${(S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).some(k=>k==='proposal'||k==='design')?`  <div class="panel cost">
+  ${(S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).some(k=>k==='proposal'||k==='design')&&canPrice()?`  <div class="panel cost">
    <div><div class="l">Contract value</div><div class="v">${money(contract)}</div><div class="muted" style="font-size:12px">From proposal, before tax</div></div>
    <div><div class="l">Material cost</div><div class="v">${money(q.cost)}</div><div class="muted" style="font-size:12px">${q.lines.reduce((s,l)=>s+l.qty,0)} units at dealer cost</div></div>
    <div><div class="l">Labor hours</div><div class="v">${used.toFixed(1)} <span class="muted" style="font-size:18px">/ ${q.hrs}</span></div><div class="bar"><i class="${used>budget?'over':''}" style="width:${pct}%"></i></div></div>
    <div><div class="l">Projected gross margin</div><div class="v ${gm<0?'bad':''}">${contract?Math.round(gm/contract*100):0}%</div><div class="muted" style="font-size:12px">${money(gm)} at $${(+SETTINGS.internalRate||52)}/h internal labor</div></div>
   </div>`:''}
   <div id="pmBody"></div>
-  <div class="panel"><div class="ph"><h2>Log time</h2><span class="actions"><span class="muted" style="font-size:12px">Field techs clock in from the mobile view</span><button class="btn sm" data-go="billing">Time &amp; invoicing →</button></span></div><div class="pb" style="display:flex;flex-direction:column;gap:14px">
+  <div class="panel"><div class="ph"><h2>Log time</h2><span class="actions"><span class="muted" style="font-size:12px">Field techs clock in from the mobile view</span><button class="btn sm money" data-go="billing">Time &amp; invoicing →</button></span></div><div class="pb" style="display:flex;flex-direction:column;gap:14px">
    <div class="timeform">
     <label class="field" for="tTask">Task<select id="tTask">${S.tasks.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join('')}</select></label>
     <label class="field" for="tType">Labor type<select id="tType"><option>Install</option><option>Programming</option><option>Site visit</option><option>Commute</option><option>Office</option></select></label>
@@ -4905,7 +4917,7 @@ const NAVL=[
  {sec:'work',title:'Workspace',icon:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',items:['av:assistant|Assistant|AI', 'nl:help|Help & guide', 'av:settings|Settings', 'nl:admin|Admin console']}];
 const NL_DEF={sites:'Sites & rooms',plans:'Floor plans',devices:'Devices',racks:'Racks',power:'Power',cabling:'Cabling',jacks:'Wall jacks',lifecycle:'Lifecycle & budget',discover:'Import from switches',inventory:'Site inventory',topology:'Topology',ipam:'IP & VLANs',circuits:'WAN circuits',wireless:'Wireless',security:'Firewall & VPN',dnscloud:'DNS & cloud',tickets:'Tickets',board:'Board',billing:'Time & billing',maint:'Maintenance',field:'Field view',contacts:'Contacts',runbooks:'Runbooks',audit:'Audit',revisions:'Revisions',labels:'Labels',docset:'Document set',portal:'Client portal',help:'Help & guide',overview:'Network overview'};
 function nlItem(go){if(!NLST)return go==='admin'||go==='portal'?null:{go,label:NL_DEF[go]||go};const all=[...NLST.top,...NLST.secs.flatMap(x=>x.items)];return all.find(x=>x.go===go)||null}
-function navItem(spec,top,icon){const [k,lab,extra]=spec.split('|'),[kind,go]=k.split(':');
+function navItem(spec,top,icon){const [k,lab,extra]=spec.split('|'),[kind,go]=k.split(':');if(S.tech&&((kind==='av'&&TECH_HIDE.includes(go))||(kind==='nl'&&go==='billing')))return '';
   if(kind==='av'){const cur=S.view===go&&S.view!=='networks';
     return `<button data-go="${go}"${top?' class="navtop"':''}${cur?' aria-current="page"':''}>${top?NVI(icon)+`<span class="nvl">${esc(lab)}</span>`:`<span>${esc(lab)}</span>`}${extra?(extra[0]==='#'?`<span class="badge" id="${extra.slice(1)}">0</span>`:`<span class="k">${esc(extra)}</span>`):''}</button>`}
   const it=nlItem(go);if(!it)return '';const cur=S.view==='networks'&&NLST&&NLST.view===go;
@@ -6507,6 +6519,7 @@ function cloudPayloads(){const out={},J=o=>JSON.stringify(o);
   out['meta/service']=J({agreements:S.agreements,tseq:S.tseq,pipeline:S.pipeline,ticketsChunked:true});
   {const CH=100,n=Math.max(1,Math.ceil(S.tickets.length/CH)),m=Math.max(n,CLOUD.tkMax||0);for(let k=0;k<m;k++)out['meta/tickets-'+k]=J(k<n?S.tickets.slice(k*CH,(k+1)*CH):[]);CLOUD.tkMax=m}
   out['meta/library']=J(libPayload());out['meta/contracts']=J(S.contracts||[]);
+  if(S.tech){delete out['meta/invoices'];delete out['meta/contracts']}
   {const CH=100,n=Math.max(1,Math.ceil(S.registers.length/CH)),m=Math.max(n,CLOUD.regMax||0);for(let k=0;k<m;k++)out['meta/registers-'+k]=J(k<n?S.registers.slice(k*CH,(k+1)*CH):[]);CLOUD.regMax=m}
   {const CH=200,n=Math.max(1,Math.ceil(S.inventory.length/CH)),m=Math.max(n,CLOUD.invMax||0);for(let k=0;k<m;k++)out['meta/inventory-'+k]=J(k<n?S.inventory.slice(k*CH,(k+1)*CH):[]);CLOUD.invMax=m}out['meta/index']=J({cur:PJ.cur,order:PJ.list.map(e=>e.id)});
   PJ.list.forEach(e=>{const o=projectPayload(e);if(!o.design&&e.id!==PJ.cur)return;out['projects/'+e.id]=J(o)});
@@ -6553,7 +6566,8 @@ function applyCloud(meta,pjs){
 }
 async function cloudBoot(){
   const c=window.claude;if(!c||typeof c.use!=='function'){CAPS_READY=true;setSync('local','Saved in this browser only');return}
-  const [db,sm,as]=await Promise.all(['db','sample','assets'].map(n=>c.use(n).catch(()=>null)));
+  const [db,sm,as,us]=await Promise.all(['db','sample','assets','user'].map(n=>c.use(n).catch(()=>null)));
+  if(us&&typeof us.can==='function'){try{const pr=await us.can('pricing');if(pr===false)techMode()}catch(e){}}
   SAMPLE=sm||null;ASSETS=as||null;CAPS_READY=true;
   if(S.view==='assistant')R.assistant();else if(S.view==='proposal')propParts();else if(S.view==='field'||S.view==='settings'||S.view==='library')R[S.view]();
   if(!db){setSync('local','Saved in this browser only');if(S.view==='settings')R.settings();return}

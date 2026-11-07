@@ -9,5 +9,6 @@ export default async function OperationsPage() {
   const { userId, profile } = await getViewer();
   if (!userId) redirect("/login");
   if (!profile?.active) redirect("/pending");
+  if (profile.role === "tech") redirect("/app");
   return <AppShell profile={profile} app="jamsos" />;
 }

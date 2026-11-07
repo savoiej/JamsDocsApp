@@ -28,7 +28,7 @@ export type Profile = {
   id: string;
   email: string | null;
   full_name: string | null;
-  role: "admin" | "user";
+  role: "admin" | "user" | "tech";
   active: boolean;
   created_at: string;
 };
