@@ -3488,8 +3488,9 @@ R.library=function(){
   <input type="file" id="srOne" hidden accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Spec sheet for this product">
   ${canPrice()&&(S.pl||S.plOpen)?plPanelHTML():''}
   ${S.sr&&S.sr.open?srPanelHTML():''}
-  ${pls.length&&canPrice()?`<div class="panel"><div class="ph"><h2>Price lists</h2><span class="muted" style="font-size:12px">Import a newer list from the same brand to update its prices</span></div><div class="scroll"><table class="t"><thead><tr><th>Brand</th><th>List</th><th>Imported</th><th class="n">Products</th><th class="n">With photos</th><th class="n">Need ports</th><th></th></tr></thead><tbody>
-   ${pls.map((l,i)=>`<tr><td><b>${esc(l.brand)}</b></td><td class="mono" style="font-size:12px">${esc(clip(l.name,44))}</td><td>${esc(dayFmtIso(l.at))}</td><td class="n">${l.n}</td><td class="n">${l.photos}</td><td class="n">${l.need?`<button class="lnk" data-act="srList" data-i="${i}">${l.need}</button>`:'0'}</td><td style="white-space:nowrap"><button class="btn sm" data-act="libBrandShow" data-v="${esc(l.brand)}">Show</button> ${S.ui.plDel===i?`<span class="muted sm">Remove the ones no project uses?</span> <button class="btn sm danger" data-act="plDelGo" data-i="${i}">Remove</button> <button class="btn sm" data-act="plDelAsk" data-i="-1">Keep</button>`:`<button class="btn sm" data-act="plDelAsk" data-i="${i}">Remove…</button>`}</td></tr>`).join('')}
+  ${pls.length&&canPrice()?`<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Price lists</h2><span class="muted" style="font-size:12px">Import a newer list from the same brand to update its prices</span><span class="tgrow"></span><label class="field inl" for="pDays">Flag lists older than<select class="inp" id="pDays" style="width:auto">${[30,60,90,180,365].map(d=>`<option value="${d}" ${priceDays()===d?'selected':''}>${d} days</option>`).join('')}</select></label></div>
+   ${(()=>{const st=pls.filter(l=>ageDays(l.at)>priceDays());return st.length?`<div class="pb" style="padding-bottom:0"><div class="banner" style="margin:0"><span><b>${esc(st.length===1?st[0].brand:`${st[0].brand} and ${plural(st.length-1,'other brand')}`)}: prices over ${priceDays()} days old.</b> Ask for current lists and import them; open proposals using them show a warning.</span></div></div>`:''})()}<div class="scroll"><table class="t"><thead><tr><th>Brand</th><th>List</th><th>Imported</th><th class="n">Products</th><th class="n">With photos</th><th class="n">Need ports</th><th></th></tr></thead><tbody>
+   ${pls.map((l,i)=>`<tr><td><b>${esc(l.brand)}</b></td><td class="mono" style="font-size:12px">${esc(clip(l.name,44))}</td><td>${esc(dayFmtIso(l.at))}${ageDays(l.at)>priceDays()?` <span class="chip Overdue">${esc(ageTxt(ageDays(l.at)))} old</span>`:''}</td><td class="n">${l.n}</td><td class="n">${l.photos}</td><td class="n">${l.need?`<button class="lnk" data-act="srList" data-i="${i}">${l.need}</button>`:'0'}</td><td style="white-space:nowrap"><button class="btn sm" data-act="libBrandShow" data-v="${esc(l.brand)}">Show</button> ${S.ui.plDel===i?`<span class="muted sm">Remove the ones no project uses?</span> <button class="btn sm danger" data-act="plDelGo" data-i="${i}">Remove</button> <button class="btn sm" data-act="plDelAsk" data-i="-1">Keep</button>`:`<button class="btn sm" data-act="plDelAsk" data-i="${i}">Remove…</button>`}</td></tr>`).join('')}
   </tbody></table></div></div>`:''}
   ${findHTML()}
   <div class="panel"><div class="ph" style="flex-wrap:wrap"><div class="libtools" style="flex:1"><input class="inp" id="libQ" placeholder="Search products" value="${esc(libQ)}" aria-label="Search products">
@@ -3499,7 +3500,7 @@ R.library=function(){
     <div class="seg" role="group" aria-label="View"><button data-act="libView" data-v="table" aria-pressed="${!cards}">List</button><button data-act="libView" data-v="cards" aria-pressed="${cards}">Photos</button></div></div>
    ${cards?grid:table}
    ${items.length>shown.length?`<div class="pb" style="padding-top:0"><button class="btn" data-act="libMore">Show ${Math.min(200,items.length-shown.length)} more of ${items.length-shown.length}</button></div>`:''}</div>`;
-  bindFind();bindPL();bindSR();
+  bindFind();bindPL();bindSR();{const d=$('#pDays');if(d)d.addEventListener('change',e=>{SETTINGS.priceDays=+e.target.value;saveSettings();R.library()})}
   $('#libQ').addEventListener('input',e=>{libQ=e.target.value;libLim=200;const pos=e.target.selectionStart;R.library();const q=$('#libQ');q.focus();q.setSelectionRange(pos,pos)});
   $('#libCat').addEventListener('change',e=>{libCat=e.target.value;libLim=200;R.library()});
   $('#libBrand').addEventListener('change',e=>{libBrand=e.target.value;libCat='All';libLim=200;R.library()});
@@ -3753,6 +3754,7 @@ function plPanelHTML(){
         return `<tr><td class="n m">${r.line}</td><td class="thumbcell">${im}</td><td>${esc(r.mfr||'—')} <b>${esc(r.model||'—')}</b>${r.desc?`<br><span class="muted">${esc(clip(r.desc,90))}</span>`:''}</td><td>${r.err?'':`<span class="catchip">${esc(r.cat)}</span>`}</td><td class="n">${r.err?'':money2(r.cost)}</td><td class="n">${r.err?'':money2(r.msrp)}</td><td>${st(r)}</td></tr>`}).join('')||'<tr><td colspan="7" class="muted">No rows here.</td></tr>'}
       ${shown.length>lim.length?`<tr><td colspan="7"><button class="lnk" data-act="plMore">Show ${Math.min(200,shown.length-lim.length)} more of ${shown.length-lim.length}</button></td></tr>`:''}
      </tbody></table></div>
+     ${(()=>{if(!cnt.price||!P.upd)return '';const hit=openPropsUsing(ok.filter(r=>r.st==='price').map(r=>r.ex.id));return hit.length?`<div class="banner" style="margin:0"><span><b>These price changes reach ${plural(hit.length,'open proposal')}:</b> ${esc(hit.slice(0,4).map(propRef).join(', '))}${hit.length>4?', …':''}. Proposals price from the library, so their totals will change.</span></div>`:''})()}
      <div class="plfoot"><span class="muted">${plural(cnt.new,'new product')} · ${plural(cnt.price,'price change')}${withImg?` · ${withImg} with photos`:''}${err.length?` · ${err.length} skipped`:''}</span>
       <button class="btn primary" data-act="plImport" ${willSave&&!P.busy?'':'disabled'}>${P.busy?esc(P.busy):`Import ${plural(willSave,'product')}`}</button></div>
     </section>
@@ -3791,7 +3793,7 @@ async function plImport(){
   const at=isoDay(0),list={name:P.name,at};let added=0,upd=0,photos=0,linked=0,failed=0;
   const jobs=[];
   rows.forEach(r=>{let p=r.ex;
-    if(p){Object.assign(p,{cost:r.cost,msrp:r.msrp,list});if(r.desc)p.desc=r.desc;if(P.map.cat!=null&&r.cat)p.cat=r.cat;if(P.map.ru!=null)p.ru=r.ru;if(P.map.watts!=null&&r.watts)p.watts=r.watts;if(P.map.labor!=null)p.labor=r.labor;
+    if(p){if(Math.abs((+p.cost||0)-r.cost)>.004||Math.abs((+p.msrp||0)-r.msrp)>.004)p.priceLog=[...(p.priceLog||[]).slice(-4),{at:p.list&&p.list.at||'',cost:+p.cost||0,msrp:+p.msrp||0}];Object.assign(p,{cost:r.cost,msrp:r.msrp,list});if(r.desc)p.desc=r.desc;if(P.map.cat!=null&&r.cat)p.cat=r.cat;if(P.map.ru!=null)p.ru=r.ru;if(P.map.watts!=null&&r.watts)p.watts=r.watts;if(P.map.labor!=null)p.labor=r.labor;
       if(r.spec)p.specUrl=r.spec;if(P.map.ins!=null&&r.ins.length)p.ins=r.ins;if(P.map.outs!=null&&r.outs.length)p.outs=r.outs;upd++}
     else{let id='PL-'+(plKey(r.mfr).slice(0,6).toUpperCase()||'X')+'-'+r.model.replace(/[^A-Za-z0-9]+/g,'').slice(0,28).toUpperCase(),n=2,base=id;while(byId(id))id=base+'-'+(n++);
       p={id,mfr:r.mfr,model:r.model,cat:r.cat,desc:r.desc||`${r.mfr} ${r.model}`,cost:r.cost,msrp:r.msrp,labor:r.labor,ins:r.ins,outs:r.outs,ru:r.ru,watts:r.watts,mount:'rack',imgs:[],list,...(r.spec?{specUrl:r.spec}:{})};lib.push(p);added++}
@@ -4233,6 +4235,19 @@ R.proposal=function(){
   document.querySelectorAll('#v-proposal [data-bind]').forEach(el=>el.addEventListener('input',()=>{P[el.dataset.bind]=el.value;propParts()}));
   S.liveSet=null;propParts();
 };
+/* ---------- price freshness ---------- */
+const priceDays=()=>+SETTINGS.priceDays||90;
+const ageDays=d=>{if(!d)return 0;const t=new Date(d+'T12:00:00');return isNaN(t)?0:Math.floor((Date.now()-t)/864e5)};
+const ageTxt=n=>n<45?`${n} days`:n<365?`${Math.round(n/30.4)} months`:`${(n/365).toFixed(n<730?1:0)} years`;
+const staleProd=p=>p&&p.list&&p.list.at&&ageDays(p.list.at)>priceDays();
+const OPEN_PROP=['Draft','Sent','Viewed','Change order'];
+/* open proposals (any project) whose bill of materials uses any of these products */
+function openPropsUsing(pids){const want=new Set(pids),out=[];
+  PJ.list.forEach(e=>{const cur=e.id===PJ.cur,pr=cur?S.prop:e.prop||{},d=cur?S.design:e.design;if(!d||!OPEN_PROP.includes(pr.status||'Draft'))return;
+    const used=new Set([...(d.nodes||[]).map(n=>n.pid),...(d.extras||[]).map(x=>x.pid),...(d.nodes||[]).flatMap(n=>Object.values(n.mods||{}).map(v=>v&&v.pid||v).filter(x=>typeof x==='string'))]);
+    if([...want].some(id=>used.has(id)))out.push({id:e.id,no:pr.no||'',client:pr.client||'',project:pr.project||'',status:pr.status||'Draft'})});return out}
+const propRef=x=>`${x.no}${x.client?' '+x.client:''}${x.status!=='Draft'?` (${x.status.toLowerCase()})`:''}`;
+function priceDrift(){const P=S.prop;if(!P.sentPrices)return [];return bom().filter(l=>P.sentPrices[l.p.id]!=null&&Math.abs((+l.p.cost||0)-P.sentPrices[l.p.id])>.004).map(l=>({p:l.p,qty:l.qty,was:P.sentPrices[l.p.id],now:+l.p.cost||0}))}
 function propParts(){
   const P=S.prop,q=quote();
   const changed=P.signedTotal!=null&&Math.abs(q.total-P.signedTotal)>0.5;
@@ -4241,7 +4256,10 @@ function propParts(){
    ${P.status!=='Draft'?`<button class="btn" data-act="clientView">Open client view</button>`:''}
    <button class="btn" data-act="propPdf" ${q.lines.length?'':'disabled'}>Download PDF</button>
    <button class="btn" data-go="design">Edit design</button>`;
-  $('#coBanner').innerHTML=(P.status==='Signed'&&changed)?`<div class="banner"><span><b>The design changed after signing.</b> The total moved by ${q.total>P.signedTotal?'+':'−'}${money2(Math.abs(q.total-P.signedTotal))}.</span><button class="btn primary" data-act="changeOrder">Send change order</button></div>`:'';
+  const drift=['Sent','Viewed'].includes(P.status)?priceDrift():[],stale=P.status==='Draft'?q.lines.filter(l=>staleProd(l.p)):[];
+  const fresh=drift.length?`<div class="banner"><span><b>Prices changed since you sent this.</b> ${plural(drift.length,'item')} ${drift.length===1?'has':'have'} a new dealer cost (${esc(drift.slice(0,3).map(d=>`${d.p.model} ${money2(d.was)} → ${money2(d.now)}`).join(', '))}${drift.length>3?', …':''}), so the client now sees ${money2(q.total)} instead of ${money2(P.sentTotal||0)}.</span><button class="btn primary" data-act="propRepriced">Accept the new prices</button></div>`
+    :stale.length?`<div class="banner"><span><b>${plural(stale.length,'item')} ${stale.length===1?'is':'are'} priced from lists over ${priceDays()} days old:</b> ${esc([...new Set(stale.map(l=>`${l.p.mfr} (${dayFmtIso(l.p.list.at)})`))].join(', '))}. Ask for current lists and import them before you send.</span><button class="btn" data-go="library">Price lists</button></div>`:'';
+  $('#coBanner').innerHTML=fresh+((P.status==='Signed'&&changed)?`<div class="banner"><span><b>The design changed after signing.</b> The total moved by ${q.total>P.signedTotal?'+':'−'}${money2(Math.abs(q.total-P.signedTotal))}.</span><button class="btn primary" data-act="changeOrder">Send change order</button></div>`:'');
   const gm=q.equip-q.cost,gmp=q.equip?gm/q.equip*100:0;
   const at=P.attach||{},sent=!!P.drawings,set=sheetSet();
   $('#pDwgN').textContent=plural(set.sheets.length,'sheet');
@@ -5457,6 +5475,7 @@ const A={
       catch(e){toast('Couldn’t build the PDF. Check your connection and try again.')}finally{pdfBusy=false;if(el&&el.isConnected){el.disabled=false;el.textContent=lab}}})()},
   coPublish(){const P=S.prop;P.closeout={at:isoDay(0),set:coSet(),reg:coRegister().map(({uid,inst,net,...r})=>r)};plog(`As-built documentation published to the client (${plural(P.closeout.set.sheets.length,'sheet')}, ${plural(P.closeout.reg.length,'device')})`);saveProjects();R.projects();toast('Published. The client view now has the as-built drawings and equipment register.')},
   viewAsBuilt(el){const P=S.prop;if(!P.closeout)return;S.sv={set:P.closeout.set,i:+el.dataset.i};renderSheetViewer()},
+  propRepriced(){const P=S.prop,q=quote(),was=P.sentTotal;P.sentTotal=q.total;P.sentPrices=Object.fromEntries(q.lines.map(l=>[l.p.id,+l.p.cost||0]));plog(`Repriced from the current price lists: ${money2(was||0)} → ${money2(q.total)}`);saveProjects();propParts();toast('Prices accepted. The client view shows the new total; let the client know it changed.')},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -5636,7 +5655,7 @@ const A={
       if(ex){Object.assign(ex,obj);upd++}else{lib.push({id:'IM-'+(r.mfr.replace(/[^A-Za-z]/g,'').slice(0,4)||'X')+'-'+r.model.replace(/\W/g,''),...obj});added++}});
     S.importRows=null;save();badges();R.library();toast(`Imported ${added} new, updated ${upd}. They’re in the Design device list now.`);
   },
-  sendProp(){const P=S.prop;P.drawings=drawingSet();S.liveSet=null;P.sowSent=sowSections();S.ui.sowEdit=false;plog(`Scope of work attached (${plural(P.sowSent.length,'section')})`);P.status='Sent';P.link='https://proposals.jamsdocsanddesigns.com/p/'+P.no.toLowerCase()+'-7kq2';plog(P.drawings.sheets.length?`Drawing set attached: ${esc(sheetList(P.drawings))} (${plural(P.drawings.sheets.length,'sheet')}, rev ${esc(P.drawings.rev)})`:'Sent without drawings');saveProjects();plog(`Sent to ${esc(P.client)} at ${money2(quote().total)}`);propParts();toast('Sent. You’ll see when it’s opened.')},
+  sendProp(){const P=S.prop;{const q0=quote();P.sentTotal=q0.total;P.sentAt=isoDay(0);P.sentPrices=Object.fromEntries(q0.lines.map(l=>[l.p.id,+l.p.cost||0]))}P.drawings=drawingSet();S.liveSet=null;P.sowSent=sowSections();S.ui.sowEdit=false;plog(`Scope of work attached (${plural(P.sowSent.length,'section')})`);P.status='Sent';P.link='https://proposals.jamsdocsanddesigns.com/p/'+P.no.toLowerCase()+'-7kq2';plog(P.drawings.sheets.length?`Drawing set attached: ${esc(sheetList(P.drawings))} (${plural(P.drawings.sheets.length,'sheet')}, rev ${esc(P.drawings.rev)})`:'Sent without drawings');saveProjects();plog(`Sent to ${esc(P.client)} at ${money2(quote().total)}`);propParts();toast('Sent. You’ll see when it’s opened.')},
   copyLink(){const t=S.prop.link;const sel=()=>{const r=document.createRange();r.selectNodeContents($('#plink'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Link selected. Copy it with your keyboard.')};
     try{navigator.clipboard.writeText(t).then(()=>toast('Link copied.'),sel)}catch(e){sel()}},
   clientView(){openClient()},
