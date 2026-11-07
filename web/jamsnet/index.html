@@ -1257,6 +1257,7 @@ button:not(:disabled):active{filter:brightness(.92)}
     <section class="view" id="v-clients" hidden></section>
     <section class="view" id="v-library" hidden></section>
     <section class="view" id="v-purchasing" hidden></section>
+    <section class="view" id="v-estimate" hidden></section>
     <section class="view" id="v-proposal" hidden></section>
     <section class="view" id="v-projects" hidden></section>
     <section class="view" id="v-field" hidden></section>
@@ -1811,9 +1812,10 @@ function quote(){
   let equip=0,cost=0,hrs=0;
   lines.forEach(l=>{l.sell=l.p.cost*mk;l.ext=l.sell*l.qty;equip+=l.ext;cost+=l.p.cost*l.qty;hrs+=l.p.labor*l.qty});
   hrs=Math.round(hrs*4)/4;
-  const labor=P.laborMethod==='hours'?hrs*(+P.laborRate||0):equip*(+P.laborPct||0)/100;
-  const tax=equip*(+P.tax||0)/100;
-  return {lines,equip,cost,hrs,labor,tax,total:equip+labor+tax};
+  let cons=0,consCost=0;if(P.laborMethod==='detail'){const e=estCalc();hrs=e.hrs;consCost=e.consCost;cons=consCost*mk}
+  const labor=P.laborMethod==='pct'?equip*(+P.laborPct||0)/100:hrs*(+P.laborRate||0);
+  const tax=(equip+cons)*(+P.tax||0)/100;
+  return {lines,equip,cost,hrs,labor,tax,cons,consCost,total:equip+cons+labor+tax};
 }
 
 /* ---------- UI helpers ---------- */
@@ -1824,7 +1826,7 @@ function renderProjSwitch(){const b=$('#pjsw');if(!b)return;
   b.innerHTML=`<label class="navgroup" for="pjSel">Project</label><select class="inp" id="pjSel" aria-label="Open project">${projOptions()}</select><button class="btn sm" data-act="newProject">+ New project</button>`}
 function projOptions(){return PJ.list.map(e=>{const pr=e.id===PJ.cur?S.prop:(e.prop||{});return `<option value="${e.id}" ${e.id===PJ.cur?'selected':''}>${esc([pr.client,pr.project].filter(Boolean).join(' · ')||'Untitled project')}</option>`}).join('')}
 function badges(){renderProjSwitch();{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}($('#bCl')||{}).textContent=S.clients.length;($('#bDesign')||{}).textContent=S.design.nodes.length;($('#bLib')||{}).textContent=lib.length;($('#bSvc')||{}).textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
-const VIEWS=['overview','assistant','design','clients','library','purchasing','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
+const VIEWS=['overview','assistant','design','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
 function go(v){
   if(v==='clients'&&S.view==='clients'&&S.ui.cpage){S.ui.cpage=null}
   if(!VIEWS.includes(v))v='overview';
@@ -1840,7 +1842,7 @@ function go(v){
    drawings (without prices), the library (without costs), the field app and the service desk;
    money pages are hidden and invoices and contracts never load or save for them (the database
    refuses those records to techs too). */
-const TECH_HIDE=['overview','clients','proposal','billing','contracts','purchasing','assistant','settings'];
+const TECH_HIDE=['overview','clients','proposal','billing','contracts','purchasing','estimate','assistant','settings'];
 const canPrice=()=>!S.tech;
 function techMode(){if(S.tech)return;S.tech=true;document.body.classList.add('tech');
   if(S.design&&S.design.meta6)S.design.meta6.price='none';
@@ -4157,6 +4159,97 @@ function snapIp(){const rows=ipRows();if(!rows.length)return {html:'<p class="mu
   const vt=m.vlans.length?`<table class="t"><thead><tr><th>VLAN</th><th>Name</th><th>Subnet</th><th>Gateway</th></tr></thead><tbody>${m.vlans.map(v=>`<tr><td>${esc(v.id)}</td><td>${esc(v.name)}</td><td class="mono">${esc(v.subnet)}</td><td class="mono">${esc(v.gateway||'')}</td></tr>`).join('')}</tbody></table>`:'';
   return {html:vt+ipTableHTML(rows,false),sum:`${plural(rows.length,'device')} · ${plural(m.vlans.length,'VLAN')}`}}
 
+/* ================= LABOR & CONSUMABLES =================
+   A detailed estimate kept apart from the bill of materials. Labor starts from the install hours
+   each product already carries (the same total the "hours per device" method uses), then adds the
+   work no product carries: field terminations, programming, testing and commissioning, project
+   management and training. Consumables (connectors, labels, Velcro, mounting and rack hardware,
+   a job kit) are counted from the cable schedule, devices and racks. Every quantity and rate can be
+   overridden per project; unit costs and default rates are firm-wide. Used on the proposal when its
+   labor method is "Detailed estimate". */
+const EST_RATES={term:0.1,test:0.1,commission:0.25,pmPct:10,training:1};
+const EST_PROG={Control:6,DSP:4,Switcher:1,Network:1.5,Camera:0.5,Display:0.25,Microphone:0.5,Soundbar:0.5,Source:1,Extender:0.25,Amplifier:0.25,Telephony:1};
+const EST_CONS=[['rj45','RJ45 connectors',1.2,'Field terminations on network runs, plus 10% spare'],['labels','Cable and device labels',0.3,'Two per cable run, one per device'],
+  ['velcro','Velcro and cable ties (roll)',18,'One roll per 150 m of cable'],['anchors','Wall anchors and mounting hardware (kit)',6,'Each wall- or ceiling-mounted device'],
+  ['rackhw','Rack screws and cage nuts (per U)',0.6,'Rack units used'],['misc','Job kit: tape, grommets, wire nuts',35,'One per job']];
+const estRate=k=>{const r=SETTINGS.estRates||{};return r[k]!=null&&r[k]!==''?+r[k]:EST_RATES[k]};
+const estProg=c=>{const r=(SETTINGS.estProg||{})[c];return r!=null&&r!==''?+r:(EST_PROG[c]||0)};
+const consCost=k=>{const r=(SETTINGS.consCost||{})[k];return r!=null&&r!==''?+r:(EST_CONS.find(x=>x[0]===k)||[])[2]||0};
+const estP=()=>{const P=S.prop;if(!P.est||typeof P.est!=='object')P.est={};const e=P.est;['each','qty','cq'].forEach(k=>{if(!e[k]||typeof e[k]!=='object')e[k]={}});['extra','consExtra'].forEach(k=>{if(!Array.isArray(e[k]))e[k]=[]});return e};
+const RACK_CATS=['Rack','Patch panel','Accessory'];
+const FIELD_TERM=p=>p&&(p.ctype||p.cat==='Cable')&&/field|run|bulk|wire|plenum/i.test((p.desc||'')+' '+(p.model||''));
+function estCalc(){const e=estP(),lines=[],add=(key,label,basis,qty,each,kind)=>{const q=e.qty[key]!=null&&e.qty[key]!==''?+e.qty[key]:qty,ea=e.each[key]!=null&&e.each[key]!==''?+e.each[key]:each;
+    if(q>0||e.qty[key]!=null)lines.push({key,label,basis,qty:q,autoQty:qty,each:ea,autoEach:each,hrs:Math.round(q*ea*100)/100,kind,ovQ:e.qty[key]!=null&&e.qty[key]!=='',ovE:e.each[key]!=null&&e.each[key]!==''})};
+  const b=bom(),cats=new Map();let cabQ=0,cabH=0,rkQ=0,rkH=0;
+  b.forEach(l=>{const p=l.p,h=(+p.labor||0)*l.qty;if(p.ctype||p.cat==='Cable'){cabQ+=l.qty;cabH+=h}else if(RACK_CATS.includes(p.cat)){rkQ+=l.qty;rkH+=h}else{const c=cats.get(p.cat)||{q:0,h:0};c.q+=l.qty;c.h+=h;cats.set(p.cat,c)}});
+  [...cats].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([c,v])=>add('dev:'+c,`Install · ${c}`,'Library install hours',v.q,v.q?Math.round(v.h/v.q*100)/100:0,'install'));
+  if(rkQ)add('rack','Rack build, panels and accessories','Library install hours',rkQ,Math.round(rkH/rkQ*100)/100,'install');
+  if(cabQ)add('cable','Pull and dress cable runs and cords','Library install hours',cabQ,Math.round(cabH/cabQ*100)/100,'install');
+  const terms=S.design.cables.filter(c=>FIELD_TERM(byId(skuFor(c)))).length*2;add('term','Field terminations','2 per field-terminated run',terms,estRate('term'),'work');
+  const pc=new Map();S.design.nodes.forEach(n=>{const c=prod(n).cat;if(estProg(c)>0)pc.set(c,(pc.get(c)||0)+1)});
+  [...pc].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([c,q])=>add('prog:'+c,`Programming · ${c}`,'Per device',q,estProg(c),'prog'));
+  add('test','Test and certify cables','Per cable run',S.design.cables.length,estRate('test'),'work');
+  add('commission','Commission devices','Per device',S.design.nodes.length,estRate('commission'),'work');
+  add('training','Owner training','Per job',S.design.nodes.length?1:0,estRate('training'),'work');
+  e.extra.forEach((x,i)=>lines.push({key:'x'+i,label:x.n||'Other work',basis:'Added',qty:1,each:+x.hrs||0,hrs:+x.hrs||0,kind:'extra',i}));
+  const sub=lines.reduce((s,l)=>s+l.hrs,0),pmPct=e.pmPct!=null&&e.pmPct!==''?+e.pmPct:estRate('pmPct'),pm=Math.round(sub*pmPct/100*4)/4;
+  const hrs=Math.round((sub+pm)*4)/4;
+  /* consumables */
+  const runs=S.design.cables,meters=runs.reduce((s,c)=>s+(+lenOf(c)||0),0),netTerms=runs.filter(c=>c.type==='net'&&FIELD_TERM(byId(skuFor(c)))).length*2;
+  const wall=S.design.nodes.filter(n=>!racked(n.uid)&&['Display','Speaker','Camera','Control','Wall plate','Microphone','Soundbar','Extender'].includes(prod(n).cat)).length;
+  const ru=S.design.racks.reduce((s,r)=>s+r.items.reduce((a,it)=>a+(+itemH(it)||0),0),0);
+  const auto={rj45:Math.ceil(netTerms*1.1),labels:runs.length*2+S.design.nodes.length,velcro:runs.length?Math.max(1,Math.ceil(meters/150)):0,anchors:wall,rackhw:ru,misc:S.design.nodes.length?1:0};
+  const cons=EST_CONS.map(([k,n,_c,basis])=>{const ov=e.cq[k]!=null&&e.cq[k]!=='';const qty=ov?+e.cq[k]:auto[k];return {key:k,label:n,basis,qty,autoQty:auto[k],ov,cost:consCost(k),ext:Math.round(qty*consCost(k)*100)/100}}).filter(c=>c.qty>0||c.ov);
+  e.consExtra.forEach((x,i)=>cons.push({key:'cx'+i,label:x.n||'Other material',basis:'Added',qty:+x.qty||0,cost:+x.cost||0,ext:Math.round((+x.qty||0)*(+x.cost||0)*100)/100,extra:true,i}));
+  const consCostT=cons.reduce((s,c)=>s+c.ext,0);
+  return {lines,sub,pmPct,pm,hrs,cons,consCost:consCostT,meters}}
+R.estimate=function(){const el=$('#v-estimate'),P=S.prop,e=estP(),c=estCalc(),mk=1+(+P.markup||0)/100,rate=+P.laborRate||0,on=P.laborMethod==='detail';
+  const num=(attr,v,ph,w)=>`<input class="cellin num" type="number" min="0" step="0.05" ${attr} value="${v==null?'':esc(v)}" placeholder="${esc(ph)}" style="width:${w||76}px">`;
+  el.innerHTML=`<header class="vh"><div><p class="eyebrow">${esc(P.client||'No client yet')} · ${esc(P.project||'')} · ${esc(P.no||'')}</p><h1>Labor &amp; consumables</h1>
+    <p class="sub">The work and materials behind the installation, kept apart from the bill of materials. Quantities come from the drawings; change any of them for this job.</p></div>
+    <div class="actions">${on?'':`<button class="btn primary" data-act="estUse">Use on the proposal</button>`}<button class="btn" data-go="proposal">Proposal →</button></div></header>
+  ${on?'':`<div class="banner"><span>The proposal prices labor as <b>${P.laborMethod==='pct'?`${+P.laborPct||0}% of equipment`:'hours per device × rate'}</b> and has no consumables. <b>Use on the proposal</b> switches it to this estimate.</span></div>`}
+  <div class="schedcards">
+   <div class="panel kpi"><div class="l">Labor</div><div class="v">${c.hrs} h</div><div class="s"><span>${money(c.hrs*rate)} at ${money(rate)}/h</span><span>≈ ${Math.max(1,Math.ceil(c.hrs/16))} days for a crew of 2</span></div></div>
+   <div class="panel kpi"><div class="l">Consumables</div><div class="v">${money(c.consCost*mk)}</div><div class="s"><span>${money(c.consCost)} at cost, ${+P.markup||0}% markup</span></div></div>
+   <div class="panel kpi"><div class="l">Labor and consumables</div><div class="v">${money(c.hrs*rate+c.consCost*mk)}</div><div class="s"><span>${on?'On the proposal':'Not on the proposal yet'}</span></div></div></div>
+  <div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Labor</h2><span class="tgrow"></span><label class="field inl" for="esRate">Rate ($/h)<input class="inp" id="esRate" type="number" min="0" step="1" value="${esc(P.laborRate)}" style="width:90px"></label><button class="btn sm" data-act="estAdd">+ Add work</button></div>
+   <div class="scroll"><table class="t"><thead><tr><th>Work</th><th>Based on</th><th class="n">Qty</th><th class="n">Hours each</th><th class="n">Hours</th><th class="n">Labor</th><th></th></tr></thead><tbody>
+    ${c.lines.map(l=>l.kind==='extra'?`<tr><td><input class="cellin" data-esx="n" data-i="${l.i}" value="${esc(l.label)}" aria-label="Work description" style="width:100%"></td><td class="muted sm">Added</td><td class="n">1</td><td class="n">${num(`data-esx="hrs" data-i="${l.i}" aria-label="Hours"`,l.each,'0')}</td><td class="n">${l.hrs}</td><td class="n">${money2(l.hrs*rate)}</td><td><button class="lnk" data-act="estDel" data-i="${l.i}">remove</button></td></tr>`
+     :`<tr><td>${esc(l.label)}</td><td class="muted sm">${esc(l.basis)}</td><td class="n">${num(`data-esq="${esc(l.key)}" aria-label="Quantity for ${esc(l.label)}"`,l.ovQ?l.qty:'',String(l.autoQty),64)}</td><td class="n">${num(`data-ese="${esc(l.key)}" aria-label="Hours each for ${esc(l.label)}"`,l.ovE?l.each:'',String(l.autoEach),72)}</td><td class="n">${l.hrs}</td><td class="n">${money2(l.hrs*rate)}</td><td>${l.ovQ||l.ovE?`<button class="lnk" data-act="estReset" data-k="${esc(l.key)}">reset</button>`:''}</td></tr>`).join('')
+     ||'<tr><td colspan="7" class="muted">Nothing on the drawings yet.</td></tr>'}
+    <tr><td>Project management</td><td class="muted sm">Percent of the hours above</td><td class="n">${num('id="esPm" aria-label="Project management percent"',e.pmPct!=null&&e.pmPct!==''?e.pmPct:'',String(estRate('pmPct')),64)}<span class="muted sm"> %</span></td><td></td><td class="n">${c.pm}</td><td class="n">${money2(c.pm*rate)}</td><td></td></tr>
+    </tbody><tfoot><tr><td colspan="4" class="n">Total</td><td class="n"><b>${c.hrs}</b></td><td class="n"><b>${money2(c.hrs*rate)}</b></td><td></td></tr></tfoot></table></div>
+   <div class="pb" style="padding-top:8px"><p class="note" style="margin:0">Grey numbers are worked out from the drawings and your defaults; type over one to change it for this job. Programming hours per device type and the default rates are under <button class="lnk" data-act="estDefaults">${S.ui.estDef?'Hide defaults':'Defaults'}</button>.</p></div></div>
+  ${S.ui.estDef?estDefaultsHTML():''}
+  <div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Consumables</h2><span class="muted" style="font-size:12px">${Math.round(c.meters)} m of cable on the schedule</span><span class="tgrow"></span><button class="btn sm" data-act="estConsAdd">+ Add material</button></div>
+   <div class="scroll"><table class="t"><thead><tr><th>Material</th><th>Based on</th><th class="n">Qty</th><th class="n">Unit cost</th><th class="n">Cost</th><th class="n">Sell</th><th></th></tr></thead><tbody>
+    ${c.cons.map(x=>x.extra?`<tr><td><input class="cellin" data-ecx="n" data-i="${x.i}" value="${esc(x.label)}" aria-label="Material" style="width:100%"></td><td class="muted sm">Added</td><td class="n">${num(`data-ecx="qty" data-i="${x.i}" aria-label="Quantity"`,x.qty,'0',64)}</td><td class="n">${num(`data-ecx="cost" data-i="${x.i}" aria-label="Unit cost"`,x.cost,'0',80)}</td><td class="n">${money2(x.ext)}</td><td class="n">${money2(x.ext*mk)}</td><td><button class="lnk" data-act="estConsDel" data-i="${x.i}">remove</button></td></tr>`
+     :`<tr><td>${esc(x.label)}</td><td class="muted sm">${esc(x.basis)}</td><td class="n">${num(`data-ecq="${x.key}" aria-label="Quantity of ${esc(x.label)}"`,x.ov?x.qty:'',String(x.autoQty),64)}</td><td class="n">${num(`data-ecc="${x.key}" aria-label="Unit cost of ${esc(x.label)} (all jobs)"`,consCost(x.key).toFixed(2),'',80)}</td><td class="n">${money2(x.ext)}</td><td class="n">${money2(x.ext*mk)}</td><td>${x.ov?`<button class="lnk" data-act="estConsReset" data-k="${x.key}">reset</button>`:''}</td></tr>`).join('')
+     ||'<tr><td colspan="7" class="muted">Nothing yet.</td></tr>'}
+    </tbody><tfoot><tr><td colspan="4" class="n">Total</td><td class="n"><b>${money2(c.consCost)}</b></td><td class="n"><b>${money2(c.consCost*mk)}</b></td><td></td></tr></tfoot></table></div>
+   <div class="pb" style="padding-top:8px"><p class="note" style="margin:0">Unit costs apply to every job. Consumables are sold at your markup and taxed with the equipment.</p></div></div>`;
+  bindEst()};
+function estDefaultsHTML(){const r=k=>`<input class="cellin num" type="number" min="0" step="0.05" data-esr="${k}" value="${esc(estRate(k))}" style="width:72px" aria-label="${k}">`;
+  return `<div class="panel"><div class="ph"><h2>Defaults for every job</h2></div><div class="pb" style="display:flex;flex-direction:column;gap:12px">
+   <div class="pogrid"><label class="field">Hours per field termination${r('term')}</label><label class="field">Hours to test a cable${r('test')}</label><label class="field">Hours to commission a device${r('commission')}</label><label class="field">Project management (%)${r('pmPct')}</label><label class="field">Training hours per job${r('training')}</label></div>
+   <p class="eyebrow" style="margin:0">Programming hours per device</p>
+   <div class="pogrid">${[...new Set([...Object.keys(EST_PROG),...SPEC_CATS.filter(c=>!['Module','Other'].includes(c))])].sort().map(c=>`<label class="field">${esc(c)}<input class="cellin num" type="number" min="0" step="0.25" data-esp="${esc(c)}" value="${esc(estProg(c))}" style="width:72px" aria-label="Programming hours for ${esc(c)}"></label>`).join('')}</div></div></div>`}
+function bindEst(){const el=$('#v-estimate');if(el.dataset.b)return;el.dataset.b=1;
+  el.addEventListener('change',ev=>{const t=ev.target,e=estP(),v=t.value.trim(),n=v===''?null:Math.max(0,+v||0);
+    if(t.id==='esRate'){S.prop.laborRate=n||0}
+    else if(t.id==='esPm'){if(n==null)delete e.pmPct;else e.pmPct=n}
+    else if(t.dataset.esq){if(n==null)delete e.qty[t.dataset.esq];else e.qty[t.dataset.esq]=n}
+    else if(t.dataset.ese){if(n==null)delete e.each[t.dataset.ese];else e.each[t.dataset.ese]=n}
+    else if(t.dataset.esx){const x=e.extra[+t.dataset.i];if(!x)return;if(t.dataset.esx==='n')x.n=v;else x.hrs=n||0}
+    else if(t.dataset.ecq){if(n==null)delete e.cq[t.dataset.ecq];else e.cq[t.dataset.ecq]=n}
+    else if(t.dataset.ecx){const x=e.consExtra[+t.dataset.i];if(!x)return;if(t.dataset.ecx==='n')x.n=v;else x[t.dataset.ecx]=n||0}
+    else if(t.dataset.ecc){SETTINGS.consCost=SETTINGS.consCost||{};if(n==null)delete SETTINGS.consCost[t.dataset.ecc];else SETTINGS.consCost[t.dataset.ecc]=n;saveSettings()}
+    else if(t.dataset.esr){SETTINGS.estRates=SETTINGS.estRates||{};if(n==null)delete SETTINGS.estRates[t.dataset.esr];else SETTINGS.estRates[t.dataset.esr]=n;saveSettings()}
+    else if(t.dataset.esp){SETTINGS.estProg=SETTINGS.estProg||{};if(n==null)delete SETTINGS.estProg[t.dataset.esp];else SETTINGS.estProg[t.dataset.esp]=n;saveSettings()}
+    else return;
+    saveProjects();R.estimate()})}
+
 /* ================= PROPOSAL ================= */
 /* ---------- drawing set attached to proposals ----------
    Captured when the proposal is sent (and again on a change order), so the client sees the sheets exactly as proposed. */
@@ -4221,7 +4314,7 @@ R.proposal=function(){
     <div class="panel"><div class="ph"><h2>Pricing</h2></div><div class="pb" style="display:flex;flex-direction:column;gap:12px">
      <div class="row2"><label class="field" for="pMk">Markup on cost (%)<input id="pMk" type="number" min="0" step="1" value="${P.markup}" data-bind="markup"></label>
       <label class="field" for="pTax">Tax (%)<input id="pTax" type="number" min="0" step="0.001" value="${P.tax}" data-bind="tax"></label></div>
-     <label class="field" for="pLm">Labor method<select id="pLm" data-bind="laborMethod"><option value="hours" ${P.laborMethod==='hours'?'selected':''}>Hours per device × rate</option><option value="pct" ${P.laborMethod==='pct'?'selected':''}>Percent of equipment</option></select></label>
+     <label class="field" for="pLm">Labor method<select id="pLm" data-bind="laborMethod"><option value="hours" ${P.laborMethod==='hours'?'selected':''}>Hours per device × rate</option><option value="pct" ${P.laborMethod==='pct'?'selected':''}>Percent of equipment</option><option value="detail" ${P.laborMethod==='detail'?'selected':''}>Detailed estimate (labor &amp; consumables)</option></select></label>
      <div class="row2"><label class="field" for="pLr">Labor rate ($/h)<input id="pLr" type="number" min="0" value="${P.laborRate}" data-bind="laborRate"></label>
       <label class="field" for="pLp">Labor (% of equip.)<input id="pLp" type="number" min="0" value="${P.laborPct}" data-bind="laborPct"></label></div>
      <div id="pMargin"></div>
@@ -4268,7 +4361,7 @@ function propParts(){
   {const el=$('#pOpts');if(el){const withImg=q.lines.filter(l=>pImg(l.p)).length;
     el.innerHTML=`<label class="check"><input type="checkbox" data-popt="photos" ${pdfPhotosOn(P)?'checked':''} ${withImg?'':'disabled'}> <span>Product photos beside each line item</span></label>
      <p class="note" style="margin:0">${withImg?`${plural(withImg,'line')} of ${q.lines.length} ${withImg===1?'has':'have'} a photo in your library.`:'None of these products have photos yet. Add them in the Library.'}</p>`}}
-  $('#pMargin').innerHTML=`<p class="note">Equipment margin <b class="tab">${money(gm)}</b> (${gmp.toFixed(1)}%). Install labor is ${q.hrs} h from device labor values.</p>`;
+  $('#pMargin').innerHTML=`<p class="note">Equipment margin <b class="tab">${money(gm)}</b> (${gmp.toFixed(1)}%). ${P.laborMethod==='detail'?`Labor is ${q.hrs} h and consumables ${money(q.cons)} from the detailed estimate.`:`Install labor is ${q.hrs} h from device labor values.`} <button class="lnk" data-go="estimate">Labor &amp; consumables →</button></p>`;
   $('#pTrack').innerHTML=`${P.link?`<div class="linkbox"><code id="plink">${esc(P.link)}</code><button class="btn sm" data-act="copyLink">Copy</button></div>`:'<p class="muted" style="margin:0">Send the proposal to get a trackable link. You’ll see when the client opens and signs it.</p>'}
    ${P.log.length?`<ul class="log">${P.log.slice().reverse().map(l=>`<li><time>${esc(l.t)}</time><span>${l.m}</span></li>`).join('')}</ul>`:''}`;
   const groups=[['Equipment',q.lines.filter(l=>!['Cable','Rack'].includes(l.p.cat))],['Racks and mounting',q.lines.filter(l=>l.p.cat==='Rack')],['Cabling',q.lines.filter(l=>l.p.cat==='Cable')]];
@@ -4278,9 +4371,10 @@ function propParts(){
    ${q.lines.length?`<div class="scroll"><table class="t"><thead><tr><th class="n">Qty</th><th>Description</th><th class="n">Unit</th><th class="n">Amount</th></tr></thead><tbody>
     ${groups.filter(g=>g[1].length).map(([g,ls])=>`<tr class="grp"><td colspan="4">${g}</td></tr>`+ls.map(l=>`<tr${l.mod?' class="modline"':''}><td class="n">${l.qty}</td><td>${thumb(l.p,'propthumb')}${l.mod?'<span class="muted">↳ </span>':''}<b>${esc(l.p.mfr)} ${esc(l.p.model)}</b><br><span class="muted">${esc(l.p.desc)}</span></td><td class="n">${money2(l.sell)}</td><td class="n">${money2(l.ext)}</td></tr>`).join('')).join('')}
     <tr class="grp"><td colspan="4">Services</td></tr>
-    <tr><td class="n">1</td><td><b>Installation, programming and commissioning</b><br><span class="muted">${P.laborMethod==='hours'?`${q.hrs} h at ${money(+P.laborRate||0)}/h`:`${+P.laborPct||0}% of equipment`}</span></td><td class="n"></td><td class="n">${money2(q.labor)}</td></tr>
+    <tr><td class="n">1</td><td><b>Installation, programming and commissioning</b><br><span class="muted">${P.laborMethod==='pct'?`${+P.laborPct||0}% of equipment`:`${q.hrs} h at ${money(+P.laborRate||0)}/h${P.laborMethod==='detail'?' (detailed estimate)':''}`}</span></td><td class="n"></td><td class="n">${money2(q.labor)}</td></tr>
+    ${q.cons?`<tr><td class="n">1</td><td><b>Consumables and installation hardware</b><br><span class="muted">Connectors, labels, cable management, mounting and rack hardware</span></td><td class="n"></td><td class="n">${money2(q.cons)}</td></tr>`:''}
     <tr class="tot"><td></td><td>Equipment subtotal</td><td></td><td class="n">${money2(q.equip)}</td></tr>
-    <tr class="tot"><td></td><td>Tax (${+P.tax||0}% on equipment)</td><td></td><td class="n">${money2(q.tax)}</td></tr>
+    <tr class="tot"><td></td><td>Tax (${+P.tax||0}% on equipment${q.cons?' and materials':''})</td><td></td><td class="n">${money2(q.tax)}</td></tr>
     <tr class="grand"><td></td><td>Total</td><td></td><td class="n">${money2(q.total)}</td></tr>
     </tbody></table></div><p class="note" style="margin-top:14px">${depPct()?`${depPct()}% deposit (${money2(q.total*depPct()/100)}) due on signing; balance on substantial completion.`:'Payment due on substantial completion.'} ${set.sheets.length?`Drawings ${esc(sheetList(set))} are attached below.`:'No drawings are attached.'}</p>
     ${set.sheets.length?`<div class="dsec"><div class="dsec-h"><b>Drawing set</b><span class="muted">${sent?`Sent ${esc(P.drawings.at)} · rev ${esc(P.drawings.rev)}`:`Preview · attached when you send · rev ${esc(S.design.meta.rev)}`}</span></div>${sheetThumbs(set)}</div>`:''}
@@ -4300,7 +4394,7 @@ function openClient(){
     <details class="sowd"><summary>Scope of work · ${plural(sowCurrent().length,'section')}</summary>${sowHTML(sowCurrent())}</details>
     ${(()=>{const set=sheetSet();return set.sheets.length?`<div class="dsec"><div class="dsec-h"><b>Drawings · ${plural(set.sheets.length,'sheet')}</b><span class="muted">Tap a sheet to open it full size</span></div>${sheetThumbs(set)}</div>`:''})()}
     <table class="t"><tbody>
-     <tr><td>Equipment</td><td class="n">${money2(q.equip)}</td></tr><tr><td>Installation and programming</td><td class="n">${money2(q.labor)}</td></tr>
+     <tr><td>Equipment</td><td class="n">${money2(q.equip)}</td></tr><tr><td>Installation and programming</td><td class="n">${money2(q.labor)}</td></tr>${q.cons?`<tr><td>Consumables and installation hardware</td><td class="n">${money2(q.cons)}</td></tr>`:''}
      <tr><td>Tax</td><td class="n">${money2(q.tax)}</td></tr><tr class="grand"><td>Total</td><td class="n">${money2(q.total)}</td></tr></tbody></table>
     ${canSign?`${P.status==='Change order'?`<div class="banner">This is a change order. The previous signed total was ${money2(P.signedTotal)}.</div>`:''}
      <label class="field" for="sigName">Full name<input id="sigName" class="inp" placeholder="Name of authorized signer" autocomplete="name"></label>
@@ -4546,9 +4640,9 @@ async function buildProposalPdf(opts){
   const body=[],groups=[['Equipment',q.lines.filter(l=>!['Cable','Rack'].includes(l.p.cat))],['Racks and mounting',q.lines.filter(l=>l.p.cat==='Rack')],['Cabling',q.lines.filter(l=>l.p.cat==='Cable')]];
   const rowImg=[],photos=pdfPhotosOn(P)?new Map(await Promise.all(q.lines.filter(l=>pImg(l.p)).map(async l=>[l.p.id,await pdfPhoto(pImg(l.p))]))):new Map();
   groups.filter(g=>g[1].length).forEach(([g,ls])=>{body.push(grp(g));ls.forEach(l=>{rowImg[body.length]=photos.get(l.p.id)||null;body.push([String(l.qty),pt(`${l.mod?'   - ':''}${l.p.mfr} ${l.p.model}\n${l.mod?'     ':''}${l.p.desc}`),pt(money2(l.sell)),pt(money2(l.ext))])})});
-  body.push(grp('Services'));body.push(['1',pt(`Installation, programming and commissioning\n${P.laborMethod==='hours'?`${q.hrs} h at ${money(+P.laborRate||0)}/h`:`${+P.laborPct||0}% of equipment`}`),'',pt(money2(q.labor))]);
+  body.push(grp('Services'));body.push(['1',pt(`Installation, programming and commissioning\n${P.laborMethod==='pct'?`${+P.laborPct||0}% of equipment`:`${q.hrs} h at ${money(+P.laborRate||0)}/h${P.laborMethod==='detail'?' (detailed estimate)':''}`}`),'',pt(money2(q.labor))]);if(q.cons)body.push(['1',pt('Consumables and installation hardware\nConnectors, labels, cable management, mounting and rack hardware'),'',pt(money2(q.cons))]);
   const tot=(l,v,big)=>[{content:'',styles:{}},{content:pt(l),styles:{fontStyle:'bold',fontSize:big?12:9}},'',{content:pt(v),styles:{fontStyle:'bold',halign:'right',fontSize:big?12:9}}];
-  body.push(tot('Equipment subtotal',money2(q.equip)),tot('Installation and programming',money2(q.labor)),tot(`Tax (${+P.tax||0}% on equipment)`,money2(q.tax)),tot('Total',money2(q.total),true));
+  body.push(tot('Equipment subtotal',money2(q.equip)),tot('Installation and programming',money2(q.labor)),...(q.cons?[tot('Consumables and hardware',money2(q.cons))]:[]),tot(`Tax (${+P.tax||0}% on equipment${q.cons?' and materials':''})`,money2(q.tax)),tot('Total',money2(q.total),true));
   doc.autoTable({startY:y,margin:{left:M,right:M,bottom:56},head:[['Qty','Description','Unit','Amount']],body,theme:'plain',
     styles:{font:'helvetica',fontSize:8.5,textColor:INK,cellPadding:{top:4,bottom:4,left:5,right:5},lineColor:LINE,lineWidth:{bottom:.5}},
     headStyles:{fontSize:7,textColor:MUTED,fontStyle:'normal',lineWidth:{bottom:1},lineColor:INK},
@@ -5000,7 +5094,7 @@ const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-h
 const NAVL=[
  {top:'av:overview|Dashboard',icon:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>'},
  {sec:'clients',title:'Clients & billing',icon:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h10"/>',items:['av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals', 'av:billing|Time & invoicing|#bTime', 'nl:billing|Network time & billing']},
- {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
+ {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
  {sec:'support',title:'Service',icon:'<path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1"/><rect x="17" y="13" width="4" height="6" rx="1"/>',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
  {net:true},
  {sec:'physical',title:'Physical',icon:'<rect x="4" y="3" width="16" height="7" rx="1"/><rect x="4" y="14" width="16" height="7" rx="1"/><path d="M8 6.5h.01M8 17.5h.01"/>',items:['nl:sites', 'nl:plans', 'nl:devices', 'nl:racks', 'nl:power', 'nl:cabling', 'nl:jacks', 'nl:lifecycle', 'nl:discover', 'nl:inventory|Site inventory']},
@@ -5476,6 +5570,14 @@ const A={
   coPublish(){const P=S.prop;P.closeout={at:isoDay(0),set:coSet(),reg:coRegister().map(({uid,inst,net,...r})=>r)};plog(`As-built documentation published to the client (${plural(P.closeout.set.sheets.length,'sheet')}, ${plural(P.closeout.reg.length,'device')})`);saveProjects();R.projects();toast('Published. The client view now has the as-built drawings and equipment register.')},
   viewAsBuilt(el){const P=S.prop;if(!P.closeout)return;S.sv={set:P.closeout.set,i:+el.dataset.i};renderSheetViewer()},
   propRepriced(){const P=S.prop,q=quote(),was=P.sentTotal;P.sentTotal=q.total;P.sentPrices=Object.fromEntries(q.lines.map(l=>[l.p.id,+l.p.cost||0]));plog(`Repriced from the current price lists: ${money2(was||0)} → ${money2(q.total)}`);saveProjects();propParts();toast('Prices accepted. The client view shows the new total; let the client know it changed.')},
+  estUse(){S.prop.laborMethod='detail';saveProjects();R.estimate();toast('The proposal now uses this estimate for labor and consumables.')},
+  estAdd(){estP().extra.push({n:'',hrs:1});saveProjects();R.estimate();requestAnimationFrame(()=>{const i=[...document.querySelectorAll('[data-esx="n"]')].pop();if(i)i.focus()})},
+  estDel(el){estP().extra.splice(+el.dataset.i,1);saveProjects();R.estimate()},
+  estReset(el){const e=estP(),k=el.dataset.k;delete e.qty[k];delete e.each[k];saveProjects();R.estimate()},
+  estConsAdd(){estP().consExtra.push({n:'',qty:1,cost:0});saveProjects();R.estimate();requestAnimationFrame(()=>{const i=[...document.querySelectorAll('[data-ecx="n"]')].pop();if(i)i.focus()})},
+  estConsDel(el){estP().consExtra.splice(+el.dataset.i,1);saveProjects();R.estimate()},
+  estConsReset(el){delete estP().cq[el.dataset.k];saveProjects();R.estimate()},
+  estDefaults(){S.ui.estDef=!S.ui.estDef;R.estimate()},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -5517,7 +5619,7 @@ const A={
     if(k==='dep'){const d=depPct()||50;v.lines=[{desc:`${d}% deposit due on signing · ${lab}`,qty:1,rate:r2(pq.q.total*d/100),tax:false}]}
     else if(k==='bal'){const prior=invoicedFor(v.pj,v.id);v.lines=[{desc:`Balance on completion · ${lab}${prior?` (less ${money2(prior)} invoiced)`:''}`,qty:1,rate:r2(pq.q.total-prior),tax:false}]}
     else{v.lines=pq.q.lines.map(l=>({desc:`${l.p.mfr} ${l.p.model} · ${l.p.desc}`,qty:l.qty,rate:r2(l.sell),tax:true}));
-      v.lines.push({desc:`Installation, programming and commissioning${pq.prop.laborMethod==='hours'?` · ${pq.q.hrs} h`:''}`,qty:1,rate:r2(pq.q.labor),tax:false});v.taxPct=+pq.prop.tax||0}
+      v.lines.push({desc:`Installation, programming and commissioning${pq.prop.laborMethod!=='pct'?` · ${pq.q.hrs} h`:''}`,qty:1,rate:r2(pq.q.labor),tax:false});if(pq.q.cons)v.lines.push({desc:'Consumables and installation hardware',qty:1,rate:r2(pq.q.cons),tax:true});v.taxPct=+pq.prop.tax||0}
     renderInvoice();toast(k==='items'?`${plural(v.lines.length,'line')} filled from ${pq.prop.no}.`:'Filled from the proposal.')},
   ivSave(){const v=S.iv.draft;if(!v.clientId){toast('Pick a client.');return}ivStore(v);invRefresh();toast(`${v.no} saved as a draft.`)},
   ivSend(){const v=S.iv.draft,k=invCalc(v),c=clientById(v.clientId);
