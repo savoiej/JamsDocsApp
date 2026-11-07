@@ -1238,6 +1238,9 @@ button:not(:disabled):active{filter:brightness(.92)}
 @media (pointer:coarse){input,textarea,select{font-size:16px!important}}
 </style>
 <script>try{if(localStorage.getItem("sitrep-palette")==="hfh")document.documentElement.setAttribute("data-palette","hfh")}catch(e){}</script>
+<style>.pclean{margin-left:auto;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;color:var(--fg);cursor:pointer}.pimg figcaption{flex-wrap:wrap;row-gap:4px}.pimg figcaption>:first-child{flex:1 0 100%;text-align:center;justify-content:center}
+.pimg img{background-color:#fff;background-image:linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%),linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%);background-size:12px 12px;background-position:0 0,6px 6px}
+</style>
 <style id="palHfh">/* ===== Hands Free Help palette: lime, gray, black (from the company logo). On when <html data-palette="hfh"> ===== */
 :root[data-palette="hfh"]{--lime:#9CCB19;--hfgray:#A9ACA6;--basalt:#111210;--basalt2:#1D1F1B;--amber:#9CCB19;--lagoon:#4F7A00}
 :root[data-palette="hfh"],:root[data-palette="hfh"][data-theme="light"]{--bg:#F3F4F1;--surface:#FFFFFF;--sunk:#E9EBE6;--line:#D5D8D0;--fg:#111210;--muted:#585B54;--accent:#4A7300;--accent-ink:#111210;--accent-soft:#ECF5D2;--ok:#2F7D32;--ok-soft:#E1F1DF;--sheet:#FBFCFA;--grid:#E8EAE4;--gridmaj:#D8DBD3}
@@ -3405,22 +3408,74 @@ function slotsHTML(b){const k=b.sbulk||(b.sbulk={count:4,name:'Slot {n}',acc:''}
    <div class="actions"><button class="btn sm" data-act="bsBulk">Add ${esc(k.count)} slots</button>${b.slots.length?'<button class="btn sm danger" data-act="bsClear">Remove all slots</button>':''}</div>
    <datalist id="slotTypesL">${slotTypes().map(t=>`<option value="${esc(t)}">`).join('')}</datalist>`}
 function photosHTML(b){const im=b.imgs||[];
-  return `<div class="pimgs" id="pimgs"><div class="solh"><span class="plh" style="margin:0">Photos · ${im.length}</span>${b.imgBusy?`<span class="muted" style="font-size:12px">Uploading ${plural(b.imgBusy,'photo')}…</span>`:''}</div>
-   <div class="pimgrow">${im.map((x,i)=>`<figure class="pimg${i?'':' main'}"><img src="${esc(imgSrc(x))}" alt="${esc(b.model||'Product')} photo ${i+1}"><figcaption>${i?`<button class="btn sm" data-act="bImgMain" data-i="${i}">Make main</button>`:'<span class="chip Sent">Main</span>'}<button class="btn sm danger" data-act="bImgDel" data-i="${i}" aria-label="Remove photo ${i+1}">✕</button></figcaption></figure>`).join('')}
+  return `<div class="pimgs" id="pimgs"><div class="solh"><span class="plh" style="margin:0">Photos · ${im.length}</span>${b.imgBusy?`<span class="muted" style="font-size:12px">${photoCleanOn()?'Cleaning up':'Uploading'} ${plural(b.imgBusy,'photo')}…</span>`:''}<label class="chk pclean"><input type="checkbox" id="bImgClean" ${photoCleanOn()?'checked':''}> Remove backgrounds</label></div>
+   <div class="pimgrow">${im.map((x,i)=>`<figure class="pimg${i?'':' main'}"><img src="${esc(imgSrc(x))}" alt="${esc(b.model||'Product')} photo ${i+1}"><figcaption>${i?`<button class="btn sm" data-act="bImgMain" data-i="${i}">Make main</button>`:'<span class="chip Sent">Main</span>'}<button class="btn sm" data-act="bImgCut" data-i="${i}" title="Remove this photo’s background" aria-label="Remove the background of photo ${i+1}">Clean</button><button class="btn sm danger" data-act="bImgDel" data-i="${i}" aria-label="Remove photo ${i+1}">✕</button></figcaption></figure>`).join('')}
     ${im.length<8?`<label class="pimgadd filebtn" title="Choose photos">+ Add photos<input type="file" id="bImgFile" accept="image/png,image/jpeg,image/webp,image/gif" multiple aria-label="Add product photos"></label>`:''}</div>
-   <p class="note" style="margin:0">Drop images here, or copy an image and paste it. The main photo shows in the library, the device list, the device’s properties and proposals.${ASSETS?'':' Not signed in, so photos are kept small and only in this browser.'}</p></div>`}
+   <p class="note" style="margin:0">Drop images here, or copy an image and paste it. ${photoCleanOn()?'New photos are trimmed and their plain backgrounds removed. ':''}The main photo shows in the library, the device list, the device’s properties and proposals.${ASSETS?'':' Not signed in, so photos are kept small and only in this browser.'}</p></div>`}
+/* ---------- product photo clean-up: cut the product off a plain background, trim and center it ----------
+   Works on studio shots (a white, gray or other plain backdrop). A photo taken in a room, with a busy
+   background, is kept as it is. Returns a new canvas, or null when there's no plain background to remove. */
+function photoCutout(src){
+  const w=src.width,h=src.height;if(w<8||h<8)return null;
+  const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(src,0,0);
+  const id=ctx.getImageData(0,0,w,h),d=id.data,N=w*h;
+  const border=[];for(let x=0;x<w;x++){border.push(x,(h-1)*w+x)}for(let y=1;y<h-1;y++){border.push(y*w,y*w+w-1)}
+  let clear=0;const rs=[],gs=[],bs=[];
+  for(const i of border){const o=i*4;if(d[o+3]<24){clear++;continue}rs.push(d[o]);gs.push(d[o+1]);bs.push(d[o+2])}
+  const alreadyClear=clear>border.length*.5;
+  let bg=null,tol=34;
+  if(!alreadyClear){
+    const med=a=>{a.sort((x,y)=>x-y);return a[a.length>>1]};bg=[med(rs),med(gs),med(bs)];
+    let near=0;for(const i of border){const o=i*4;if(d[o+3]<24||Math.max(Math.abs(d[o]-bg[0]),Math.abs(d[o+1]-bg[1]),Math.abs(d[o+2]-bg[2]))<=40)near++}
+    if(near<border.length*.6)return null; // the edges aren't one plain color: not a studio shot
+    /* JPEG noise on the backdrop: widen the tolerance a little when the border is noisy */
+    let dev=0;for(let k=0;k<rs.length;k++)dev+=Math.abs(rs[k]-bg[0])+Math.abs(gs[k]-bg[1])+Math.abs(bs[k]-bg[2]);dev/=Math.max(1,rs.length*3);
+    tol=Math.min(48,Math.max(26,Math.round(18+dev*3)))}
+  const dist=o=>bg?Math.max(Math.abs(d[o]-bg[0]),Math.abs(d[o+1]-bg[1]),Math.abs(d[o+2]-bg[2])):255;
+  const isBg=i=>{const o=i*4;return d[o+3]<24||dist(o)<=tol};
+  /* flood fill from the edges: only backdrop that touches the edge goes, so white parts inside the product stay */
+  const m=new Uint8Array(N),q=new Int32Array(N);let qh=0,qt=0;
+  for(const i of border)if(!m[i]&&isBg(i)){m[i]=1;q[qt++]=i}
+  while(qh<qt){const i=q[qh++],x=i%w;
+    if(x>0&&!m[i-1]&&isBg(i-1)){m[i-1]=1;q[qt++]=i-1}
+    if(x<w-1&&!m[i+1]&&isBg(i+1)){m[i+1]=1;q[qt++]=i+1}
+    if(i>=w&&!m[i-w]&&isBg(i-w)){m[i-w]=1;q[qt++]=i-w}
+    if(i<N-w&&!m[i+w]&&isBg(i+w)){m[i+w]=1;q[qt++]=i+w}}
+  const gone=qt/N;if(!alreadyClear&&(gone<.03||gone>.96))return null; // nothing to remove, or it would remove the product
+  for(let i=0;i<N;i++)if(m[i])d[i*4+3]=0;
+  /* soft edge: the product's outline fades by how close it is to the backdrop color, and the backdrop's tint is taken out of it */
+  if(bg)for(let i=0;i<N;i++){if(m[i])continue;const x=i%w;
+    if(!((x>0&&m[i-1])||(x<w-1&&m[i+1])||(i>=w&&m[i-w])||(i<N-w&&m[i+w])))continue;
+    const o=i*4,a=Math.min(1,Math.max(.25,(dist(o)-tol)/60+.35));
+    for(let k=0;k<3;k++)d[o+k]=Math.max(0,Math.min(255,Math.round((d[o+k]-(1-a)*bg[k])/a)));d[o+3]=Math.round(d[o+3]*a)}
+  ctx.putImageData(id,0,0);
+  /* trim to the product and center it with even margins */
+  let x0=w,y0=h,x1=-1,y1=-1;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>16){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return null;
+  const cw=x1-x0+1,ch=y1-y0+1,pad=Math.round(Math.max(cw,ch)*.05);
+  const out=document.createElement('canvas');out.width=cw+pad*2;out.height=ch+pad*2;out.getContext('2d').drawImage(c,x0,y0,cw,ch,pad,pad,cw,ch);return out}
+/* one product photo, ready to keep: cleaned when it can be (and when that's on), sized for storage */
+const photoCleanOn=()=>SETTINGS.photoClean!==false;
+async function prepProductPhoto(blob,opts){opts=opts||{};const clean=opts.clean!=null?opts.clean:photoCleanOn();
+  const png=/png|gif|webp/.test(blob.type||'');
+  let c=await shrinkImage(blob,ASSETS?1400:360,(png||clean)?'image/png':'image/jpeg');let cut=null;
+  if(clean){cut=photoCutout(c);if(cut)c=cut}
+  const alpha=png||!!cut;
+  if(ASSETS){let b=await new Promise(r=>c.toBlob(r,alpha?'image/png':'image/jpeg',.86));
+    if(alpha&&b.size>1.5e6)b=await new Promise(r=>c.toBlob(r,'image/webp',.86));
+    const res=await ASSETS.upload(b,{type:b.type});return {im:{asset:res.id},cleaned:!!cut}}
+  let url;if(alpha){url=c.toDataURL('image/webp',.82);if(!/^data:image\/webp/.test(url))url=c.toDataURL('image/png')}else url=c.toDataURL('image/jpeg',.78);
+  return {im:{src:url},cleaned:!!cut}}
 async function addPhotos(files){const b=S.bld;if(!b)return;const fs=[...files].filter(f=>/^image\//.test(f.type));if(!fs.length){toast('Use a PNG, JPG, WebP or GIF image.');return}
   const room=8-(b.imgs||[]).length;if(room<=0){toast('That’s the most photos for one product (8).');return}
   const take=fs.slice(0,room);if(fs.length>room)toast(`Only ${room} more ${room===1?'photo fits':'photos fit'}; the rest were skipped.`);
-  b.imgBusy=(b.imgBusy||0)+take.length;renderPhotos();
+  b.imgBusy=(b.imgBusy||0)+take.length;renderPhotos();let plain=0;
   for(const f of take){try{
       if(f.size>25*1024*1024)throw new Error('big');const png=/png|gif|webp/.test(f.type);
-      if(ASSETS){const c=await shrinkImage(f,1400,png?'image/png':'image/jpeg');let blob=await new Promise(r=>c.toBlob(r,png?'image/png':'image/jpeg',.86));
-        if(png&&blob.size>1.5e6)blob=await new Promise(r=>c.toBlob(r,'image/webp',.86));
-        const res=await ASSETS.upload(blob,{type:blob.type});if(S.bld!==b){dropAssets([{asset:res.id}]);return}b.imgs.push({asset:res.id});b.up.push(res.id)}
-      else{const c=await shrinkImage(f,360,'image/jpeg');b.imgs.push({src:c.toDataURL('image/jpeg',.78)})}}
+      const r=await prepProductPhoto(f);if(S.bld!==b){dropAssets([r.im]);return}b.imgs.push(r.im);if(r.im.asset)b.up.push(r.im.asset);if(photoCleanOn()&&!r.cleaned)plain++}
     catch(e){toast(e&&e.message==='big'?`${f.name} is over 25 MB.`:e&&e.code==='quota_exceeded'?'The app’s photo storage is full. Remove some photos first.':`Couldn’t add ${f.name}. Try a PNG or JPG.`)}
-    finally{if(S.bld===b){b.imgBusy--;renderPhotos()}}}}
+    finally{if(S.bld===b){b.imgBusy--;renderPhotos()}}}
+  if(plain)toast(plain===take.length&&take.length===1?'That photo’s background isn’t plain enough to remove, so it was kept as it is.':`${plural(plain,'photo')} kept as is: the background isn’t plain enough to remove.`)}
 function renderPhotos(){const el=$('#pimgs');if(el&&S.bld){el.outerHTML=photosHTML(S.bld);bindPhotoDrop()}}
 function bindPhotoDrop(){const el=$('#pimgs');if(!el)return;
   el.addEventListener('dragover',e=>{if([...(e.dataTransfer.types||[])].includes('Files')){e.preventDefault();el.classList.add('dropping')}});
@@ -3428,7 +3483,7 @@ function bindPhotoDrop(){const el=$('#pimgs');if(!el)return;
   el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('dropping');if(e.dataTransfer.files&&e.dataTransfer.files.length)addPhotos(e.dataTransfer.files)})}
 document.addEventListener('paste',e=>{if(!S.bld||$('#overlay').hidden)return;const t=e.target;if(t&&/INPUT|TEXTAREA/.test(t.tagName)&&t.type!=='file'){const fl=[...(e.clipboardData?.files||[])];if(!fl.some(f=>/^image\//.test(f.type)))return}
   const fl=[...(e.clipboardData?.files||[])].filter(f=>/^image\//.test(f.type));if(fl.length){e.preventDefault();addPhotos(fl)}});
-document.addEventListener('change',e=>{if(e.target&&e.target.id==='bImgFile'){addPhotos(e.target.files);e.target.value=''}});
+document.addEventListener('change',e=>{if(e.target&&e.target.id==='bImgFile'){addPhotos(e.target.files);e.target.value=''}if(e.target&&e.target.id==='bImgClean'){SETTINGS.photoClean=e.target.checked;saveSettings();renderPhotos()}});
 /* products that share a model name with this one (case-insensitive) */
 const nameTwins=p=>lib.filter(x=>x!==p&&x.model.trim().toLowerCase()===p.model.trim().toLowerCase()&&placeable(x)===placeable(p));
 const portCount=p=>p.ins.length+p.outs.length;
@@ -3815,10 +3870,7 @@ function bindPL(){
   on('plFetch','change',e=>{P.fetchImgs=e.target.checked})}
 
 /* a photo for the library: uploaded to the app's storage when signed in, else kept small in this browser */
-async function plStoreImage(blob){const png=/png|gif|webp/.test(blob.type||'');
-  if(ASSETS){const c=await shrinkImage(blob,1400,png?'image/png':'image/jpeg');let b=await new Promise(r=>c.toBlob(r,png?'image/png':'image/jpeg',.86));
-    if(png&&b.size>1.5e6)b=await new Promise(r=>c.toBlob(r,'image/webp',.86));const res=await ASSETS.upload(b,{type:b.type});return {asset:res.id}}
-  const c=await shrinkImage(blob,360,'image/jpeg');return {src:c.toDataURL('image/jpeg',.78)}}
+async function plStoreImage(blob){return (await prepProductPhoto(blob)).im}
 async function plFetchImage(url){try{const r=await fetch(url,{mode:'cors',credentials:'omit',referrerPolicy:'no-referrer'});if(!r.ok)return null;const b=await r.blob();if(!/^image\//.test(b.type)||b.size>25e6)return null;return await plStoreImage(b)}catch(e){return null}}
 async function plImport(){
   const P=S.pl;if(!P||P.busy)return;
@@ -5749,6 +5801,13 @@ const A={
   bsBulk(){const b=S.bld,k=b.sbulk,n=Math.max(0,Math.min(32,parseInt(k.count,10)||0));if(!n){toast('Enter how many slots (1–32).');return}
     if(b.slots.length+n>64){toast('That’s more than 64 slots.');return}const base=String(k.name||'').trim()||'Slot {n}',from=b.slots.length+1;
     for(let i=0;i<n;i++)b.slots.push({n:base.includes('{n}')?base.replace(/\{n\}/g,String(from+i)):`${base} ${from+i}`,acc:String(k.acc||'').trim()});renderBuilder();toast(`Added ${plural(n,'slot')}.`)},
+  async bImgCut(el){const b=S.bld;if(!b)return;const i=+el.dataset.i,old=b.imgs[i];if(!old)return;el.disabled=true;el.textContent='…';
+    try{const r0=await fetch(imgSrc(old),{credentials:'same-origin'});if(!r0.ok)throw new Error('read');const blob=await r0.blob();
+      const r=await prepProductPhoto(blob,{clean:true});if(S.bld!==b){dropAssets([r.im]);return}
+      if(!r.cleaned){if(r.im.asset)dropAssets([r.im]);toast('This photo’s background isn’t plain enough to remove.');renderPhotos();return}
+      const at=b.imgs.indexOf(old);if(at<0){dropAssets([r.im]);return}b.imgs[at]=r.im;if(r.im.asset)b.up.push(r.im.asset);toast('Background removed. Save the product to keep it.')}
+    catch(e){toast('Couldn’t read that photo. It may be linked from the brand’s site; download it and add it here instead.')}
+    finally{renderPhotos()}},
   bImgDel(el){const b=S.bld;if(!b)return;b.imgs.splice(+el.dataset.i,1);renderPhotos()},
   bImgMain(el){const b=S.bld;if(!b)return;const [x]=b.imgs.splice(+el.dataset.i,1);b.imgs.unshift(x);renderPhotos()},
   bpClearAsk(){S.bld.clearAsk=true;renderBuilder()},
