@@ -1053,6 +1053,11 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .bmt tr.bmmod td{background:color-mix(in srgb,var(--sunk) 55%,transparent)}.bmt tfoot td{border-top:2px solid var(--line);font-weight:600}
 .field.inl{flex:0 0 auto;flex-direction:row;align-items:center;gap:6px}.field.inl .inp{width:180px}
 @media (max-width:640px){.field.inl{flex:1 1 100%}.field.inl .inp{width:auto;flex:1}.libcards{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px;gap:10px}}
+.pogrp+.pogrp{border-top:1px solid var(--line)}.pogh{display:flex;align-items:center;gap:10px;padding:12px 16px 4px;flex-wrap:wrap}
+.pot tr.podet>td{background:var(--sunk);padding:0}.podetail{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.pogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
+.pobrands{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.chip.Received{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}.chip.Partially-received{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -1245,6 +1250,7 @@ button:not(:disabled):active{filter:brightness(.92)}
     <section class="view" id="v-design" hidden></section>
     <section class="view" id="v-clients" hidden></section>
     <section class="view" id="v-library" hidden></section>
+    <section class="view" id="v-purchasing" hidden></section>
     <section class="view" id="v-proposal" hidden></section>
     <section class="view" id="v-projects" hidden></section>
     <section class="view" id="v-field" hidden></section>
@@ -1810,8 +1816,8 @@ const chip=s=>`<span class="chip ${esc(String(s).replace(/\s+/g,'-'))}">${esc(s)
 function renderProjSwitch(){const b=$('#pjsw');if(!b)return;
   b.innerHTML=`<label class="navgroup" for="pjSel">Project</label><select class="inp" id="pjSel" aria-label="Open project">${projOptions()}</select><button class="btn sm" data-act="newProject">+ New project</button>`}
 function projOptions(){return PJ.list.map(e=>{const pr=e.id===PJ.cur?S.prop:(e.prop||{});return `<option value="${e.id}" ${e.id===PJ.cur?'selected':''}>${esc([pr.client,pr.project].filter(Boolean).join(' · ')||'Untitled project')}</option>`}).join('')}
-function badges(){renderProjSwitch();{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}$('#bCl').textContent=S.clients.length;$('#bDesign').textContent=S.design.nodes.length;$('#bLib').textContent=lib.length;$('#bSvc').textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
-const VIEWS=['overview','assistant','design','clients','library','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
+function badges(){renderProjSwitch();{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}$('#bCl').textContent=S.clients.length;$('#bDesign').textContent=S.design.nodes.length;$('#bLib').textContent=lib.length;$('#bSvc').textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
+const VIEWS=['overview','assistant','design','clients','library','purchasing','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
 function go(v){
   if(v==='clients'&&S.view==='clients'&&S.ui.cpage){S.ui.cpage=null}
   if(!VIEWS.includes(v))v='overview';
@@ -3906,6 +3912,129 @@ function bindSR(){const f=$('#srFiles');if(f)f.addEventListener('change',e=>{srA
     dz.addEventListener('dragleave',()=>dz.classList.remove('dropping'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dropping');if(e.dataTransfer.files.length)srAddFiles(e.dataTransfer.files)})}
   const one=$('#srOne');if(one&&!one.dataset.b){one.dataset.b=1;one.addEventListener('change',e=>{const f=e.target.files[0],pid=e.target.dataset.pid;e.target.value='';if(!f)return;srQueue({file:f,name:f.name,pid});R.library();srRun()})}}
 
+/* ================= PURCHASING =================
+   Purchase orders come straight from the bill of materials: what's still to order is the BOM
+   minus everything already on a live PO, grouped by the vendor each brand is bought from.
+   POs are kept with the project (in its proposal record, so they save and sync with it);
+   vendors and the brand -> vendor map are firm-wide settings. */
+const PO_ST=['Draft','Sent','Partially received','Received','Cancelled'];
+const poAll=()=>{const P=S.prop;if(!P.purch||!Array.isArray(P.purch.pos))P.purch={pos:[]};return P.purch.pos};
+const vendors=()=>{if(!Array.isArray(SETTINGS.vendors))SETTINGS.vendors=[];return SETTINGS.vendors};
+const vendorOf=brand=>{const m=SETTINGS.brandVendor||{};return m[brand]||brand};
+const vendorRec=name=>vendors().find(v=>sameTxt(v.name,name))||null;
+const poTotal=po=>po.lines.reduce((s,l)=>s+(+l.cost||0)*(+l.qty||0),0);
+const poLive=po=>po.status!=='Cancelled';
+function poStatus(po){if(po.status==='Draft'||po.status==='Cancelled')return po.status;
+  const q=po.lines.reduce((s,l)=>s+(+l.qty||0),0),r=po.lines.reduce((s,l)=>s+Math.min(+l.rec||0,+l.qty||0),0);
+  return r<=0?'Sent':r>=q?'Received':'Partially received'}
+function poSync(po){po.status=poStatus(po);return po}
+/* every BOM line with what's on order and received across this project's live POs */
+function poNeeds(){
+  const on=new Map(),rec=new Map(),bo=new Map();
+  poAll().filter(poLive).forEach(po=>po.lines.forEach(l=>{on.set(l.pid,(on.get(l.pid)||0)+(+l.qty||0));rec.set(l.pid,(rec.get(l.pid)||0)+Math.min(+l.rec||0,+l.qty||0));if(l.bo&&po.status!=='Draft')bo.set(l.pid,(bo.get(l.pid)||0)+Math.max(0,(+l.qty||0)-(+l.rec||0)))}));
+  return bom().map(l=>({p:l.p,need:l.qty,on:on.get(l.p.id)||0,rec:rec.get(l.p.id)||0,bo:bo.get(l.p.id)||0,left:Math.max(0,l.qty-(on.get(l.p.id)||0)),vendor:vendorOf(l.p.mfr)}))}
+function poNextNo(){const P=S.prop,base=String(P.no||'0000').replace(/^P-?/i,'');const n=poAll().length+1;return `PO-${base}-${String(n).padStart(2,'0')}`}
+function poCreate(vendor,lines){const po={id:'po'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),no:poNextNo(),vendor,status:'Draft',created:isoDay(0),sent:null,eta:'',notes:'',
+  shipTo:SETTINGS.address||'',lines:lines.map(x=>({pid:x.p.id,mfr:x.p.mfr,model:x.p.model,desc:x.p.desc,qty:x.left,cost:+x.p.cost||0,rec:0,bo:false}))};
+  poAll().push(po);return po}
+R.purchasing=function(){
+  const el=$('#v-purchasing'),P=S.prop,needs=poNeeds(),pos=poAll(),open=S.ui.po;
+  pos.forEach(poSync);
+  const left=needs.filter(n=>n.left>0),groups=new Map();left.forEach(n=>{if(!groups.has(n.vendor))groups.set(n.vendor,[]);groups.get(n.vendor).push(n)});
+  const live=pos.filter(poLive),ordered=live.filter(p=>p.status!=='Draft').reduce((s,p)=>s+poTotal(p),0),
+    recVal=live.reduce((s,p)=>s+p.lines.reduce((a,l)=>a+Math.min(+l.rec||0,+l.qty||0)*(+l.cost||0),0),0),
+    toOrder=left.reduce((s,n)=>s+n.left*(+n.p.cost||0),0),boN=needs.reduce((s,n)=>s+n.bo,0);
+  const vSel=(brand)=>`<select class="inp" data-bv="${esc(brand)}" aria-label="Vendor for ${esc(brand)}" style="width:auto;min-width:150px"><option value="">${esc(brand)} (direct)</option>${vendors().map(v=>`<option ${vendorOf(brand)===v.name?'selected':''}>${esc(v.name)}</option>`).join('')}</select>`;
+  const brands=[...new Set(needs.map(n=>n.p.mfr))].sort();
+  const poRow=po=>{const st=poStatus(po),isOpen=open===po.id,v=vendorRec(po.vendor);
+    return `<tr class="click" data-act="poOpen" data-id="${po.id}"><td class="mono"><b>${esc(po.no)}</b></td><td>${esc(po.vendor)}</td><td>${chip(st)}${po.lines.some(l=>l.bo&&(+l.rec||0)<(+l.qty||0))&&st!=='Draft'?' <span class="chip Overdue">Backorder</span>':''}</td><td class="n">${po.lines.length}</td><td class="n">${money2(poTotal(po))}</td><td>${esc(po.eta?dayFmtIso(po.eta):'—')}</td><td><button class="btn sm" data-act="poOpen" data-id="${po.id}">${isOpen?'Close':'Open'}</button></td></tr>
+     ${isOpen?`<tr class="podet"><td colspan="7">${poDetailHTML(po,v)}</td></tr>`:''}`};
+  el.innerHTML=`
+  <header class="vh"><div><p class="eyebrow">${esc(P.client||'No client yet')} · ${esc(P.project||'')} · ${esc(P.no||'')}</p><h1>Purchasing</h1>
+   <p class="sub">Order the equipment on this project’s bill of materials, vendor by vendor, and check it in as it arrives.${P.status!=='Signed'&&P.status!=='Change order'?` <b>The proposal isn’t signed yet</b>, so you may want to wait before ordering.`:''}</p></div>
+   <div class="actions">${groups.size?`<button class="btn primary" data-act="poMakeAll">Create ${plural(groups.size,'purchase order')}</button>`:''}<button class="btn" data-act="poVendors">${S.ui.poVend?'Hide vendors':'Vendors'}</button></div></header>
+  <div class="schedcards">
+   <div class="panel kpi"><div class="l">Still to order</div><div class="v">${money(toOrder)}</div><div class="s"><span>${plural(left.reduce((s,n)=>s+n.left,0),'piece')}</span><span>${plural(groups.size,'vendor')}</span></div></div>
+   <div class="panel kpi"><div class="l">On order</div><div class="v">${money(ordered)}</div><div class="s"><span>${plural(live.filter(p=>p.status!=='Draft').length,'PO')} sent</span><span>${plural(live.filter(p=>p.status==='Draft').length,'draft')}</span></div></div>
+   <div class="panel kpi"><div class="l">Received</div><div class="v">${money(recVal)}</div><div class="s"><span>${ordered?Math.round(recVal/ordered*100):0}% of what’s ordered</span>${boN?`<span class="bad">${plural(boN,'piece')} backordered</span>`:''}</div></div>
+  </div>
+  ${S.ui.poVend?poVendorsHTML(brands,vSel):''}
+  <div class="panel"><div class="ph"><h2>To order</h2><span class="muted" style="font-size:12px">From the bill of materials, less what’s already on a purchase order</span></div>
+   ${groups.size?[...groups].map(([vn,ns])=>`<div class="pogrp"><div class="pogh"><b>${esc(vn)}</b><span class="muted sm">${plural(ns.length,'line')} · ${money2(ns.reduce((s,n)=>s+n.left*(+n.p.cost||0),0))}</span><span class="tgrow"></span><button class="btn sm primary" data-act="poMake" data-v="${esc(vn)}">Create PO</button></div>
+     <div class="scroll"><table class="t"><thead><tr><th class="n">To order</th><th><span class="sr">Photo</span></th><th>Product</th><th class="n">In BOM</th><th class="n">On order</th><th class="n">Dealer</th><th class="n">Extended</th></tr></thead><tbody>
+     ${ns.map(n=>`<tr><td class="n"><b>${n.left}</b></td><td class="thumbcell">${thumb(n.p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><b>${esc(n.p.model)}</b> <span class="muted">${esc(n.p.mfr)}</span><br><span class="muted sm">${esc(clip(n.p.desc,80))}</span></td><td class="n">${n.need}</td><td class="n">${n.on||'—'}</td><td class="n">${money2(n.p.cost)}</td><td class="n">${money2(n.left*(+n.p.cost||0))}</td></tr>`).join('')}
+     </tbody></table></div></div>`).join('')
+    :`<div class="pb"><p class="muted">${needs.length?'Everything on the bill of materials is on a purchase order.':'Nothing on the bill of materials yet. Place devices on the drawings first.'}</p></div>`}</div>
+  <div class="panel"><div class="ph"><h2>Purchase orders</h2><span class="muted" style="font-size:12px">${plural(pos.length,'PO')}</span></div>
+   ${pos.length?`<div class="scroll"><table class="t pot"><thead><tr><th>PO</th><th>Vendor</th><th>Status</th><th class="n">Lines</th><th class="n">Total</th><th>Expected</th><th></th></tr></thead><tbody>${pos.slice().reverse().map(poRow).join('')}</tbody></table></div>`
+    :'<div class="pb"><p class="muted">No purchase orders yet. Create them from the list above.</p></div>'}</div>`;
+  bindPO()};
+function poDetailHTML(po,v){const st=poStatus(po),draft=st==='Draft',done=st==='Cancelled';
+  return `<div class="podetail">
+   <div class="pogrid">
+    <div><p class="eyebrow">Vendor</p><b>${esc(po.vendor)}</b>${v?`<br><span class="muted sm">${esc([v.contact,v.email,v.phone].filter(Boolean).join(' · '))}${v.account?` · Acct ${esc(v.account)}`:''}</span>`:`<br><span class="muted sm">No contact saved. Add one under Vendors.</span>`}</div>
+    <label class="field" for="poEta-${po.id}">Expected<input class="inp" type="date" id="poEta-${po.id}" data-pof="eta" data-id="${po.id}" value="${esc(po.eta||'')}" ${done?'disabled':''}></label>
+    <label class="field" for="poShip-${po.id}">Ship to<input class="inp" id="poShip-${po.id}" data-pof="shipTo" data-id="${po.id}" value="${esc(po.shipTo||'')}" ${draft?'':'disabled'}></label>
+    <label class="field" for="poNotes-${po.id}" style="grid-column:1/-1">Notes for the vendor<input class="inp" id="poNotes-${po.id}" data-pof="notes" data-id="${po.id}" value="${esc(po.notes||'')}" placeholder="Job name, delivery window, tag each box with the PO number" ${draft?'':'disabled'}></label>
+   </div>
+   <div class="scroll"><table class="t"><thead><tr><th>Product</th><th class="n">Qty</th><th class="n">Unit</th><th class="n">Extended</th>${draft?'<th></th>':'<th class="n">Received</th><th>Backorder</th>'}</tr></thead><tbody>
+    ${po.lines.map((l,i)=>`<tr><td><b>${esc(l.model)}</b> <span class="muted">${esc(l.mfr)}</span><br><span class="muted sm">${esc(clip(l.desc,70))}</span></td>
+     <td class="n">${draft?`<input class="cellin num" type="number" min="1" step="1" data-pol="qty" data-id="${po.id}" data-i="${i}" value="${l.qty}" style="width:64px" aria-label="Quantity of ${esc(l.model)}">`:l.qty}</td>
+     <td class="n">${draft?`<input class="cellin num" type="number" min="0" step="0.01" data-pol="cost" data-id="${po.id}" data-i="${i}" value="${(+l.cost||0).toFixed(2)}" style="width:92px" aria-label="Unit cost of ${esc(l.model)}">`:money2(l.cost)}</td>
+     <td class="n">${money2((+l.cost||0)*(+l.qty||0))}</td>
+     ${draft?`<td><button class="lnk" data-act="poLineDel" data-id="${po.id}" data-i="${i}">remove</button></td>`
+      :`<td class="n">${done?(+l.rec||0):`<input class="cellin num" type="number" min="0" max="${l.qty}" step="1" data-pol="rec" data-id="${po.id}" data-i="${i}" value="${+l.rec||0}" style="width:64px" aria-label="Received of ${esc(l.model)}"> <span class="muted sm">of ${l.qty}</span>`}</td>
+        <td>${(+l.rec||0)>=(+l.qty||0)?'<span class="muted sm">—</span>':`<label class="check"><input type="checkbox" data-pol="bo" data-id="${po.id}" data-i="${i}" ${l.bo?'checked':''} ${done?'disabled':''}> <span>Backordered</span></label>`}</td>`}</tr>`).join('')}
+   </tbody><tfoot><tr><td colspan="3" class="n">Total</td><td class="n"><b>${money2(poTotal(po))}</b></td><td colspan="${draft?1:2}"></td></tr></tfoot></table></div>
+   <div class="actions" style="flex-wrap:wrap">
+    <button class="btn" data-act="poPdf" data-id="${po.id}">Download PDF</button>
+    ${draft?`<button class="btn primary" data-act="poSend" data-id="${po.id}">Mark as sent</button>${v&&v.email?`<a class="btn" href="mailto:${esc(v.email)}?subject=${encodeURIComponent(`Purchase order ${po.no} · ${firm()}`)}&body=${encodeURIComponent(`Hello${v.contact?' '+v.contact:''},\n\nPlease find purchase order ${po.no} attached for ${S.prop.project||'our project'}.\nTotal: ${money2(poTotal(po))}\n\nPlease confirm pricing and ship dates.\n\nThank you,\n${firm()}`)}">Email ${esc(v.email)}</a>`:''}<button class="btn danger" data-act="poDel" data-id="${po.id}">Delete draft</button>`
+     :done?`<button class="btn" data-act="poReopen" data-id="${po.id}">Restore</button>`
+     :`<button class="btn primary" data-act="poRecvAll" data-id="${po.id}" ${st==='Received'?'disabled':''}>Receive everything</button><button class="btn" data-act="poCancel" data-id="${po.id}">Cancel PO</button>`}
+    <span class="muted sm">${po.sent?`Sent ${esc(dayFmtIso(po.sent))}`:`Created ${esc(dayFmtIso(po.created))}`}</span>
+   </div></div>`}
+function poVendorsHTML(brands,vSel){const vs=vendors();
+  return `<div class="panel"><div class="ph"><h2>Vendors</h2><span class="muted" style="font-size:12px">Saved for every project</span><span class="tgrow"></span><button class="btn sm" data-act="vendAdd">+ Add vendor</button></div>
+   <div class="scroll"><table class="t"><thead><tr><th>Vendor</th><th>Contact</th><th>Email</th><th>Phone</th><th>Account no.</th><th></th></tr></thead><tbody>
+    ${vs.map((v,i)=>`<tr>${['name','contact','email','phone','account'].map(k=>`<td><input class="cellin" data-vend="${k}" data-i="${i}" value="${esc(v[k]||'')}" aria-label="Vendor ${k}" ${k==='email'?'type="email"':''}></td>`).join('')}<td><button class="lnk" data-act="vendDel" data-i="${i}">remove</button></td></tr>`).join('')||'<tr><td colspan="6" class="muted">No vendors yet. Add the distributors you buy from (ADI, Snap One, a brand’s direct desk).</td></tr>'}
+   </tbody></table></div>
+   ${brands.length?`<div class="pb"><p class="eyebrow" style="margin:0 0 8px">Who each brand is bought from</p><div class="pobrands">${brands.map(b=>`<label class="field">${esc(b)}${vSel(b)}</label>`).join('')}</div></div>`:''}</div>`}
+function bindPO(){const el=$('#v-purchasing');if(!el||el.dataset.b)return;el.dataset.b=1;
+  el.addEventListener('change',e=>{const t=e.target;
+    if(t.dataset.bv!==undefined){SETTINGS.brandVendor=SETTINGS.brandVendor||{};if(t.value)SETTINGS.brandVendor[t.dataset.bv]=t.value;else delete SETTINGS.brandVendor[t.dataset.bv];saveSettings();R.purchasing();return}
+    if(t.dataset.vend){const v=vendors()[+t.dataset.i];if(!v)return;const old=v.name;v[t.dataset.vend]=t.value.trim();
+      if(t.dataset.vend==='name'&&old&&v.name&&old!==v.name){const m=SETTINGS.brandVendor||{};Object.keys(m).forEach(b=>{if(m[b]===old)m[b]=v.name})}
+      saveSettings();if(t.dataset.vend==='name')R.purchasing();return}
+    const po=t.dataset.id&&poAll().find(p=>p.id===t.dataset.id);if(!po)return;
+    if(t.dataset.pof){po[t.dataset.pof]=t.value;saveProjects();if(t.dataset.pof==='eta')R.purchasing();return}
+    if(t.dataset.pol){const l=po.lines[+t.dataset.i];if(!l)return;const k=t.dataset.pol;
+      if(k==='bo')l.bo=t.checked;else if(k==='qty')l.qty=Math.max(1,Math.round(+t.value||1));else if(k==='cost')l.cost=Math.max(0,+t.value||0);else if(k==='rec')l.rec=Math.max(0,Math.min(l.qty,Math.round(+t.value||0)));
+      if(k==='rec'&&l.rec>=l.qty)l.bo=false;
+      const was=po.status;poSync(po);saveProjects();R.purchasing();if(k==='rec'&&po.status==='Received'&&was!=='Received')toast(`${po.no} is fully received.`)}})}
+async function poPdf(po){
+  await loadPdfLibs();const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'pt',format:'letter',orientation:'portrait',compress:true}),P=S.prop,v=vendorRec(po.vendor);
+  const INK=[23,33,44],MUTED=[100,112,125],M=48,PW=612;
+  const LX=logoSrc()?M+50:M;if(logoSrc()){try{doc.addImage(logoSrc(),'PNG',M,42,40,40)}catch(_){}}
+  doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text(pt(firm().toUpperCase()),LX,62);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text(pt(contactLine()),LX,76);
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);doc.text('PURCHASE ORDER',PW-M,58,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(9);
+  [['PO number',po.no],['Date',dayFmtIso(po.sent||po.created)],['Project',clip(P.project||'',34)],['Our ref.',P.no||'']].forEach(([k,val],i)=>{doc.setTextColor(...MUTED);doc.text(pt(k),PW-M-150,76+i*13);doc.setTextColor(...INK);doc.text(pt(val||'—'),PW-M,76+i*13,{align:'right'})});
+  let y=140;doc.setDrawColor(214,220,227);doc.line(M,y-14,PW-M,y-14);
+  const block=(x,title,lines)=>{doc.setFontSize(7);doc.setTextColor(...MUTED);doc.text(title,x,y);doc.setFontSize(10);doc.setTextColor(...INK);lines.filter(Boolean).forEach((l,i)=>{doc.setFont('helvetica',i?'normal':'bold');doc.text(pt(clip(l,48)),x,y+15+i*13)});doc.setFont('helvetica','normal')};
+  block(M,'VENDOR',[po.vendor,v&&v.contact,v&&v.email,v&&v.phone,v&&v.account?`Account ${v.account}`:'']);
+  block(PW/2+10,'SHIP TO',[firm(),...(po.shipTo||'').split(/\n|,\s*(?=\S)/).slice(0,3),P.client?`Job: ${P.client}${P.project?' - '+P.project:''}`:'']);
+  doc.autoTable({startY:y+92,margin:{left:M,right:M},head:[['#','Qty','Manufacturer','Model','Description','Unit','Extended']],
+    body:po.lines.map((l,i)=>[String(i+1),String(l.qty),pt(l.mfr),pt(l.model),pt(l.desc),money2(l.cost),money2((+l.cost||0)*(+l.qty||0))]),
+    foot:[['','','','','Total','',money2(poTotal(po))]],theme:'striped',styles:{fontSize:8.5,cellPadding:4},headStyles:{fillColor:INK},footStyles:{fillColor:[236,240,244],textColor:INK,fontStyle:'bold'},
+    columnStyles:{0:{cellWidth:22,halign:'right'},1:{cellWidth:30,halign:'right'},5:{halign:'right'},6:{halign:'right'}}});
+  let y2=doc.lastAutoTable.finalY+22;doc.setFontSize(9);doc.setTextColor(...INK);
+  if(po.notes){doc.setFont('helvetica','bold');doc.text('Notes',M,y2);doc.setFont('helvetica','normal');doc.text(doc.splitTextToSize(pt(po.notes),PW-2*M),M,y2+13);y2+=34}
+  if(po.eta){doc.text(pt(`Requested delivery: ${dayFmtIso(po.eta)}`),M,y2);y2+=16}
+  doc.setTextColor(...MUTED);doc.setFontSize(8);doc.text(pt(`Please show ${po.no} on every invoice, packing slip and box. Confirm pricing and ship dates by replying to ${SETTINGS.email||firm()}.`),M,Math.min(y2+10,760));
+  const blob=doc.output('blob'),r=await saveFile(blob,`${po.no} ${po.vendor}.pdf`.replace(/[\\/:*?"<>|]+/g,' '));
+  toast(r==='saved'?'PDF ready.':r==='declined'?'Download cancelled.':'PDF ready.')}
+
 /* ================= PROPOSAL ================= */
 /* ---------- drawing set attached to proposals ----------
    Captured when the proposal is sent (and again on a change order), so the client sees the sheets exactly as proposed. */
@@ -4655,7 +4784,7 @@ const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-h
 const NAVL=[
  {top:'av:overview|Dashboard',icon:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>'},
  {sec:'clients',title:'Clients & billing',icon:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h10"/>',items:['av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals', 'av:billing|Time & invoicing|#bTime', 'nl:billing|Network time & billing']},
- {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:field|Field app|Mobile']},
+ {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
  {sec:'support',title:'Service',icon:'<path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1"/><rect x="17" y="13" width="4" height="6" rx="1"/>',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
  {net:true},
  {sec:'physical',title:'Physical',icon:'<rect x="4" y="3" width="16" height="7" rx="1"/><rect x="4" y="14" width="16" height="7" rx="1"/><path d="M8 6.5h.01M8 17.5h.01"/>',items:['nl:sites', 'nl:plans', 'nl:devices', 'nl:racks', 'nl:power', 'nl:cabling', 'nl:jacks', 'nl:lifecycle', 'nl:discover', 'nl:inventory|Site inventory']},
@@ -5107,6 +5236,19 @@ const A={
     (async()=>{if(ASSETS&&it.file){try{p.spec=(await ASSETS.upload(it.file,{type:it.file.type||'application/pdf'})).id}catch(e){}}lib.push(p);it.pid=p.id;it.added=true;it.st='done';it.msg=`Added · ${srSummary(it.rec)} · add its dealer cost`;save();badges();srPaint()})()},
   srRetry(el){const it=S.sr&&S.sr.items.find(i=>i.id===+el.dataset.i);if(!it)return;it.st='wait';it.msg='';srPaint();srRun()},
   srDrop(el){if(!S.sr)return;S.sr.items=S.sr.items.filter(i=>i.id!==+el.dataset.i);srPaint()},
+  poOpen(el){S.ui.po=S.ui.po===el.dataset.id?null:el.dataset.id;R.purchasing()},
+  poMake(el){const v=el.dataset.v,ls=poNeeds().filter(n=>n.left>0&&n.vendor===v);if(!ls.length)return;const po=poCreate(v,ls);S.ui.po=po.id;saveProjects();badges();R.purchasing();toast(`${po.no} drafted for ${v}. Check quantities and prices, then download it or mark it sent.`)},
+  poMakeAll(){const g=new Map();poNeeds().filter(n=>n.left>0).forEach(n=>{if(!g.has(n.vendor))g.set(n.vendor,[]);g.get(n.vendor).push(n)});const made=[...g].map(([v,ls])=>poCreate(v,ls));S.ui.po=made.length===1?made[0].id:null;saveProjects();badges();R.purchasing();toast(`${plural(made.length,'draft purchase order')} created.`)},
+  poVendors(){S.ui.poVend=!S.ui.poVend;R.purchasing()},
+  poSend(el){const po=poAll().find(p=>p.id===el.dataset.id);if(!po||!po.lines.length)return;po.status='Sent';po.sent=isoDay(0);poSync(po);saveProjects();badges();R.purchasing();toast(`${po.no} marked as sent.`)},
+  poDel(el){const P=S.prop;P.purch.pos=poAll().filter(p=>p.id!==el.dataset.id);S.ui.po=null;saveProjects();badges();R.purchasing();toast('Draft deleted.')},
+  poCancel(el){const po=poAll().find(p=>p.id===el.dataset.id);if(!po)return;po.status='Cancelled';saveProjects();badges();R.purchasing();toast(`${po.no} cancelled. Its items are back on the to-order list.`)},
+  poReopen(el){const po=poAll().find(p=>p.id===el.dataset.id);if(!po)return;po.status=po.sent?'Sent':'Draft';poSync(po);saveProjects();badges();R.purchasing()},
+  poRecvAll(el){const po=poAll().find(p=>p.id===el.dataset.id);if(!po)return;po.lines.forEach(l=>{l.rec=l.qty;l.bo=false});poSync(po);saveProjects();badges();R.purchasing();toast(`${po.no} is fully received.`)},
+  poLineDel(el){const po=poAll().find(p=>p.id===el.dataset.id);if(!po)return;po.lines.splice(+el.dataset.i,1);if(!po.lines.length){S.prop.purch.pos=poAll().filter(p=>p!==po);S.ui.po=null}saveProjects();R.purchasing()},
+  poPdf(el){const po=poAll().find(p=>p.id===el.dataset.id);if(po)poPdf(po).catch(()=>toast('Couldn’t build the PDF. Check your connection and try again.'))},
+  vendAdd(){vendors().push({name:'New vendor',contact:'',email:'',phone:'',account:''});saveSettings();S.ui.poVend=true;R.purchasing();requestAnimationFrame(()=>{const i=document.querySelector(`[data-vend="name"][data-i="${vendors().length-1}"]`);if(i){i.focus();i.select()}})},
+  vendDel(el){const v=vendors()[+el.dataset.i];if(!v)return;vendors().splice(+el.dataset.i,1);const m=SETTINGS.brandVendor||{};Object.keys(m).forEach(b=>{if(m[b]===v.name)delete m[b]});saveSettings();R.purchasing()},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -5299,7 +5441,7 @@ const A={
   svStep(el){if(!S.sv)return;S.sv.i=Math.max(0,Math.min(S.sv.set.sheets.length-1,S.sv.i+ +el.dataset.d));renderSheetViewer()},
   svClose(){S.sv=null;renderSheetViewer()},
   clearSig(){const c=$('#sigPad');c.getContext('2d').clearRect(0,0,c.width,c.height);sigInk=false;checkSign()},
-  signProp(){const P=S.prop,name=$('#sigName').value.trim(),q=quote();const wasCO=P.status==='Change order';P.status='Signed';P.signer=name;P.signedTotal=q.total;plog(`${wasCO?'Change order signed':'Signed'} by ${esc(name)} for ${money2(q.total)}`);closeOverlay();toast('Signed. The project board is ready.')},
+  signProp(){const P=S.prop,name=$('#sigName').value.trim(),q=quote();const wasCO=P.status==='Change order';P.status='Signed';P.signer=name;P.signedTotal=q.total;plog(`${wasCO?'Change order signed':'Signed'} by ${esc(name)} for ${money2(q.total)}`);closeOverlay();toast('Signed. The project board is ready, and the equipment can be ordered under Purchasing.')},
   changeOrder(){const P=S.prop,q=quote();P.drawings=drawingSet();P.sowSent=sowSections();plog(`Updated drawing set attached: ${esc(sheetList(P.drawings))} (rev ${esc(P.drawings.rev)})`);saveProjects();plog(`Change order sent: ${q.total>P.signedTotal?'+':'−'}${money2(Math.abs(q.total-P.signedTotal))}`);P.status='Change order';propParts();toast('Change order sent for signature.')},
   mvTask(el){const t=S.tasks.find(x=>x.id===el.dataset.id),i=COLS.findIndex(c=>c[0]===t.col)+ +el.dataset.d;if(i<0||i>=COLS.length)return;t.col=COLS[i][0];if(t.col!=='blocked')delete t.note;saveProjects();R.projects()},
   logTime(){if(!S.tasks.length){toast('Add a task first.');return}const h=parseFloat($('#tHrs').value);if(!(h>0)){toast('Enter hours greater than zero.');return}S.time.push(tbNorm({task:$('#tTask').value,type:$('#tType').value,hrs:h,who:$('#tWho').value,day:isoDay(0)},curPj()));saveProjects();R.projects();toast(`Logged ${h} h.`)},
