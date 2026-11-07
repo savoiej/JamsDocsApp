@@ -9259,7 +9259,7 @@ Internet  10.10.10.40             2   0024.a5b1.0098  ARPA   Vlan10
 `}
 
 /* ---------- QR, labels, field view, photos ---------- */
-const APP_URL=EMB?.appUrl||'https://claude.ai/artifact/HTnSSukvAoNNfVikhxhhqs';
+const APP_URL=EMB?.appUrl||'https://claude.ai/artifact/1du4BSTFvnCX4tamvmsKuG';
 const TK={devices:'d',assets:'a',cables:'c',racks:'r'};
 function parseScan(h){const m=String(h||'').match(/^#?scan-([A-Za-z0-9]+)-([dacr])-([A-Za-z0-9-]+)$/);return m?{pid:m[1],t:{d:'devices',a:'assets',c:'cables',r:'racks'}[m[2]],id:m[3].replace(/-/g,'_')}:null}
 const scanURL=(t,o)=>`${APP_URL}#scan-${S.pid}-${TK[t]}-${String(o.id).replace(/_/g,'-')}`;
