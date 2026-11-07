@@ -1030,6 +1030,29 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .attn li small{display:block;color:var(--muted);font-size:13px}
 /* draggable items: "all:unset" also clears the browser's drag setting, so turn it back on */
 [draggable="true"]{-webkit-user-drag:element;user-select:none;-webkit-user-select:none}@media (hover:hover) and (pointer:fine){[draggable="true"]:hover{-webkit-user-drag:element;user-select:none;-webkit-user-select:none}}
+.pldrop{border:1.5px dashed var(--line);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;background:var(--sunk)}
+.pldrop.dropping,#plPanel.dropping{border-color:var(--accent);background:var(--accent-soft)}
+.plsteps{display:flex;flex-direction:column;gap:20px}.plstep{display:flex;flex-direction:column;gap:10px;min-width:0}.plstep+.plstep{border-top:1px solid var(--line);padding-top:16px}
+.plstep h3{margin:0;font-size:14px;display:flex;align-items:center;gap:8px}
+.plno{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700}
+.plgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.plfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.plimg-n{font-size:11px;color:var(--accent);font-weight:600;white-space:nowrap}
+.libcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;padding:14px}
+.libcard{display:flex;flex-direction:column;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0;overflow:hidden;cursor:pointer;font:inherit;color:inherit;transition:transform 160ms ease-out,border-color 160ms}
+@media (hover:hover) and (pointer:fine){.libcard:hover{border-color:var(--accent);transform:translateY(-2px)}}
+.libcard:active{transform:scale(.98)}.libcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lcimg{aspect-ratio:4/3;background:#fff;display:grid;place-items:center;border-bottom:1px solid var(--line);overflow:hidden}
+.lcimg img{width:100%;height:100%;object-fit:contain;padding:10px;box-sizing:border-box}
+.lcnone{font-size:28px;font-weight:700;color:#9aa3ad}
+.lcb{display:flex;flex-direction:column;gap:3px;padding:10px 12px 12px;min-width:0}.lcm{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:2px}
+.lcd{font-size:12px;color:var(--muted);line-height:1.35}
+.lcp{display:flex;gap:16px;margin-top:6px;font-weight:600;font-size:13px}.lcp small{display:block;font-weight:500;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.bmadd{display:flex;flex-direction:column;gap:8px}.bmaddlist{display:flex;flex-direction:column;gap:6px}
+.bmhit{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--line);border-radius:8px}.bmhit .grow{flex:1;min-width:0}
+.bmt tr.bmmod td{background:color-mix(in srgb,var(--sunk) 55%,transparent)}.bmt tfoot td{border-top:2px solid var(--line);font-weight:600}
+.field.inl{flex:0 0 auto;flex-direction:row;align-items:center;gap:6px}.field.inl .inp{width:180px}
+@media (max-width:640px){.field.inl{flex:1 1 100%}.field.inl .inp{width:auto;flex:1}.libcards{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px;gap:10px}}
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -1351,9 +1374,10 @@ const DEFAULT_META2={dwg:'E-201',title:'Rack elevations'};
 const DEFAULT_META3={dwg:'E-301',title:'Floor plan'};
 const DEFAULT_META4={dwg:'E-401',title:'Cable schedule'};
 const DEFAULT_META5={dwg:'E-202',title:'Patch panels'};
+const DEFAULT_META6={dwg:'E-501',title:'Bill of materials',price:'none'};
 const S={
   view:'overview',
-  design:{nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta:{...DEFAULT_META},meta2:{...DEFAULT_META2},meta3:{...DEFAULT_META3},meta4:{...DEFAULT_META4},meta5:{...DEFAULT_META5},plan:null},
+  design:{nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta:{...DEFAULT_META},meta2:{...DEFAULT_META2},meta3:{...DEFAULT_META3},meta4:{...DEFAULT_META4},meta5:{...DEFAULT_META5},meta6:{...DEFAULT_META6},plan:null},
   ui:{route:'curved',labels:'mid',hide:{},tab:'props',sheet:'flow',cov:true,runs:true},
   sel:null,wire:null,drag:null,rdrag:null,pdrag:null,planTool:null,pan:null,bld:null,
   prop:{no:'P-'+new Date().getFullYear()+'-0001',client:'',project:'First project',markup:35,laborMethod:'hours',laborRate:115,laborPct:18,tax:4.712,status:'Draft',log:[],signedTotal:null,signer:null,link:null},
@@ -1391,7 +1415,7 @@ function normDesign(d){if(!d||!Array.isArray(d.nodes))return null;const o={d};
   o.d.meta=Object.assign({...DEFAULT_META},o.d.meta||{});o.d.meta2=Object.assign({...DEFAULT_META2},o.d.meta2||{});
   o.d.extras=o.d.extras||[];o.d.seq=o.d.seq||{};o.d.racks=o.d.racks||[];
   o.d.meta3=Object.assign({...DEFAULT_META3},o.d.meta3||{});o.d.meta4=Object.assign({...DEFAULT_META4},o.d.meta4||{});
-  o.d.meta5=Object.assign({...DEFAULT_META5},o.d.meta5||{});o.d.panels=Array.isArray(o.d.panels)?o.d.panels:[];o.d.panels.forEach(p=>{p.map=p.map||{}});if(!o.d.plan)o.d.plan=newPlan(S.prop.project,6,4.5);
+  o.d.meta5=Object.assign({...DEFAULT_META5},o.d.meta5||{});o.d.meta6=Object.assign({...DEFAULT_META6},o.d.meta6||{});o.d.panels=Array.isArray(o.d.panels)?o.d.panels:[];o.d.panels.forEach(p=>{p.map=p.map||{}});if(!o.d.plan)o.d.plan=newPlan(S.prop.project,6,4.5);
   return o.d}
 function loadSaved(){try{const raw=localStorage.getItem(KEY);if(!raw)return false;const o=JSON.parse(raw);
   (o.lib||[]).forEach(p=>{if(!byId(p.id))lib.push(p)});
@@ -1454,7 +1478,7 @@ function switchProject(id){
   if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
   cleanRacks();tkNormAll();
   H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.padd=false;S.ui.pform=null;
-  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch)c.init=false});
+  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom)c.init=false});
   save();return true}
 function createProject(f){
   const cur=curPj(),base=S.prop,src=f.start==='copy'?JSON.parse(JSON.stringify(S.design)):null,srcU=uidc;
@@ -1468,7 +1492,7 @@ function createProject(f){
   else{S.design=JSON.parse(JSON.stringify(S.design));loadTemplate(f.start);const r=S.design.racks[0];if(r&&+f.rack>r.size){r.size=+f.rack;if(f.start!=='blank')autoArrange(r)}if(f.start==='blank'&&r)r.name='Equipment rack'}
   S.design.meta.rev='A';
   H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.sheet='flow';
-  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch)c.init=false});
+  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom)c.init=false});
   save();return e}
 
 /* ---------- signal-flow model ---------- */
@@ -1724,8 +1748,8 @@ function deviceOptions(){const tg=tags(),out=[];
   return out.sort((a,b)=>tg[a.ep.uid].localeCompare(tg[b.ep.uid],undefined,{numeric:true})||(a.t==='net'?0:1)-(b.t==='net'?0:1))}
 
 function loadTemplate(kind){
-  const meta=S.design.meta||{...DEFAULT_META},meta2=S.design.meta2||{...DEFAULT_META2},meta3=S.design.meta3||{...DEFAULT_META3},meta4=S.design.meta4||{...DEFAULT_META4},meta5=S.design.meta5||{...DEFAULT_META5};
-  S.design={nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta,meta2,meta3,meta4,meta5,plan:newPlan(S.prop.project,6,4.5)};S.sel=null;S.wire=null;S.planTool=null;
+  const meta=S.design.meta||{...DEFAULT_META},meta2=S.design.meta2||{...DEFAULT_META2},meta3=S.design.meta3||{...DEFAULT_META3},meta4=S.design.meta4||{...DEFAULT_META4},meta5=S.design.meta5||{...DEFAULT_META5},meta6=S.design.meta6||{...DEFAULT_META6};
+  S.design={nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta,meta2,meta3,meta4,meta5,meta6,plan:newPlan(S.prop.project,6,4.5)};S.sel=null;S.wire=null;S.planTool=null;
   const a=(pid,x,y)=>{const n={uid:nid(),pid,x,y};S.design.nodes.push(n);return n.uid};
   const at=(uid,xm,ym,rot)=>{node(uid).fp={x:RO.x+xm*100,y:RO.y+ym*100,rot:rot||0}};
   const c=(au,ai,bu,bi)=>connectRaw({uid:au,dir:'out',i:ai},{uid:bu,dir:'in',i:bi});
@@ -1845,7 +1869,7 @@ R.overview=function(){
 };
 
 /* ================= DESIGN EDITOR ================= */
-const cams={flow:{x:0,y:0,k:1,init:false},rack:{x:0,y:0,k:1,init:false},plan:{x:0,y:0,k:1,init:false},sched:{x:0,y:0,k:1,init:true},patch:{x:0,y:0,k:1,init:true}};
+const cams={flow:{x:0,y:0,k:1,init:false},rack:{x:0,y:0,k:1,init:false},plan:{x:0,y:0,k:1,init:false},sched:{x:0,y:0,k:1,init:true},patch:{x:0,y:0,k:1,init:true},bom:{x:0,y:0,k:1,init:true}};
 let cam=cams.flow;
 const ptrs=new Map();let pinch=null;
 const isSel=(k,id)=>S.sel&&S.sel.kind===k&&S.sel.id===id;
@@ -1858,24 +1882,26 @@ const onPatch=()=>S.ui.sheet==='patch';
 R.design=function(){R.design0();fsApply()};
 R.design0=function(){
   cam=cams[S.ui.sheet]||cams.flow;
-  const m=S.design.meta,m2=S.design.meta2,m3=S.design.meta3,m4=S.design.meta4,m5=S.design.meta5,rk=onRack(),pn=onPlan(),sc=onSched(),pp=onPatch(),cur=rk?m2:pn?m3:sc?m4:pp?m5:m;
+  if(!S.design.meta6)S.design.meta6={...DEFAULT_META6};
+  const m=S.design.meta,m2=S.design.meta2,m3=S.design.meta3,m4=S.design.meta4,m5=S.design.meta5,m6=S.design.meta6,rk=onRack(),pn=onPlan(),sc=onSched(),pp=onPatch(),bm=onBom(),cur=rk?m2:pn?m3:sc?m4:pp?m5:bm?m6:m;
   $('#v-design').innerHTML=`
   <header class="vh"><div><p class="eyebrow">${esc(cliName(S.prop))} · ${esc(S.prop.project)} · DWG ${esc(cur.dwg)} rev ${esc(m.rev)}</p><h1>${esc(cur.title)}</h1></div>
    <div class="actions">
     <select class="inp" id="tplSel" aria-label="Room template" style="width:auto"><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="blank">Blank drawing set</option></select>
     <button class="btn" data-act="loadTpl">Load</button>
-    ${rk||pn||sc||pp?'':'<button class="btn" data-act="newBlock">New device block</button>'}
+    ${rk||pn||sc||pp||bm?'':'<button class="btn" data-act="newBlock">New device block</button>'}
     <button class="btn" data-act="fsToggle" title="Work on this sheet full screen (F)">⤢ Full screen</button>
     <button class="btn primary" data-go="proposal">Build proposal →</button></div></header>
-  ${fsBarHTML(cur,!(sc||pp))}
+  ${fsBarHTML(cur,!(sc||pp||bm))}
   <div class="sheets" role="tablist" aria-label="Drawing sheets">
-   <button role="tab" data-sheet="flow" aria-selected="${!rk&&!pn&&!sc&&!pp}"><span>${esc(m.dwg)}</span><b>${esc(m.title)}</b></button>
+   <button role="tab" data-sheet="flow" aria-selected="${!rk&&!pn&&!sc&&!pp&&!bm}"><span>${esc(m.dwg)}</span><b>${esc(m.title)}</b></button>
    <button role="tab" data-sheet="rack" aria-selected="${rk}"><span>${esc(m2.dwg)}</span><b>${esc(m2.title)}</b></button>
    <button role="tab" data-sheet="patch" aria-selected="${pp}"><span>${esc(m5.dwg)}</span><b>${esc(m5.title)}</b></button>
    <button role="tab" data-sheet="plan" aria-selected="${pn}"><span>${esc(m3.dwg)}</span><b>${esc(m3.title)}</b></button>
    <button role="tab" data-sheet="sched" aria-selected="${sc}"><span>${esc(m4.dwg)}</span><b>${esc(m4.title)}</b></button>
+   <button role="tab" data-sheet="bom" aria-selected="${bm}"><span>${esc(m6.dwg)}</span><b>${esc(m6.title)}</b></button>
   </div>
-  ${sc?schedShellHTML():pp?patchShellHTML():`<div class="dgrid">
+  ${sc?schedShellHTML():pp?patchShellHTML():bm?bomShellHTML():`<div class="dgrid">
    <aside class="panel pal"><div class="ph"><h2>${rk?'Rack equipment':pn?'Room devices':'Devices'}</h2><span class="muted" style="font-size:12px">${rk?'Drag onto a rack':pn?'Drag onto the plan':'Drag onto sheet'}</span></div><div class="pb">
     <input class="inp" id="palQ" placeholder="${rk?'Search rack gear':pn?'Search devices and racks':'Search model, brand, type'}" aria-label="Search devices">
     <div class="palList" id="palList"></div>
@@ -1898,6 +1924,7 @@ R.design0=function(){
   </div>`}`;
   if(sc){bindSched();renderSched();return}
   if(pp){renderPatch();return}
+  if(bm){bindBom();renderBom();return}
   renderToolbar();renderPal();renderCanvas();renderInspector();renderRackConn();applyCam();
   const sv=$('#cv');
   sv.addEventListener('pointerdown',onDown);
@@ -1920,7 +1947,7 @@ function setSheet(s,selId){
   S.ui.sheet=s;S.wire=null;S.rdrag=null;S.drag=null;S.pdrag=null;if(s!=='plan')S.planTool=null;S.sel=selId||null;cam=cams[s];save();
   if(S.view!=='design')go('design');else R.design();
 }
-function refreshDesign(){if(S.view==='design'&&onSched()){renderSched();badges();return}if(S.view==='design'&&onPatch()){renderPatch();badges();return}if(!designOn()){badges();return}renderCanvas();renderInspector();renderToolbar();renderPal();renderRackConn();badges()}
+function refreshDesign(){if(S.view==='design'&&onBom()){renderBom();badges();return}if(S.view==='design'&&onSched()){renderSched();badges();return}if(S.view==='design'&&onPatch()){renderPatch();badges();return}if(!designOn()){badges();return}renderCanvas();renderInspector();renderToolbar();renderPal();renderRackConn();badges()}
 function renderToolbar(){renderToolbar0();const t=$('#tbar');if(t)t.insertAdjacentHTML('beforeend',fsBtnHTML())}
 function renderToolbar0(){
   const t=$('#tbar');if(!t)return;
@@ -2904,10 +2931,10 @@ function ritemPanel(f,tg){
   <div class="actions"><button class="btn danger" data-act="delSel">Remove</button></div></div>`;
 }
 function bomPanel(){
-  const lines=bom(),tot=lines.reduce((s,l)=>s+l.p.cost*l.qty,0);
-  if(!lines.length)return '<div class="pb"><p class="muted">Add devices to the sheet and the materials list builds itself.</p></div>';
+  const lines=bom(),tot=lines.reduce((s,l)=>s+l.p.cost*l.qty,0),open=`<div class="pb" style="padding-bottom:4px"><button class="btn sm" data-act="openBom">Open the bill of materials (${esc(S.design.meta6.dwg)}) →</button></div>`;
+  if(!lines.length)return open+'<div class="pb"><p class="muted">Add devices to the sheet and the materials list builds itself.</p></div>';
   const ex=new Set(S.design.extras.map(e=>e.pid));
-  return `<div class="scroll"><table class="t"><thead><tr><th class="n">Qty</th><th>Item</th><th class="n">Dealer</th></tr></thead><tbody>
+  return open+`<div class="scroll"><table class="t"><thead><tr><th class="n">Qty</th><th>Item</th><th class="n">Dealer</th></tr></thead><tbody>
    ${lines.map(l=>`<tr><td class="n">${l.qty}</td><td><b>${esc(l.p.model)}</b> <span class="catchip">${esc(l.p.cat)}</span><br><span class="muted">${esc(l.p.desc)}</span>${ex.has(l.p.id)?` <button class="lnk" data-act="rmExtra" data-pid="${esc(l.p.id)}">remove</button>`:''}</td><td class="n">${money(l.p.cost*l.qty)}</td></tr>`).join('')}
    </tbody></table></div><div class="sideFoot"><span class="muted">At dealer cost</span><b>${money(tot)}</b></div>`;
 }
@@ -3402,41 +3429,54 @@ Halverd,HV-86Q,Display,86" 4K commercial display,2650,3899,2.5,hdmi:HDMI 1|hdmi:
 Ostrava Signal,OS-SC21,Switcher,2×1 HDMI auto-switcher,240,349,0.5,hdmi:HDMI 1|hdmi:HDMI 2,hdmi:HDMI Out,1,12
 Kestrel Vision,KV-Bar,Soundbar,USB video bar with camera and mics,,1499,1,usb:USB-C,,0,40
 Marrow Pro,MP-4x150,Amplifier,4 × 150 W 70 V amplifier,1190,1690,1,audio:Line In 1|audio:Line In 2,audio:Spk A|audio:Spk B|audio:Spk C|audio:Spk D,2,640`;
-let libQ='',libCat='All';
+let libQ='',libCat='All',libBrand='All',libLim=200;
+/* a product with no ports that isn't a cable, rack part or module goes on the materials list, not the drawings */
+const matOnly=p=>!placeable(p)&&!isMod(p)&&!p.ctype&&!['Cable','Rack','Patch panel','Accessory'].includes(p.cat);
+/* imported price lists, read back from the products themselves */
+function priceLists(){const m=new Map();lib.forEach(p=>{if(!p.list)return;const k=p.mfr+'|'+p.list.name;const o=m.get(k)||{brand:p.mfr,name:p.list.name,at:p.list.at,n:0,photos:0};o.n++;if(pImg(p))o.photos++;if(p.list.at>o.at)o.at=p.list.at;m.set(k,o)});
+  return [...m.values()].sort((a,b)=>b.at.localeCompare(a.at)||a.brand.localeCompare(b.brand))}
 R.library=function(){
-  const cats=['All',...new Set(lib.map(p=>p.cat))];
-  const items=lib.filter(p=>(libCat==='All'||p.cat===libCat)&&(!libQ||(p.mfr+' '+p.model+' '+p.desc).toLowerCase().includes(libQ.toLowerCase())));
-  $('#v-library').innerHTML=`
-  <header class="vh"><div><p class="eyebrow">My library · ${lib.length} products · ${new Set(lib.map(p=>p.mfr)).size} brands</p><h1>Equipment library</h1>
-   <p class="sub">Every device carries its ports, rack space, power, dealer cost and install labor, so drawings, materials lists and proposals stay in sync.</p></div>
-   <div class="actions">${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn primary filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="newBlockLib">Build a custom device</button></div></header>
-  ${findHTML()}
-  <div class="panel"><div class="ph"><h2>Import from a price list</h2><span class="muted" style="font-size:12px">CSV · one product per row</span></div>
-   <div class="pb import">
-    <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
-     <label class="field" for="csvIn">Paste CSV, or choose a file
-      <textarea id="csvIn" rows="7" spellcheck="false">${esc(S.csvText??SAMPLE_CSV)}</textarea></label>
-     <div class="actions"><label class="btn filebtn">Choose CSV file<input type="file" id="csvFile" accept=".csv,text/csv" aria-label="Choose CSV file"></label><button class="btn" data-act="csvPreview">Check rows</button><button class="btn primary" data-act="csvImport" ${S.importRows&&S.importRows.some(r=>!r.err)?'':'disabled'}>Import ${S.importRows?S.importRows.filter(r=>!r.err).length:''} products</button></div>
-     <p class="note">Ports use <span class="mono">type:name</span>, separated by <span class="mono">|</span>. Types: hdmi, audio, net, usb, ctrl. Optional columns: rack_units, watts, mount (rack or shelf).</p>
-    </div>
-    <div style="min-width:0">${S.importRows?`<div class="scroll"><table class="t"><thead><tr><th>Row</th><th>Product</th><th>Result</th></tr></thead><tbody>
-     ${S.importRows.map(r=>`<tr><td class="m">${r.line}</td><td>${esc(r.mfr||'—')} <b>${esc(r.model||'')}</b><br><span class="muted">${r.ins?r.ins.length:0} in · ${r.outs?r.outs.length:0} out${r.ru?` · ${r.ru}U`:''}</span></td><td class="${r.err?'bad':'ok'}">${r.err?esc(r.err):(r.dup?'Updates existing product':'Ready')}</td></tr>`).join('')}</tbody></table></div>`
-     :'<p class="muted">Press “Check rows” to validate before anything is added. Rows with problems are skipped, not guessed.</p>'}</div>
-   </div></div>
-  <div class="panel"><div class="ph" style="flex-wrap:wrap"><div class="libtools" style="flex:1"><input class="inp" id="libQ" placeholder="Search products" value="${esc(libQ)}" aria-label="Search products">
-    <select class="inp" id="libCat" aria-label="Category" style="width:auto">${cats.map(c=>`<option ${c===libCat?'selected':''}>${esc(c)}</option>`).join('')}</select></div><span class="muted" style="font-size:12px">${items.length} shown</span></div>
-   <div class="scroll"><table class="t"><thead><tr><th><span class="sr">Photo</span></th><th>Category</th><th>Product</th><th>Ports</th><th class="n">Rack</th><th class="n">Dealer</th><th class="n">MSRP</th><th class="n">Labor h</th><th></th></tr></thead><tbody>
-   ${items.map(p=>`<tr class="click" data-act="libEdit" data-id="${esc(p.id)}" title="Edit ${esc(p.model)}"><td class="thumbcell">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><span class="catchip">${esc(p.cat)}</span></td><td><b>${esc(p.model)}</b> <span class="muted">${esc(p.mfr)}</span>${p.spec?` <a class="lnk" data-act="openSpec" href="/_blob/${esc(p.spec)}" target="_blank" rel="noopener" style="font-size:11px">spec sheet</a>`:''}${p.src&&/^https?:\/\//.test(p.src)?` <a class="lnk" href="${esc(p.src)}" target="_blank" rel="noopener noreferrer" style="font-size:11px">source</a>`:''}${nameTwins(p).length?' <span class="chip Medium" title="Another product has the same model name. Open it to merge them.">same name</span>':''}<br><span class="muted">${esc(p.desc)}</span></td>
-    <td>${isMod(p)?`${[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')}<span class="muted mono" style="font-size:11px">${portCount(p)} ports · fits ${esc(p.fits)}</span>`:placeable(p)?(slotsOf(p).length?`<span class="chip Sent" title="${esc(slotsOf(p).map(x=>x.n).join(', '))}">${plural(slotsOf(p).length,'slot')}</span> `:'')+[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')+`<span class="muted mono" style="font-size:11px">${p.ins.length} in · ${p.outs.length} out</span>`:(p.ctype?`<span class="dot ${SIG[p.ctype].cls}"></span> <span class="muted mono" style="font-size:11px">${SIG[p.ctype].short} cable</span>`:'<span class="muted">—</span>')}</td>
+  const brands=[...new Set(lib.map(p=>p.mfr))].sort((a,b)=>a.localeCompare(b));if(libBrand!=='All'&&!brands.includes(libBrand))libBrand='All';
+  const inBrand=lib.filter(p=>libBrand==='All'||p.mfr===libBrand),cats=['All',...new Set(inBrand.map(p=>p.cat))];if(!cats.includes(libCat))libCat='All';
+  const ql=libQ.toLowerCase(),items=inBrand.filter(p=>(libCat==='All'||p.cat===libCat)&&(!ql||(p.mfr+' '+p.model+' '+p.desc+' '+p.cat).toLowerCase().includes(ql)));
+  const shown=items.slice(0,libLim),cards=S.ui.libView==='cards',pls=priceLists();
+  const portsCell=p=>isMod(p)?`${[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')}<span class="muted mono" style="font-size:11px">${portCount(p)} ports · fits ${esc(p.fits)}</span>`
+    :placeable(p)?(slotsOf(p).length?`<span class="chip Sent" title="${esc(slotsOf(p).map(x=>x.n).join(', '))}">${plural(slotsOf(p).length,'slot')}</span> `:'')+[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')+`<span class="muted mono" style="font-size:11px">${p.ins.length} in · ${p.outs.length} out</span>`
+    :p.ctype?`<span class="dot ${SIG[p.ctype].cls}"></span> <span class="muted mono" style="font-size:11px">${SIG[p.ctype].short} cable</span>`
+    :matOnly(p)?'<span class="chip" title="No ports yet, so it goes on the bill of materials but not the drawings. Open it to add ports.">Materials only</span>':'<span class="muted">—</span>';
+  const links=p=>`${p.spec?` <a class="lnk" data-act="openSpec" href="/_blob/${esc(p.spec)}" target="_blank" rel="noopener" style="font-size:11px">spec sheet</a>`:''}${p.src&&/^https?:\/\//.test(p.src)?` <a class="lnk" href="${esc(p.src)}" target="_blank" rel="noopener noreferrer" style="font-size:11px">source</a>`:''}${nameTwins(p).length?' <span class="chip Medium" title="Another product has the same model name. Open it to merge them.">same name</span>':''}`;
+  const table=`<div class="scroll"><table class="t"><thead><tr><th><span class="sr">Photo</span></th><th>Category</th><th>Product</th><th>Ports</th><th class="n">Rack</th><th class="n">Dealer</th><th class="n">MSRP</th><th class="n">Labor h</th><th></th></tr></thead><tbody>
+   ${shown.map(p=>`<tr class="click" data-act="libEdit" data-id="${esc(p.id)}" title="Edit ${esc(p.model)}"><td class="thumbcell">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><span class="catchip">${esc(p.cat)}</span></td><td><b>${esc(p.model)}</b> <span class="muted">${esc(p.mfr)}</span>${links(p)}<br><span class="muted">${esc(p.desc)}</span></td>
+    <td>${portsCell(p)}</td>
     <td class="n">${placeable(p)&&!['Cable','Rack','Patch panel'].includes(p.cat)?`<select class="cellin libru" data-libru="${esc(p.id)}" aria-label="Rack space for ${esc(p.model)}"><option value="0" ${p.ru>0?'':'selected'}>Not racked</option>${[1,2,3,4,5,6,7,8].map(u=>`<option value="${u}" ${p.ru===u&&p.mount!=='shelf'?'selected':''}>${u}U</option><option value="${u}s" ${p.ru===u&&p.mount==='shelf'?'selected':''}>${u}U shelf</option>`).join('')}</select>`:(p.ru?p.ru+'U':'<span class="muted">—</span>')}</td>
-    <td class="n">${money2(p.cost)}</td><td class="n">${money2(p.msrp)}</td><td class="n">${p.labor}</td><td><button class="btn sm" data-act="libEdit" data-id="${esc(p.id)}">Edit</button></td></tr>`).join('')}
-   </tbody></table></div></div>`;
-  bindFind();
-  $('#libQ').addEventListener('input',e=>{libQ=e.target.value;const pos=e.target.selectionStart;R.library();const q=$('#libQ');q.focus();q.setSelectionRange(pos,pos)});
-  $('#libCat').addEventListener('change',e=>{libCat=e.target.value;R.library()});
-  $('#csvIn').addEventListener('input',e=>{S.csvText=e.target.value});
-  $('#csvFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.csvText=String(r.result);S.importRows=parseCSV(S.csvText);R.library()};r.readAsText(f)});
+    <td class="n">${money2(p.cost)}</td><td class="n">${money2(p.msrp)}</td><td class="n">${p.labor}</td><td><button class="btn sm" data-act="libEdit" data-id="${esc(p.id)}">Edit</button></td></tr>`).join('')||'<tr><td colspan="9" class="muted">No products match.</td></tr>'}
+   </tbody></table></div>`;
+  const grid=`<div class="libcards">${shown.map(p=>{const u=pImg(p);return `<button class="libcard" data-act="libEdit" data-id="${esc(p.id)}" aria-label="Edit ${esc(p.mfr+' '+p.model)}">
+     <span class="lcimg">${u?`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:`<span class="lcnone" aria-hidden="true">${esc(p.cat.slice(0,1))}</span>`}</span>
+     <span class="lcb"><span class="lcm"><span class="catchip">${esc(p.cat)}</span>${matOnly(p)?'<span class="chip">Materials only</span>':''}</span><b>${esc(p.model)}</b><span class="muted">${esc(p.mfr)}</span><span class="lcd">${esc(clip(p.desc,80))}</span>
+     <span class="lcp"><span><small>Dealer</small>${money2(p.cost)}</span><span><small>MSRP</small>${money2(p.msrp)}</span></span></span></button>`}).join('')||'<p class="muted">No products match.</p>'}</div>`;
+  $('#v-library').innerHTML=`
+  <header class="vh"><div><p class="eyebrow">My library · ${lib.length} products · ${brands.length} brands</p><h1>Equipment library</h1>
+   <p class="sub">Every device carries its photos, ports, rack space, power, dealer cost and install labor, so drawings, the bill of materials and proposals stay in sync.</p></div>
+   <div class="actions"><button class="btn primary" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="newBlockLib">Build a custom device</button></div></header>
+  ${S.pl||S.plOpen?plPanelHTML():''}
+  ${pls.length?`<div class="panel"><div class="ph"><h2>Price lists</h2><span class="muted" style="font-size:12px">Import a newer list from the same brand to update its prices</span></div><div class="scroll"><table class="t"><thead><tr><th>Brand</th><th>List</th><th>Imported</th><th class="n">Products</th><th class="n">With photos</th><th></th></tr></thead><tbody>
+   ${pls.map((l,i)=>`<tr><td><b>${esc(l.brand)}</b></td><td class="mono" style="font-size:12px">${esc(clip(l.name,44))}</td><td>${esc(dayFmtIso(l.at))}</td><td class="n">${l.n}</td><td class="n">${l.photos}</td><td style="white-space:nowrap"><button class="btn sm" data-act="libBrandShow" data-v="${esc(l.brand)}">Show</button> ${S.ui.plDel===i?`<span class="muted sm">Remove the ones no project uses?</span> <button class="btn sm danger" data-act="plDelGo" data-i="${i}">Remove</button> <button class="btn sm" data-act="plDelAsk" data-i="-1">Keep</button>`:`<button class="btn sm" data-act="plDelAsk" data-i="${i}">Remove…</button>`}</td></tr>`).join('')}
+  </tbody></table></div></div>`:''}
+  ${findHTML()}
+  <div class="panel"><div class="ph" style="flex-wrap:wrap"><div class="libtools" style="flex:1"><input class="inp" id="libQ" placeholder="Search products" value="${esc(libQ)}" aria-label="Search products">
+    <select class="inp" id="libBrand" aria-label="Brand" style="width:auto"><option value="All">All brands</option>${brands.map(b=>`<option ${b===libBrand?'selected':''}>${esc(b)}</option>`).join('')}</select>
+    <select class="inp" id="libCat" aria-label="Category" style="width:auto">${cats.map(c=>`<option value="${esc(c)}" ${c===libCat?'selected':''}>${c==='All'?'All categories':esc(c)}</option>`).join('')}</select></div>
+    <span class="muted" style="font-size:12px">${items.length===lib.length?plural(items.length,'product'):`${items.length} of ${lib.length}`}</span>
+    <div class="seg" role="group" aria-label="View"><button data-act="libView" data-v="table" aria-pressed="${!cards}">List</button><button data-act="libView" data-v="cards" aria-pressed="${cards}">Photos</button></div></div>
+   ${cards?grid:table}
+   ${items.length>shown.length?`<div class="pb" style="padding-top:0"><button class="btn" data-act="libMore">Show ${Math.min(200,items.length-shown.length)} more of ${items.length-shown.length}</button></div>`:''}</div>`;
+  bindFind();bindPL();
+  $('#libQ').addEventListener('input',e=>{libQ=e.target.value;libLim=200;const pos=e.target.selectionStart;R.library();const q=$('#libQ');q.focus();q.setSelectionRange(pos,pos)});
+  $('#libCat').addEventListener('change',e=>{libCat=e.target.value;libLim=200;R.library()});
+  $('#libBrand').addEventListener('change',e=>{libBrand=e.target.value;libCat='All';libLim=200;R.library()});
 };
+const dayFmtIso=d=>{if(!d)return '—';const t=new Date(d+'T12:00:00');return isNaN(t)?d:t.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};
 function splitCSV(line){
   const out=[];let cur='',q=false,start=true;
   for(let i=0;i<line.length;i++){const ch=line[i];
@@ -3465,10 +3505,299 @@ function parseCSV(text){
   });
 }
 
+/* ================= BILL OF MATERIALS SHEET =================
+   E-501 lists every device, module, cable, rack part and added material in the design,
+   numbered, with the drawing tags that use each one. Pricing is off by default because
+   the drawing set goes to installers and clients; turn on dealer cost or sell price per project. */
+const onBom=()=>S.ui.sheet==='bom';
+const BOM_PRICE=[['none','No prices'],['cost','Dealer cost'],['sell','Sell price']];
+function bomRows(){
+  const tg=tags(),use=new Map(),add=(pid,t)=>{if(!t)return;if(!use.has(pid))use.set(pid,[]);use.get(pid).push(t)};
+  S.design.nodes.forEach(n=>{add(n.pid,tg[n.uid]);modsOf(n).forEach(({m})=>add(m.id,tg[n.uid]))});
+  S.design.racks.forEach(r=>{add(rackSku(r.size),r.name);r.items.forEach(it=>{if(it.kind==='acc')add(it.ref,r.name);else if(it.kind==='dev'&&prod(node(it.ref)).mount==='shelf')add('RK-1U',r.name)})});
+  S.design.panels.forEach(p=>add(panelSku(p.media,p.ports),p.name));
+  const ex=new Map(S.design.extras.map(e=>[e.pid,e.qty])),mk=1+(+S.prop.markup||0)/100;
+  return bom().map((l,i)=>{const t=[...new Set(use.get(l.p.id)||[])].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));
+    return {no:i+1,p:l.p,qty:l.qty,mod:l.mod,tags:t,extra:ex.get(l.p.id)||0,cable:!!l.p.ctype||l.p.cat==='Cable',unit:{cost:l.p.cost||0,sell:(l.p.cost||0)*mk}}})}
+const bomTagTxt=r=>r.tags.length?(r.tags.length>8?`${r.tags.slice(0,8).join(', ')} +${r.tags.length-8}`:r.tags.join(', ')):r.cable?'See cable schedule':r.extra?'Added material':'';
+function bomShellHTML(){
+  const m6=S.design.meta6;
+  return `<div class="schedbar">
+    <input class="inp grow" id="bmQ" placeholder="Search model, brand, description, tag" value="${esc(S.ui.bq||'')}" aria-label="Search the bill of materials">
+    <select class="inp" id="bmGr" aria-label="Group rows">${[['cat','Group by category'],['mfr','Group by brand'],['none','No grouping']].map(([k,l])=>`<option value="${k}" ${(S.ui.bgroup||'cat')===k?'selected':''}>${l}</option>`).join('')}</select>
+    <select class="inp" id="bmPr" aria-label="Prices on the sheet">${BOM_PRICE.map(([k,l])=>`<option value="${k}" ${(m6.price||'none')===k?'selected':''}>${l}</option>`).join('')}</select>
+    <label class="check" style="white-space:nowrap"><input type="checkbox" id="bmImg" ${m6.photos===false?'':'checked'}> <span>Photos</span></label>
+    <span id="bmHist"></span>
+    <button class="btn" data-act="copyBom">Copy as CSV</button>
+  </div>
+  <div id="bmSum"></div>
+  <div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>${esc(m6.dwg)} · ${esc(m6.title)}</h2><span class="muted" style="font-size:12px" id="bmCount"></span><span class="tgrow"></span>
+    <label class="field inl" for="m6T">Sheet title<input class="inp" id="m6T" data-m6prop="title" value="${esc(m6.title)}"></label><label class="field inl" for="m6D">Drawing no.<input class="inp" id="m6D" data-m6prop="dwg" value="${esc(m6.dwg)}" style="width:90px"></label></div>
+   <div class="schedwrap" id="bmTable"></div></div>
+  <div class="panel"><div class="ph"><h2>Add materials</h2><span class="muted" style="font-size:12px">Mounts, wall plates, conduit, anything from the library that isn’t drawn</span></div>
+   <div class="pb"><div class="bmadd"><input class="inp grow" id="bmAddQ" placeholder="Search the library" aria-label="Search the library to add materials" autocomplete="off" value="${esc(S.ui.baq||'')}"><div id="bmAddList" class="bmaddlist"></div></div></div></div>
+  <textarea id="csvOut" class="inp" rows="6" hidden aria-label="CSV output"></textarea>`}
+function bomTableHTML(rows,opt){
+  const o=Object.assign({price:S.design.meta6.price||'none',photos:S.design.meta6.photos!==false,edit:true,group:S.ui.bgroup||'cat'},opt||{});
+  const pr=o.price!=='none',cols=6+(o.photos?1:0)+(pr?2:0);
+  const groups=[];if(o.group==='none')groups.push(['',rows]);else{const mp=new Map();rows.forEach(r=>{const k=o.group==='mfr'?r.p.mfr:r.p.cat;if(!mp.has(k))mp.set(k,[]);mp.get(k).push(r)});groups.push(...mp)}
+  const row=r=>{const u=r.unit[o.price]||0;return `<tr${r.mod?' class="bmmod"':''}><td class="n m">${r.no}</td>${o.photos?`<td class="thumbcell">${thumb(r.p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td>`:''}
+   <td class="n">${o.edit&&r.extra&&r.extra===r.qty?`<input class="cellin num" type="number" min="1" step="1" data-bmqty="${esc(r.p.id)}" value="${r.qty}" aria-label="Quantity of ${esc(r.p.model)}" style="width:62px">`:`<b>${r.qty}</b>`}</td>
+   <td>${esc(r.p.mfr)}</td><td><b>${esc(r.p.model)}</b>${r.mod?' <span class="muted sm">module</span>':''}</td><td>${esc(r.p.desc)}${o.edit&&r.extra?` <button class="lnk" data-act="rmExtra" data-pid="${esc(r.p.id)}">remove${r.extra<r.qty?` ${r.extra} added`:''}</button>`:''}</td>
+   <td class="m sm">${esc(bomTagTxt(r))}</td>${pr?`<td class="n">${money2(u)}</td><td class="n"><b>${money2(u*r.qty)}</b></td>`:''}</tr>`};
+  const sub=rs=>pr?` · ${money2(rs.reduce((s,r)=>s+r.unit[o.price]*r.qty,0))}`:'';
+  return `<table class="t bmt"><thead><tr><th class="n">Item</th>${o.photos?'<th><span class="sr">Photo</span></th>':''}<th class="n">Qty</th><th>Manufacturer</th><th>Model</th><th>Description</th><th>Tags</th>${pr?`<th class="n">Unit</th><th class="n">Extended</th>`:''}</tr></thead><tbody>
+   ${rows.length?groups.map(([k,rs])=>(k?`<tr class="grp"><td colspan="${cols}">${esc(k)} · ${plural(rs.reduce((s,r)=>s+r.qty,0),'item')}${sub(rs)}</td></tr>`:'')+rs.map(row).join('')).join('')
+    :`<tr><td colspan="${cols}" class="muted">${S.design.nodes.length||S.design.extras.length?'Nothing matches the search.':'Nothing in the design yet. Devices you place on the drawings, and materials you add below, show up here.'}</td></tr>`}
+   </tbody>${pr&&rows.length?`<tfoot><tr><td colspan="${cols-1}" class="n">${o.price==='sell'?`Equipment at sell price (${+S.prop.markup||0}% markup)`:'Equipment at dealer cost'}</td><td class="n"><b>${money2(rows.reduce((s,r)=>s+r.unit[o.price]*r.qty,0))}</b></td></tr></tfoot>`:''}</table>`}
+function bomView(){const q=(S.ui.bq||'').toLowerCase();return bomRows().filter(r=>!q||(r.p.mfr+' '+r.p.model+' '+r.p.desc+' '+r.p.cat+' '+r.tags.join(' ')).toLowerCase().includes(q))}
+function renderBom(){
+  if(!$('#bmTable'))return;
+  const all=bomRows(),rows=bomView(),qty=all.reduce((s,r)=>s+r.qty,0),brands=new Set(all.map(r=>r.p.mfr)).size,noImg=all.filter(r=>!pImg(r.p)&&!r.cable).length;
+  $('#bmHist').innerHTML=`<span class="seg" role="group" aria-label="History"><button data-act="undo" ${H.past.length?'':'disabled'}>↶ Undo</button><button data-act="redo" ${H.future.length?'':'disabled'}>Redo ↷</button></span>`;
+  const q=quote();
+  $('#bmSum').innerHTML=`<div class="schedcards">
+   <div class="panel kpi"><div class="l">Line items</div><div class="v">${all.length}</div><div class="s"><span>${plural(qty,'piece')} in total</span><span>${plural(brands,'brand')}</span></div></div>
+   <div class="panel kpi"><div class="l">Devices on the drawings</div><div class="v">${S.design.nodes.length}</div><div class="s"><span>${plural(S.design.cables.length,'cable run')}</span><span>${plural(S.design.extras.reduce((s,e)=>s+e.qty,0),'added material')}</span></div></div>
+   <div class="panel kpi"><div class="l">Equipment</div><div class="v">${money(q.cost)}</div><div class="s"><span>dealer cost</span><span>${money(q.equip)} sell</span></div></div>
+  </div>${noImg?`<p class="note" style="margin:0">${plural(noImg,'item')} ${noImg===1?'has':'have'} no photo. Add photos in the library, or import the brand’s price list with its images.</p>`:''}`;
+  $('#bmCount').textContent=rows.length===all.length?plural(all.length,'line'):`${rows.length} of ${all.length} lines`;
+  $('#bmTable').innerHTML=bomTableHTML(rows);
+  renderBomAdd()}
+function renderBomAdd(){const box=$('#bmAddList');if(!box)return;const q=(S.ui.baq||'').trim().toLowerCase();
+  if(!q){box.innerHTML='<p class="muted sm" style="margin:6px 0 0">Type to find a product. Devices with ports are usually better placed on the signal flow sheet, where they get a tag.</p>';return}
+  const hits=lib.filter(p=>!isMod(p)&&(p.mfr+' '+p.model+' '+p.desc+' '+p.cat).toLowerCase().includes(q)).sort((a,b)=>Number(matOnly(b)||b.cat==='Accessory')-Number(matOnly(a)||a.cat==='Accessory')||a.model.localeCompare(b.model)).slice(0,12);
+  box.innerHTML=hits.length?hits.map(p=>`<div class="bmhit">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}<span class="grow"><b>${esc(p.model)}</b> <span class="muted">${esc(p.mfr)}</span><br><span class="muted sm">${esc(clip(p.desc,70))} · ${money2(p.cost)}</span></span>
+   <input class="cellin num" type="number" min="1" step="1" value="1" id="bmn-${esc(p.id)}" aria-label="Quantity of ${esc(p.model)} to add" style="width:56px"><button class="btn sm" data-act="bomAdd" data-pid="${esc(p.id)}">Add</button></div>`).join(''):'<p class="muted sm">No products match.</p>'}
+function bindBom(){
+  $('#bmQ').addEventListener('input',e=>{S.ui.bq=e.target.value;renderBom()});
+  $('#bmGr').addEventListener('change',e=>{S.ui.bgroup=e.target.value;renderBom()});
+  $('#bmPr').addEventListener('change',e=>{mut(()=>S.design.meta6.price=e.target.value);renderBom()});
+  $('#bmImg').addEventListener('change',e=>{mut(()=>S.design.meta6.photos=e.target.checked);renderBom()});
+  $('#bmAddQ').addEventListener('input',e=>{S.ui.baq=e.target.value;renderBomAdd()});
+  $('#bmAddQ').addEventListener('keydown',e=>{if(e.key==='Enter'){const b=$('#bmAddList [data-act="bomAdd"]');if(b)A.bomAdd(b)}});
+  $('#bmTable').addEventListener('change',e=>{const t=e.target;if(!t.dataset.bmqty)return;const n=Math.max(1,Math.round(+t.value||1));mut(()=>{const x=S.design.extras.find(z=>z.pid===t.dataset.bmqty);if(x)x.qty=n});renderBom()});
+  document.querySelectorAll('[data-m6prop]').forEach(i=>i.addEventListener('change',e=>{const k=e.target.dataset.m6prop,v=e.target.value.trim();if(!v)return;mut(()=>S.design.meta6[k]=v);R.design()}))}
+function bomCSV(){const rows=bomRows(),pr=S.design.meta6.price||'none',q=v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  const head=['Item','Qty','Manufacturer','Model','Description','Category','Tags',...(pr==='none'?[]:['Unit','Extended'])];
+  return [head,...rows.map(r=>[r.no,r.qty,r.p.mfr,r.p.model,r.p.desc,r.p.cat,bomTagTxt(r),...(pr==='none'?[]:[r.unit[pr].toFixed(2),(r.unit[pr]*r.qty).toFixed(2)])])].map(r=>r.map(q).join(',')).join('\n')}
+function snapBom(){const rows=bomRows();
+  if(!rows.length)return {html:'<p class="muted">Nothing in the design yet.</p>',sum:'No materials'};
+  return {html:bomTableHTML(rows,{edit:false,group:'cat'}),sum:`${plural(rows.length,'line')} · ${plural(rows.reduce((s,r)=>s+r.qty,0),'piece')}`}}
+
+/* ================= BRAND PRICE LISTS =================
+   Upload a manufacturer's price list (CSV, Excel or pasted rows), map its columns once,
+   and every row becomes a library product with its photos and prices. Re-importing the
+   same brand later updates prices in place and shows what changed before anything is saved. */
+const PL_FIELDS=[
+  ['model','Model / part number',1],['mfr','Brand column',0],['desc','Description',0],['cat','Category',0],
+  ['cost','Dealer cost',0],['msrp','MSRP / list price',0],['img','Image URL',0],
+  ['ru','Rack units',0],['watts','Watts',0],['labor','Labor hours',0],['ins','Inputs (type:name|…)',0],['outs','Outputs (type:name|…)',0]];
+const PL_GUESS={
+  mfr:/^(manufacturer|brand|mfr|mfg|make|vendor)$/,
+  model:/model|part ?(no|num|number|#)|^p\/?n$|^sku$|item ?(no|num|number|#)|product ?(code|no|number|id)|catalog|^mpn$|^article/,
+  desc:/desc|product ?name|^name$|^title$|^product$|details/,
+  cat:/categor|^type$|product ?type|^class|family|^group|line/,
+  cost:/dealer|cost|^net|net price|your price|reseller|wholesale|integrator|partner/,
+  msrp:/msrp|list|retail|^srp$|^map$|street|^price$|unit price|suggested/,
+  img:/image|photo|picture|^img|thumbnail|thumb/,
+  ru:/rack ?units?|^ru$|^u$|rack ?space|^height ?\(?u/,
+  watts:/watt|power|consumption/,labor:/labor|install ?h/,ins:/^inputs?$/,outs:/^outputs?$/};
+const plKey=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const plNum=s=>{const t=String(s??'').replace(/[^0-9.\-]/g,'');if(!t||t==='.'||t==='-')return NaN;return parseFloat(t)};
+let PLIMG=new Map(); /* normalized file name -> [File], kept only while the import is open */
+
+/* a CSV / TSV / semicolon parser that keeps quoted commas and line breaks */
+function plParse(text){
+  text=String(text||'').replace(/^﻿/,'');const first=text.split(/\r?\n/,1)[0]||'';
+  const d=[['\t',(first.match(/\t/g)||[]).length],[';',(first.match(/;/g)||[]).length],[',',(first.match(/,/g)||[]).length]].sort((a,b)=>b[1]-a[1])[0][0];
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<text.length;i++){const ch=text[i];
+    if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=ch;continue}
+    if(ch==='"'&&f==='')q=true;else if(ch===d){row.push(f);f=''}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}
+    else f+=ch}
+  if(f!==''||row.length){row.push(f);rows.push(row)}
+  return rows.map(r=>r.map(c=>String(c).trim())).filter(r=>r.some(c=>c!==''))}
+/* the header is the first row near the top that names a model or part column (price lists often open with a title block) */
+function plHeaderAt(rows){for(let i=0;i<Math.min(rows.length,20);i++){const r=rows[i],n=r.filter(Boolean).length;if(n>=2&&r.some(c=>PL_GUESS.model.test(c.toLowerCase())))return i}
+  return Math.max(0,rows.findIndex(r=>r.filter(Boolean).length>=2))}
+function plGuess(head){const map={},used=new Set(),lc=head.map(h=>h.toLowerCase().trim());
+  ['ins','outs','mfr','model','img','ru','watts','labor','cost','msrp','cat','desc'].forEach(k=>{const i=lc.findIndex((h,j)=>h&&!used.has(j)&&PL_GUESS[k].test(h));if(i>=0){map[k]=i;used.add(i)}});
+  return map}
+function plLoad(name,rows,sheets){
+  const hi=plHeaderAt(rows),head=(rows[hi]||[]).map((h,i)=>h||`Column ${i+1}`),body=rows.slice(hi+1).filter(r=>r.some(Boolean));
+  const map=plGuess(head),prev=S.pl||{};
+  const brandGuess=prev.brand||(map.mfr==null?String(name).replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/\b(price ?list|pricelist|dealer|msrp|20\d\d|q[1-4]|usd)\b/gi,'').replace(/\s+/g,' ').trim().replace(/^[a-z]/,c=>c.toUpperCase()):'');
+  S.pl={name,head,rows:body,map,sheets:sheets||null,sheet:(sheets&&prev.sheets===sheets)?prev.sheet:0,brand:brandGuess,
+    price:map.cost!=null?'cost':'disc',disc:prev.disc??35,defCat:prev.defCat||'Other',labor:prev.labor??1,upd:prev.upd??true,fetchImgs:prev.fetchImgs??true,busy:null,done:null};
+  R.library();requestAnimationFrame(()=>{const el=$('#plPanel');if(el)el.scrollIntoView({block:'start',behavior:'smooth'})})}
+async function plReadFile(file){
+  if(!file)return;const ext=(file.name.split('.').pop()||'').toLowerCase();
+  try{
+    if(['xlsx','xlsm','xls','ods'].includes(ext)){
+      S.plStatus=`Reading ${file.name}…`;R.library();
+      if(!window.XLSX)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)});
+      const wb=window.XLSX.read(await file.arrayBuffer(),{type:'array'});
+      const sheets=wb.SheetNames.map(n=>({n,rows:window.XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:''}).map(r=>r.map(c=>String(c??'').trim())).filter(r=>r.some(Boolean))})).filter(s=>s.rows.length);
+      if(!sheets.length)throw new Error('empty');
+      const best=sheets.reduce((b,s,i)=>s.rows.length>sheets[b].rows.length?i:b,0);
+      S.plStatus=null;plLoad(file.name,sheets[best].rows,sheets.length>1?sheets:null);if(S.pl.sheets)S.pl.sheet=best;R.library()}
+    else if(ext==='pdf'){toast('PDF price lists can’t be read as a table. Export the list to Excel or CSV from the PDF, or ask the brand for the Excel version.')}
+    else{const rows=plParse(await file.text());if(!rows.length)throw new Error('empty');plLoad(file.name,rows,null)}}
+  catch(e){S.plStatus=null;R.library();toast(e&&e.message==='load'?'Couldn’t load the spreadsheet reader. Check your connection and try again.':e&&e.message==='empty'?`${file.name} has no rows.`:`Couldn’t read ${file.name}. Save it as .xlsx or .csv and try again.`)}}
+/* photos: single images or a .zip from the brand's media kit; matched to products by model number in the file name */
+async function plAddImages(files){
+  const fs=[...files];let n=0;
+  for(const f of fs){
+    if(/\.zip$/i.test(f.name)||f.type==='application/zip'||f.type==='application/x-zip-compressed'){
+      S.plStatus=`Opening ${f.name}…`;R.library();
+      try{if(!window.JSZip)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';s.onload=res;s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)});
+        const z=await window.JSZip.loadAsync(f);
+        for(const e of Object.values(z.files)){if(e.dir||!/\.(png|jpe?g|webp|gif)$/i.test(e.name)||/(^|\/)(__MACOSX|\.)/.test(e.name))continue;
+          const base=e.name.split('/').pop(),type=/png$/i.test(base)?'image/png':/webp$/i.test(base)?'image/webp':/gif$/i.test(base)?'image/gif':'image/jpeg';
+          plImgPut(new File([await e.async('blob')],base,{type}));n++}}
+      catch(e){toast(e&&e.message==='load'?'Couldn’t load the zip reader. Check your connection.':`Couldn’t open ${f.name}.`)}}
+    else if(/^image\//.test(f.type)){plImgPut(f);n++}}
+  S.plStatus=null;if(!n)toast('Choose PNG, JPG or WebP photos, or a .zip of them.');R.library()}
+function plImgPut(f){const k=plKey(f.name.replace(/\.[a-z0-9]+$/i,''));if(!k)return;if(!PLIMG.has(k))PLIMG.set(k,[]);PLIMG.get(k).push(f)}
+/* photos for one model: file names equal to the model, or the model followed by a view suffix (HD-PTZ12_front.jpg) */
+function plImgsFor(model,keys){const m=plKey(model);if(m.length<2)return [];const out=[];
+  PLIMG.forEach((fs,k)=>{if(k===m||(k.startsWith(m)&&!/^\d/.test(k.slice(m.length))&&!(keys||[]).some(o=>o.length>m.length&&o.startsWith(m)&&k.startsWith(o))))out.push(...fs)});
+  return out.sort((a,b)=>a.name.length-b.name.length||a.name.localeCompare(b.name)).slice(0,8)}
+const plSplitUrls=s=>String(s||'').split(/[\s|,;]+/).map(x=>x.trim()).filter(x=>/^https?:\/\/\S+$/i.test(x)).slice(0,8);
+/* one row of the list as a product, or an error saying why it's skipped */
+function plRow(r,i,keys){const P=S.pl,m=P.map,g=k=>m[k]!=null?(r[m[k]]??'').trim():'';
+  const o={line:i,model:g('model'),mfr:g('mfr')||P.brand.trim(),desc:g('desc'),cat:g('cat')||P.defCat};
+  if(!o.model){o.err='No model number';return o}
+  if(!o.mfr){o.err='No brand';return o}
+  const cost=plNum(g('cost')),msrp=plNum(g('msrp'));
+  if(P.price==='cost'){if(!(cost>=0)){o.err=m.cost==null?'Pick the dealer cost column':'No dealer cost';return o}o.cost=cost;o.msrp=msrp>=0?msrp:Math.round(cost*1.45*100)/100}
+  else{if(!(msrp>=0)){o.err=m.msrp==null?'Pick the MSRP column':'No MSRP';return o}o.msrp=msrp;o.cost=Math.round(msrp*(1-(+P.disc||0)/100)*100)/100}
+  const ins=ports(g('ins')),outs=ports(g('outs')),bad=[...ins,...outs].find(p=>!SIG[p.t]);if(bad){o.err=`Unknown port type “${bad.t}”`;return o}
+  o.ins=ins;o.outs=outs;o.ru=Math.max(0,Math.min(8,parseInt(g('ru'))||0));o.watts=plNum(g('watts'))>0?plNum(g('watts')):0;o.labor=plNum(g('labor'))>=0?plNum(g('labor')):+P.labor||0;
+  o.urls=plSplitUrls(g('img'));o.files=plImgsFor(o.model,keys);
+  o.ex=lib.find(p=>sameTxt(p.mfr,o.mfr)&&sameTxt(p.model,o.model));
+  o.st=!o.ex?'new':(Math.abs((o.ex.cost||0)-o.cost)>.004||Math.abs((o.ex.msrp||0)-o.msrp)>.004)?'price':'same';
+  return o}
+function plRowsAll(){const P=S.pl;if(!P)return [];const seen=new Set(),mi=P.map.model,keys=mi==null?[]:[...new Set(P.rows.map(r=>plKey(r[mi])).filter(Boolean))];return P.rows.map((r,i)=>{const o=plRow(r,i+1,keys);
+  if(!o.err){const k=plKey(o.mfr)+'|'+plKey(o.model);if(seen.has(k)){o.err='Repeats an earlier row';o.dupRow=true}seen.add(k)}return o})}
+
+function plPanelHTML(){
+  const P=S.pl;
+  const drop=`<div class="pldrop" id="plDrop"><b>Drop a brand’s price list here</b><span class="muted">Excel (.xlsx, .xls) or CSV, straight from the manufacturer. Any column names: you match them up next.</span>
+    <div class="actions"><label class="btn primary filebtn">Choose price list<input type="file" id="plFile" accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls,.ods,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" aria-label="Choose a price list file"></label><button class="btn" data-act="plPasteOpen">Paste rows instead</button><button class="btn" data-act="plSample">Try a sample list</button></div>
+    ${S.plPaste?`<label class="field" for="plPasteIn" style="width:100%">Paste rows copied from a spreadsheet, header row first<textarea id="plPasteIn" rows="6" spellcheck="false"></textarea></label><div class="actions"><button class="btn primary" data-act="plPasteGo">Use these rows</button><button class="btn" data-act="plPasteOpen">Cancel</button></div>`:''}</div>`;
+  if(!P)return `<div class="panel" id="plPanel"><div class="ph"><h2>Import a brand price list</h2>${S.plStatus?`<span class="chip Sent">${esc(S.plStatus)}</span>`:''}<button class="btn sm" data-act="plClose" style="margin-left:auto">Close</button></div><div class="pb">${drop}</div></div>`;
+  const all=plRowsAll(),ok=all.filter(r=>!r.err),cnt={new:0,price:0,same:0};ok.forEach(r=>cnt[r.st]++);
+  const err=all.filter(r=>r.err),withImg=ok.filter(r=>r.urls.length||r.files.length).length,imgFiles=[...PLIMG.values()].reduce((s,a)=>s+a.length,0);
+  const willSave=cnt.new+(P.upd?cnt.price+cnt.same:0);
+  const colSel=(k,label,req)=>`<label class="field" for="plm-${k}">${label}<select class="inp" id="plm-${k}" data-plmap="${k}"><option value="">${req?'Choose a column':'Not in this list'}</option>${P.head.map((h,i)=>`<option value="${i}" ${P.map[k]===i?'selected':''}>${esc(clip(h,40))}${P.rows[0]&&P.rows[0][i]?` — ${esc(clip(P.rows[0][i],22))}`:''}</option>`).join('')}</select></label>`;
+  const f=P.filter||'all',shown=(f==='all'?all:f==='err'?err:ok.filter(r=>r.st===f)),lim=shown.slice(0,P.lim||60);
+  const st=r=>r.err?`<span class="bad">${esc(r.err)}</span>`:r.st==='new'?'<span class="chip Sent">New</span>':r.st==='price'?`<span class="chip Medium">Price change</span><br><span class="muted sm">${money2(r.ex.cost||0)} → <b>${money2(r.cost)}</b></span>`:`<span class="muted">${P.upd?'Already in library':'Skipped · already in library'}</span>`;
+  return `<div class="panel" id="plPanel"><div class="ph" style="flex-wrap:wrap"><h2>Import a brand price list</h2><span class="muted mono" style="font-size:12px">${esc(clip(P.name,40))} · ${plural(P.rows.length,'row')}</span>${S.plStatus||P.busy?`<span class="chip Sent">${esc(P.busy||S.plStatus)}</span>`:''}<span class="tgrow"></span><button class="btn sm" data-act="plReset">Choose another file</button><button class="btn sm" data-act="plClose">Cancel</button></div>
+   <div class="pb plsteps">
+    <section class="plstep"><h3><span class="plno">1</span> Brand and columns</h3>
+     ${P.sheets?`<label class="field" for="plSheet">Worksheet<select class="inp" id="plSheet">${P.sheets.map((s,i)=>`<option value="${i}" ${P.sheet===i?'selected':''}>${esc(s.n)} · ${plural(s.rows.length,'row')}</option>`).join('')}</select></label>`:''}
+     <div class="plgrid">
+      <label class="field" for="plBrand">${P.map.mfr!=null?'Brand when a row has none':'Brand name'}<input class="inp" id="plBrand" value="${esc(P.brand)}" placeholder="e.g. Crestron" list="plBrands"></label>
+      <datalist id="plBrands">${[...new Set(lib.map(p=>p.mfr))].sort().map(b=>`<option value="${esc(b)}">`).join('')}</datalist>
+      ${PL_FIELDS.map(([k,l,req])=>colSel(k,l,req)).join('')}
+     </div></section>
+    <section class="plstep"><h3><span class="plno">2</span> Pricing and defaults</h3>
+     <div class="seg" role="group" aria-label="Dealer cost comes from"><button data-act="plPrice" data-v="cost" aria-pressed="${P.price==='cost'}">Dealer cost is a column</button><button data-act="plPrice" data-v="disc" aria-pressed="${P.price==='disc'}">Dealer cost is MSRP less a discount</button></div>
+     <div class="plgrid">
+      ${P.price==='disc'?`<label class="field" for="plDisc">Dealer discount off MSRP (%)<input class="inp" id="plDisc" type="number" min="0" max="95" step="0.5" value="${esc(P.disc)}"></label>`:''}
+      <label class="field" for="plCat">Category for rows without one<select class="inp" id="plCat">${CAT_ORDER.map(c=>`<option ${c===P.defCat?'selected':''}>${esc(c)}</option>`).join('')}</select></label>
+      <label class="field" for="plLabor">Install labor per item (hours)<input class="inp" id="plLabor" type="number" min="0" step="0.25" value="${esc(P.labor)}"></label>
+     </div>
+     <label class="check"><input type="checkbox" id="plUpd" ${P.upd?'checked':''}> <span>Update prices and descriptions of products already in the library (ports, rack space and your photos are kept)</span></label></section>
+    <section class="plstep"><h3><span class="plno">3</span> Product photos</h3>
+     <p class="note" style="margin:0">${P.map.img!=null?'Photos are taken from the image column. ':''}Add the brand’s photos or its media-kit .zip as well: a file named after the model number (HD-PTZ12.jpg, HD-PTZ12_rear.png) goes on that product.</p>
+     <div class="actions"><label class="btn filebtn">Add photos or a .zip<input type="file" id="plImgs" multiple accept="image/png,image/jpeg,image/webp,image/gif,.zip,application/zip" aria-label="Add product photos or a zip of them"></label>
+      ${imgFiles?`<span class="muted">${plural(imgFiles,'photo')} added · ${plural(ok.filter(r=>r.files.length).length,'product')} matched</span><button class="lnk" data-act="plImgClear">clear</button>`:''}</div>
+     ${P.map.img!=null?`<label class="check"><input type="checkbox" id="plFetch" ${P.fetchImgs?'checked':''}> <span>Copy linked photos into the app when the brand’s site allows it, so they keep working if the brand moves them</span></label>`:''}</section>
+    <section class="plstep"><h3><span class="plno">4</span> Check and import</h3>
+     <div class="seg" role="group" aria-label="Show rows">${[['all','All',all.length],['new','New',cnt.new],['price','Price changes',cnt.price],['same','Already in library',cnt.same],['err','Skipped',err.length]].map(([k,l,n])=>`<button data-act="plFilter" data-v="${k}" aria-pressed="${f===k}">${l} · ${n}</button>`).join('')}</div>
+     <div class="scroll" style="max-height:420px"><table class="t"><thead><tr><th class="n">Row</th><th><span class="sr">Photo</span></th><th>Product</th><th>Category</th><th class="n">Dealer</th><th class="n">MSRP</th><th>Result</th></tr></thead><tbody>
+      ${lim.map(r=>{const im=r.err?'':r.files.length?`<span class="plimg-n" title="${esc(r.files.map(x=>x.name).join(', '))}">${r.files.length} file${r.files.length>1?'s':''}</span>`:r.urls.length?`<img class="libthumb" src="${esc(r.urls[0])}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:'<span class="libthumb none" aria-hidden="true"></span>';
+        return `<tr><td class="n m">${r.line}</td><td class="thumbcell">${im}</td><td>${esc(r.mfr||'—')} <b>${esc(r.model||'—')}</b>${r.desc?`<br><span class="muted">${esc(clip(r.desc,90))}</span>`:''}</td><td>${r.err?'':`<span class="catchip">${esc(r.cat)}</span>`}</td><td class="n">${r.err?'':money2(r.cost)}</td><td class="n">${r.err?'':money2(r.msrp)}</td><td>${st(r)}</td></tr>`}).join('')||'<tr><td colspan="7" class="muted">No rows here.</td></tr>'}
+      ${shown.length>lim.length?`<tr><td colspan="7"><button class="lnk" data-act="plMore">Show ${Math.min(200,shown.length-lim.length)} more of ${shown.length-lim.length}</button></td></tr>`:''}
+     </tbody></table></div>
+     <div class="plfoot"><span class="muted">${plural(cnt.new,'new product')} · ${plural(cnt.price,'price change')}${withImg?` · ${withImg} with photos`:''}${err.length?` · ${err.length} skipped`:''}</span>
+      <button class="btn primary" data-act="plImport" ${willSave&&!P.busy?'':'disabled'}>${P.busy?esc(P.busy):`Import ${plural(willSave,'product')}`}</button></div>
+    </section>
+   </div></div>`}
+function bindPL(){
+  const on=(id,ev,fn)=>{const el=$('#'+id);if(el)el.addEventListener(ev,fn)};
+  on('plFile','change',e=>{plReadFile(e.target.files[0]);e.target.value=''});
+  on('plImgs','change',e=>{plAddImages(e.target.files);e.target.value=''});
+  const dz=$('#plDrop')||$('#plPanel');
+  if(dz){dz.addEventListener('dragover',e=>{if([...(e.dataTransfer.types||[])].includes('Files')){e.preventDefault();dz.classList.add('dropping')}});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('dropping'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dropping');const fs=[...e.dataTransfer.files];if(!fs.length)return;
+      const list=fs.find(f=>/\.(csv|tsv|txt|xlsx|xlsm|xls|ods|pdf)$/i.test(f.name)),imgs=fs.filter(f=>f!==list);
+      (async()=>{if(list)await plReadFile(list);if(imgs.length&&S.pl)await plAddImages(imgs)})()})}
+  if(!S.pl)return;
+  const P=S.pl,re=()=>R.library();
+  on('plSheet','change',e=>{const i=+e.target.value,sh=P.sheets[i];const sheets=P.sheets;plLoad(P.name,sh.rows,sheets);S.pl.sheet=i;re()});
+  on('plBrand','input',e=>{P.brand=e.target.value;clearTimeout(P.t);P.t=setTimeout(()=>{const pos=e.target.selectionStart;re();const b=$('#plBrand');if(b){b.focus();b.setSelectionRange(pos,pos)}},450)});
+  document.querySelectorAll('[data-plmap]').forEach(s=>s.addEventListener('change',e=>{const k=e.target.dataset.plmap,v=e.target.value;if(v==='')delete P.map[k];else{Object.keys(P.map).forEach(o=>{if(P.map[o]===+v&&o!==k)delete P.map[o]});P.map[k]=+v}
+    if(k==='cost'&&v!=='')P.price='cost';re()}));
+  on('plDisc','change',e=>{P.disc=Math.max(0,Math.min(95,+e.target.value||0));re()});
+  on('plCat','change',e=>{P.defCat=e.target.value;re()});
+  on('plLabor','change',e=>{P.labor=Math.max(0,+e.target.value||0);re()});
+  on('plUpd','change',e=>{P.upd=e.target.checked;re()});
+  on('plFetch','change',e=>{P.fetchImgs=e.target.checked})}
+
+/* a photo for the library: uploaded to the app's storage when signed in, else kept small in this browser */
+async function plStoreImage(blob){const png=/png|gif|webp/.test(blob.type||'');
+  if(ASSETS){const c=await shrinkImage(blob,1400,png?'image/png':'image/jpeg');let b=await new Promise(r=>c.toBlob(r,png?'image/png':'image/jpeg',.86));
+    if(png&&b.size>1.5e6)b=await new Promise(r=>c.toBlob(r,'image/webp',.86));const res=await ASSETS.upload(b,{type:b.type});return {asset:res.id}}
+  const c=await shrinkImage(blob,360,'image/jpeg');return {src:c.toDataURL('image/jpeg',.78)}}
+async function plFetchImage(url){try{const r=await fetch(url,{mode:'cors',credentials:'omit',referrerPolicy:'no-referrer'});if(!r.ok)return null;const b=await r.blob();if(!/^image\//.test(b.type)||b.size>25e6)return null;return await plStoreImage(b)}catch(e){return null}}
+async function plImport(){
+  const P=S.pl;if(!P||P.busy)return;
+  const rows=plRowsAll().filter(r=>!r.err&&(r.st==='new'||P.upd));if(!rows.length)return;
+  const at=isoDay(0),list={name:P.name,at};let added=0,upd=0,photos=0,linked=0,failed=0;
+  const jobs=[];
+  rows.forEach(r=>{let p=r.ex;
+    if(p){Object.assign(p,{cost:r.cost,msrp:r.msrp,list});if(r.desc)p.desc=r.desc;if(P.map.cat!=null&&r.cat)p.cat=r.cat;if(P.map.ru!=null)p.ru=r.ru;if(P.map.watts!=null&&r.watts)p.watts=r.watts;if(P.map.labor!=null)p.labor=r.labor;
+      if(P.map.ins!=null&&r.ins.length)p.ins=r.ins;if(P.map.outs!=null&&r.outs.length)p.outs=r.outs;upd++}
+    else{let id='PL-'+(plKey(r.mfr).slice(0,6).toUpperCase()||'X')+'-'+r.model.replace(/[^A-Za-z0-9]+/g,'').slice(0,28).toUpperCase(),n=2,base=id;while(byId(id))id=base+'-'+(n++);
+      p={id,mfr:r.mfr,model:r.model,cat:r.cat,desc:r.desc||`${r.mfr} ${r.model}`,cost:r.cost,msrp:r.msrp,labor:r.labor,ins:r.ins,outs:r.outs,ru:r.ru,watts:r.watts,mount:'rack',imgs:[],list};lib.push(p);added++}
+    p.imgs=Array.isArray(p.imgs)?p.imgs:[];
+    if(r.files.length||r.urls.length)jobs.push({p,files:r.files,urls:r.urls})});
+  save();badges();
+  /* photos after the products exist, a few at a time, so a long list still imports even if some photos fail */
+  let done=0;const total=jobs.reduce((s,j)=>s+j.files.length+j.urls.length,0);
+  const tick=()=>{P.busy=`Adding photos ${done} of ${total}…`;const b=$('[data-act="plImport"]');if(b)b.textContent=P.busy};
+  if(total){tick();
+    const q=[...jobs];const worker=async()=>{while(q.length){const j=q.shift(),have=new Set(j.p.imgs.map(x=>x.src||x.asset));
+      for(const f of j.files){if(j.p.imgs.length>=8)break;try{j.p.imgs.push(await plStoreImage(f));photos++}catch(e){failed++}done++;tick()}
+      for(const u of j.urls){if(j.p.imgs.length>=8||have.has(u)){done++;continue}let im=P.fetchImgs?await plFetchImage(u):null;if(im)photos++;else{im={src:u};linked++}j.p.imgs.push(im);have.add(u);done++;tick()}}};
+    await Promise.all([worker(),worker(),worker(),worker()]);save()}
+  const brands=[...new Set(rows.map(r=>r.mfr))];
+  S.pl=null;S.plOpen=false;PLIMG=new Map();libBrand=brands.length===1?brands[0]:'All';libCat='All';libQ='';libLim=200;badges();R.library();
+  toast(`${brands.length===1?brands[0]+': ':''}${plural(added,'new product')}, ${upd} updated${photos+linked?`, ${plural(photos+linked,'photo')}`:''}.${failed?` ${failed} photos couldn’t be read.`:''}${linked&&P.fetchImgs?' Some photos stay linked to the brand’s site.':''}`)}
+
+const PL_SAMPLE=`Northfield AV · Dealer price list · Effective Nov 2026
+Part Number,Product Name,Category,MSRP,Dealer Price,Rack Units,Power (W),Image
+NF-PTZ12,12x PTZ camera with HDMI and IP out,Camera,"$2,199.00","$1,429.35",0,18,
+NF-MX8,8-input USB conferencing DSP,DSP,"$1,850.00","$1,202.50",1,30,
+NF-SB2,Video bar with 4K camera and beamforming mics,Soundbar,"$1,299.00",$844.35,0,24,
+NF-AMP470,4 x 70 W 70V/100V amplifier,Amplifier,"$1,090.00",$708.50,1,420,
+NF-CS6,6.5" ceiling speaker 70V (pair),Speaker,$389.00,$252.85,0,,
+NF-WP2,Wall plate HDMI + USB-C input,Wall plate,$520.00,$338.00,0,8,
+NF-TX70,HDBaseT transmitter 70 m,Extender,$640.00,$416.00,0,6,
+NF-RX70,HDBaseT receiver 70 m,Extender,$640.00,$416.00,0,6,
+NF-TP10,"10"" touch panel, PoE",Control,"$1,480.00",$962.00,0,13,
+NF-PWR8,8-outlet rack power with sequencing,Rack,$449.00,$291.85,1,,`;
+
 /* ================= PROPOSAL ================= */
 /* ---------- drawing set attached to proposals ----------
    Captured when the proposal is sent (and again on a change order), so the client sees the sheets exactly as proposed. */
-const DSHEETS=[['flow','meta'],['rack','meta2'],['patch','meta5'],['plan','meta3'],['sched','meta4']];
+const DSHEETS=[['flow','meta'],['rack','meta2'],['patch','meta5'],['plan','meta3'],['sched','meta4'],['bom','meta6']];
 const snapDefs=()=>`<defs>${logoSym()}<pattern id="gmin" width="20" height="20" patternUnits="userSpaceOnUse"><path class="gmin" d="M20 0H0V20"/></pattern><pattern id="gmaj" width="100" height="100" patternUnits="userSpaceOnUse"><path class="gmaj" d="M100 0H0V100"/></pattern></defs>`;
 /* draws one canvas sheet off-screen with the editor's own renderer and returns its SVG markup */
 function snapCanvas(sheet){
@@ -3496,7 +3825,7 @@ function snapSched(){const rows=schedRows().sort((a,b)=>a.id.localeCompare(b.id,
     sum:`${plural(rows.length,'cable run')} · ${tot} m`}}
 function drawingSet(){const d=S.design,at=S.prop.attach||{};
   return {at:dayFmt(0)+' '+nowT(),rev:d.meta.rev,sheets:DSHEETS.filter(([k])=>at[k]!==false).map(([k,mk])=>{const m=d[mk],x={k,dwg:m.dwg,title:m.title};
-    if(k==='patch'){const p=snapPatch();x.html=p.html;x.sum=p.sum}else if(k==='sched'){const p=snapSched();x.html=p.html;x.sum=p.sum}else x.svg=snapCanvas(k);return x})}}
+    if(k==='patch'){const p=snapPatch();x.html=p.html;x.sum=p.sum}else if(k==='sched'){const p=snapSched();x.html=p.html;x.sum=p.sum}else if(k==='bom'){const p=snapBom();x.html=p.html;x.sum=p.sum}else x.svg=snapCanvas(k);return x})}}
 const sheetSet=()=>S.prop.drawings||S.liveSet||(S.liveSet=drawingSet());
 const sheetList=set=>set.sheets.map(s=>s.dwg).join(', ');
 function sheetBody(sh){return sh.svg!=null?`<svg class="dsheet" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="${esc(sh.dwg+' '+sh.title)}">${snapDefs()}${sh.svg}</svg>`
@@ -3806,6 +4135,12 @@ async function buildProposalPdf(){
       doc.autoTable({startY:52,margin:{left:LM,right:LM,top:52,bottom:40},head:[['Label','Type','From','To','Via','Cable','Length']],body:rows.map(r=>[pt(r.id),SIG[r.type].short,pt(`${r.fromTag} ${r.fromPort}\n${r.fromLoc||r.fromDev}`),pt(`${r.toTag} ${r.toPort}\n${r.toLoc||r.toDev}`),pt(r.via),pt(r.sku.desc),`${r.len} m`]),
         theme:'striped',styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:INK},columnStyles:{6:{halign:'right'}},didDrawPage:()=>sheetHead(sh)});
       const y2=doc.lastAutoTable.finalY+14;doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(pt(`${plural(rows.length,'cable run')} · ${rows.reduce((s,r)=>s+r.len,0)} m total`),LM,Math.min(y2,LH-30))}
+    else if(sh.k==='bom'){sheetHead(sh);const rows=bomRows(),pr=S.design.meta6.price||'none',np=pr==='none';
+      doc.autoTable({startY:52,margin:{left:LM,right:LM,top:52,bottom:40},head:[['Item','Qty','Manufacturer','Model','Description','Tags',...(np?[]:['Unit','Extended'])]],
+        body:rows.map(r=>[String(r.no),String(r.qty),pt(r.p.mfr),pt(r.p.model),pt(r.p.desc),pt(bomTagTxt(r)),...(np?[]:[money2(r.unit[pr]),money2(r.unit[pr]*r.qty)])]),
+        theme:'striped',styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:INK},columnStyles:{0:{halign:'right',cellWidth:30},1:{halign:'right',cellWidth:30},6:{halign:'right'},7:{halign:'right'}},didDrawPage:()=>sheetHead(sh)});
+      const y2=doc.lastAutoTable.finalY+14;doc.setFontSize(8);doc.setTextColor(...MUTED);
+      doc.text(pt(`${plural(rows.length,'line')} · ${plural(rows.reduce((s,r)=>s+r.qty,0),'piece')}${np?'':` · ${pr==='sell'?'sell':'dealer'} total ${money2(rows.reduce((s,r)=>s+r.unit[pr]*r.qty,0))}`}`),LM,Math.min(y2,LH-30))}
   }
   /* --- footers --- */
   const n=doc.getNumberOfPages();
@@ -4556,7 +4891,7 @@ const A={
   sheet(el){setSheet(el.dataset.sheet)},
   openRack(){S.ui.sheet='rack';cam=cams.rack;S.sel=null;save();go('design')},
   openFlow(){S.ui.sheet='flow';cam=cams.flow;S.sel=null;save();go('design')},
-  selCable(el){if(onRack()||onSched()||onPatch()){setSheet('flow',{kind:'cable',id:el.dataset.id});return}S.sel={kind:'cable',id:el.dataset.id};S.wire=null;renderCanvas();renderInspector()},
+  selCable(el){if(onRack()||onSched()||onPatch()||onBom()){setSheet('flow',{kind:'cable',id:el.dataset.id});return}S.sel={kind:'cable',id:el.dataset.id};S.wire=null;renderCanvas();renderInspector()},
   selNode(el){const sel={kind:'node',id:el.dataset.id};S.ui.tab='props';if(S.view!=='design'||S.ui.sheet!=='flow'){S.ui.sheet='flow';cam=cams.flow;S.sel=sel;save();go('design');return}S.sel=sel;S.wire=null;renderCanvas();renderInspector()},
   selRack(el){select('rack',el.dataset.id)},
   showOnFlow(el){setSheet('flow',{kind:'node',id:el.dataset.id})},
@@ -4639,6 +4974,28 @@ const A={
   wireFrom(el){startWire(parseEp(el.dataset.ep))},
   cancelWire(){S.wire=null;renderCanvas();renderInspector()},
   rmExtra(el){mut(()=>S.design.extras=S.design.extras.filter(e=>e.pid!==el.dataset.pid));refreshDesign()},
+  bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
+    mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
+  copyBom(){copyText(bomCSV(),'Bill of materials')},
+  openBom(){S.ui.sheet='bom';cam=cams.bom;S.sel=null;save();go('design')},
+  plOpen(){S.plOpen=true;R.library();requestAnimationFrame(()=>{const el=$('#plPanel');if(el)el.scrollIntoView({block:'start',behavior:'smooth'})})},
+  plClose(){S.pl=null;S.plOpen=false;S.plPaste=false;PLIMG=new Map();R.library()},
+  plReset(){S.pl=null;S.plOpen=true;R.library()},
+  plPasteOpen(){S.plPaste=!S.plPaste;R.library();if(S.plPaste){const t=$('#plPasteIn');if(t)t.focus()}},
+  plPasteGo(){const rows=plParse(($('#plPasteIn')||{}).value);if(rows.length<2){toast('Paste a header row and at least one product row.');return}S.plPaste=false;plLoad('Pasted rows',rows,null)},
+  plSample(){plLoad('Northfield AV price list.csv',plParse(PL_SAMPLE),null)},
+  plPrice(el){S.pl.price=el.dataset.v;R.library()},
+  plFilter(el){S.pl.filter=el.dataset.v;S.pl.lim=60;R.library()},
+  plMore(){S.pl.lim=(S.pl.lim||60)+200;R.library()},
+  plImgClear(){PLIMG=new Map();R.library()},
+  plImport(){plImport()},
+  libView(el){S.ui.libView=el.dataset.v;R.library()},
+  libMore(){libLim+=200;R.library()},
+  libBrandShow(el){libBrand=el.dataset.v;libCat='All';libQ='';libLim=200;R.library();requestAnimationFrame(()=>{const q=$('#libQ');if(q)q.scrollIntoView({block:'center',behavior:'smooth'})})},
+  plDelAsk(el){S.ui.plDel=+el.dataset.i<0?null:+el.dataset.i;R.library()},
+  plDelGo(el){const l=priceLists()[+el.dataset.i];S.ui.plDel=null;if(!l){R.library();return}
+    const ps=lib.filter(p=>p.mfr===l.brand&&p.list&&p.list.name===l.name),keep=ps.filter(p=>{const u=productUse(p.id);return u.placed+u.other>0}),drop=ps.filter(p=>!keep.includes(p));
+    lib=lib.filter(p=>!drop.includes(p));setTimeout(()=>drop.forEach(p=>dropAssets(p.imgs)),0);save();badges();R.library();toast(`Removed ${plural(drop.length,'product')}.${keep.length?` Kept ${keep.length} that a project uses.`:''}`)},
   newBlock(){openBuilder()},
   newProject(){openNewProject()},
   rackSizeSave(){const z=S.rsz;if(!z)return;const p=byId(z.pid);if(!p){closeOverlay();return}
@@ -5755,7 +6112,7 @@ function applyCloud(meta,pjs){
     const e=curPj();if(e.prop)S.prop=e.prop;S.tasks=Array.isArray(e.tasks)?e.tasks:[];S.time=Array.isArray(e.time)?e.time:[];S.photos=Array.isArray(e.photos)?e.photos:[];tkNormAll();
     const d=normDesign(e.design);if(d)S.design=d;e.design=null;if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
     uidc=Math.max(uidc,+e.u||0,maxUid());cleanRacks();H.past=[];H.future=[];S.sel=null;S.wire=null;S.liveSet=null;
-    Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch)c.init=false})}
+    Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom)c.init=false})}
   purgeSamples();
   /* mirror into this browser so it opens fast next time */
   save();saveClients();saveInvoices();try{localStorage.setItem(CTKEY,JSON.stringify(S.contracts||[]))}catch(e){}try{localStorage.setItem(SVKEY,JSON.stringify({tickets:S.tickets,agreements:S.agreements,tseq:S.tseq}))}catch(e){}
