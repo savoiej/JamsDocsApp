@@ -6006,7 +6006,7 @@ R.contracts=function(){const el=$('#v-contracts');{const n=ctPmSweep();if(n)setT
   ${att.length?`<div class="panel"><div class="ph"><h2>Needs attention</h2></div><div class="pb"><ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">${att.map(([c,t])=>`<li><button class="rowlnk" data-act="ctOpen" data-id="${c.id}" style="color:var(--accent);font-weight:600">${esc(c.client)} · ${esc(c.title||c.no)}</button> ${esc(t)}</li>`).join('')}</ul></div></div>`:''}
   <div class="panel"><div class="ph"><h2>Contracts</h2><select class="inp" id="ctF" aria-label="Show" style="width:auto">${[['live','Active'],['Expiring','Expiring soon'],['Draft','Drafts'],['Expired','Expired'],['Cancelled','Cancelled'],['all','All']].map(([k,l])=>`<option value="${k}"${k===f?' selected':''}>${l}</option>`).join('')}</select></div>
    ${rows.length?`<div class="scroll"><table class="t"><thead><tr><th>Company</th><th>Contract</th><th>Type</th><th>Covers</th><th>Term</th><th>Hours this period</th><th class="n">Monthly</th><th>Status</th></tr></thead><tbody>
-    ${rows.map(c=>{const u=ctUsage(c),st=ctStatus(c);return `<tr class="click" data-act="ctOpen" data-id="${c.id}"><td><b>${esc(c.client)}</b></td><td>${esc(c.title||'')}<span class="muted mono" style="display:block;font-size:11px">${esc(c.no)}</span></td><td>${esc(CT_TYPE(c.type)[1])}</td><td><span style="font-size:12px">${esc((c.services||[]).slice(0,3).join(', '))}${(c.services||[]).length>3?` +${c.services.length-3}`:''}</span></td><td class="m">${c.start?fmtD(c.start):'—'}<br><span class="muted">to ${c.end?fmtD(c.end):'open-ended'}</span></td><td>${c.type==='fixed'?'<span class="muted">—</span>':ctBar(u.used,u.incl)}</td><td class="n">${ctMRR(c)?money(ctMRR(c)):'—'}</td><td>${chip(st)}</td></tr>`}).join('')}</tbody></table></div>`
+    ${rows.map(c=>{const u=ctUsage(c),st=ctStatus(c);return `<tr class="click" data-act="ctOpen" data-id="${c.id}"><td><b>${esc(c.client)}</b>${ctAutopayOn(c)?' <span class="chip Active" title="Invoices are charged automatically">Autopay</span>':''}</td><td>${esc(c.title||'')}<span class="muted mono" style="display:block;font-size:11px">${esc(c.no)}</span></td><td>${esc(CT_TYPE(c.type)[1])}</td><td><span style="font-size:12px">${esc((c.services||[]).slice(0,3).join(', '))}${(c.services||[]).length>3?` +${c.services.length-3}`:''}</span></td><td class="m">${c.start?fmtD(c.start):'—'}<br><span class="muted">to ${c.end?fmtD(c.end):'open-ended'}</span></td><td>${c.type==='fixed'?'<span class="muted">—</span>':ctBar(u.used,u.incl)}</td><td class="n">${ctMRR(c)?money(ctMRR(c)):'—'}</td><td>${chip(st)}</td></tr>`}).join('')}</tbody></table></div>`
    :`<div class="pb"><p class="muted" style="margin:0 0 10px">${C.length?'No contracts match.':'No service contracts yet. Add each company you have an agreement with: what you cover, the hours included and how you bill.'}</p>${C.length?'':'<div class="actions"><button class="btn primary" data-act="ctEdit">+ New contract</button><button class="btn" data-act="ctSample">Add an example contract</button></div>'}</div>`}</div>`}
 
 /* ---------- recurring billing run and preventive maintenance ---------- */
@@ -6036,13 +6036,40 @@ function ctPmSweep(){const soon=isoDay(14),old=isoDay(-30);let n=0;
         S.tickets.unshift({id:'SR-'+(S.tseq++),site:site?`${c.client} · ${site}`:c.client,issue:`Preventive maintenance visit · ${c.no}${c.title?' · '+c.title:''}`,desc:`Scheduled ${String(c.pm).toLowerCase()} maintenance under ${c.no}, due ${fmtD(due)}.`,pri:'Medium',tech:'',col:'Open',when:'',due,cat:'Maintenance',pm:key,ct:c.id,log:[]});n++}
       const nx=addMonths(due,m);c.pmNext=c.end&&!c.autoRenew&&nx>c.end?'':nx}});
   if(n){saveService();saveContracts();badges()}return n}
-function ctRunHTML(){const items=ctRunItems(),pmC=S.contracts.filter(c=>ctLive(c)&&CT_PM[c.pm||'None']);
+function ctRunHTML(){const items=ctRunItems(),pmC=S.contracts.filter(c=>ctLive(c)&&CT_PM[c.pm||'None']),apd=ctAutopayDrafts();
   const run=items.length?`<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Billing run</h2><span class="muted" style="font-size:12px">${plural(items.length,'invoice')} due · ${money2(items.reduce((s,i)=>s+i.total,0))}</span><span class="tgrow"></span><button class="btn primary" data-act="ctRun">Draft ${plural(items.length,'invoice')}</button></div>
     <div class="scroll"><table class="t"><thead><tr><th>Company</th><th>Contract</th><th>For</th><th class="n">Amount</th></tr></thead><tbody>${items.map(i=>`<tr class="click" data-act="ctOpen" data-id="${i.c.id}"><td><b>${esc(i.c.client)}</b></td><td>${esc(i.c.title||'')} <span class="muted mono" style="font-size:11px">${esc(i.c.no)}</span></td><td>${esc(i.label)}</td><td class="n">${money2(i.total)}</td></tr>`).join('')}</tbody></table></div>
     <div class="pb" style="padding-top:8px"><p class="note" style="margin:0">Invoices are drafted, not sent. Review each one under Clients &amp; invoices, then send it.</p></div></div>`:'';
   const pm=pmC.length?`<div class="panel"><div class="ph"><h2>Maintenance visits</h2><span class="muted" style="font-size:12px">A service-desk ticket opens two weeks before each visit</span></div>
     <div class="scroll"><table class="t"><thead><tr><th>Company</th><th>Contract</th><th>Every</th><th>Next visit</th><th class="n">Open PM tickets</th></tr></thead><tbody>${pmC.map(c=>{const open=S.tickets.filter(t=>t.ct===c.id&&t.pm&&TK_OPEN(t)).length;return `<tr class="click" data-act="ctOpen" data-id="${c.id}"><td><b>${esc(c.client)}</b></td><td>${esc(c.title||'')} <span class="muted mono" style="font-size:11px">${esc(c.no)}</span></td><td>${esc(c.pm)}</td><td>${c.pmNext?esc(fmtD(c.pmNext)):'<span class="muted">Not scheduled</span>'}</td><td class="n">${open||'—'}</td></tr>`}).join('')}</tbody></table></div></div>`:'';
-  return run+pm}
+  const ap=apd.length?`<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Ready to charge</h2><span class="muted" style="font-size:12px">${plural(apd.length,'draft invoice')} on autopay · ${money2(apd.reduce((s,v)=>s+invCalc(v).total,0))}</span><span class="tgrow"></span><button class="btn primary" data-act="ctCharge">Send and charge ${plural(apd.length,'invoice')}</button></div>
+    <div class="scroll"><table class="t"><thead><tr><th>Invoice</th><th>Company</th><th>For</th><th>Charged to</th><th class="n">Amount</th></tr></thead><tbody>${apd.map(v=>{const c=ctFind(v.src.ct),pm=ctPm(c);return `<tr><td class="mono">${esc(v.no)}</td><td><b>${esc(c?c.client:'')}</b></td><td>${esc(v.src.label||'')}</td><td>${esc(pm?pm.label:'')}</td><td class="n">${money2(invCalc(v).total)}</td></tr>`}).join('')}</tbody></table></div>
+    <div class="pb" style="padding-top:8px"><p class="note" style="margin:0">Each invoice is sent and charged to the saved payment method. If a charge fails, the invoice stays sent with its pay link so the client can pay it themselves.</p></div></div>`:'';
+  return run+ap+pm}
+/* ---------- retainer autopay ---------- */
+const AUTOPAY_BASE='https://app.jamsdocsanddesigns.com/autopay/';
+let STRIPEPM=new Map(),STRIPEPM_UNSUB=null;
+const ctPm=c=>{const d=c&&STRIPEPM.get(c.id);return d&&d.status==='active'?d:null};
+const ctAutopayOn=c=>!!ctPm(c)&&c.autopay!==false;
+function stripePmSync(){if(!DBX||S.tech||STRIPEPM_UNSUB)return;try{STRIPEPM_UNSUB=DBX.collection('stripepm').onSnapshot(snap=>{STRIPEPM=new Map(snap.docs.map(d=>{const x=d.data();return [x.contractId,x]}));if(S.view==='contracts')try{R.contracts()}catch(e){}},()=>{})}catch(e){}}
+function ctAutopayHTML(c){const pm=ctPm(c),link=c.payToken?AUTOPAY_BASE+c.id+'.'+c.payToken:'';
+  return `<div class="panel"><div class="ph"><h2>Autopay</h2>${pm?(c.autopay===false?'<span class="chip Medium">Paused</span>':'<span class="chip Active">On</span>'):''}</div><div class="pb" style="display:flex;flex-direction:column;gap:10px">
+   ${pm?`<p style="margin:0">Invoices from the billing run are charged to <b>${esc(pm.label)}</b> (saved ${esc(fmtD(String(pm.at).slice(0,10)))}).</p>
+     <div class="actions"><button class="btn sm" data-act="ctAutopayPause" data-id="${c.id}">${c.autopay===false?'Resume autopay':'Pause autopay'}</button></div>`
+    :`<p class="muted" style="margin:0">Send the client a link to save a card or US bank account. Their invoices are then charged automatically when you run billing.</p>`}
+   ${link?`<div class="addrow" style="display:flex;gap:8px"><input class="inp mono" id="apLink-${c.id}" readonly value="${esc(link)}" aria-label="Autopay setup link" style="flex:1;min-width:0;font-size:12px"><button class="btn sm" data-act="ctAutopayCopy" data-id="${c.id}">Copy link</button></div><p class="muted sm" style="margin:0">${pm?'The client can use the same link to change their payment method.':''}</p>`
+    :`<button class="btn sm" data-act="ctAutopayLink" data-id="${c.id}" style="align-self:flex-start">Create autopay setup link</button>`}
+  </div></div>`}
+/* drafts from the billing run whose contract has autopay on */
+const ctAutopayDrafts=()=>S.invoices.filter(v=>!v.void&&!v.sentAt&&v.src&&v.src.app==='Contract'&&v.src.ct&&ctAutopayOn(ctFind(v.src.ct)||{})&&invCalc(v).total>0);
+async function ctChargeDrafts(btn){const list=ctAutopayDrafts();if(!list.length)return;if(btn){btn.disabled=true;btn.textContent='Charging…'}
+  list.forEach(v=>{v.sentAt=isoDay(0);if(!v.payToken)v.payToken=payTok();const c=clientById(v.clientId);if(c)clog(c,`Invoice ${v.no} sent and charged by autopay for ${money2(invCalc(v).total)}`)});
+  saveInvoices();saveClients();try{await cloudFlush()}catch(e){}
+  let ok=0,proc=0;const bad=[];
+  for(const v of list){try{const r=await fetch('/api/autopay/charge',{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify({invoiceId:v.id})});
+      const d=await r.json().catch(()=>({}));if(d.status==='paid')ok++;else if(d.status==='processing')proc++;else bad.push(`${v.no}: ${d.message||'not charged'}`)}
+    catch(e){bad.push(`${v.no}: couldn’t reach the payment service`)}}
+  R.contracts();toast([ok?`${plural(ok,'invoice')} paid`:'',proc?`${plural(proc,'bank payment')} processing`:'',bad.length?`${bad.length} not charged (${bad.slice(0,2).join('; ')}${bad.length>2?'…':''}). They were sent with a pay link`:''].filter(Boolean).join(' · ')+'.')}
 function ctDetailHTML(c){const st=ctStatus(c),p=ctPeriodOf(c),u=ctUsage(c,p),T=CT_TYPE(c.type),vis=(c.visits||[]).slice().sort((a,b)=>b.day.localeCompare(a.day));
   const invs=S.invoices.filter(v=>v.src&&v.src.app==='Contract'&&v.src.ct===c.id).sort((a,b)=>b.issued.localeCompare(a.issued));
   const tix=S.tickets.filter(t=>String(t.site||'').toLowerCase().startsWith(String(c.client).toLowerCase())&&TK_OPEN(t));
@@ -6061,6 +6088,7 @@ function ctDetailHTML(c){const st=ctStatus(c),p=ctPeriodOf(c),u=ctUsage(c,p),T=C
       return `<tr class="click" data-act="ctVisit" data-id="${c.id}" data-v="${v.id}"><td class="m">${fmtD(v.day)}</td><td><b>${esc(v.service||'')}</b>${v.ticket?` <span class="mono muted" style="font-size:11px">${esc(v.ticket)}</span>`:''}${v.note?`<span class="muted" style="display:block;font-size:12px">${esc(v.note)}</span>`:''}</td><td>${esc(v.site||'')}</td><td><span class="av">${esc(v.tech||'—')}</span></td><td class="n">${tbHrs(+v.hrs||0)}${v.ah?'<span class="muted" style="display:block;font-size:11px">after hours</span>':''}</td><td>${billed?`<button class="btn sm ghost" data-act="tbOpenInv" data-id="${iv.id}">${esc(iv.no)}</button>`:c.type==='tm'||v.ah?'<span class="chip Open">To bill</span>':c.type==='fixed'?'<span class="chip">In price</span>':'<span class="chip Active">Covered</span>'}</td></tr>`}).join('')}</tbody></table></div>`
      :'<div class="pb"><p class="muted" style="margin:0">No visits logged yet. Log each onsite visit, install or support call here so hours count against the contract.</p></div>'}</div>
    <div style="display:flex;flex-direction:column;gap:16px">
+    ${ctAutopayHTML(c)}
     <div class="panel"><div class="ph"><h2>Terms</h2></div><div class="pb"><div class="kv">${kv('Type',esc(T[1]))}${kv('Term',`${c.start?fmtD(c.start):'—'} to ${c.end?fmtD(c.end):'open-ended'}`)}${kv('Renewal',c.autoRenew?'Renews automatically':'Renew by agreement')}${kv('Billing',c.type==='retainer'?esc(c.cycle||'Monthly'):c.type==='block'?'Block prepaid, extra hours billed':c.type==='tm'?'Hours billed as worked':'Agreed price')}${kv('PO number',esc(c.po||''))}${kv('Coverage',esc(c.coverage||''))}
       ${c.sla?['Urgent','High','Normal'].map(k=>c.sla[k]?kv(k+' response',esc(c.sla[k])+' h'):'').join(''):''}</div>
       ${(c.services||[]).length?`<p class="plh" style="margin-top:12px">Services covered</p><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${c.services.map(x=>`<span class="chip Active">${esc(x)}</span>`).join('')}</div>`:''}
@@ -6183,6 +6211,11 @@ Object.assign(A,{
     saveContracts();closeOverlay();if(S.view==='contracts')R.contracts();const u=ctUsage(c);toast(`Logged ${tbHrs(v.hrs)} h on ${c.no}.${u.incl&&u.used>u.incl?` ${c.client} is ${tbHrs(u.used-u.incl)} h over the included hours.`:''}`)},
   ctVisitDel(){const o=S.ctv,c=ctFind(o.cid);if(!c)return;c.visits=(c.visits||[]).filter(v=>v.id!==o.vid);saveContracts();closeOverlay();R.contracts();toast('Visit deleted.')},
   ctBill(el){ctBillDialog(el.dataset.id)},
+  ctAutopayLink(el){const c=ctFind(el.dataset.id);if(!c)return;c.payToken=payTok();saveContracts();R.contracts();toast('Autopay setup link created. Copy it into an email to the client.')},
+  ctAutopayCopy(el){const i=document.getElementById('apLink-'+el.dataset.id);if(i)copyText(i.value,'Autopay setup link')},
+  ctAutopayPause(el){const c=ctFind(el.dataset.id);if(!c)return;c.autopay=c.autopay===false;saveContracts();R.contracts();toast(c.autopay===false?'Autopay paused. Billing-run invoices for this contract go out with a pay link instead.':'Autopay resumed.')},
+  ctCharge(el){ctChargeDrafts(el)},
+
   ctRun(){const items=ctRunItems();if(!items.length)return;const made=[];items.forEach(i=>{const v=ctDraft(i.c,i.o);if(v)made.push(v)});
     saveClients();saveContracts();saveInvoices();badges();R.contracts();toast(`${plural(made.length,'draft invoice')} created (${money2(made.reduce((s,v)=>s+invCalc(v).total,0))}). Review and send them under Clients & invoices.`)},
 
@@ -6802,7 +6835,7 @@ async function cloudBoot(){
     const meta={};ms.docs.forEach(d=>{const x=d.data();if(x&&typeof x.json==='string')meta[d.id]=x.json});
     const pjs=ps.docs.map(d=>{const x=d.data();return x&&typeof x.json==='string'?[d.id,x.json]:null}).filter(Boolean);
     if(!pjs.length&&!Object.keys(meta).length){CLOUD.ready=true;await cloudFlush();toast('Your projects, clients and invoices now save to the app, so they follow you to any device.');return}
-    applyCloud(meta,pjs);CLOUD.ready=true;setSync('live','Saved to the app');renderBrand();go(S.view);cloudFlush();stripeSync();
+    applyCloud(meta,pjs);CLOUD.ready=true;setSync('live','Saved to the app');renderBrand();go(S.view);cloudFlush();stripeSync();stripePmSync();
   }catch(e){setSync('err','Couldn’t load saved work · using this browser');DBX=null}
 }
 async function backupAll(){

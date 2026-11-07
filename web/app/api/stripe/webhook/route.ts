@@ -1,11 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { recordPayment, stripe, type PayDoc } from "@/lib/stripe-pay";
+import { pmLabel, recordPayment, stripe, writePm, type PayDoc } from "@/lib/stripe-pay";
 
 // Stripe webhook: records invoice payments made through Checkout. Every event's signature is
 // verified before anything is read. Card payments arrive paid on checkout.session.completed;
 // ACH bank payments arrive unpaid ("processing") and settle days later with
-// checkout.session.async_payment_succeeded or ..._failed.
+// checkout.session.async_payment_succeeded or ..._failed. Autopay: a setup-mode session saves the
+// contract's payment method; off-session charges settle with payment_intent.succeeded / ..._failed.
 export const runtime = "nodejs";
 
 const label = (pi: Stripe.PaymentIntent | null) => {
@@ -34,9 +35,41 @@ export async function POST(request: NextRequest) {
     "checkout.session.async_payment_succeeded": "paid",
     "checkout.session.async_payment_failed": "failed",
   };
+  /* autopay: off-session charges made by /api/autopay/charge */
+  if (event.type === "payment_intent.succeeded" || event.type === "payment_intent.payment_failed") {
+    const pi = event.data.object as Stripe.PaymentIntent;
+    if (pi.metadata?.app !== "sitrep" || pi.metadata?.kind !== "autopay" || !pi.metadata.invoice_id) return NextResponse.json({ received: true });
+    let full: Stripe.PaymentIntent | null = null;
+    try { full = await stripe().paymentIntents.retrieve(pi.id, { expand: ["latest_charge"] }); } catch { full = null; }
+    try {
+      await recordPayment({ sessionId: pi.id, invoiceId: pi.metadata.invoice_id, invoiceNo: pi.metadata.invoice_no || "", amount: Math.round(pi.amount || 0) / 100,
+        status: event.type === "payment_intent.succeeded" ? "paid" : "failed", method: `Autopay ${label(full)}`, pi: pi.id,
+        date: new Date(event.created * 1000).toISOString().slice(0, 10), at: new Date().toISOString() });
+    } catch (e) {
+      console.error("record autopay", (e as Error).message);
+      return NextResponse.json({ error: "could not record" }, { status: 500 });
+    }
+    return NextResponse.json({ received: true });
+  }
   const kind = kinds[event.type];
   if (!kind) return NextResponse.json({ received: true });
   const s = event.data.object as Stripe.Checkout.Session;
+  /* autopay setup: save the contract's payment method */
+  if (s.mode === "setup") {
+    if (s.metadata?.app !== "sitrep" || s.metadata?.kind !== "autopay" || !s.metadata.contract_id || event.type !== "checkout.session.completed") return NextResponse.json({ received: true });
+    const siId = typeof s.setup_intent === "string" ? s.setup_intent : s.setup_intent?.id;
+    try {
+      const si = siId ? await stripe().setupIntents.retrieve(siId, { expand: ["payment_method"] }) : null;
+      const pm = si && typeof si.payment_method === "object" ? si.payment_method : null;
+      const customer = typeof s.customer === "string" ? s.customer : s.customer?.id || "";
+      if (!pm || !customer) return NextResponse.json({ received: true });
+      await writePm({ contractId: s.metadata.contract_id, customer, pm: pm.id, label: pmLabel(pm), status: "active", at: new Date().toISOString(), sessionId: s.id });
+    } catch (e) {
+      console.error("save autopay method", (e as Error).message);
+      return NextResponse.json({ error: "could not record" }, { status: 500 });
+    }
+    return NextResponse.json({ received: true });
+  }
   if (s.metadata?.app !== "sitrep" || !s.metadata?.invoice_id) return NextResponse.json({ received: true });
 
   const status: PayDoc["status"] = kind === "auto" ? (s.payment_status === "unpaid" ? "processing" : "paid") : kind;

@@ -97,3 +97,58 @@ export async function recordPayment(d: PayDoc) {
 
 /* label for the Checkout integration in the Stripe Dashboard */
 export const INTEGRATION_ID = "sitrep_invoice_pay_qkzmvwta";
+
+/* ---------- retainer autopay: a saved payment method per service contract ---------- */
+export type Contract = { id: string; no: string; client: string; title?: string; type?: string; cycle?: string; fee?: number | string; status?: string; end?: string; payToken?: string; autopay?: boolean };
+export type PmDoc = { contractId: string; customer: string; pm: string; label: string; status: "active" | "removed"; at: string; sessionId?: string };
+
+export async function readPm(contractId: string) {
+  const { data } = await adminDb().from("documents").select("data").eq("path", `stripepm/${contractId}`).maybeSingle();
+  return (data?.data as PmDoc) || null;
+}
+export async function writePm(d: PmDoc) {
+  const { error } = await adminDb()
+    .from("documents")
+    .upsert({ path: `stripepm/${d.contractId}`, collection: "stripepm", doc_id: d.contractId, data: d, updated_by: null }, { onConflict: "path" });
+  if (error) throw new Error(error.message);
+}
+function tokenOk(saved: string | undefined, given: string) {
+  if (!saved || saved.length !== given.length) return false;
+  let diff = 0;
+  for (let i = 0; i < given.length; i++) diff |= saved.charCodeAt(i) ^ given.charCodeAt(i);
+  return !diff;
+}
+/* "contractId.token" -> the contract, its client's email and the firm, or null */
+export async function loadContractByRef(ref: string) {
+  const m = /^([A-Za-z0-9_-]{3,64})\.([A-Za-z0-9]{16,64})$/.exec(String(ref || ""));
+  if (!m) return null;
+  const db = adminDb();
+  const [contracts, clients, settings] = await Promise.all([
+    readDoc<Contract[]>(db, "meta/contracts"),
+    readDoc<{ id: string; name: string; contacts?: { email?: string; primary?: boolean }[] }[]>(db, "meta/clients"),
+    readDoc<{ name?: string; email?: string }>(db, "meta/settings"),
+  ]);
+  const c = (contracts || []).find((x) => x.id === m[1]);
+  if (!c || !tokenOk(c.payToken, m[2])) return null;
+  const client = (clients || []).find((x) => String(x.name).trim().toLowerCase() === String(c.client).trim().toLowerCase()) || null;
+  const contact = client?.contacts?.find((x) => x.primary) || client?.contacts?.[0];
+  return { c, email: contact?.email || "", firm: settings?.name || "Jams Docs and Designs", firmEmail: settings?.email || "", pm: await readPm(c.id) };
+}
+/* one invoice by id (server copy) */
+export async function loadInvoice(id: string) {
+  const invoices = await readDoc<(Invoice & { src?: { ct?: string; app?: string } })[]>(adminDb(), "meta/invoices");
+  return (invoices || []).find((v) => v.id === id) || null;
+}
+export async function loadContract(id: string) {
+  const contracts = await readDoc<Contract[]>(adminDb(), "meta/contracts");
+  return (contracts || []).find((c) => c.id === id) || null;
+}
+export const AUTOPAY_INTEGRATION_ID = "sitrep_autopay_setup_hdwqnrxe";
+/* "Visa ...4242" / "ACH bank ...6789" from a PaymentMethod */
+export function pmLabel(pm: Stripe.PaymentMethod | null) {
+  if (!pm) return "Saved payment method";
+  if (pm.type === "card" && pm.card) return `${(pm.card.brand || "Card").replace(/^./, (c) => c.toUpperCase())} …${pm.card.last4}`;
+  if (pm.type === "us_bank_account" && pm.us_bank_account) return `${pm.us_bank_account.bank_name || "Bank account"} …${pm.us_bank_account.last4}`;
+  if (pm.type === "link") return "Link";
+  return pm.type.replace(/_/g, " ");
+}

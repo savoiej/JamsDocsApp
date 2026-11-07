@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// /pay and its API are for clients paying an invoice (no account); the Stripe webhook authenticates by signature.
-const PUBLIC_PATHS = ["/login", "/signup", "/auth", "/pay/", "/api/pay/", "/api/stripe/webhook"];
+// /pay and /autopay are for clients paying or saving a payment method (no account); /api/autopay/charge checks
+// sign-in itself; the Stripe webhook authenticates by signature.
+const PUBLIC_PATHS = ["/login", "/signup", "/auth", "/pay/", "/api/pay/", "/autopay/", "/api/autopay/", "/api/stripe/webhook"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
