@@ -1063,6 +1063,7 @@ body.tech .money{display:none!important}
 .fdev{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}.fdev.done .fdev-h b{color:var(--ok)}
 .fdev-h{display:flex;flex-direction:column;gap:2px}.fdev-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
 .fdin{display:flex;gap:6px;align-items:center}.fdin .inp{flex:1;min-width:0}.fdev-a{display:flex;gap:8px}
+.colist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.colist li{display:flex;gap:8px;align-items:baseline}.colist .cok{width:16px;color:var(--muted);font-weight:700}.colist li.ok .cok{color:var(--ok)}
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -4289,6 +4290,9 @@ function openClient(){
      <div class="actions" style="justify-content:space-between"><button class="btn sm" data-act="clearSig">Clear</button><button class="btn primary" id="signBtn" data-act="signProp" disabled>Accept and sign</button></div>
      <p class="note">Signing records the signer’s name, time and the proposal total.</p>`
     :`<p class="note">Signed by <b>${esc(P.signer||'')}</b>. This proposal is locked.</p>`}
+    ${P.closeout?`<div class="dsec"><div class="dsec-h"><b>As-built documentation · ${esc(dayFmtIso(P.closeout.at))}</b><span class="muted">Your installed system, as built</span></div>${sheetThumbs(P.closeout.set).replace(/data-act="viewSheet"/g,'data-act="viewAsBuilt"')}
+     <details class="sowd"><summary>Equipment register · ${plural(P.closeout.reg.length,'device')}</summary><div class="scroll"><table class="t"><thead><tr><th>Tag</th><th>Equipment</th><th>Location</th><th>Serial</th><th>MAC</th><th>IP</th></tr></thead><tbody>${P.closeout.reg.map(r=>`<tr><td class="mono">${esc(r.tag)}</td><td>${esc(r.mfr)} ${esc(r.model)}</td><td>${esc(r.loc)}</td><td class="mono">${esc(r.serial)}</td><td class="mono">${esc(r.mac)}</td><td class="mono">${esc(r.ip)}</td></tr>`).join('')}</tbody></table></div></details>
+     <div class="actions"><button class="btn sm" data-act="coPdf">Download the closeout package</button></div></div>`:''}
    </div></div>`;
   ov.hidden=false;
   if(canSign)initSig();
@@ -4432,14 +4436,79 @@ async function svgToPng(markup,w,h,scale){
   const img=new Image();await new Promise((res,rej)=>{img.onload=res;img.onerror=()=>rej(new Error('render'));img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(xml)});
   const c=document.createElement('canvas');c.width=Math.round(w*scale);c.height=Math.round(h*scale);const ctx=c.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);
   return c.toDataURL('image/png')}
-async function buildProposalPdf(){
+/* ================= CLOSEOUT PACKAGE =================
+   At the end of a job: an as-built PDF (cover and readiness summary, equipment register with
+   serials, MACs and IPs, cable test results, warranty and support, every drawing sheet marked
+   AS-BUILT, and the install photos), and an as-built snapshot published to the client view. */
+function coSet(){const at=S.prop.attach,m6=S.design.meta6,pr=m6.price;S.prop.attach={};m6.price='none';try{const x=drawingSet();x.rev='AS-BUILT';return x}finally{S.prop.attach=at;m6.price=pr}}
+function coRegister(){const tg=tags(),m=S.design.ipam||{},hosts=m.hosts||{},vl=new Map((m.vlans||[]).map(v=>[String(v.id),v]));
+  return S.design.nodes.map(n=>{const p=prod(n),h=hosts[n.uid]||{},v=vl.get(String(h.vlan||''));return {uid:n.uid,tag:tg[n.uid]||'',mfr:p.mfr,model:p.model,desc:p.desc,loc:endLoc(n.uid)||'',serial:n.serial||'',mac:h.mac||'',ip:h.ip||'',vlan:v?`${v.id} ${v.name}`:'',host:h.host||'',inst:n.inst||null,net:netPortsOf(p).length>0}})
+    .sort((a,b)=>String(a.tag).localeCompare(String(b.tag),undefined,{numeric:true}))}
+function coStats(){const r=coRegister(),cs=S.design.cables,ph=(S.photos||[]).filter(p=>p.asset);
+  return {devs:r.length,inst:r.filter(x=>x.inst).length,serial:r.filter(x=>x.serial).length,net:r.filter(x=>x.net).length,mac:r.filter(x=>x.net&&x.mac).length,ip:r.filter(x=>x.net&&x.ip).length,
+    cables:cs.length,tested:cs.filter(c=>c.status==='Tested').length,photos:ph.length,devPhotos:new Set(ph.filter(p=>p.uid).map(p=>p.uid)).size}}
+function closeoutHTML(){const P=S.prop,st=coStats(),pub=P.closeout;if(!st.devs)return '';
+  const row=(ok,txt,go)=>`<li class="${ok?'ok':''}"><span class="cok" aria-hidden="true">${ok?'✓':'•'}</span><span>${txt}</span>${!ok&&go?`<button class="lnk" data-go="${go}">${go==='field'?'Field app':'Open'}</button>`:''}</li>`;
+  const ready=st.inst===st.devs&&st.tested===st.cables;
+  return `<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Closeout</h2>${pub?`<span class="chip Signed">Published ${esc(dayFmtIso(pub.at))}</span>`:''}<span class="tgrow"></span>
+    <button class="btn" data-act="coPdf">Download closeout PDF</button><button class="btn ${ready?'primary':''}" data-act="coPublish">${pub?'Update the client’s as-built':'Publish as-built to the client'}</button></div>
+   <div class="pb"><ul class="colist">
+    ${row(st.inst===st.devs,`${st.inst} of ${st.devs} devices marked installed`,'field')}
+    ${row(st.tested===st.cables,`${st.tested} of ${st.cables} cables tested`,'field')}
+    ${row(st.serial===st.devs,`${st.serial} of ${st.devs} serial numbers captured`,'field')}
+    ${st.net?row(st.mac===st.net,`${st.mac} of ${st.net} MAC addresses captured`,'field'):''}
+    ${st.net?row(st.ip===st.net,`${st.ip} of ${st.net} network devices have an IP on the E-601 sheet`,'design'):''}
+    ${row(st.devPhotos>0,`${plural(st.photos,'photo')}${st.devPhotos?`, ${st.devPhotos} devices with install photos`:''}`,'field')}
+   </ul><p class="note" style="margin:8px 0 0">The package can go out with gaps: missing items show blank in the register. ${pub?'Publishing again replaces what the client sees.':'Publishing adds the as-built drawings and equipment register to the client view; it never shows prices.'}</p></div></div>`}
+async function coPages(doc,o){const {INK,MUTED,LINE,M,PW,set}=o,P=S.prop,st=coStats(),reg=coRegister(),done=(P.closeout&&P.closeout.at)||isoDay(0);
+  const LX=logoSrc()?M+50:M;if(logoSrc()){try{doc.addImage(logoSrc(),'PNG',M,42,40,40)}catch(_){}}
+  doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text(pt(firm().toUpperCase()),LX,64);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text(pt([SETTINGS.tagline,contactLine()].filter(Boolean).join(' · ')),LX,78);
+  doc.setFont('helvetica','bold');doc.setFontSize(24);doc.setTextColor(...INK);doc.text('Closeout package',M,150);
+  doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(...MUTED);doc.text('As-built documentation',M,170);
+  [['Client',P.client],['Project',P.project],['Reference',P.no],['Completed',dayFmtIso(done)],['Prepared by',firm()]].forEach(([k,v],i)=>{doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(pt(k.toUpperCase()),M,206+i*20);doc.setFontSize(11);doc.setTextColor(...INK);doc.text(pt(clip(v||'—',60)),M+110,206+i*20)});
+  doc.setDrawColor(...LINE);doc.line(M,316,PW-M,316);
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('At handover',M,340);doc.setFont('helvetica','normal');doc.setFontSize(10);
+  const sum=[`${st.inst} of ${st.devs} devices installed`,`${st.tested} of ${st.cables} cable runs tested`,`${st.serial} of ${st.devs} serial numbers recorded`,...(st.net?[`${st.mac} of ${st.net} MAC addresses and ${st.ip} IP addresses recorded`]:[]),`${plural(st.photos,'photo')} of the installation`];
+  sum.forEach((t,i)=>doc.text(pt('- '+t),M,358+i*15));
+  let y=358+sum.length*15+20;doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('Contents',M,y);doc.setFont('helvetica','normal');doc.setFontSize(10);
+  ['Equipment register','Cable test results','Warranty and support',...set.sheets.map(sh=>`${sh.dwg}  ${sh.title} (as-built)`),...(st.photos?['Installation photos']:[])].forEach((t,i)=>doc.text(pt(t),M+8,y+16+i*14));
+  /* equipment register */
+  doc.addPage('letter','portrait');doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);doc.text('Equipment register',M,56);
+  doc.autoTable({startY:68,margin:{left:M-18,right:M-18},head:[['Tag','Equipment','Location','Serial no.','MAC','IP / VLAN','Installed']],
+    body:reg.map(r=>[pt(r.tag),pt(`${r.mfr} ${r.model}`),pt(r.loc),pt(r.serial),pt(r.mac),pt([r.ip,r.vlan&&'VLAN '+r.vlan].filter(Boolean).join('\n')),pt(r.inst?`${dayFmtIso(r.inst.at)}${r.inst.who?' · '+r.inst.who:''}`:'')]),
+    theme:'striped',styles:{fontSize:7.5,cellPadding:3},headStyles:{fillColor:INK},columnStyles:{0:{cellWidth:44},3:{cellWidth:86},4:{cellWidth:82}}});
+  /* cable tests */
+  doc.addPage('letter','portrait');doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);doc.text('Cable test results',M,56);
+  const rows=schedRows().sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
+  doc.autoTable({startY:68,margin:{left:M-18,right:M-18},head:[['Label','Type','From','To','Length','Status']],body:rows.map(r=>[pt(r.id),SIG[r.type].short,pt(`${r.fromTag} ${r.fromPort}`),pt(`${r.toTag} ${r.toPort}`),`${r.len} m`,pt(r.status)]),
+    theme:'striped',styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:INK},columnStyles:{4:{halign:'right'}},
+    didParseCell:d=>{if(d.section==='body'&&d.column.index===5&&rows[d.row.index]&&rows[d.row.index].status!=='Tested')d.cell.styles.textColor=[180,90,20]}});
+  /* warranty and support */
+  let wy=doc.lastAutoTable.finalY+30;if(wy>620){doc.addPage('letter','portrait');wy=56}
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);doc.text('Warranty and support',M,wy);doc.setFont('helvetica','normal');doc.setFontSize(9.5);
+  const ct=(S.contracts||[]).find(x=>ctLive(x)&&sameTxt(x.client,P.client));
+  const w=[`Equipment carries each manufacturer's warranty from the date of installation (${dayFmtIso(done)}). Serial numbers are listed in the equipment register for warranty claims.`,
+    `Workmanship is warranted for one year from substantial completion.`,
+    ct?`Ongoing support is provided under service contract ${ct.no}${ct.title?' ('+ct.title+')':''}${ct.coverage?', '+ct.coverage:''}.`:`For service, contact ${firm()}${SETTINGS.phone?' at '+SETTINGS.phone:''}${SETTINGS.email?' or '+SETTINGS.email:''}.`];
+  let yy=wy+18;w.forEach(t=>{const l=doc.splitTextToSize(pt(t),PW-2*M);doc.text(l,M,yy);yy+=l.length*12+6})}
+async function coPhotoPages(doc,o){const {INK,MUTED,M,PW}=o,tg=tags(),ph=(S.photos||[]).filter(p=>p.asset).slice().sort((a,b)=>String(a.uid?tg[a.uid]||'':'~').localeCompare(String(b.uid?tg[b.uid]||'':'~'),undefined,{numeric:true})||(a.at||0)-(b.at||0));if(!ph.length)return;
+  const cw=(PW-2*M-16)/2,chh=190;let k=0;
+  for(const p of ph){if(k%6===0){doc.addPage('letter','portrait');doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);doc.text('Installation photos',M,56)}
+    const col=k%2,row=Math.floor((k%6)/2),x=M+col*(cw+16),y=72+row*(chh+36);
+    const im=await pdfPhoto(photoUrl(p)).catch(()=>null);if(im){const s=Math.min(cw/im.w,chh/im.h),w=im.w*s,h=im.h*s;try{doc.addImage(im.data,'JPEG',x+(cw-w)/2,y+(chh-h)/2,w,h,undefined,'FAST')}catch(_){}}
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...INK);doc.text(pt(p.uid&&tg[p.uid]?tg[p.uid]:'Site'),x,y+chh+12);
+    doc.setFont('helvetica','normal');doc.setTextColor(...MUTED);doc.text(pt(clip(`${p.caption||''}${p.at?(p.caption?' · ':'')+new Date(p.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}`,70)),x,y+chh+23);k++}}
+async function buildProposalPdf(opts){
+  const CO=!!(opts&&opts.closeout);
   await loadPdfLibs();
   const root=document.documentElement,prevTheme=root.getAttribute('data-theme');root.setAttribute('data-theme','light'); // print on white whatever the screen theme
   try{
-  const {jsPDF}=window.jspdf,P=S.prop,q=quote(),set=sheetSet(),c=clientByName(P.client),pc=c&&primaryOf(c);
+  const {jsPDF}=window.jspdf,P=S.prop,q=quote(),set=CO?coSet():sheetSet(),c=clientByName(P.client),pc=c&&primaryOf(c);
   const doc=new jsPDF({unit:'pt',format:'letter',orientation:'portrait',compress:true});
   const INK=[23,33,44],MUTED=[100,112,125],LINE=[214,220,227],BAND=[236,240,244];
   const M=48,PW=612;
+  if(CO){await coPages(doc,{INK,MUTED,LINE,BAND,M,PW,set})}else{
   /* --- proposal --- */
   const LX=logoSrc()?M+50:M;if(logoSrc()){try{doc.addImage(logoSrc(),'PNG',M,42,40,40)}catch(_){}}
   doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text(pt(firm().toUpperCase()),LX,64);
@@ -4477,6 +4546,7 @@ async function buildProposalPdf(){
   doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('Acceptance',M,y);doc.setFont('helvetica','normal');doc.setFontSize(9);
   if(P.signer){doc.text(pt(`Accepted by ${P.signer} for ${money2(P.signedTotal)}.`),M,y+16)}
   else{doc.setDrawColor(...MUTED);doc.setLineWidth(.6);[[M,'Signature'],[M+220,'Printed name'],[M+400,'Date']].forEach(([x,l],i)=>{const w=i===2?116:200;doc.line(x,y+44,x+w,y+44);doc.setFontSize(7);doc.setTextColor(...MUTED);doc.text(l.toUpperCase(),x,y+55)})}
+  }
   /* --- drawing sheets --- */
   const LW=792,LH=612,LM=28;
   const sheetHead=sh=>{doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...INK);doc.text(pt(`${sh.dwg}  ${sh.title}`),LM,36);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(pt(`${P.project} · rev ${set.rev}`),LW-LM,36,{align:'right'})};
@@ -4495,7 +4565,7 @@ async function buildProposalPdf(){
       doc.autoTable({startY:52,margin:{left:LM,right:LM,top:52,bottom:40},head:[['Label','Type','From','To','Via','Cable','Length']],body:rows.map(r=>[pt(r.id),SIG[r.type].short,pt(`${r.fromTag} ${r.fromPort}\n${r.fromLoc||r.fromDev}`),pt(`${r.toTag} ${r.toPort}\n${r.toLoc||r.toDev}`),pt(r.via),pt(r.sku.desc),`${r.len} m`]),
         theme:'striped',styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:INK},columnStyles:{6:{halign:'right'}},didDrawPage:()=>sheetHead(sh)});
       const y2=doc.lastAutoTable.finalY+14;doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(pt(`${plural(rows.length,'cable run')} · ${rows.reduce((s,r)=>s+r.len,0)} m total`),LM,Math.min(y2,LH-30))}
-    else if(sh.k==='bom'){sheetHead(sh);const rows=bomRows(),pr=S.design.meta6.price||'none',np=pr==='none',ph=S.design.meta6.photos!==false;
+    else if(sh.k==='bom'){sheetHead(sh);const rows=bomRows(),pr=CO?'none':(S.design.meta6.price||'none'),np=pr==='none',ph=S.design.meta6.photos!==false;
       const photos=ph?new Map(await Promise.all(rows.filter(r=>pImg(r.p)).map(async r=>[r.p.id,await pdfPhoto(pImg(r.p)).catch(()=>null)]))):new Map(),pc=ph?2:-1;
       doc.autoTable({startY:52,margin:{left:LM,right:LM,top:52,bottom:40},head:[['Item','Qty',...(ph?['']:[]),'Manufacturer','Model','Description','Tags',...(np?[]:['Unit','Extended'])]],
         body:rows.map(r=>[String(r.no),String(r.qty),...(ph?['']:[]),pt(r.p.mfr),pt(r.p.model),pt(r.p.desc),pt(bomTagTxt(r)),...(np?[]:[money2(r.unit[pr]),money2(r.unit[pr]*r.qty)])]),
@@ -4515,10 +4585,11 @@ async function buildProposalPdf(){
       const sws=ipSwitches(rows);let y2=doc.lastAutoTable.finalY+14;
       if(sws.length&&y2<LH-80){doc.autoTable({startY:y2,margin:{left:LM,right:LM,top:52,bottom:40},head:[['Switch','Ports used','PoE draw','PoE budget']],body:sws.map(x=>[pt(`${x.r.tag} ${x.r.p.model}`),`${x.used} of ${x.ports}`,`${x.draw} W`,x.budget?`${x.budget} W`:'-']),theme:'grid',styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:INK},tableWidth:380,didDrawPage:()=>sheetHead(sh)})}}
   }
+  if(CO)await coPhotoPages(doc,{INK,MUTED,M,PW});
   /* --- footers --- */
   const n=doc.getNumberOfPages();
   for(let i=1;i<=n;i++){doc.setPage(i);const w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(...MUTED);
-    doc.text(pt(`${P.no} · ${P.client} · ${P.project}`),i===1||w<700?M:LM,h-22);doc.text(`Page ${i} of ${n}`,w-(w<700?M:LM),h-22,{align:'right'})}
+    doc.text(pt(`${CO?'As-built · ':''}${P.no} · ${P.client} · ${P.project}`),i===1||w<700?M:LM,h-22);doc.text(`Page ${i} of ${n}`,w-(w<700?M:LM),h-22,{align:'right'})}
   return {blob:doc.output('blob'),pages:n};
   }finally{if(prevTheme==null)root.removeAttribute('data-theme');else root.setAttribute('data-theme',prevTheme)}
 }
@@ -4557,6 +4628,7 @@ R.projects=function(){
    <div><div class="l">Labor hours</div><div class="v">${used.toFixed(1)} <span class="muted" style="font-size:18px">/ ${q.hrs}</span></div><div class="bar"><i class="${used>budget?'over':''}" style="width:${pct}%"></i></div></div>
    <div><div class="l">Projected gross margin</div><div class="v ${gm<0?'bad':''}">${contract?Math.round(gm/contract*100):0}%</div><div class="muted" style="font-size:12px">${money(gm)} at $${(+SETTINGS.internalRate||52)}/h internal labor</div></div>
   </div>`:''}
+  ${closeoutHTML()}
   <div id="pmBody"></div>
   <div class="panel"><div class="ph"><h2>Log time</h2><span class="actions"><span class="muted" style="font-size:12px">Field techs clock in from the mobile view</span><button class="btn sm money" data-go="billing">Time &amp; invoicing →</button></span></div><div class="pb" style="display:flex;flex-direction:column;gap:14px">
    <div class="timeform">
@@ -5380,6 +5452,11 @@ const A={
   copyIp(){copyText(ipCSV(),'IP schedule')},
   vlanAdd(){mut(()=>{const m=ipam(),ids=m.vlans.map(v=>+v.id||0),id=String(Math.max(0,...ids)+10),o=10+m.vlans.length;m.vlans.push({id,name:'New VLAN',subnet:`10.10.${Math.min(254,+id)}.0/24`,gateway:`10.10.${Math.min(254,+id)}.1`})});renderIp()},
   vlanDel(el){mut(()=>{const m=ipam(),v=m.vlans[+el.dataset.i];if(!v)return;m.vlans.splice(+el.dataset.i,1);Object.values(m.hosts).forEach(h=>{if(String(h.vlan)===String(v.id))delete h.vlan})});renderIp()},
+  coPdf(el){if(pdfBusy)return;pdfBusy=true;const lab=el&&el.textContent;if(el){el.disabled=true;el.textContent='Building PDF…'}toast('Building the closeout package…');
+    (async()=>{try{const {blob,pages}=await buildProposalPdf({closeout:true}),P=S.prop,name=pt(`Closeout ${P.no} ${P.client} - ${P.project}.pdf`).replace(/[\\/:*?"<>|?]+/g,' ').replace(/\s+/g,' ').trim();const r=await saveFile(blob,name);toast(r==='saved'?`Closeout package ready (${pages} pages).`:r==='declined'?'Download cancelled.':'Another download is waiting for you.')}
+      catch(e){toast('Couldn’t build the PDF. Check your connection and try again.')}finally{pdfBusy=false;if(el&&el.isConnected){el.disabled=false;el.textContent=lab}}})()},
+  coPublish(){const P=S.prop;P.closeout={at:isoDay(0),set:coSet(),reg:coRegister().map(({uid,inst,net,...r})=>r)};plog(`As-built documentation published to the client (${plural(P.closeout.set.sheets.length,'sheet')}, ${plural(P.closeout.reg.length,'device')})`);saveProjects();R.projects();toast('Published. The client view now has the as-built drawings and equipment register.')},
+  viewAsBuilt(el){const P=S.prop;if(!P.closeout)return;S.sv={set:P.closeout.set,i:+el.dataset.i};renderSheetViewer()},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
