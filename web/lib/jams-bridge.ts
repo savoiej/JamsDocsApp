@@ -5,7 +5,8 @@
  *   user      → the signed-in person and public.profiles (admins are the "owner")
  *   assets    → the private "assets" Storage bucket, served at /_blob/<id>
  *   downloads → a normal browser download
- * Capabilities that only exist on claude.ai (the AI assistant, connectors) return null, and the app hides them.
+ *   sample    → Claude through /api/ai, when the site has ANTHROPIC_API_KEY (else null and the app hides AI features)
+ * Connectors only exist on claude.ai and return null.
  */
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
@@ -337,9 +338,105 @@ export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
     },
   };
 
+  /* ---------- sample (Claude, through /api/ai) ---------- */
+  type SampleTool = { name: string; description?: string; inputSchema?: unknown; execute: (input: unknown) => unknown };
+  type SampleOpts = { onText?: (t: { text: string; delta: string }) => void; signal?: AbortSignal; tools?: SampleTool[]; images?: Blob[]; modelTier?: string; maxTokens?: number };
+  type SampleMsg = { role: "user" | "assistant"; content: unknown };
+  const sErr = (code: string, message: string) => Object.assign(new Error(message), { code, message });
+  const b64 = async (b: Blob) => {
+    const bytes = new Uint8Array(await b.arrayBuffer());
+    let s = "";
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    return btoa(s);
+  };
+  async function turn(messages: SampleMsg[], tools: SampleTool[] | undefined, opts: SampleOpts) {
+    const r = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        messages,
+        tier: opts.modelTier || "default",
+        maxTokens: opts.maxTokens,
+        tools: tools?.map((t) => ({ name: t.name, description: t.description || t.name, input_schema: t.inputSchema || { type: "object", properties: {} } })),
+      }),
+      signal: opts.signal,
+    }).catch((e) => {
+      throw (e as Error)?.name === "AbortError" ? sErr("aborted", "Stopped.") : sErr("unavailable", "Couldn't reach the assistant.");
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw sErr(r.status === 403 ? "not_granted" : r.status === 429 ? "rate_limited" : data.code || "unavailable", data.message || "The assistant returned an error.");
+    return data as { content: { type: string; text?: string; id?: string; name?: string; input?: unknown }[]; stop_reason: string };
+  }
+  async function sample(input: string | SampleMsg[], opts: SampleOpts = {}) {
+    const msgs: SampleMsg[] = typeof input === "string" ? [{ role: "user", content: input }] : (input || []).map((m) => ({ role: m.role, content: String(m.content ?? "") }));
+    if (!msgs.length || msgs[msgs.length - 1].role !== "user") throw sErr("bad_request", "The conversation must end with a user message.");
+    if (opts.images?.length) {
+      // images go on the last user message; keep the request under the host's 4.5 MB body limit
+      const blocks: unknown[] = [];
+      let total = 0;
+      for (const im of opts.images.slice(0, 8)) {
+        const data = await b64(im);
+        if (total + data.length > 3_800_000) break;
+        total += data.length;
+        blocks.push({ type: "image", source: { type: "base64", media_type: /^image\/(png|jpeg|webp|gif)$/.test(im.type) ? im.type : "image/jpeg", data } });
+      }
+      const last = msgs[msgs.length - 1];
+      last.content = [...blocks, { type: "text", text: String(last.content) }];
+    }
+    const tools = opts.tools?.length ? opts.tools : undefined;
+    let text = "";
+    for (let step = 0; step < 12; step++) {
+      const res = await turn(msgs, tools, opts);
+      const said = res.content.filter((b) => b.type === "text").map((b) => b.text || "").join("");
+      if (said) {
+        text += (text ? "\n\n" : "") + said;
+        opts.onText?.({ text, delta: said });
+      }
+      const uses = res.content.filter((b) => b.type === "tool_use");
+      if (res.stop_reason !== "tool_use" || !uses.length || !tools) return { text, truncated: res.stop_reason === "max_tokens" };
+      msgs.push({ role: "assistant", content: res.content });
+      const results = [];
+      for (const u of uses) {
+        const tool = tools.find((t) => t.name === u.name);
+        let out: unknown, isError = false;
+        try {
+          out = tool ? await tool.execute(u.input) : `No tool named ${u.name}.`;
+          isError = !tool;
+        } catch (e) {
+          out = (e as Error)?.message || String(e);
+          isError = true;
+        }
+        results.push({ type: "tool_result", tool_use_id: u.id, content: typeof out === "string" ? out : JSON.stringify(out ?? null), is_error: isError });
+      }
+      msgs.push({ role: "user", content: results });
+    }
+    return { text, truncated: true };
+  }
+  sample.json = async (input: string | SampleMsg[], opts: SampleOpts = {}) => {
+    const ask = "\n\nReply with only the JSON value: no prose and no code fences.";
+    const inp = typeof input === "string" ? input + ask : input.map((m, i) => (i === input.length - 1 ? { ...m, content: String(m.content) + ask } : m));
+    const { text } = await sample(inp, opts);
+    const t = text.replace(/^[\s\S]*?```(?:json)?\s*/i, (m) => (m.includes("```") ? "" : m)).replace(/```[\s\S]*$/, "").trim();
+    const start = t.search(/[[{]/);
+    try {
+      return JSON.parse(start > 0 ? t.slice(start) : t);
+    } catch {
+      const end = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]"));
+      try {
+        return JSON.parse(t.slice(Math.max(0, start), end + 1));
+      } catch {
+        throw sErr("bad_json", "The assistant's answer wasn't readable.");
+      }
+    }
+  };
+  sample.limits = async () => ({ images: true, maxImages: 8 });
+  // only offered when this site has an API key; otherwise the app hides its AI features as before
+  const sampleReady = fetch("/api/ai").then((r) => (r.ok ? r.json() : { ready: false })).then((d) => !!d.ready).catch(() => false);
+
   const caps: Record<string, unknown> = { db, user, assets, downloads };
   return {
     use(name: string) {
+      if (name === "sample") return sampleReady.then((ok) => (ok ? sample : null));
       return Promise.resolve(caps[name] ?? null);
     },
   };
