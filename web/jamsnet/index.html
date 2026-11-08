@@ -1237,7 +1237,7 @@ button,[role="button"],[draggable="true"]{-webkit-user-select:none;user-select:n
 button:not(:disabled):active{filter:brightness(.92)}
 @media (pointer:coarse){input,textarea,select{font-size:16px!important}}
 </style>
-<script>try{if(localStorage.getItem("sitrep-palette")==="hfh")document.documentElement.setAttribute("data-palette","hfh");var jm=localStorage.getItem("sitrep-mode");if(jm==="light"||jm==="dark")document.documentElement.setAttribute("data-theme",jm)}catch(e){}</script>
+<script>try{var jp=localStorage.getItem("sitrep-palette");if(jp==="hfh"||jp==="cable")document.documentElement.setAttribute("data-palette",jp);var jm=localStorage.getItem("sitrep-mode");if(jm==="light"||jm==="dark")document.documentElement.setAttribute("data-theme",jm)}catch(e){}</script>
 <style>.pclean{margin-left:auto;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;color:var(--fg);cursor:pointer}.pimg figcaption{flex-wrap:wrap;row-gap:4px}.pimg figcaption>:first-child{flex:1 0 100%;text-align:center;justify-content:center}
 .pimg img{background-color:#fff;background-image:linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%),linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%);background-size:12px 12px;background-position:0 0,6px 6px}
 </style>
@@ -1305,6 +1305,38 @@ button:not(:disabled):active{filter:brightness(.92)}
 :root[data-palette="hfh"] .rail .nvdot{background:var(--hfink)!important}
 :root[data-palette="hfh"] .rail .nav button.locked::after{background:var(--hfink)!important;color:var(--lime)!important}
 :root[data-palette="hfh"] .rail :focus-visible,:root[data-palette="hfh"] .railfoot .modebtn:focus-visible{outline-color:var(--hfink)!important}
+
+/* ===== Cabling palette: navy and the six structured-cabling colors. On when <html data-palette="cable"> ===== */
+:root[data-palette="cable"]{--navy:#0D2B52;--navy2:#123A6B;--c-orange:#F07A1A;--c-black:#1B1F24;--c-yellow:#F5C400;--c-blue:#1D6FD6;--c-green:#2E9B45;--c-white:#F3F4F5;--basalt:#0D2B52;--basalt2:#123A6B;--amber:#F5C400;--lagoon:#1D6FD6;
+  --cstripe:linear-gradient(90deg,var(--c-orange) 0 16.66%,var(--c-black) 0 33.33%,var(--c-yellow) 0 50%,var(--c-blue) 0 66.66%,var(--c-green) 0 83.33%,var(--c-white) 0)}
+:root[data-palette="cable"],:root[data-palette="cable"][data-theme="light"]{--bg:#EEF3F9;--surface:#FFFFFF;--sunk:#E3EBF5;--line:#D3DEEB;--fg:#0E1B2C;--muted:#4D5E73;--accent:#1D6FD6;--accent-ink:#FFFFFF;--accent-soft:#DDE9FA;--ok:#2E9B45;--ok-soft:#E0F2E4;--sheet:#FBFCFE;--grid:#E2EAF4;--gridmaj:#D2DDEA}
+@media (prefers-color-scheme: dark){:root[data-palette="cable"]:not([data-theme="light"]){--bg:#071528;--surface:#0D2140;--sunk:#0A1A33;--line:#1E3A60;--fg:#E8EFF8;--muted:#9DB0C8;--accent:#5AA2FF;--accent-ink:#06142A;--accent-soft:#12305A;--ok:#52C46B;--ok-soft:#11331F;--sheet:#0B1D38;--grid:#0F2445;--gridmaj:#173055;--basalt:#08203F;--basalt2:#0D2B52}}
+:root[data-palette="cable"][data-theme="dark"]{--bg:#071528;--surface:#0D2140;--sunk:#0A1A33;--line:#1E3A60;--fg:#E8EFF8;--muted:#9DB0C8;--accent:#5AA2FF;--accent-ink:#06142A;--accent-soft:#12305A;--ok:#52C46B;--ok-soft:#11331F;--sheet:#0B1D38;--grid:#0F2445;--gridmaj:#173055;--basalt:#08203F;--basalt2:#0D2B52}
+:root[data-palette="cable"] .btn.primary{background:var(--navy)!important;border-color:var(--navy)!important;color:#fff!important}
+@media (prefers-color-scheme: dark){:root[data-palette="cable"]:not([data-theme="light"]) .btn.primary{background:var(--c-yellow)!important;border-color:var(--c-yellow)!important;color:#08203F!important}}
+:root[data-palette="cable"][data-theme="dark"] .btn.primary{background:var(--c-yellow)!important;border-color:var(--c-yellow)!important;color:#08203F!important}
+:root[data-palette="cable"] :focus-visible{outline-color:var(--accent)!important}
+:root[data-palette="cable"] .admhero{background:linear-gradient(135deg,#0D2B52,#123A6B)!important;position:relative}
+:root[data-palette="cable"] .admhero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--cstripe)}
+:root[data-palette="cable"] .kpis .kpi:first-child::before{background:var(--c-blue)}
+:root[data-palette="cable"] .tbtime{background:color-mix(in srgb,var(--c-yellow) 22%,var(--surface));border-color:color-mix(in srgb,var(--c-yellow) 60%,var(--line))}
+:root[data-palette="cable"] .topbar{box-shadow:inset 0 -1px 0 var(--line)}
+/* the side menu: a navy rack face with the color-code stripe */
+:root[data-palette="cable"] .rail{background:var(--basalt)!important;color:#E6EEF8!important;scrollbar-color:#2C4E7A transparent;position:relative}
+:root[data-palette="cable"] .rail::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--cstripe);z-index:1}
+:root[data-palette="cable"] .rail .brand small,:root[data-palette="cable"] .rail .navgroup,:root[data-palette="cable"] .rail label.navgroup,:root[data-palette="cable"] .rail .railfoot,:root[data-palette="cable"] .rail .railfoot *{color:#A9BCD6!important}
+:root[data-palette="cable"] .rail .inp,:root[data-palette="cable"] .rail select,:root[data-palette="cable"] .rail .pjsw .btn{background:rgba(255,255,255,.06)!important;border-color:#2C4E7A!important;color:#F0F5FB!important}
+:root[data-palette="cable"] .rail .nav button,:root[data-palette="cable"] .rail .nav .navhd{color:#D2DEEE!important}
+@media (hover:hover) and (pointer:fine){:root[data-palette="cable"] .rail .nav button:hover{background:rgba(255,255,255,.08)!important;color:#fff!important}}
+:root[data-palette="cable"] .rail .nav button[aria-current="page"]{background:rgba(255,255,255,.13)!important;color:#fff!important}
+:root[data-palette="cable"] .rail .nav button[aria-current="page"]::before{background:var(--c-yellow)!important}
+:root[data-palette="cable"] .rail .nvi,:root[data-palette="cable"] .rail .nav .k{color:#8FA6C4!important}
+:root[data-palette="cable"] .rail .nav [aria-current="page"] .nvi{color:var(--c-yellow)!important}
+:root[data-palette="cable"] .rail .navsub,:root[data-palette="cable"] .rail .chev{border-left-color:#2C4E7A!important}
+:root[data-palette="cable"] .rail .nlhd,:root[data-palette="cable"] .rail .nav .nlhd{border-top-color:#2C4E7A!important}
+:root[data-palette="cable"] .rail .nav .badge{background:rgba(255,255,255,.12)!important;color:#fff!important}
+:root[data-palette="cable"] .rail .nav button.locked::after{background:rgba(245,196,0,.16)!important;color:var(--c-yellow)!important}
+:root[data-palette="cable"] .rail :focus-visible{outline-color:var(--c-yellow)!important}
 </style>
 <div class="app">
   <aside class="rail">
@@ -5818,7 +5850,7 @@ const A={
   ivPayLink(){const v=invById(S.iv&&S.iv.id);if(!v)return;v.payToken=payTok();saveInvoices();renderInvoice();toast('Payment link created. Copy it into your email to the client.')},
   ivPayCopy(){const i=$('#payLinkIn');if(i)copyText(i.value,'Payment link')},
   colorSet(el){palSet(el.dataset.pal);toast(PALETTES.find(p=>p.id===palGet()).name+' colors on')},
-  colorToggle(){palSet(palGet()==='hfh'?'sitrep':'hfh')},
+  colorToggle(){const i=PALETTES.findIndex(p=>p.id===palGet());palSet(PALETTES[(i+1)%PALETTES.length].id)},
   modeSet(el){modeSet(el.dataset.mode)},
   modeToggle(){modeSet(modeShown()==='dark'?'light':'dark')},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
@@ -7122,12 +7154,12 @@ async function backupAll(){
 
 /* ---------- business settings ---------- */
 /* ---------- color theme: SITREP (default) or Hands Free Help (lime, gray, black) ---------- */
-const PALETTES=[{id:'sitrep',name:'SITREP',sw:['#14252A','#0B7A83','#F2B11B']},{id:'hfh',name:'Hands Free Help',sw:['#9CCB19','#111210','#A9ACA6']}];
+const PALETTES=[{id:'sitrep',name:'SITREP',sw:['#14252A','#0B7A83','#F2B11B']},{id:'hfh',name:'Hands Free Help',sw:['#9CCB19','#111210','#A9ACA6']},{id:'cable',name:'Cabling',sw:['#0D2B52','#F07A1A','#F5C400','#1D6FD6','#2E9B45']}];
 const PAL_KEY='sitrep-palette';
 function palGet(){let v='';try{v=localStorage.getItem(PAL_KEY)||''}catch(e){}return PALETTES.some(p=>p.id===v)?v:'sitrep'}
 function palApplyTo(doc,id){if(!doc||!doc.documentElement)return;if(id==='sitrep')doc.documentElement.removeAttribute('data-palette');else doc.documentElement.setAttribute('data-palette',id)}
 function palApply(id){palApplyTo(document,id);try{if(NLF&&NLF.contentDocument)palApplyTo(NLF.contentDocument,id)}catch(e){}
-  const b=document.getElementById('palBtn');if(b){const o=PALETTES.find(p=>p.id!==id);b.innerHTML=`<span class="palsw" aria-hidden="true">${o.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span>${esc(o.name)} colors`;b.setAttribute('aria-label','Switch to the '+o.name+' colors')}
+  const b=document.getElementById('palBtn');if(b){const o=PALETTES[(PALETTES.findIndex(p=>p.id===id)+1)%PALETTES.length];b.innerHTML=`<span class="palsw" aria-hidden="true">${o.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span>${esc(o.name)} colors`;b.setAttribute('aria-label','Switch to the '+o.name+' colors')}
   document.querySelectorAll('.palopt').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.pal===id)))}
 const ICO_SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   ICO_MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>',
