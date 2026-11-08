@@ -1317,6 +1317,7 @@ button:not(:disabled):active{filter:brightness(.92)}
 .ibtl{list-style:none;margin:0;padding:6px 14px 12px;display:flex;flex-direction:column}
 .ibtl li{display:grid;grid-template-columns:80px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}.ibtl li:last-child{border:0}
 .ibtl time{color:var(--muted);font-size:12px;padding-top:2px}.ibtl small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.ibtl .ibch,.ibtl .ibflag{margin-left:4px;vertical-align:1px}
+.ibsync{font-size:13px;white-space:nowrap}.ibacct{border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:6px}.ibacct small{display:block;color:var(--muted);font-size:12px}
 .ibrule{display:flex;align-items:center;gap:8px}.ibrule button{margin-left:auto}
 .ibconn{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px;font-size:13.5px}.ibconn .t{display:flex;gap:8px;align-items:center}.ibconn .t .ibflag{margin-left:auto}.ibconn p{margin:0}
 @media (max-width:1180px){.ib{grid-template-columns:minmax(240px,320px) minmax(0,1fr)}.ibside{display:none}}
@@ -4523,7 +4524,7 @@ R.inbox=function(){const el=$('#v-inbox');if(!el)return;const u=S.ui;if(!u.ibF)u
   const F=[['needs','Needs reply',cn.needs],['waiting','Waiting on client',cn.waiting],['all','All open',cn.all],['unmatched','Unmatched',cn.unmatched],['done','Done',cn.done]];
   const anySample=INBOX.convs.some(v=>v.sample);
   el.innerHTML=`<header class="vh"><div><p class="eyebrow">Clients &amp; billing</p><h1>Client inbox</h1>
-     <p class="sub">Every message from your clients in one place, matched to the client and the job. ${cn.needs?`<b>${plural(cn.needs,'conversation')} need${cn.needs===1?'s':''} a reply.</b>`:'Nothing is waiting on you.'}</p></div>
+     <p class="sub">Every message from your clients in one place, matched to the client and the job. ${m365Ok()?`<span class="ibsync">Email ${M365.busy?'syncing…':M365.last?(Date.now()-M365.last<6e4?'synced just now':'synced '+ibAge(M365.last)+' ago'):'connected'} · <button class="lnk" data-act="ibSyncNow">Sync now</button>.</span> `:''}${cn.needs?`<b>${plural(cn.needs,'conversation')} need${cn.needs===1?'s':''} a reply.</b>`:'Nothing is waiting on you.'}</p></div>
     <div class="actions">${anySample?`<button class="btn" data-act="ibSampleOff">Remove examples</button>`:''}<button class="btn" data-act="ibConnInfo">Connect accounts</button><button class="btn primary" data-act="ibLogOpen">+ Log a message</button></div></header>
    ${INBOX.convs.length?`<div class="ibbar" role="toolbar" aria-label="Filter conversations">
      <div class="ibseg" role="group" aria-label="Show">${F.map(([k,l,n])=>`<button data-act="ibF" data-f="${k}" aria-pressed="${u.ibF===k}">${l}${n?` <span class="ibn${k==='needs'?' hot':''}">${n}</span>`:''}</button>`).join('')}</div>
@@ -4564,12 +4565,12 @@ function ibThreadHTML(v){const c=clientById(v.clientId),u=S.ui,f=ibFirstIn(v),ne
    <div class="ibreply">
     <div class="ibrt"><label for="ibRch">Reply with</label><select class="inp sm" id="ibRch" data-id="${v.id}">${chs.map(([k,l])=>`<option value="${k}" ${k===rch?'selected':''}>${esc(l)}</option>`).join('')}</select>${SAMPLE?`<button class="btn sm" data-act="ibSum" data-id="${v.id}">Summarize</button><button class="btn sm" data-act="ibDraft" data-id="${v.id}">Draft a reply</button>`:''}</div>
     <textarea class="inp" id="ibTxt" rows="3" placeholder="Write a reply…">${esc(u.ibDraft&&u.ibDraft.id===v.id?u.ibDraft.t:'')}</textarea>
-    <div class="ibrb"><span class="muted" style="font-size:12px">${{email:'Opens your email app with the reply filled in.',wa:'Opens WhatsApp with the reply filled in.',teams:'Opens a Teams chat with the reply filled in.',slack:'Copies the reply; paste it in the Slack thread.',note:'Saved on the conversation only.'}[rch]||''}</span><button class="btn primary" data-act="ibSend" data-id="${v.id}">${rch==='note'?'Save note':'Send'}</button></div></div>
+    <div class="ibrb"><span class="muted" style="font-size:12px">${{email:m365Ok()?'Sends from your Microsoft 365 mailbox, in the same email thread.':'Opens your email app with the reply filled in.',wa:'Opens WhatsApp with the reply filled in.',teams:'Opens a Teams chat with the reply filled in.',slack:'Copies the reply; paste it in the Slack thread.',note:'Saved on the conversation only.'}[rch]||''}</span><button class="btn primary" data-act="ibSend" data-id="${v.id}">${rch==='note'?'Save note':'Send'}</button></div></div>
   </div>
   <aside class="ibside">${ibSideHTML(v,c)}</aside>`}
 function ibReplyChans(v,c){const f=ibFirstIn(v),out=[],em=/@/.test(f.addr||'')?f.addr:(c&&(primaryOf(c)||{}).email)||'',ph=(!/@/.test(f.addr||'')&&ibDigits(f.addr).length>=7)?f.addr:(c&&(primaryOf(c)||{}).phone)||'';
   const used=ibChans(v);
-  if(em)out.push(['email','Email · '+em]);if(ph)out.push(['wa','WhatsApp · '+ph]);if(em&&used.includes('teams'))out.push(['teams','Teams · '+em]);if(used.includes('slack'))out.push(['slack','Slack (copy)']);
+  if(em)out.push(['email',(m365Ok()?'Email from Outlook · ':'Email · ')+em]);if(ph)out.push(['wa','WhatsApp · '+ph]);if(em&&used.includes('teams'))out.push(['teams','Teams · '+em]);if(used.includes('slack'))out.push(['slack','Slack (copy)']);
   out.sort((a,b)=>(used.includes(b[0])?1:0)-(used.includes(a[0])?1:0)||(b[0]===ibLast(v).ch?1:0)-(a[0]===ibLast(v).ch?1:0));
   out.push(['note','Note only']);return out}
 function ibSideHTML(v,c){const f=ibFirstIn(v);
@@ -4611,9 +4612,13 @@ function ibLogHint(){const a=$('#ibLAddr'),h=$('#ibLMatch'),s=$('#ibLCl');if(!a|
 function ibAddMsg(o){/* o: {ch,dir,name,addr,subject,text,clientId,at} → the conversation it joined */
   const clientId=o.clientId||ibMatch(o.addr),at=o.at||Date.now(),sub=String(o.subject||'').replace(/^((re|fw|fwd)\s*:\s*)+/i,'').trim();
   const key=ibNorm(o.addr);
-  let v=INBOX.convs.find(x=>!x.done&&(sub?String(x.subject).toLowerCase()===sub.toLowerCase():true)&&(clientId?x.clientId===clientId:x.msgs.some(m=>ibNorm(m.addr)===key&&key))&&at-ibLast(x).at<3*864e5);
+  let v=o.ckey?INBOX.convs.find(x=>(x.ckeys||[]).includes(o.ckey)):null;
+  if(!v)v=INBOX.convs.find(x=>!x.done&&(sub?String(x.subject).toLowerCase()===sub.toLowerCase():true)&&(clientId?x.clientId===clientId:x.msgs.some(m=>ibNorm(m.addr)===key&&key))&&at-ibLast(x).at<3*864e5);
   if(!v){v={id:ibNewId(),clientId,subject:sub||String(o.text||'').split('\n')[0].slice(0,80)||'(no subject)',msgs:[],done:false,who:'',pid:'',ticket:'',created:at};INBOX.convs.unshift(v)}
-  v.msgs.push({id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ch:o.ch||'email',dir:o.dir||'in',name:o.name||'',addr:o.addr||'',at,text:String(o.text||'').trim()});
+  if(o.ckey&&!(v.ckeys||[]).includes(o.ckey))v.ckeys=[...(v.ckeys||[]),o.ckey];
+  const msg={id:o.id||'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ch:o.ch||'email',dir:o.dir||'in',name:o.name||'',addr:o.addr||'',at,text:String(o.text||'').trim()};
+  ['mid','mbox','acct','att'].forEach(k=>{if(o[k])msg[k]=o[k]});
+  const pos=v.msgs.findIndex(m=>m.at>at);if(pos<0)v.msgs.push(msg);else v.msgs.splice(pos,0,msg);
   if(o.dir==='in')v.done=false;if(!v.clientId&&clientId)v.clientId=clientId;return v}
 function ibSampleConvs(){const cl=S.clients.filter(c=>!/^sample/i.test(c.name)).slice(0,3),mk=(i)=>cl[i]||null,now=Date.now(),H=36e5;
   const pc=c=>c&&primaryOf(c)||{};const ex=[];
@@ -4643,12 +4648,50 @@ function ibClientTabHTML(c){const convs=INBOX.convs.filter(v=>v.clientId===c.id)
     ${rules.map(r=>`<div class="ibrule">✓ <b>${esc(r.value)}</b><button class="btn sm" data-act="ibRuleDel" data-id="${r.id}" aria-label="Remove ${esc(r.value)}">Remove</button></div>`).join('')}
     <div class="addrow"><input class="inp" id="ibRuleIn" placeholder="Email, @domain, phone or #channel"><button class="btn" data-act="ibRuleAdd" data-id="${c.id}">Add</button></div>
     <p class="muted" style="margin:0;font-size:12px">Contacts' emails and phone numbers match on their own. Add another address, a whole email domain, a WhatsApp number or a Slack or Teams channel name.</p></div></div></div>`}
-function ibConnInfo(){const ov=$('#overlay');const C=[['email','Email','Google Workspace (Gmail) or Microsoft 365 (Outlook), signed in once per mailbox.','Your email provider, and which mailboxes to bring in.'],['wa','WhatsApp','The WhatsApp Business Platform from Meta, with your business number registered to it.','A Meta business account and the number to use. You can reply freely for 24 hours after a client writes; after that, Meta requires an approved template and charges for it.'],['teams','Teams','Microsoft Graph, approved once by your Microsoft 365 admin.','Admin approval. Some live chat features need Microsoft approval or carry usage fees.'],['slack','Slack','A Slack app in your workspace that reads the Slack Connect channels you share with clients.','Which shared channels belong to which client.']];
+function ibM365Card(){
+  if(!M365.configured)return `<div class="ibconn"><div class="t">${ibCh('email')}<b>Email · Microsoft 365</b><span class="ibflag wait">Waiting on setup</span></div>
+    <p>Register SITREP in Microsoft Entra once, then add its three values to the site's settings in Vercel: <span class="mono">M365_CLIENT_ID</span>, <span class="mono">M365_CLIENT_SECRET</span>, <span class="mono">M365_TENANT_ID</span> (and <span class="mono">SUPABASE_SERVICE_ROLE_KEY</span>). After the site redeploys, a <b>Connect a mailbox</b> button appears here.</p></div>`;
+  return `<div class="ibconn"><div class="t">${ibCh('email')}<b>Email · Microsoft 365</b>${M365.accounts.length?'<span class="ibflag ok">Connected</span>':'<span class="ibflag wait">No mailbox yet</span>'}</div>
+    ${M365.accounts.map(a=>`<div class="ibacct"><div><b>${esc(a.email)}</b><small>${a.error?`<span style="color:#C8341F">Last sync failed: ${esc(a.error)}</span>`:a.lastSync?'Synced '+esc(ibWhen(Date.parse(a.lastSync),true)):'Not synced yet'}</small></div>
+      <label class="field" for="ibSh-${a.id}">Shared mailboxes it can read (optional)<input class="inp" id="ibSh-${a.id}" data-acct="${a.id}" placeholder="support@yourcompany.com, info@…" value="${esc((a.shared||[]).join(', '))}"></label>
+      <div class="actions"><button class="btn sm" data-act="m365Shared" data-id="${a.id}">Save shared mailboxes</button><button class="btn sm" data-act="m365Remove" data-id="${a.id}">Disconnect</button></div></div>`).join('')}
+    <label class="chk" style="font-size:13px"><input type="checkbox" id="ibAllMail" ${SETTINGS.ibAllMail?'checked':''}> Bring in all email, not only from clients</label>
+    <div class="actions"><a class="btn sm primary" href="/api/inbox/m365/connect">${M365.accounts.length?'+ Connect another mailbox':'Connect a mailbox'}</a>${M365.accounts.length?'<button class="btn sm" data-act="ibSyncNow">Sync now</button>':''}</div>
+    <p class="muted" style="margin:0;font-size:12px">Signs in with Microsoft. SITREP reads the inbox and Sent Items and sends your replies; it never deletes or moves mail.</p></div>`}
+async function ibConnInfo(){if(!M365.checked)await m365Status();const ov=$('#overlay');const C=[['email','Email','Google Workspace (Gmail) or Microsoft 365 (Outlook), signed in once per mailbox.','Your email provider, and which mailboxes to bring in.'],['wa','WhatsApp','The WhatsApp Business Platform from Meta, with your business number registered to it.','A Meta business account and the number to use. You can reply freely for 24 hours after a client writes; after that, Meta requires an approved template and charges for it.'],['teams','Teams','Microsoft Graph, approved once by your Microsoft 365 admin.','Admin approval. Some live chat features need Microsoft approval or carry usage fees.'],['slack','Slack','A Slack app in your workspace that reads the Slack Connect channels you share with clients.','Which shared channels belong to which client.']];
   ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="ibCH"><div class="dlgtop"><span>CLIENT INBOX</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
    <div style="padding:18px;display:flex;flex-direction:column;gap:12px"><h2 id="ibCH" style="margin:0;font-family:var(--f-display);font-size:26px">Connect accounts</h2>
-    <p class="note" style="margin:0">None of these are connected yet. Each one needs an account and keys you create, added to the app's server settings. Until then, log calls and paste emails with <b>+ Log a message</b>; replies open in the matching app with the text filled in.</p>
-    ${C.map(([k,l,how,need])=>`<div class="ibconn"><div class="t">${ibCh(k)}<b>${l}</b><span class="ibflag wait">Not connected</span></div><p>${how}</p><p class="muted">Needs: ${need}</p></div>`).join('')}</div>
+    <p class="note" style="margin:0">Each channel needs an account and keys you create, added to the app's server settings. Until one is connected, log calls and paste emails with <b>+ Log a message</b>; replies open in the matching app with the text filled in.</p>
+    ${ibM365Card()}
+    ${C.filter(x=>x[0]!=='email').map(([k,l,how,need])=>`<div class="ibconn"><div class="t">${ibCh(k)}<b>${l}</b><span class="ibflag wait">Not connected</span></div><p>${how}</p><p class="muted">Needs: ${need}</p></div>`).join('')}</div>
    <div class="dlgfoot"><button class="btn primary" data-act="closeOverlay">Got it</button></div></div>`;ov.hidden=false}
+
+/* ---------- Microsoft 365 email: synced by the server into inboxmsg/<id>, matched to clients here ---------- */
+const M365={configured:false,accounts:[],checked:false,last:0,busy:false};let M365_UNSUB=null,M365_TIMER=null;
+const m365Ok=()=>M365.configured&&M365.accounts.length>0;
+async function m365Status(){if(S.tech)return;try{const r=await fetch('/api/inbox/m365',{credentials:'same-origin'});if(!r.ok)return;const j=await r.json();M365.configured=!!j.configured;M365.accounts=j.accounts||[];M365.checked=true}catch(e){}}
+async function m365Sync(manual){if(S.tech||M365.busy||!m365Ok())return;M365.busy=true;if(manual&&S.view==='inbox')R.inbox();
+  try{const r=await fetch('/api/inbox/m365/sync',{method:'POST',credentials:'same-origin'});const j=await r.json().catch(()=>({}));M365.last=Date.now();
+    if(manual){const bad=(j.results||[]).filter(x=>x.error);toast(bad.length?`${bad[0].email}: ${bad[0].error}`:'Email is up to date.')}await m365Status()}
+  catch(e){if(manual)toast('Couldn’t reach Microsoft 365. Try again in a minute.')}
+  finally{M365.busy=false;if(S.view==='inbox')R.inbox()}}
+function m365Boot(){if(S.tech)return;m365Status().then(()=>{
+    try{let L=location;try{if(parent!==window&&parent.location.search)L=parent.location}catch(x){}const q=new URLSearchParams(L.search).get('inbox');if(q){const msg={connected:'Mailbox connected. Bringing in your client email now.',declined:'Microsoft sign-in was cancelled.',expired:'That sign-in took too long. Try connecting again.',failed:'Microsoft sign-in didn’t finish. Try again, or check the app registration.',not_configured:'Microsoft 365 isn’t set up on this site yet.',not_allowed:'Only office staff can connect a mailbox.',no_offline:'Microsoft didn’t allow staying signed in. Check that offline_access is granted.',no_mailbox:'That account has no mailbox.'}[q];if(msg)toast(msg);try{(L===location?history:parent.history).replaceState(null,'',L.pathname+L.hash)}catch(x){}if(q==='connected')go('inbox')}}catch(e){}
+    if(!m365Ok())return;
+    if(DBX&&!M365_UNSUB){try{M365_UNSUB=DBX.collection('inboxmsg').onSnapshot(snap=>ibApplySynced(snap.docs.map(d=>d.data())),()=>{})}catch(e){}}
+    m365Sync(false);clearInterval(M365_TIMER);M365_TIMER=setInterval(()=>{if(!document.hidden)m365Sync(false)},3*60e3)})}
+/* turn synced mail into conversations: only senders matched to a client, or replies in a thread already here (unless "all mail" is on) */
+function ibApplySynced(docs){const seen=new Set(INBOX.seen||[]);let n=0;
+  docs.filter(d=>d&&d.id&&!seen.has(d.id)).sort((a,b)=>a.at-b.at).forEach(d=>{
+    const ckey='m365:'+(d.conv||d.msgId),has=INBOX.convs.find(x=>(x.ckeys||[]).includes(ckey));
+    const who=d.dir==='in'?d.addr:(d.to||[])[0]||d.addr,cid=ibMatch(who);
+    if(!has&&!cid&&!SETTINGS.ibAllMail)return;
+    if(has&&d.dir==='out'){const t=String(d.text||'').slice(0,60);if(has.msgs.some(m=>m.dir==='out'&&Math.abs(m.at-d.at)<30*6e4&&String(m.text||'').slice(0,60)===t)){seen.add(d.id);return}}
+    if(has&&has.msgs.some(m=>m.mid&&m.mid===d.msgId)){seen.add(d.id);return}
+    ibAddMsg({ch:'email',dir:d.dir,name:d.name,addr:d.dir==='in'?d.addr:who,subject:d.subject,text:(d.text||'')+(d.att?'\n(attachment in Outlook)':''),clientId:cid,at:d.at,ckey,mid:d.msgId,mbox:d.mailbox,acct:d.account});
+    seen.add(d.id);n++});
+  if(!n&&seen.size===(INBOX.seen||[]).length)return;
+  INBOX.seen=[...seen].slice(-4000);saveInbox();badges();if(S.view==='inbox')R.inbox();else if(S.view==='clients'&&S.ui.cwTab==='messages')R.clients()}
 
 let ibQT;
 document.addEventListener('change',e=>{const t=e.target;if(!t||!t.id||!/^ib/.test(t.id))return;const u=S.ui;
@@ -4658,7 +4701,8 @@ document.addEventListener('change',e=>{const t=e.target;if(!t||!t.id||!/^ib/.tes
   else if(t.id==='ibPj'){const v=ibById(t.dataset.id);if(v){v.pid=t.value;saveInbox();R.inbox();if(t.value)toast('Linked to '+(((PJ.list.find(x=>x.id===t.value)||{}).prop||{}).project||'the project')+'.')}}
   else if(t.id==='ibWho'){const v=ibById(t.dataset.id);if(v){v.who=t.value;saveInbox();toast(t.value?'Assigned to '+t.value+'.':'Unassigned.')}}
   else if(t.id==='ibRch'){const x=$('#ibTxt');if(x)u.ibDraft={id:t.dataset.id,t:x.value};u.ibRch=t.value;R.inbox()}
-  else if(t.id==='ibLCl')ibLogHint()});
+  else if(t.id==='ibLCl')ibLogHint();
+  else if(t.id==='ibAllMail'){SETTINGS.ibAllMail=t.checked;saveSettings();INBOX.seen=[];if(M365_UNSUB){try{M365_UNSUB()}catch(x){}M365_UNSUB=null}m365Boot();toast(t.checked?'All email will come in.':'Only email from clients will come in.')}});
 document.addEventListener('input',e=>{const t=e.target;if(!t||!t.id)return;
   if(t.id==='ibQ'){clearTimeout(ibQT);ibQT=setTimeout(()=>{S.ui.ibQ=t.value;S.ui.ibSel=null;const pos=t.selectionStart;R.inbox();const q=$('#ibQ');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(x){}}},250)}
   else if(t.id==='ibLAddr')ibLogHint();
@@ -6133,6 +6177,12 @@ const A={
   ibSampleOn(){INBOX.convs.unshift(...ibSampleConvs());saveInbox();S.ui.ibF='all';R.inbox();badges();toast('Example conversations added. Remove them any time.')},
   ibSampleOff(){INBOX.convs=INBOX.convs.filter(v=>!v.sample);saveInbox();S.ui.ibSel=null;R.inbox();badges();toast('Examples removed.')},
   ibConnInfo(){ibConnInfo()},
+  ibSyncNow(){m365Sync(true)},
+  async m365Shared(el){const i=$('#ibSh-'+el.dataset.id),shared=String(i&&i.value||'').split(/[,;\s]+/).filter(Boolean);
+    const r=await fetch('/api/inbox/m365',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:el.dataset.id,shared})}).catch(()=>null);const j=r?await r.json().catch(()=>({})):{};
+    if(!r||!r.ok){toast(j.message||'Couldn’t save.');return}await m365Status();toast(j.shared.length?`Will also read ${j.shared.join(', ')}.`:'No shared mailboxes.');ibConnInfo();m365Sync(false)},
+  async m365Remove(el){const r=await fetch('/api/inbox/m365',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:el.dataset.id,remove:true})}).catch(()=>null);
+    if(!r||!r.ok){toast('Couldn’t disconnect.');return}await m365Status();toast('Mailbox disconnected. Messages already in the inbox stay.');ibConnInfo();if(S.view==='inbox')R.inbox()},
   ibDone(el){const v=ibById(el.dataset.id);if(!v)return;v.done=!v.done;saveInbox();if(v.done&&S.ui.ibF!=='done')S.ui.ibSel=null;R.inbox();badges();toast(v.done?'Marked done.':'Reopened.')},
   ibTicket(el){const v=ibById(el.dataset.id);if(!v)return;const c=clientById(v.clientId),f=ibFirstIn(v),id='SR-'+(S.tseq++);
     S.tickets.unshift({id,site:c?c.name:(f.name||f.addr||'Client'),issue:v.subject||'Client request',desc:`${v.msgs.filter(m=>m.dir==='in').map(m=>m.text).join('\n\n').slice(0,1500)}\n\nFrom ${f.name||f.addr||'the client'} by ${(IBCH[f.ch]||IBCH.call).l}.`,pri:ibResp(c)&&ibResp(c)<=4?'High':'Medium',tech:v.who||'',col:'Open',when:'',due:'',cat:'',log:[],src:'inbox:'+v.id});
@@ -6143,6 +6193,11 @@ const A={
   ibSend(el){const v=ibById(el.dataset.id),t=$('#ibTxt');if(!v||!t)return;const txt=t.value.trim();if(!txt){toast('Write a reply first.');t.focus();return}
     const ch=$('#ibRch').value,c=clientById(v.clientId),opt=ibReplyChans(v,c).find(x=>x[0]===ch),to=opt&&opt[1].includes('·')?opt[1].split('·').slice(1).join('·').trim():'';
     const open=u=>{const a=document.createElement('a');a.href=u;if(/^https:/.test(u)){a.target='_blank';a.rel='noopener'}document.body.appendChild(a);a.click();a.remove()};
+    if(ch==='email'&&m365Ok()){const last=[...v.msgs].reverse().find(m=>m.dir==='in'&&m.mid);const btn=el;btn.disabled=true;btn.textContent='Sending…';
+      fetch('/api/inbox/m365/send',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(last?{account:last.acct,mailbox:last.mbox,replyTo:last.mid,text:txt}:{to,subject:'Re: '+(v.subject||''),text:txt})})
+        .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(({ok,j})=>{if(!ok)throw new Error(j.message||'Not sent');
+          v.msgs.push({id:'m'+Date.now().toString(36),ch:'email',dir:'out',name:'',addr:to,at:Date.now(),text:txt,via:'m365'});S.ui.ibDraft=null;saveInbox();R.inbox();badges();toast('Sent from '+(j.from||'Outlook')+'.')})
+        .catch(e=>{btn.disabled=false;btn.textContent='Send';toast('Not sent: '+e.message)});return}
     if(ch==='email')open(`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent('Re: '+(v.subject||''))}&body=${encodeURIComponent(txt)}`);
     else if(ch==='wa')open(`https://wa.me/${ibDigits(to).length===10?'1'+ibDigits(to):String(to).replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`);
     else if(ch==='teams')open(`https://teams.microsoft.com/l/chat/0/0?users=${encodeURIComponent(to)}&message=${encodeURIComponent(txt)}`);
@@ -7453,7 +7508,7 @@ async function cloudBoot(){
     const meta={};ms.docs.forEach(d=>{const x=d.data();if(x&&typeof x.json==='string')meta[d.id]=x.json});
     const pjs=ps.docs.map(d=>{const x=d.data();return x&&typeof x.json==='string'?[d.id,x.json]:null}).filter(Boolean);
     if(!pjs.length&&!Object.keys(meta).length){CLOUD.ready=true;await cloudFlush();toast('Your projects, clients and invoices now save to the app, so they follow you to any device.');return}
-    applyCloud(meta,pjs);CLOUD.ready=true;setSync('live','Saved to the app');renderBrand();go(S.view);cloudFlush();stripeSync();stripePmSync();
+    applyCloud(meta,pjs);CLOUD.ready=true;setSync('live','Saved to the app');renderBrand();go(S.view);cloudFlush();stripeSync();stripePmSync();m365Boot();
   }catch(e){setSync('err','Couldn’t load saved work · using this browser');DBX=null}
 }
 async function backupAll(){
