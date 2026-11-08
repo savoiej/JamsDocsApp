@@ -1261,6 +1261,75 @@ button:not(:disabled):active{filter:brightness(.92)}
 .sowrt h5{font-size:11px}
 @media (max-width:560px){.sowed-h{flex-wrap:wrap}.sowed-t{flex-basis:calc(100% - 40px)}.sowed-h .actions{width:100%;justify-content:flex-end}}
 </style>
+<style>/* ---------- client inbox ---------- */
+.ibch{display:inline-flex;align-items:center;font-size:11px;font-weight:700;color:#fff;background:var(--ch);border-radius:5px;padding:2px 6px;white-space:nowrap;line-height:1.3}
+.ibcl{display:inline-flex;font-size:11.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:5px;padding:2px 7px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.ibcl.un{color:#9B2C1C;background:color-mix(in srgb,#E2553F 16%,var(--surface))}
+.ibflag{display:inline-flex;font-size:11px;font-weight:700;border-radius:5px;padding:2px 6px;white-space:nowrap;color:#A33A12;background:color-mix(in srgb,#F07A1A 18%,var(--surface))}
+.ibflag.late{color:#fff;background:#C8341F}.ibflag.wait{color:var(--muted);background:var(--sunk)}.ibflag.ok{color:var(--ok);background:var(--ok-soft)}.ibflag.ex{color:#6B4E00;background:color-mix(in srgb,#F5C400 26%,var(--surface))}
+.ibbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ibbar .inp{width:auto;height:36px}.ibbar #ibQ{flex:1;min-width:180px}
+.ibseg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.ibseg button{all:unset;white-space:nowrap;cursor:pointer;padding:8px 12px;font-size:13px;font-weight:600;color:var(--fg);display:inline-flex;gap:6px;align-items:center;touch-action:manipulation}
+.ibseg button+button{border-left:1px solid var(--line)}.ibseg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.ibseg button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.ibn{font-size:11px;font-weight:700;background:var(--sunk);color:var(--fg);border-radius:999px;padding:0 7px}.ibn.hot{background:#C8341F;color:#fff}
+.ib{display:grid;grid-template-columns:minmax(260px,350px) minmax(0,1fr) 270px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);height:calc(100dvh - 300px);min-height:520px}
+.iblist{border-right:1px solid var(--line);overflow-y:auto;overscroll-behavior:contain}
+.ibrow{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:3px;width:100%;padding:11px 14px 11px 18px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
+@media (hover:hover) and (pointer:fine){.ibrow:hover{background:var(--sunk)}}
+.ibrow.unread::before{content:"";position:absolute;left:7px;top:17px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.ibrow.sel{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.ibrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.ibrow .r1{display:flex;justify-content:space-between;gap:8px}.ibrow .r1 b{font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ibrow time{font-size:12px;color:var(--muted);white-space:nowrap}
+.ibrow .r2{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ibrow.unread .r2{font-weight:700}
+.ibrow .r3{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ibrow .r4{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.ibempty{padding:24px 16px;color:var(--muted);margin:0}
+.ibthread{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg)}
+.ibnone{align-items:center;justify-content:center}
+.ibth{padding:12px 18px;border-bottom:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.ibtt{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.ibtt h2{margin:0;font-size:19px;line-height:1.25;text-wrap:balance}
+.ibacts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ibacts .inp.sm,.ibrt .inp.sm{height:30px;width:auto;max-width:220px;font-size:12.5px;padding:0 26px 0 8px;line-height:28px}
+.ibtime{display:inline-flex;gap:4px}.ibtime .inp{width:62px!important}
+.ibback{display:none;align-self:flex-start}
+.ibsum{margin:12px 18px 0;border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));background:var(--accent-soft);border-radius:10px;padding:9px 12px;font-size:13px}.ibsum b{color:var(--accent)}
+.ibmsgs{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.ibm{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 13px;max-width:88%;align-self:flex-start}
+.ibm.me{align-self:flex-end;background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,var(--line))}
+.ibm .mh{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:3px}.ibm .mh b{color:var(--fg);font-size:13px}
+.ibm .mt{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.ibsys{align-self:center;font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
+.ibreply{border-top:1px solid var(--line);background:var(--surface);padding:10px 18px 12px;display:flex;flex-direction:column;gap:8px}
+.ibrt{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}.ibrt .inp.sm{max-width:300px}
+.ibreply textarea{resize:vertical;min-height:64px;font:inherit;font-size:16px}
+@media (min-width:761px){.ibreply textarea{font-size:14px}}
+.ibrb{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ibside{border-left:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;background:var(--surface)}
+.ibcard{border:1px solid var(--line);border-radius:10px;padding:11px 12px;display:flex;flex-direction:column;gap:6px}
+.ibcard h5{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ibcn{font-size:15px}
+.ibkv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13px}.ibkv span{color:var(--muted)}.ibkv b{text-align:right;font-weight:600}
+.ibp{display:flex;gap:9px;align-items:center}.ibp b{display:block;font-size:13px}.ibp small{display:block;color:var(--muted);font-size:11.5px;overflow-wrap:anywhere}
+.ibav{width:30px;height:30px;border-radius:50%;background:var(--sunk);display:grid;place-items:center;font-weight:700;font-size:11.5px;color:var(--accent);flex:none}
+.ibother{text-align:left;font-size:12.5px}
+.ibstart{max-width:640px}
+.ibtl{list-style:none;margin:0;padding:6px 14px 12px;display:flex;flex-direction:column}
+.ibtl li{display:grid;grid-template-columns:80px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}.ibtl li:last-child{border:0}
+.ibtl time{color:var(--muted);font-size:12px;padding-top:2px}.ibtl small{display:block;color:var(--muted);font-size:12px;margin-top:2px}.ibtl .ibch,.ibtl .ibflag{margin-left:4px;vertical-align:1px}
+.ibrule{display:flex;align-items:center;gap:8px}.ibrule button{margin-left:auto}
+.ibconn{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px;font-size:13.5px}.ibconn .t{display:flex;gap:8px;align-items:center}.ibconn .t .ibflag{margin-left:auto}.ibconn p{margin:0}
+@media (max-width:1180px){.ib{grid-template-columns:minmax(240px,320px) minmax(0,1fr)}.ibside{display:none}}
+@media (max-width:760px){
+  .ib{display:block;height:auto;min-height:0;border-radius:10px}
+  .ib.has-sel .iblist{display:none}.ib:not(.has-sel) .ibthread{display:none}
+  .iblist{border-right:0}.ibback{display:inline-flex}
+  .ibmsgs{max-height:none;overflow:visible}.ibm{max-width:94%}
+  .ibbar .inp{height:auto;min-height:42px}.ibbar #ibQ{flex-basis:100%;order:-1}.ibbar #ibChSel,.ibbar #ibClSel,.ibbar #ibSort{flex:1;min-width:0}
+  .ibseg{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.ibseg button{flex:none;white-space:nowrap;padding:9px 12px}
+  #v-inbox.ibreading .vh,#v-inbox.ibreading .ibbar{display:none}
+}
+</style>
 <style id="palHfh">/* ===== Hands Free Help palette: lime, gray, black (from the company logo). On when <html data-palette="hfh"> ===== */
 :root[data-palette="hfh"]{--lime:#9CCB19;--hfgray:#A9ACA6;--basalt:#111210;--basalt2:#1D1F1B;--amber:#9CCB19;--lagoon:#4F7A00}
 :root[data-palette="hfh"],:root[data-palette="hfh"][data-theme="light"]{--bg:#F3F4F1;--surface:#FFFFFF;--sunk:#E9EBE6;--line:#D5D8D0;--fg:#111210;--muted:#585B54;--accent:#4A7300;--accent-ink:#111210;--accent-soft:#ECF5D2;--ok:#2F7D32;--ok-soft:#E1F1DF;--sheet:#FBFCFA;--grid:#E8EAE4;--gridmaj:#D8DBD3}
@@ -1360,6 +1429,7 @@ button:not(:disabled):active{filter:brightness(.92)}
     <section class="view" id="v-library" hidden></section>
     <section class="view" id="v-purchasing" hidden></section>
     <section class="view" id="v-estimate" hidden></section>
+    <section class="view" id="v-inbox" hidden></section>
     <section class="view" id="v-proposal" hidden></section>
     <section class="view" id="v-projects" hidden></section>
     <section class="view" id="v-field" hidden></section>
@@ -1927,8 +1997,8 @@ const chip=s=>`<span class="chip ${esc(String(s).replace(/\s+/g,'-'))}">${esc(s)
 function renderProjSwitch(){const b=$('#pjsw');if(!b)return;
   b.innerHTML=`<label class="navgroup" for="pjSel">Project</label><select class="inp" id="pjSel" aria-label="Open project">${projOptions()}</select><button class="btn sm" data-act="newProject">+ New project</button>`}
 function projOptions(){return PJ.list.map(e=>{const pr=e.id===PJ.cur?S.prop:(e.prop||{});return `<option value="${e.id}" ${e.id===PJ.cur?'selected':''}>${esc([pr.client,pr.project].filter(Boolean).join(' · ')||'Untitled project')}</option>`}).join('')}
-function badges(){renderProjSwitch();{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}($('#bCl')||{}).textContent=S.clients.length;($('#bDesign')||{}).textContent=S.design.nodes.length;($('#bLib')||{}).textContent=lib.length;($('#bSvc')||{}).textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
-const VIEWS=['overview','assistant','design','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
+function badges(){renderProjSwitch();{const b=$('#bInbox');if(b&&typeof ibNeeds==='function'){const n=INBOX.convs.filter(ibNeeds).length;b.textContent=n;b.hidden=!n;b.classList.toggle('bad',n>0)}}{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}($('#bCl')||{}).textContent=S.clients.length;($('#bDesign')||{}).textContent=S.design.nodes.length;($('#bLib')||{}).textContent=lib.length;($('#bSvc')||{}).textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
+const VIEWS=['overview','assistant','design','inbox','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
 function go(v){
   if(v==='clients'&&S.view==='clients'&&S.ui.cpage){S.ui.cpage=null}
   if(!VIEWS.includes(v))v='overview';
@@ -1944,7 +2014,7 @@ function go(v){
    drawings (without prices), the library (without costs), the field app and the service desk;
    money pages are hidden and invoices and contracts never load or save for them (the database
    refuses those records to techs too). */
-const TECH_HIDE=['overview','clients','proposal','billing','contracts','purchasing','estimate','assistant','settings'];
+const TECH_HIDE=['overview','inbox','clients','proposal','billing','contracts','purchasing','estimate','assistant','settings'];
 const canPrice=()=>!S.tech;
 function techMode(){if(S.tech)return;S.tech=true;document.body.classList.add('tech');
   if(S.design&&S.design.meta6)S.design.meta6.price='none';
@@ -4401,6 +4471,200 @@ function bindEst(){const el=$('#v-estimate');if(el.dataset.b)return;el.dataset.b
     else return;
     saveProjects();R.estimate()})}
 
+/* ================= CLIENT INBOX =================
+   Every message a client sends (email, WhatsApp, Teams, Slack, calls) in one list, matched to the
+   client, the room and the job. Stored in meta/inbox (office staff only; technicians never load it).
+   Until an account is connected, messages are logged by hand or pasted in; replies open in the
+   matching app with the text filled in and are recorded on the conversation. */
+const IBKEY='jdd-inbox-v1';
+let INBOX={convs:[],rules:[]};
+try{const o=JSON.parse(localStorage.getItem(IBKEY)||'null');if(o&&Array.isArray(o.convs))INBOX={convs:o.convs,rules:Array.isArray(o.rules)?o.rules:[]}}catch(e){}
+function saveInbox(){try{localStorage.setItem(IBKEY,JSON.stringify(INBOX))}catch(e){}cloudMark()}
+const IBCH={email:{l:'Email',c:'#1D6FD6'},wa:{l:'WhatsApp',c:'#1E9E52'},teams:{l:'Teams',c:'#5B5FC7'},slack:{l:'Slack',c:'#7A2E7B'},call:{l:'Call or note',c:'#56677D'}};
+const ibCh=k=>`<span class="ibch" style="--ch:${(IBCH[k]||IBCH.call).c}">${esc((IBCH[k]||IBCH.call).l)}</span>`;
+const IB_FREE=/^(gmail|googlemail|yahoo|hotmail|outlook|live|msn|icloud|me|mac|aol|proton|protonmail|ymail|comcast|hawaii\.rr|hawaiiantel)\./i;
+const ibDigits=v=>String(v||'').replace(/\D/g,'').slice(-10);
+const ibNorm=v=>{v=String(v||'').trim().toLowerCase();return /@/.test(v)?v.replace(/^.*</,'').replace(/>.*$/,'').trim():v};
+const ibDomain=v=>{const m=/@([^@\s>]+)$/.exec(ibNorm(v));return m?m[1]:''};
+/* which client does a sender belong to? saved rules first, then a contact's email or phone, then the company's email domain */
+function ibMatch(addr){const a=ibNorm(addr),d=ibDomain(a),dg=ibDigits(a);if(!a)return '';
+  for(const r of INBOX.rules){const v=ibNorm(r.value);if(!v||!clientById(r.clientId))continue;
+    if(v.startsWith('@')){if(d&&d===v.slice(1))return r.clientId}else if(v===a||(dg.length>=7&&ibDigits(v)===dg))return r.clientId}
+  for(const c of S.clients){for(const p of (c.contacts||[])){if(p.email&&ibNorm(p.email)===a)return c.id;if(dg.length>=7&&p.phone&&ibDigits(p.phone)===dg)return c.id}
+    if(dg.length>=7&&c.phone&&ibDigits(c.phone)===dg)return c.id}
+  if(d&&!IB_FREE.test(d))for(const c of S.clients){if((c.contacts||[]).some(p=>ibDomain(p.email)===d)||(c.website&&String(c.website).toLowerCase().includes(d)))return c.id}
+  return ''}
+const ibLast=v=>v.msgs[v.msgs.length-1]||{};
+const ibNeeds=v=>!v.done&&ibLast(v).dir==='in';
+const ibWaiting=v=>!v.done&&ibLast(v).dir==='out';
+const ibChans=v=>[...new Set(v.msgs.map(m=>m.ch))];
+const ibFirstIn=v=>v.msgs.find(m=>m.dir==='in')||v.msgs[0]||{};
+function ibWhen(ms,full){const d=new Date(ms),now=new Date(),t=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  if(d.toDateString()===now.toDateString())return t;const y=new Date(now);y.setDate(y.getDate()-1);if(d.toDateString()===y.toDateString())return full?'Yesterday '+t:'Yesterday';
+  if(now-d<6*864e5)return d.toLocaleDateString([],{weekday:'short'})+(full?' '+t:'');return d.toLocaleDateString([],{month:'short',day:'numeric'})+(full?' '+t:'')}
+const ibAge=ms=>{const m=Math.max(0,Math.round((Date.now()-ms)/6e4));return m<60?m+'m':m<1440?Math.round(m/60)+'h':Math.round(m/1440)+'d'};
+/* a contract's response time, in hours, from its plan name ("Gold, 4 h"), for the needs-reply timer */
+function ibResp(c){if(!c||!S.contracts)return 0;const ct=S.contracts.find(x=>sameName(x.client,c.name)&&typeof ctLive==='function'&&ctLive(x));if(!ct)return 0;const m=/(\d+)\s*h/i.exec([ct.resp,ct.sla,ct.title,ct.type].filter(Boolean).join(' '));return m?+m[1]:0}
+function ibCounts(){const c={all:0,needs:0,waiting:0,unmatched:0,done:0};INBOX.convs.forEach(v=>{if(v.done){c.done++;return}c.all++;if(ibNeeds(v))c.needs++;if(ibWaiting(v))c.waiting++;if(!v.clientId)c.unmatched++});return c}
+function ibList(){const u=S.ui,f=u.ibF||'needs',q=(u.ibQ||'').trim().toLowerCase();
+  return INBOX.convs.filter(v=>{
+    if(f==='done'?!v.done:v.done)return false;
+    if(f==='needs'&&!ibNeeds(v))return false;if(f==='waiting'&&!ibWaiting(v))return false;if(f==='unmatched'&&v.clientId)return false;
+    if(u.ibCh&&!v.msgs.some(m=>m.ch===u.ibCh))return false;if(u.ibCl&&v.clientId!==u.ibCl)return false;
+    if(q){const c=clientById(v.clientId);const hay=[v.subject,c&&c.name,...v.msgs.map(m=>m.name+' '+m.addr+' '+m.text)].join(' ').toLowerCase();if(!hay.includes(q))return false}
+    return true}).sort((a,b)=>u.ibSort==='old'?ibLast(a).at-ibLast(b).at:ibLast(b).at-ibLast(a).at)}
+const ibById=id=>INBOX.convs.find(v=>v.id===id);
+function ibNewId(){return 'cv'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+
+R.inbox=function(){const el=$('#v-inbox');if(!el)return;const u=S.ui;if(!u.ibF)u.ibF=INBOX.convs.some(ibNeeds)?'needs':'all';
+  const cn=ibCounts(),list=ibList();if(u.ibSel&&!ibById(u.ibSel))u.ibSel=null;
+  if(!u.ibSel&&list.length&&window.innerWidth>760)u.ibSel=list[0].id;
+  const sel=u.ibSel&&ibById(u.ibSel),usedCl=[...new Set(INBOX.convs.map(v=>v.clientId).filter(Boolean))].map(clientById).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name));
+  const F=[['needs','Needs reply',cn.needs],['waiting','Waiting on client',cn.waiting],['all','All open',cn.all],['unmatched','Unmatched',cn.unmatched],['done','Done',cn.done]];
+  const anySample=INBOX.convs.some(v=>v.sample);
+  el.innerHTML=`<header class="vh"><div><p class="eyebrow">Clients &amp; billing</p><h1>Client inbox</h1>
+     <p class="sub">Every message from your clients in one place, matched to the client and the job. ${cn.needs?`<b>${plural(cn.needs,'conversation')} need${cn.needs===1?'s':''} a reply.</b>`:'Nothing is waiting on you.'}</p></div>
+    <div class="actions">${anySample?`<button class="btn" data-act="ibSampleOff">Remove examples</button>`:''}<button class="btn" data-act="ibConnInfo">Connect accounts</button><button class="btn primary" data-act="ibLogOpen">+ Log a message</button></div></header>
+   ${INBOX.convs.length?`<div class="ibbar" role="toolbar" aria-label="Filter conversations">
+     <div class="ibseg" role="group" aria-label="Show">${F.map(([k,l,n])=>`<button data-act="ibF" data-f="${k}" aria-pressed="${u.ibF===k}">${l}${n?` <span class="ibn${k==='needs'?' hot':''}">${n}</span>`:''}</button>`).join('')}</div>
+     <select class="inp" id="ibChSel" aria-label="Channel"><option value="">All channels</option>${Object.entries(IBCH).map(([k,o])=>`<option value="${k}" ${u.ibCh===k?'selected':''}>${esc(o.l)}</option>`).join('')}</select>
+     <select class="inp" id="ibClSel" aria-label="Client"><option value="">All clients</option>${usedCl.map(c=>`<option value="${c.id}" ${u.ibCl===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+     <input class="inp" id="ibQ" type="search" placeholder="Search messages and people" value="${esc(u.ibQ||'')}" aria-label="Search messages">
+     <select class="inp" id="ibSort" aria-label="Order"><option value="new">Newest first</option><option value="old" ${u.ibSort==='old'?'selected':''}>Oldest first</option></select></div>
+    <div class="ib${sel?' has-sel':''}">
+     <div class="iblist" role="list" aria-label="Conversations">${list.length?list.map(ibRowHTML).join(''):`<p class="ibempty">${u.ibF==='needs'?'No one is waiting on a reply.':'No conversations here.'}</p>`}</div>
+     ${sel?ibThreadHTML(sel):'<div class="ibthread ibnone"><p class="muted">Pick a conversation to read it.</p></div>'}
+    </div>`
+   :`<div class="panel empty ibstart"><h2>Your client messages, in one place</h2>
+     <p class="muted">Log a call or paste an email now; once your accounts are connected, email, WhatsApp, Teams and Slack messages arrive here on their own and match to the client.</p>
+     <div class="actions"><button class="btn primary" data-act="ibLogOpen">+ Log a message</button><button class="btn" data-act="ibSampleOn">Load example conversations</button><button class="btn" data-act="ibConnInfo">Connect accounts</button></div></div>`}`;
+  el.classList.toggle('ibreading',!!sel);const sc=$('#ibThreadMsgs');if(sc)sc.scrollTop=sc.scrollHeight}
+function ibRowHTML(v){const c=clientById(v.clientId),f=ibFirstIn(v),l=ibLast(v),need=ibNeeds(v),resp=ibResp(c),late=need&&resp&&(Date.now()-l.at)>resp*36e5;
+  return `<button class="ibrow${need?' unread':''}${S.ui.ibSel===v.id?' sel':''}" role="listitem" data-act="ibOpen" data-id="${v.id}" aria-current="${S.ui.ibSel===v.id}">
+   <span class="r1"><b>${esc(f.name||f.addr||'Unknown')}</b><time>${esc(ibWhen(l.at))}</time></span>
+   <span class="r2">${esc(v.subject||'(no subject)')}</span>
+   <span class="r3">${l.dir==='out'?'You: ':''}${esc(String(l.text||'').replace(/\s+/g,' ').slice(0,110))}</span>
+   <span class="r4">${ibChans(v).map(ibCh).join('')}${c?`<span class="ibcl">${esc(c.name)}</span>`:'<span class="ibcl un">Unmatched</span>'}${need?`<span class="ibflag${late?' late':''}">Needs reply · ${ibAge(l.at)}</span>`:v.done?'<span class="ibflag ok">Done</span>':`<span class="ibflag wait">Waiting on client</span>`}${v.sample?'<span class="ibflag ex">Example</span>':''}</span></button>`}
+function ibThreadHTML(v){const c=clientById(v.clientId),u=S.ui,f=ibFirstIn(v),need=ibNeeds(v),team=tkTeam();
+  const projs=c?PJ.list.filter(e=>sameName(e.prop&&e.prop.client,c.name)||e.clientId===c.id):PJ.list;
+  const pj=v.pid&&PJ.list.find(e=>e.id===v.pid);
+  const chs=ibReplyChans(v,c),rch=chs.some(x=>x[0]===u.ibRch)?u.ibRch:(chs[0]||['note'])[0];
+  return `<div class="ibthread" aria-label="Conversation">
+   <div class="ibth"><button class="btn sm ibback" data-act="ibBack">← All conversations</button>
+    <div class="ibtt"><h2>${esc(v.subject||'(no subject)')}</h2>${need?`<span class="ibflag">Needs reply · ${ibAge(ibLast(v).at)}</span>`:v.done?'<span class="ibflag ok">Done</span>':'<span class="ibflag wait">Waiting on client</span>'}</div>
+    <div class="ibacts">
+     ${v.ticket?`<button class="btn sm" data-go="service">Ticket ${esc(v.ticket)} →</button>`:`<button class="btn sm" data-act="ibTicket" data-id="${v.id}">Make a service ticket</button>`}
+     <select class="inp sm" id="ibPj" data-id="${v.id}" aria-label="Linked project"><option value="">${projs.length?'Link to a project…':'No projects for this client'}</option>${projs.map(e=>`<option value="${e.id}" ${v.pid===e.id?'selected':''}>${esc((e.prop&&e.prop.project)||'Project')}</option>`).join('')}</select>
+     ${pj?(pj.id===PJ.cur?`<span class="ibtime"><input class="inp sm" id="ibHrs" type="number" min="0" step="0.25" placeholder="h" aria-label="Hours to log"><button class="btn sm" data-act="ibTime" data-id="${v.id}">Log time</button></span>`:`<button class="btn sm" data-act="openProject" data-id="${pj.id}" data-to="billing">Open project to log time</button>`):''}
+     <select class="inp sm" id="ibWho" data-id="${v.id}" aria-label="Assigned to"><option value="">Unassigned</option>${team.map(m=>`<option value="${esc(m.ini)}" ${v.who===m.ini?'selected':''}>${esc(m.name||m.ini)}</option>`).join('')}</select>
+     <button class="btn sm" data-act="ibDone" data-id="${v.id}">${v.done?'Reopen':'Mark done'}</button></div></div>
+   ${v.sum?`<div class="ibsum"><b>Summary</b> · ${esc(v.sum)}</div>`:''}
+   <div class="ibmsgs" id="ibThreadMsgs">${v.msgs.map(m=>`<div class="ibm${m.dir==='out'?' me':''}"><div class="mh">${ibCh(m.ch)}<b>${esc(m.dir==='out'?'You':(m.name||m.addr||'Client'))}</b><span>${esc(ibWhen(m.at,true))}${m.addr&&m.dir==='in'&&m.name?' · '+esc(m.addr):''}</span></div><div class="mt">${esc(m.text).replace(/\n/g,'<br>')}</div></div>`).join('')}
+    ${!c?`<div class="ibsys">This sender isn't matched to a client yet. Match them on the right.</div>`:''}</div>
+   <div class="ibreply">
+    <div class="ibrt"><label for="ibRch">Reply with</label><select class="inp sm" id="ibRch" data-id="${v.id}">${chs.map(([k,l])=>`<option value="${k}" ${k===rch?'selected':''}>${esc(l)}</option>`).join('')}</select>${SAMPLE?`<button class="btn sm" data-act="ibSum" data-id="${v.id}">Summarize</button><button class="btn sm" data-act="ibDraft" data-id="${v.id}">Draft a reply</button>`:''}</div>
+    <textarea class="inp" id="ibTxt" rows="3" placeholder="Write a reply…">${esc(u.ibDraft&&u.ibDraft.id===v.id?u.ibDraft.t:'')}</textarea>
+    <div class="ibrb"><span class="muted" style="font-size:12px">${{email:'Opens your email app with the reply filled in.',wa:'Opens WhatsApp with the reply filled in.',teams:'Opens a Teams chat with the reply filled in.',slack:'Copies the reply; paste it in the Slack thread.',note:'Saved on the conversation only.'}[rch]||''}</span><button class="btn primary" data-act="ibSend" data-id="${v.id}">${rch==='note'?'Save note':'Send'}</button></div></div>
+  </div>
+  <aside class="ibside">${ibSideHTML(v,c)}</aside>`}
+function ibReplyChans(v,c){const f=ibFirstIn(v),out=[],em=/@/.test(f.addr||'')?f.addr:(c&&(primaryOf(c)||{}).email)||'',ph=(!/@/.test(f.addr||'')&&ibDigits(f.addr).length>=7)?f.addr:(c&&(primaryOf(c)||{}).phone)||'';
+  const used=ibChans(v);
+  if(em)out.push(['email','Email · '+em]);if(ph)out.push(['wa','WhatsApp · '+ph]);if(em&&used.includes('teams'))out.push(['teams','Teams · '+em]);if(used.includes('slack'))out.push(['slack','Slack (copy)']);
+  out.sort((a,b)=>(used.includes(b[0])?1:0)-(used.includes(a[0])?1:0)||(b[0]===ibLast(v).ch?1:0)-(a[0]===ibLast(v).ch?1:0));
+  out.push(['note','Note only']);return out}
+function ibSideHTML(v,c){const f=ibFirstIn(v);
+  if(!c)return `<div class="ibcard"><h5>Match to a client</h5><p class="muted" style="margin:0 0 8px;font-size:13px">${esc(f.name||'')} ${esc(f.addr||'')}</p>
+    <label class="field" for="ibMatchSel">Client<select class="inp" id="ibMatchSel"><option value="">Choose a client…</option>${S.clients.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
+    <label class="chk" style="font-size:13px;margin:6px 0"><input type="checkbox" id="ibMatchRule" checked> Match ${esc(f.addr?ibNorm(f.addr):'this sender')} to them from now on</label>
+    <div class="actions"><button class="btn sm primary" data-act="ibMatchSet" data-id="${v.id}">Match</button><button class="btn sm" data-act="ibNewClient" data-id="${v.id}">New client</button></div></div>`;
+  const ct=(S.contracts||[]).find(x=>sameName(x.client,c.name)&&typeof ctLive==='function'&&ctLive(x)),openT=S.tickets.filter(t=>String(t.site).toLowerCase().startsWith(c.name.toLowerCase())&&t.col!=='Completed').length;
+  const projs=PJ.list.filter(e=>sameName(e.prop&&e.prop.client,c.name)).length,bal=typeof clientBalance==='function'?clientBalance(c):0,resp=ibResp(c);
+  return `<div class="ibcard"><h5>Client</h5><b class="ibcn">${esc(c.name)}</b>
+    <div class="ibkv"><span>Contract</span><b>${ct?esc(ct.no||'Active')+(resp?` · ${resp} h reply`:''):'None'}</b><span>Open tickets</span><b>${openT}</b><span>Projects</span><b>${projs}</b><span>Owed</span><b>${money2(bal)}</b></div>
+    <button class="lnk" data-act="ibClient" data-id="${c.id}">Open client →</button></div>
+   <div class="ibcard"><h5>People</h5>${(c.contacts||[]).length?(c.contacts||[]).map(p=>`<div class="ibp"><span class="ibav">${esc((p.name||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase())}</span><span><b>${esc(p.name||'')}</b><small>${esc([p.title,p.email,p.phone].filter(Boolean).join(' · '))}</small></span></div>`).join(''):'<p class="muted" style="margin:0;font-size:13px">No contacts saved.</p>'}</div>
+   ${v.ticket||v.pid?`<div class="ibcard"><h5>Linked</h5>${v.ticket?`<div style="font-size:13px">Ticket <b>${esc(v.ticket)}</b></div>`:''}${v.pid?`<div style="font-size:13px">Project <b>${esc(((PJ.list.find(e=>e.id===v.pid)||{}).prop||{}).project||'')}</b></div>`:''}</div>`:''}
+   <div class="ibcard"><h5>Other conversations</h5>${INBOX.convs.filter(x=>x.clientId===c.id&&x.id!==v.id).slice(0,4).map(x=>`<button class="lnk ibother" data-act="ibOpen" data-id="${x.id}">${esc(ibWhen(ibLast(x).at))} · ${esc(x.subject||'(no subject)')}</button>`).join('')||'<p class="muted" style="margin:0;font-size:13px">None yet.</p>'}</div>`}
+
+/* log a message by hand, or paste an email with its From and Subject lines */
+function ibLogOpen(pre){pre=pre||{};const ov=$('#overlay');
+  ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="ibLH">
+   <div class="dlgtop"><span>CLIENT INBOX</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
+   <div class="bform" style="padding:18px">
+    <h2 id="ibLH" style="margin:0;font-family:var(--f-display);font-size:26px">Log a message</h2>
+    <p class="note" style="margin:0">For a call, a text, or a message from an account that isn't connected yet. Pasting a whole email fills in the sender and subject.</p>
+    <div class="row2"><label class="field" for="ibLCh">Channel<select id="ibLCh">${Object.entries(IBCH).map(([k,o])=>`<option value="${k}" ${pre.ch===k?'selected':''}>${esc(o.l)}</option>`).join('')}</select></label>
+     <label class="field" for="ibLDir">Who wrote it<select id="ibLDir"><option value="in">The client</option><option value="out">You</option></select></label></div>
+    <div class="row2"><label class="field" for="ibLName">Name<input id="ibLName" autocomplete="off" placeholder="e.g. Leilani Kahale" value="${esc(pre.name||'')}"></label>
+     <label class="field" for="ibLAddr">Email, phone or channel<input id="ibLAddr" autocomplete="off" placeholder="name@company.com or 808…" value="${esc(pre.addr||'')}"></label></div>
+    <label class="field" for="ibLCl">Client<select id="ibLCl"><option value="">Match automatically</option>${S.clients.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>`<option value="${x.id}" ${pre.clientId===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+    <label class="field" for="ibLSub">Subject<input id="ibLSub" autocomplete="off" placeholder="What it's about" value="${esc(pre.subject||'')}"></label>
+    <label class="field" for="ibLTxt">Message<textarea id="ibLTxt" rows="7" placeholder="Type or paste the message"></textarea></label>
+    <p class="muted" id="ibLMatch" style="margin:0;font-size:13px" aria-live="polite"></p>
+   </div>
+   <div class="dlgfoot"><button class="btn" data-act="closeOverlay">Cancel</button><button class="btn primary" data-act="ibLogSave">Add to inbox</button></div></div>`;
+  ov.hidden=false;setTimeout(()=>{const t=$('#ibLTxt');if(t)(pre.name?t:$('#ibLName')).focus()},0);ibLogHint()}
+function ibParseEmail(txt){const head=txt.split(/\n\s*\n/)[0]||'',from=/^from:\s*(.+)$/im.exec(head),sub=/^subject:\s*(.+)$/im.exec(head);if(!from&&!sub)return null;
+  const f=from?from[1].trim():'',em=/<([^>]+)>/.exec(f)||/([^\s<>]+@[^\s<>]+)/.exec(f),name=f.replace(/<[^>]*>/,'').replace(/["']/g,'').trim();
+  const body=txt.slice(head.length).replace(/^\s+/,'');return {name:name&&!/@/.test(name)?name:'',addr:em?em[1]:'',subject:sub?sub[1].trim():'',body:body||txt}}
+function ibLogHint(){const a=$('#ibLAddr'),h=$('#ibLMatch'),s=$('#ibLCl');if(!a||!h)return;if(s&&s.value){h.textContent='';return}const id=ibMatch(a.value),c=clientById(id);h.textContent=a.value.trim()?(c?`Matches ${c.name}.`:'No client matches this sender yet; it will go to Unmatched.'):''}
+function ibAddMsg(o){/* o: {ch,dir,name,addr,subject,text,clientId,at} → the conversation it joined */
+  const clientId=o.clientId||ibMatch(o.addr),at=o.at||Date.now(),sub=String(o.subject||'').replace(/^((re|fw|fwd)\s*:\s*)+/i,'').trim();
+  const key=ibNorm(o.addr);
+  let v=INBOX.convs.find(x=>!x.done&&(sub?String(x.subject).toLowerCase()===sub.toLowerCase():true)&&(clientId?x.clientId===clientId:x.msgs.some(m=>ibNorm(m.addr)===key&&key))&&at-ibLast(x).at<3*864e5);
+  if(!v){v={id:ibNewId(),clientId,subject:sub||String(o.text||'').split('\n')[0].slice(0,80)||'(no subject)',msgs:[],done:false,who:'',pid:'',ticket:'',created:at};INBOX.convs.unshift(v)}
+  v.msgs.push({id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ch:o.ch||'email',dir:o.dir||'in',name:o.name||'',addr:o.addr||'',at,text:String(o.text||'').trim()});
+  if(o.dir==='in')v.done=false;if(!v.clientId&&clientId)v.clientId=clientId;return v}
+function ibSampleConvs(){const cl=S.clients.filter(c=>!/^sample/i.test(c.name)).slice(0,3),mk=(i)=>cl[i]||null,now=Date.now(),H=36e5;
+  const pc=c=>c&&primaryOf(c)||{};const ex=[];
+  const a=mk(0),b=mk(1),d=mk(2);
+  ex.push({clientId:a&&a.id,subject:'Conference room display won\'t wake for the 10:00',msgs:[
+    {ch:'teams',dir:'in',name:pc(a).name||'Office manager',addr:pc(a).email||'office@client.example',at:now-.4*H,text:'Morning! The big screen in the conference room won\'t come on. Our 10:00 is in 20 minutes. Remote does nothing and the wall panel says No signal.'},
+    {ch:'email',dir:'in',name:pc(a).name||'Office manager',addr:pc(a).email||'office@client.example',at:now-.35*H,text:'Sending a photo of the panel in case it helps. (photo: panel.jpg)'}]});
+  ex.push({clientId:b&&b.id,subject:'Photo of the rack after the power outage',msgs:[{ch:'wa',dir:'in',name:pc(b).name||'Front desk',addr:pc(b).phone||'(808) 555-0144',at:now-1.2*H,text:'We lost power last night. Is the orange light on the switch normal? Sending 2 photos.'}]});
+  ex.push({clientId:d&&d.id,subject:'Move the install to Thursday?',msgs:[{ch:'slack',dir:'in',name:'#shared-av-project',addr:'#shared-av-project',at:now-26*H,text:'Can we move the lobby install to Thursday? The tenant event moved.'},{ch:'slack',dir:'out',name:'',addr:'#shared-av-project',at:now-25*H,text:'Thursday works. Crew arrives 7:30, done by 3.'}]});
+  ex.push({clientId:'',subject:'Quote for 3 meeting rooms',msgs:[{ch:'wa',dir:'in',name:'',addr:'(808) 555-0199',at:now-50*H,text:'Hi, is this Jams Docs and Designs? We need a quote for 3 meeting rooms in our new office.'}]});
+  return ex.map(x=>({id:ibNewId(),clientId:x.clientId||'',subject:x.subject,msgs:x.msgs.map((m,i)=>({id:'m'+i+Math.random().toString(36).slice(2,6),...m})),done:false,who:'',pid:'',ticket:'',created:x.msgs[0].at,sample:true}))}
+async function ibAI(v,kind){if(!SAMPLE){toast('The assistant isn’t set up on this site yet.');return null}
+  const c=clientById(v.clientId),thread=v.msgs.map(m=>`[${(IBCH[m.ch]||IBCH.call).l}] ${m.dir==='out'?'Us':(m.name||m.addr||'Client')}: ${m.text}`).join('\n');
+  const who=firm();
+  const prompt=kind==='sum'?`Summarize this conversation between ${who} (an AV and network integrator) and ${c?c.name:'a client'} in at most two sentences: what the client needs and what should happen next. Plain text only.\n\nSubject: ${v.subject}\n${thread}`
+    :`Write a short, friendly reply from ${who} (an AV and network integrator) to the client's latest message. Be practical and specific, at most 5 sentences, no subject line, no signature. Plain text only.\n\nClient: ${c?c.name:'unknown'}\nSubject: ${v.subject}\n${thread}`;
+  try{const r=await SAMPLE(prompt,{modelTier:'quick',cache:false});return String(r&&r.text||'').trim()}
+  catch(e){if(e&&e.code==='not_granted')SAMPLE=null;toast(e&&e.message?'The assistant couldn’t answer: '+e.message:'The assistant couldn’t answer.');return null}}
+function ibClientTabHTML(c){const convs=INBOX.convs.filter(v=>v.clientId===c.id).sort((a,b)=>ibLast(b).at-ibLast(a).at),rules=INBOX.rules.filter(r=>r.clientId===c.id);
+  const auto=[...new Set((c.contacts||[]).map(p=>p.email&&ibDomain(p.email)).filter(d=>d&&!IB_FREE.test(d)))];
+  return `<div class="two"><div class="panel"><div class="ph"><h2>Conversations</h2><span class="actions"><span class="muted" style="font-size:12px">${plural(convs.length,'conversation')}</span><button class="btn sm primary" data-act="ibLogFor" data-id="${c.id}">+ Log a message</button></span></div>
+    ${convs.length?`<ul class="ibtl">${convs.map(v=>`<li><time>${esc(ibWhen(ibLast(v).at))}</time><span><button class="lnk" data-act="ibGo" data-id="${v.id}"><b>${esc(v.subject||'(no subject)')}</b></button> ${ibChans(v).map(ibCh).join('')} ${ibNeeds(v)?'<span class="ibflag">Needs reply</span>':v.done?'<span class="ibflag ok">Done</span>':''}<small>${esc(ibFirstIn(v).name||ibFirstIn(v).addr||'')} · ${plural(v.msgs.length,'message')}${v.ticket?' · ticket '+esc(v.ticket):''}</small></span></li>`).join('')}</ul>`
+     :'<p class="pb muted" style="margin:0">No messages from this client yet.</p>'}</div>
+   <div class="panel"><div class="ph"><h2>How messages find ${esc(c.name)}</h2></div><div class="pb" style="display:flex;flex-direction:column;gap:8px;font-size:13.5px">
+    ${(c.contacts||[]).filter(p=>p.email||p.phone).map(p=>`<div>✓ ${esc(p.name||'Contact')}: ${esc([p.email,p.phone].filter(Boolean).join(' · '))}</div>`).join('')}
+    ${auto.map(d=>`<div>✓ Anyone at <b>@${esc(d)}</b></div>`).join('')}
+    ${rules.map(r=>`<div class="ibrule">✓ <b>${esc(r.value)}</b><button class="btn sm" data-act="ibRuleDel" data-id="${r.id}" aria-label="Remove ${esc(r.value)}">Remove</button></div>`).join('')}
+    <div class="addrow"><input class="inp" id="ibRuleIn" placeholder="Email, @domain, phone or #channel"><button class="btn" data-act="ibRuleAdd" data-id="${c.id}">Add</button></div>
+    <p class="muted" style="margin:0;font-size:12px">Contacts' emails and phone numbers match on their own. Add another address, a whole email domain, a WhatsApp number or a Slack or Teams channel name.</p></div></div></div>`}
+function ibConnInfo(){const ov=$('#overlay');const C=[['email','Email','Google Workspace (Gmail) or Microsoft 365 (Outlook), signed in once per mailbox.','Your email provider, and which mailboxes to bring in.'],['wa','WhatsApp','The WhatsApp Business Platform from Meta, with your business number registered to it.','A Meta business account and the number to use. You can reply freely for 24 hours after a client writes; after that, Meta requires an approved template and charges for it.'],['teams','Teams','Microsoft Graph, approved once by your Microsoft 365 admin.','Admin approval. Some live chat features need Microsoft approval or carry usage fees.'],['slack','Slack','A Slack app in your workspace that reads the Slack Connect channels you share with clients.','Which shared channels belong to which client.']];
+  ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="ibCH"><div class="dlgtop"><span>CLIENT INBOX</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
+   <div style="padding:18px;display:flex;flex-direction:column;gap:12px"><h2 id="ibCH" style="margin:0;font-family:var(--f-display);font-size:26px">Connect accounts</h2>
+    <p class="note" style="margin:0">None of these are connected yet. Each one needs an account and keys you create, added to the app's server settings. Until then, log calls and paste emails with <b>+ Log a message</b>; replies open in the matching app with the text filled in.</p>
+    ${C.map(([k,l,how,need])=>`<div class="ibconn"><div class="t">${ibCh(k)}<b>${l}</b><span class="ibflag wait">Not connected</span></div><p>${how}</p><p class="muted">Needs: ${need}</p></div>`).join('')}</div>
+   <div class="dlgfoot"><button class="btn primary" data-act="closeOverlay">Got it</button></div></div>`;ov.hidden=false}
+
+let ibQT;
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.id||!/^ib/.test(t.id))return;const u=S.ui;
+  if(t.id==='ibChSel'){u.ibCh=t.value;u.ibSel=null;R.inbox()}
+  else if(t.id==='ibClSel'){u.ibCl=t.value;u.ibSel=null;R.inbox()}
+  else if(t.id==='ibSort'){u.ibSort=t.value;R.inbox()}
+  else if(t.id==='ibPj'){const v=ibById(t.dataset.id);if(v){v.pid=t.value;saveInbox();R.inbox();if(t.value)toast('Linked to '+(((PJ.list.find(x=>x.id===t.value)||{}).prop||{}).project||'the project')+'.')}}
+  else if(t.id==='ibWho'){const v=ibById(t.dataset.id);if(v){v.who=t.value;saveInbox();toast(t.value?'Assigned to '+t.value+'.':'Unassigned.')}}
+  else if(t.id==='ibRch'){const x=$('#ibTxt');if(x)u.ibDraft={id:t.dataset.id,t:x.value};u.ibRch=t.value;R.inbox()}
+  else if(t.id==='ibLCl')ibLogHint()});
+document.addEventListener('input',e=>{const t=e.target;if(!t||!t.id)return;
+  if(t.id==='ibQ'){clearTimeout(ibQT);ibQT=setTimeout(()=>{S.ui.ibQ=t.value;S.ui.ibSel=null;const pos=t.selectionStart;R.inbox();const q=$('#ibQ');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(x){}}},250)}
+  else if(t.id==='ibLAddr')ibLogHint();
+  else if(t.id==='ibTxt'&&S.ui.ibSel)S.ui.ibDraft={id:S.ui.ibSel,t:t.value};
+  else if(t.id==='ibLTxt'){const pe=ibParseEmail(t.value);if(pe){const f=(id,x)=>{const i=$('#'+id);if(i&&!i.value&&x)i.value=x};f('ibLName',pe.name);f('ibLAddr',pe.addr);f('ibLSub',pe.subject);ibLogHint()}}});
+
 /* ================= PROPOSAL ================= */
 /* ---------- drawing set attached to proposals ----------
    Captured when the proposal is sent (and again on a change order), so the client sees the sheets exactly as proposed. */
@@ -5341,7 +5605,7 @@ function nlNav(st){NLST=st;try{localStorage.setItem(NLNAVK,JSON.stringify(st))}c
 const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const NAVL=[
  {top:'av:overview|Dashboard',icon:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>'},
- {sec:'clients',title:'Clients & billing',icon:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h10"/>',items:['av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals', 'av:billing|Time & invoicing|#bTime', 'nl:billing|Network time & billing']},
+ {sec:'clients',title:'Clients & billing',icon:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h10"/>',items:['av:inbox|Client inbox|#bInbox', 'av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals', 'av:billing|Time & invoicing|#bTime', 'nl:billing|Network time & billing']},
  {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
  {sec:'support',title:'Service',icon:'<path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1"/><rect x="17" y="13" width="4" height="6" rx="1"/>',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
  {net:true},
@@ -5853,6 +6117,49 @@ const A={
   colorToggle(){const i=PALETTES.findIndex(p=>p.id===palGet());palSet(PALETTES[(i+1)%PALETTES.length].id)},
   modeSet(el){modeSet(el.dataset.mode)},
   modeToggle(){modeSet(modeShown()==='dark'?'light':'dark')},
+  ibF(el){S.ui.ibF=el.dataset.f;S.ui.ibSel=null;R.inbox()},
+  ibOpen(el){const t=$('#ibTxt'),cur=S.ui.ibSel;if(t&&cur)S.ui.ibDraft={id:cur,t:t.value};S.ui.ibSel=el.dataset.id;R.inbox();if(window.innerWidth<=760)window.scrollTo(0,0)},
+  ibBack(){S.ui.ibSel=null;S.ui.ibBackOnce=true;R.inbox()},
+  ibGo(el){S.ui.ibSel=el.dataset.id;const v=ibById(el.dataset.id);S.ui.ibF=v&&v.done?'done':'all';go('inbox')},
+  ibLogOpen(){ibLogOpen()},
+  ibLogFor(el){ibLogOpen({clientId:el.dataset.id})},
+  ibLogSave(){const g=id=>($('#'+id).value||'').trim();let name=g('ibLName'),addr=g('ibLAddr'),sub=g('ibLSub'),txt=$('#ibLTxt').value.trim();
+    if(!txt){toast('Add the message.');$('#ibLTxt').focus();return}
+    const pe=ibParseEmail(txt);if(pe){if(!name)name=pe.name;if(!addr)addr=pe.addr;if(!sub)sub=pe.subject;txt=pe.body.trim()||txt}
+    if(!name&&!addr&&!g('ibLCl')){toast('Add who it’s from, or choose the client.');$('#ibLName').focus();return}
+    const v=ibAddMsg({ch:$('#ibLCh').value,dir:$('#ibLDir').value,name,addr,subject:sub,text:txt,clientId:g('ibLCl')});saveInbox();closeOverlay();
+    const c=clientById(v.clientId);S.ui.ibSel=v.id;S.ui.ibF=ibNeeds(v)?'needs':'all';if(S.view==='inbox')R.inbox();else if(S.view==='clients')R.clients();badges();
+    toast(c?`Added to ${c.name}.`:'Added to Unmatched. Match the sender to a client in the inbox.')},
+  ibSampleOn(){INBOX.convs.unshift(...ibSampleConvs());saveInbox();S.ui.ibF='all';R.inbox();badges();toast('Example conversations added. Remove them any time.')},
+  ibSampleOff(){INBOX.convs=INBOX.convs.filter(v=>!v.sample);saveInbox();S.ui.ibSel=null;R.inbox();badges();toast('Examples removed.')},
+  ibConnInfo(){ibConnInfo()},
+  ibDone(el){const v=ibById(el.dataset.id);if(!v)return;v.done=!v.done;saveInbox();if(v.done&&S.ui.ibF!=='done')S.ui.ibSel=null;R.inbox();badges();toast(v.done?'Marked done.':'Reopened.')},
+  ibTicket(el){const v=ibById(el.dataset.id);if(!v)return;const c=clientById(v.clientId),f=ibFirstIn(v),id='SR-'+(S.tseq++);
+    S.tickets.unshift({id,site:c?c.name:(f.name||f.addr||'Client'),issue:v.subject||'Client request',desc:`${v.msgs.filter(m=>m.dir==='in').map(m=>m.text).join('\n\n').slice(0,1500)}\n\nFrom ${f.name||f.addr||'the client'} by ${(IBCH[f.ch]||IBCH.call).l}.`,pri:ibResp(c)&&ibResp(c)<=4?'High':'Medium',tech:v.who||'',col:'Open',when:'',due:'',cat:'',log:[],src:'inbox:'+v.id});
+    v.ticket=id;saveService();saveInbox();R.inbox();badges();toast(`Ticket ${id} opened on the AV service desk.`)},
+  ibTime(el){const v=ibById(el.dataset.id),h=parseFloat(($('#ibHrs')||{}).value);if(!v)return;if(!(h>0)){toast('Enter hours greater than zero.');$('#ibHrs').focus();return}
+    if(v.pid!==PJ.cur){toast('Open the project first.');return}
+    S.time.push(tbNorm({task:S.tasks[0]?S.tasks[0].title||S.tasks[0].name||'':'',type:'Office',hrs:h,who:v.who||(tkTeam()[0]||{}).ini||'',day:isoDay(0),note:'Client communication: '+(v.subject||'')},curPj()));saveProjects();R.inbox();toast(`Logged ${h} h to ${S.prop.project}.`)},
+  ibSend(el){const v=ibById(el.dataset.id),t=$('#ibTxt');if(!v||!t)return;const txt=t.value.trim();if(!txt){toast('Write a reply first.');t.focus();return}
+    const ch=$('#ibRch').value,c=clientById(v.clientId),opt=ibReplyChans(v,c).find(x=>x[0]===ch),to=opt&&opt[1].includes('·')?opt[1].split('·').slice(1).join('·').trim():'';
+    const open=u=>{const a=document.createElement('a');a.href=u;if(/^https:/.test(u)){a.target='_blank';a.rel='noopener'}document.body.appendChild(a);a.click();a.remove()};
+    if(ch==='email')open(`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent('Re: '+(v.subject||''))}&body=${encodeURIComponent(txt)}`);
+    else if(ch==='wa')open(`https://wa.me/${ibDigits(to).length===10?'1'+ibDigits(to):String(to).replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`);
+    else if(ch==='teams')open(`https://teams.microsoft.com/l/chat/0/0?users=${encodeURIComponent(to)}&message=${encodeURIComponent(txt)}`);
+    else if(ch==='slack'){try{navigator.clipboard.writeText(txt).catch(()=>{})}catch(e){}}
+    v.msgs.push({id:'m'+Date.now().toString(36),ch:ch==='note'?'call':ch,dir:ch==='note'?'note':'out',name:'',addr:to,at:Date.now(),text:txt});
+    if(ch==='note'){v.msgs[v.msgs.length-1].dir='out'}
+    S.ui.ibDraft=null;saveInbox();R.inbox();badges();toast(ch==='note'?'Note saved.':ch==='slack'?'Reply copied. Paste it in the Slack thread.':'Reply recorded. Finish sending it in the app that opened.')},
+  async ibSum(el){const v=ibById(el.dataset.id);if(!v)return;el.disabled=true;el.textContent='Summarizing…';const s=await ibAI(v,'sum');if(s){v.sum=s;saveInbox()}R.inbox()},
+  async ibDraft(el){const v=ibById(el.dataset.id);if(!v)return;el.disabled=true;el.textContent='Drafting…';const s=await ibAI(v,'draft');if(s)S.ui.ibDraft={id:v.id,t:s};R.inbox();const t=$('#ibTxt');if(t&&s){t.focus();t.setSelectionRange(t.value.length,t.value.length)}},
+  ibMatchSet(el){const v=ibById(el.dataset.id),cid=($('#ibMatchSel')||{}).value;if(!v)return;if(!cid){toast('Choose a client.');$('#ibMatchSel').focus();return}
+    const f=ibFirstIn(v);v.clientId=cid;if($('#ibMatchRule').checked&&f.addr&&!INBOX.rules.some(r=>ibNorm(r.value)===ibNorm(f.addr)))INBOX.rules.push({id:'r'+Date.now().toString(36),value:ibNorm(f.addr),clientId:cid});
+    INBOX.convs.forEach(x=>{if(!x.clientId){const m=ibMatch(ibFirstIn(x).addr);if(m)x.clientId=m}});saveInbox();R.inbox();badges();toast(`Matched to ${clientById(cid).name}.`)},
+  ibNewClient(el){const v=ibById(el.dataset.id);if(!v)return;const f=ibFirstIn(v);S.ui.ibPendingClient=v.id;openNewClient();setTimeout(()=>{const s=(id,x)=>{const i=$('#'+id);if(i&&x)i.value=x};s('ncCn',f.name);if(/@/.test(f.addr||''))s('ncCe',f.addr);else s('ncCp',f.addr);s('ncNo','From the client inbox: '+(v.subject||''))},0)},
+  ibClient(el){S.ui.csel=el.dataset.id;S.ui.cpage=el.dataset.id;S.ui.cwTab='messages';go('clients')},
+  ibRuleAdd(el){const i=$('#ibRuleIn'),val=(i.value||'').trim();if(!val){toast('Type an email, @domain, phone or channel.');i.focus();return}
+    INBOX.rules.push({id:'r'+Date.now().toString(36),value:ibNorm(val),clientId:el.dataset.id});INBOX.convs.forEach(x=>{if(!x.clientId){const m=ibMatch(ibFirstIn(x).addr);if(m)x.clientId=m}});saveInbox();R.clients();badges();toast('Rule added.')},
+  ibRuleDel(el){INBOX.rules=INBOX.rules.filter(r=>r.id!==el.dataset.id);saveInbox();R.clients();toast('Rule removed.')},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -5923,7 +6230,7 @@ const A={
     if(!emailOk(v('ncCe'))){toast('That contact email doesn’t look right.');$('#ncCe').focus();return}
     const c={id:'c'+Date.now().toString(36),name,type:$('#ncT').value,status:$('#ncS').value,address:v('ncA'),phone:v('ncPh'),email:'',website:v('ncW'),terms:'Net 30',contacts:[],log:[],created:dayFmt(0)};c.terms=SETTINGS.terms||'Net 30';
     if(v('ncCn'))c.contacts.push({id:ctid(),name:v('ncCn'),title:v('ncCt'),email:v('ncCe'),phone:v('ncCp'),primary:true});
-    clog(c,'Client created'+(v('ncNo')?': '+v('ncNo'):''));S.clients.push(c);saveClients();S.ui.csel=c.id;S.ui.cpage=c.id;S.ui.cwTab='overview';S.ui.cq='';S.ui.cst='all';
+    clog(c,'Client created'+(v('ncNo')?': '+v('ncNo'):''));S.clients.push(c);saveClients();if(S.ui.ibPendingClient){const iv=ibById(S.ui.ibPendingClient);if(iv){iv.clientId=c.id;saveInbox()}S.ui.ibPendingClient=null}S.ui.csel=c.id;S.ui.cpage=c.id;S.ui.cwTab='overview';S.ui.cq='';S.ui.cst='all';
     if(el.dataset.then==='project'){openNewProject(c.name);toast(`${c.name} added. Now set up the project.`);badges();return}
     closeOverlay();go('clients');toast(`${c.name} added to Clients.`)},
   selClient(el){S.ui.csel=el.dataset.id;S.ui.cpage=el.dataset.id;S.ui.cwTab='overview';S.ui.cdel=null;R.clients();window.scrollTo(0,0);return;if(window.innerWidth<=980)$('#clSide').scrollIntoView({behavior:'smooth',block:'start'})},
@@ -7086,7 +7393,8 @@ function cloudPayloads(){const out={},J=o=>JSON.stringify(o);
   out['meta/service']=J({agreements:S.agreements,tseq:S.tseq,pipeline:S.pipeline,ticketsChunked:true});
   {const CH=100,n=Math.max(1,Math.ceil(S.tickets.length/CH)),m=Math.max(n,CLOUD.tkMax||0);for(let k=0;k<m;k++)out['meta/tickets-'+k]=J(k<n?S.tickets.slice(k*CH,(k+1)*CH):[]);CLOUD.tkMax=m}
   out['meta/library']=J(libPayload());out['meta/contracts']=J(S.contracts||[]);
-  if(S.tech){delete out['meta/invoices'];delete out['meta/contracts']}
+  out['meta/inbox']=J(INBOX);
+  if(S.tech){delete out['meta/invoices'];delete out['meta/contracts'];delete out['meta/inbox']}
   {const CH=100,n=Math.max(1,Math.ceil(S.registers.length/CH)),m=Math.max(n,CLOUD.regMax||0);for(let k=0;k<m;k++)out['meta/registers-'+k]=J(k<n?S.registers.slice(k*CH,(k+1)*CH):[]);CLOUD.regMax=m}
   {const CH=200,n=Math.max(1,Math.ceil(S.inventory.length/CH)),m=Math.max(n,CLOUD.invMax||0);for(let k=0;k<m;k++)out['meta/inventory-'+k]=J(k<n?S.inventory.slice(k*CH,(k+1)*CH):[]);CLOUD.invMax=m}out['meta/index']=J({cur:PJ.cur,order:PJ.list.map(e=>e.id)});
   PJ.list.forEach(e=>{const o=projectPayload(e);if(!o.design&&e.id!==PJ.cur)return;out['projects/'+e.id]=J(o)});
@@ -7111,6 +7419,7 @@ function applyCloud(meta,pjs){
   if(meta.clients){const o=P(meta.clients);if(Array.isArray(o))S.clients=o}
   if(meta.invoices){const o=P(meta.invoices);if(Array.isArray(o))S.invoices=o}
   if(meta.contracts){const o=P(meta.contracts);if(Array.isArray(o))S.contracts=o}
+  if(meta.inbox&&!S.tech){const o=P(meta.inbox);if(o&&Array.isArray(o.convs)){INBOX={convs:o.convs,rules:Array.isArray(o.rules)?o.rules:[]};try{localStorage.setItem(IBKEY,JSON.stringify(INBOX))}catch(e){}}}
   if(meta.service){const o=P(meta.service);if(o){if(Array.isArray(o.tickets))S.tickets=o.tickets;if(Array.isArray(o.agreements))S.agreements=o.agreements;if(Array.isArray(o.pipeline))S.pipeline=o.pipeline;if(o.tseq)S.tseq=o.tseq}}
   {const ks=Object.keys(meta).filter(k=>/^tickets-\d+$/.test(k)).sort((a,b)=>+a.split('-')[1]-+b.split('-')[1]);if(ks.length){const all=[];ks.forEach(k=>{const o=P(meta[k]);if(Array.isArray(o))all.push(...o)});S.tickets=all;CLOUD.tkMax=ks.length}}
   {const ks=Object.keys(meta).filter(k=>/^registers-\d+$/.test(k)).sort((a,b)=>+a.split('-')[1]-+b.split('-')[1]);if(ks.length){const all=[];ks.forEach(k=>{const o=P(meta[k]);if(Array.isArray(o))all.push(...o)});S.registers=all;CLOUD.regMax=ks.length;try{localStorage.setItem(RKEY,JSON.stringify(all))}catch(e){}}}
@@ -8422,7 +8731,7 @@ Object.assign(A,{
 });
 
 /* ================= CLIENT WORKSPACE: one page per client with everything about them, plus a client portal ================= */
-const CW_TABS=[['overview','Overview'],['projects','Projects'],['invoices','Invoices'],['assets','Equipment'],['docs','Drawings & photos'],['service','Service'],['history','Notes & history'],['details','Contacts & details'],['portal','Client portal']];
+const CW_TABS=[['overview','Overview'],['messages','Messages'],['projects','Projects'],['invoices','Invoices'],['assets','Equipment'],['docs','Drawings & photos'],['service','Service'],['history','Notes & history'],['details','Contacts & details'],['portal','Client portal']];
 function tagsFor(d){const m={};(d.nodes||[]).forEach(n=>{m[n.uid]=n.tag||(byId(n.pid)?autoTag(n,(d.nodes||[]).filter(x=>byId(x.pid))):'?')});return m}
 /* every project for a client, with its design, tasks, time, photos and price, whether open or parked */
 function cwProjects(c){
@@ -8464,7 +8773,7 @@ function renderCW(c){
     <div class="panel kpi"><div class="l">Owed to you</div><div class="v ${over.length?'bad':''}">${money(owed)}</div><div class="s">${over.length?plural(over.length,'invoice')+' overdue':`${money(paid)} paid to date`}</div></div>
     <div class="panel kpi"><div class="l">Equipment</div><div class="v">${assets.length}</div><div class="s">${assets.filter(a=>a.serial).length} with serials</div></div>
     <div class="panel kpi"><div class="l">Service</div><div class="v">${openT.length}</div><div class="s">${ags.length?esc(ags[0].plan.split('·')[0].trim())+' plan':'open tickets'}</div></div></div>
-   <div class="cwtabs" role="tablist" aria-label="Client sections">${CW_TABS.map(([k,l])=>`<button role="tab" data-act="cwTab" data-t="${k}" aria-selected="${tab===k}">${l}${k==='invoices'&&inv.length?` <span class="badge">${inv.length}</span>`:k==='projects'&&list.length?` <span class="badge">${list.length}</span>`:k==='service'&&openT.length?` <span class="badge">${openT.length}</span>`:''}</button>`).join('')}</div>`;
+   <div class="cwtabs" role="tablist" aria-label="Client sections">${CW_TABS.map(([k,l])=>`<button role="tab" data-act="cwTab" data-t="${k}" aria-selected="${tab===k}">${l}${k==='invoices'&&inv.length?` <span class="badge">${inv.length}</span>`:k==='messages'&&INBOX.convs.some(v=>v.clientId===c.id&&ibNeeds(v))?` <span class="badge bad">${INBOX.convs.filter(v=>v.clientId===c.id&&ibNeeds(v)).length}</span>`:k==='projects'&&list.length?` <span class="badge">${list.length}</span>`:k==='service'&&openT.length?` <span class="badge">${openT.length}</span>`:''}</button>`).join('')}</div>`;
   let body='';
   if(tab==='overview'){
     const todo=[];
@@ -8488,6 +8797,7 @@ function renderCW(c){
         ${P.tasks.length?meterBar(P.done,P.tasks.length):''}${P.next?`<p class="note" style="margin:0">Next: ${esc(P.next.title)} · ${esc(P.next.who)} · due ${dayFmt(P.next.start+P.next.dur-1)}</p>`:''}
         <div class="actions"><button class="btn sm" data-act="openProject" data-id="${P.e.id}" data-to="design">Design</button><button class="btn sm" data-act="openProject" data-id="${P.e.id}" data-to="proposal">Proposal</button><button class="btn sm" data-act="openProject" data-id="${P.e.id}" data-to="projects">Schedule</button><button class="btn sm" data-act="openProject" data-id="${P.e.id}" data-to="field">Field</button></div></div></div>`}).join('')}</div>`
       :`<div class="panel empty"><h2>No projects yet</h2><p class="muted">Start a project to design a room, price it and send a proposal.</p><button class="btn primary" data-act="clientProject" data-id="${c.id}" style="align-self:flex-start">+ New project</button></div>`;
+  else if(tab==='messages')body=ibClientTabHTML(c);
   else if(tab==='invoices'){const tot=inv.reduce((s,v)=>s+(invStatus(v)==='Void'?0:invCalc(v).total),0);
     body=`<div class="panel"><div class="ph"><h2>Invoices</h2><span class="actions"><span class="muted" style="font-size:12px">${money2(tot)} billed · ${money2(paid)} paid · ${money2(owed)} owed</span><button class="btn sm primary" data-act="newInvoice" data-client="${c.id}">+ New invoice</button></span></div>
      ${inv.length?`<div class="scroll"><table class="t"><thead><tr><th>Invoice</th><th>For</th><th>Issued</th><th>Due</th><th class="n">Total</th><th class="n">Balance</th><th>Status</th></tr></thead><tbody>${inv.slice().sort((a,b)=>b.issued.localeCompare(a.issued)).map(v=>{const k=invCalc(v),st=invStatus(v);return `<tr class="click" data-act="openInvoice" data-id="${v.id}"><td class="m">${esc(v.no)}</td><td>${esc(v.project||clip((v.lines[0]||{}).desc||'',40))}</td><td class="muted">${fmtD(v.issued)}</td><td class="${st==='Overdue'?'bad':'muted'}">${fmtD(v.due)}</td><td class="n">${money2(k.total)}</td><td class="n">${st==='Void'?'—':money2(k.bal)}</td><td>${chip(st)}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="pb muted" style="margin:0">No invoices yet.</p>'}</div>`}
