@@ -5226,6 +5226,76 @@ R.dcenter=function(){
 document.addEventListener('change',e=>{const el=e.target;if(!el||!el.dataset||!el.dataset.dcname)return;const t=dcById(el.dataset.dcname);if(!t)return;
   const v=el.value.trim().slice(0,80);if(!v){el.value=t.name;return}if(v===t.name)return;t.name=v;t.updated=Date.now();dcStore();
   if(S.view==='design'&&S.studio)R.design();else if(S.view==='dcenter')R.dcenter()});
+/* ---------- tracing: straight walls in the plan image become wall lines you can edit ----------
+   Rows and columns of dark pixels are grouped into bands; a band of the right thickness is a wall,
+   two thin parallel bands close together are one hollow wall, and ends are pulled onto the walls they meet. */
+const TR_W=[4,6,8,12,16,24];
+function trImg(src){return new Promise((res,rej)=>{const i=new Image();if(!/^data:|^blob:/.test(src))i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=()=>rej(new Error('load'));i.src=src})}
+function trMed(a){const s=a.slice().sort((x,y)=>x-y);return s[s.length>>1]}
+function trBands(M,W,H,hz,Lmin){const N=hz?H:W,len=hz?W:H,out=[];let act=[];
+  for(let l=0;l<N;l++){const raw=[];let s=-1;
+    for(let p=0;p<=len;p++){const v=p<len&&M[hz?l*W+p:p*W+l];if(v&&s<0)s=p;else if(!v&&s>=0){raw.push([s,p-1]);s=-1}}
+    const runs=[];raw.forEach(r=>{const q=runs[runs.length-1];if(q&&r[0]-q[1]<=3)q[1]=r[1];else runs.push(r.slice())});
+    const next=[];
+    runs.filter(r=>r[1]-r[0]+1>=Lmin).forEach(r=>{const a=act.find(a=>!a.hit&&Math.min(a.e,r[1])-Math.max(a.s,r[0])>=.6*Math.min(a.e-a.s,r[1]-r[0]));
+      if(a){a.hit=true;a.l1=l;a.ss.push(r[0]);a.es.push(r[1]);a.s=r[0];a.e=r[1];next.push(a)}else next.push({l0:l,l1:l,ss:[r[0]],es:[r[1]],s:r[0],e:r[1],hit:true})});
+    act.forEach(a=>{if(!a.hit)out.push(a)});next.forEach(a=>a.hit=false);act=next}
+  out.push(...act);
+  return out.map(a=>({c:(a.l0+a.l1)/2,t:a.l1-a.l0+1,s:trMed(a.ss),e:trMed(a.es)}))}
+function trWalls(bands,maxT,thin){
+  let B=bands.filter(b=>b.t<=maxT).sort((a,b)=>a.c-b.c);const used=new Set(),out=[];
+  /* hollow walls: two thin lines a wall's width apart */
+  B.forEach((a,i)=>{if(used.has(a)||a.t>3)return;for(let j=i+1;j<B.length;j++){const b=B[j];if(b.c-a.c>maxT)break;if(used.has(b)||b.t>3||b.c-a.c<4)continue;
+      const ov=Math.min(a.e,b.e)-Math.max(a.s,b.s);if(ov>=.7*Math.min(a.e-a.s,b.e-b.s)){used.add(a);used.add(b);const top=a.c-a.t/2,bot=b.c+b.t/2;out.push({c:(top+bot)/2,t:bot-top,s:Math.max(a.s,b.s),e:Math.min(a.e,b.e)});break}}});
+  B.forEach(b=>{if(used.has(b))return;if(b.t>=3||thin)out.push({...b})});
+  /* join pieces of one wall split by noise, but keep real openings (doors) */
+  out.sort((a,b)=>a.c-b.c||a.s-b.s);const m=[];
+  out.forEach(w=>{const q=m.find(q=>Math.abs(q.c-w.c)<=Math.max(q.t,w.t)/2+1&&w.s-q.e<=Math.max(3,.6*Math.max(q.t,w.t))&&q.e-w.s>=-Math.max(3,.6*Math.max(q.t,w.t))&&w.e>=q.s);
+    if(q){q.s=Math.min(q.s,w.s);q.e=Math.max(q.e,w.e);q.t=Math.max(q.t,w.t)}else m.push(w)});
+  return m}
+async function planTrace(){
+  const b=PB();if(!b||!b.src){toast('Upload a floor plan first.');return}
+  let img;try{img=await trImg(b.src)}catch(e){toast('This plan image can’t be read for tracing. Upload it again, then try Trace walls.');return}
+  const K=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight)),W=Math.max(1,Math.round(img.naturalWidth*K)),H=Math.max(1,Math.round(img.naturalHeight*K));
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);
+  let d;try{d=x.getImageData(0,0,W,H).data}catch(e){toast('This plan image can’t be read for tracing. Upload it again, then try Trace walls.');return}
+  const n=W*H,lum=new Uint8Array(n),hist=new Uint32Array(256);let op=0;
+  for(let i=0;i<n;i++){const a=d[i*4+3],l=(d[i*4]*299+d[i*4+1]*587+d[i*4+2]*114)/1000|0;lum[i]=l;if(a>110){op++;hist[l]++}}
+  /* paper is the most common light tone; lines are clearly darker. A see-through plan is lines only. */
+  let thr=200;if(op>n*.5){let mode=0;for(let v=120;v<256;v++)if(hist[v]>hist[mode])mode=v;thr=Math.max(80,Math.min(205,mode-60))}
+  const M=new Uint8Array(n);for(let i=0;i<n;i++)M[i]=d[i*4+3]>110&&lum[i]<thr?1:0;
+  const Lmin=Math.max(12,Math.round(.022*Math.max(W,H))),maxT=Math.max(6,Math.round(.035*Math.min(W,H)));
+  const hz=trWalls(trBands(M,W,H,true,Lmin),maxT,!!b.trThin).filter(w=>w.e-w.s+1>=Lmin);
+  const vt=trWalls(trBands(M,W,H,false,Lmin),maxT,!!b.trThin).filter(w=>w.e-w.s+1>=Lmin);
+  /* pull each end onto the wall it runs into */
+  const snapEnds=(A,Bs)=>A.forEach(w=>{['s','e'].forEach(k=>{const p=w[k];let best=null,bd=1e9;
+    Bs.forEach(o=>{if(w.c<o.s-o.t-2||w.c>o.e+o.t+2)return;const dd=Math.abs(o.c-p);if(dd<=Math.max(w.t,o.t)+4&&dd<bd){bd=dd;best=o}});
+    w[k+'2']=best?best.c:(k==='s'?p+w.t/2:p-w.t/2)})});
+  snapEnds(hz,vt);snapEnds(vt,hz);
+  const sx=b.w/W,sy=b.h/H,X=v=>Math.round((b.x+v*sx)*10)/10,Y=v=>Math.round((b.y+v*sy)*10)/10;
+  const sw=t=>{const v=t*(sx+sy)/2;return TR_W.reduce((a,c)=>Math.abs(c-v)<Math.abs(a-v)?c:a,TR_W[0])};
+  const walls=[];
+  hz.forEach(w=>{if(w.e2-w.s2<4)return;walls.push({t:'wall',c:'ink',sw:sw(w.t),dash:false,x1:X(w.s2),y1:Y(w.c),x2:X(w.e2),y2:Y(w.c),tr:1})});
+  vt.forEach(w=>{if(w.e2-w.s2<4)return;walls.push({t:'wall',c:'ink',sw:sw(w.t),dash:false,x1:X(w.c),y1:Y(w.s2),x2:X(w.c),y2:Y(w.e2),tr:1})});
+  if(!walls.length){toast(b.trThin?'No straight walls were found in this plan.':'No thick walls were found. Turn on Include thin lines and trace again.');return}
+  const was=mkList().filter(m=>m.tr).length;
+  mut(()=>{const pl=ensurePlan();pl.marks=pl.marks.filter(m=>!m.tr);walls.forEach(w=>w.id=mkId());pl.marks.unshift(...walls);if((b.op??.85)>.4){b.opTr=b.op??.85;b.op=.3}});
+  S.ui.mkOff=false;S.sel=null;refreshDesign();
+  toast(`${was?'Traced again: ':'Traced '}${plural(walls.length,'wall')}. The plan is faded so you can check them. Select a wall to move it or drag its ends; use the Wall, Door and Window tools to add more.`)}
+/* doors and windows sit in a wall: drawn over it with the wall cut away */
+function openingSVG(m,c){const dx=m.x2-m.x1,dy=m.y2-m.y1,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,sd=m.flip?-1:1,nx=-uy*sd,ny=ux*sd,wt=+m.wt||8,hw=wt/2+1.5,
+    P=(x,y)=>x.toFixed(1)+' '+y.toFixed(1),q=(x,y,k)=>P(x+nx*k,y+ny*k);
+  let s=`<path d="M${q(m.x1,m.y1,hw)}L${q(m.x2,m.y2,hw)}L${q(m.x2,m.y2,-hw)}L${q(m.x1,m.y1,-hw)}Z" fill="var(--sheet)"/><path d="M${q(m.x1,m.y1,wt/2)}L${q(m.x1,m.y1,-wt/2)}M${q(m.x2,m.y2,wt/2)}L${q(m.x2,m.y2,-wt/2)}" stroke="${c}" stroke-width="1.5"/>`;
+  if(m.t==='window')return s+`<path d="M${q(m.x1,m.y1,wt/2)}L${q(m.x2,m.y2,wt/2)}M${q(m.x1,m.y1,-wt/2)}L${q(m.x2,m.y2,-wt/2)}" stroke="${c}" stroke-width="1.2"/><line x1="${m.x1}" y1="${m.y1}" x2="${m.x2}" y2="${m.y2}" stroke="${c}" stroke-width="1.5"/>`;
+  const hx=m.hinge?m.x2:m.x1,hy=m.hinge?m.y2:m.y1,ox=m.hinge?m.x1:m.x2,oy=m.hinge?m.y1:m.y2,lx=hx+nx*L,ly=hy+ny*L,sweep=((lx-hx)*(oy-hy)-(ly-hy)*(ox-hx))>0?1:0;
+  return s+`<line x1="${hx.toFixed(1)}" y1="${hy.toFixed(1)}" x2="${lx.toFixed(1)}" y2="${ly.toFixed(1)}" stroke="${c}" stroke-width="2" stroke-linecap="round"/><path d="M${P(lx,ly)}A${L.toFixed(1)} ${L.toFixed(1)} 0 0 ${sweep} ${P(ox,oy)}" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="4 3"/>`}
+/* a new door or window lands on the nearest wall, lined up with it and as thick as it */
+function mkFitOpening(m){const mx=(m.x1+m.x2)/2,my=(m.y1+m.y2)/2;let best=null,bd=1e9;
+  const half=Math.hypot(m.x2-m.x1,m.y2-m.y1)/2;
+  mkList().forEach(w=>{if(w.t!=='wall')return;const dx=w.x2-w.x1,dy=w.y2-w.y1,L2=dx*dx+dy*dy;if(!L2)return;const ex=(half+(+w.sw||8))/Math.sqrt(L2),t=Math.max(-ex,Math.min(1+ex,((mx-w.x1)*dx+(my-w.y1)*dy)/L2)),dd=Math.hypot(w.x1+t*dx-mx,w.y1+t*dy-my);if(dd<bd){bd=dd;best=w}});
+  if(!best||bd>(+best.sw||8)+14){m.wt=m.wt||8;return}
+  const dx=best.x2-best.x1,dy=best.y2-best.y1,L2=dx*dx+dy*dy,pr=(x,y)=>{const t=((x-best.x1)*dx+(y-best.y1)*dy)/L2;return [Math.round(best.x1+t*dx),Math.round(best.y1+t*dy)]};
+  [m.x1,m.y1]=pr(m.x1,m.y1);[m.x2,m.y2]=pr(m.x2,m.y2);m.wt=+best.sw||8}
 /* ================= PROPOSAL ================= */
 /* ---------- drawing set attached to proposals ----------
    Captured when the proposal is sent (and again on a change order), so the client sees the sheets exactly as proposed. */
@@ -7654,7 +7724,7 @@ document.addEventListener('keydown',e=>{
   if(mod&&k==='d'){e.preventDefault();duplicateSel();return}
   if((e.key==='Delete'||e.key==='Backspace')&&S.sel){e.preventDefault();deleteSel();return}
   if(onPlan()){
-    const TK={v:'select',w:'wall',l:'line',a:'arrow',m:'dim',b:'rect',e:'ellipse',p:'pen',t:'text',i:'icon',c:'callout',s:'std'};
+    const TK={v:'select',w:'wall',d:'door',o:'window',l:'line',a:'arrow',m:'dim',b:'rect',e:'ellipse',p:'pen',t:'text',i:'icon',c:'callout',s:'std'};
     if(!mod&&!e.altKey&&TK[k]){e.preventDefault();A.ptool({dataset:{t:TK[k]}});return}
     if(S.sel&&S.sel.kind==='mark'){const m=mkById(S.sel.id);if(!m)return;
       if(k==='r'&&(m.t==='icon'||m.t==='std')){e.preventDefault();A.mkRot({dataset:{d:e.shiftKey?-45:45}});return}
@@ -7679,12 +7749,14 @@ function ensurePlan(){const pl=S.design.plan;if(!pl.marks)pl.marks=[];
 const mkList=()=>(S.design.plan&&S.design.plan.marks)||[];
 const mkById=id=>mkList().find(m=>m.id===id);
 const mkId=()=>'mk'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-const MK_LINE=['wall','line','arrow','dim'],MK_BOX=['rect','ellipse'];
+const MK_LINE=['wall','line','arrow','dim','door','window'],MK_BOX=['rect','ellipse'];
 const MK_COLORS=[['ink','Black'],['#d0342c','Red'],['#2f6fd6','Blue'],['#1f9254','Green'],['#e07b12','Orange'],['#8a4fd1','Purple'],['#8a94a3','Gray']];
 const mkCol=c=>!c||c==='ink'?'var(--fg)':c;
 const MK_TOOLS=[
  ['select','Select','V','<path d="M6 3l12 9-5.5 1.2L9.8 19z"/>'],
  ['wall','Wall','W','<path d="M3 9h18v6H3z" fill="currentColor"/>'],
+ ['door','Door','D','<path d="M3 20h4M17 20h4M7 20V6"/><path d="M7 6a14 14 0 0 1 14 14"/>'],
+ ['window','Window','O','<path d="M3 9h18v6H3zM3 12h18"/>'],
  ['line','Line','L','<path d="M5 19L19 5"/>'],
  ['arrow','Arrow','A','<path d="M5 19L18 6M10 6h8v8"/>'],
  ['dim','Measure','M','<path d="M3 12h18M3 8v8M21 8v8"/>'],
@@ -7696,7 +7768,7 @@ const MK_TOOLS=[
  ['callout','Tag','C','<circle cx="12" cy="12" r="8"/><path d="M10.5 9.5l2-1.5v8"/>'],
  ['std','AV symbol','S','<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3.5v-2"/>']];
 const MK_TNAME=Object.fromEntries(MK_TOOLS.map(t=>[t[0],t[1]]));
-const MK_HELP={std:'Pick a J-STD-710 symbol below, then click the plan. Each click places one.',wall:'Drag to draw a wall. Walls snap straight and join at their ends.',line:'Drag to draw a line. Hold Shift for 45° steps.',arrow:'Drag from the tail to the point.',dim:'Drag between two points to measure. Set the scale first for real distances.',rect:'Drag to draw a box. Hold Shift for a square.',ellipse:'Drag to draw a circle or oval. Hold Shift for a circle.',pen:'Drag to sketch freehand.',text:'Click where the text goes, then type it in Properties.',icon:'Pick an icon, then click the plan. Each click places one.',callout:'Click to drop numbered tags: 1, 2, 3… Add a note to each in Properties.'};
+const MK_HELP={door:'Drag across a wall where the door goes. It lines up with the wall and cuts the opening; flip the swing afterward.',window:'Drag along a wall where the window goes. It lines up with the wall.',std:'Pick a J-STD-710 symbol below, then click the plan. Each click places one.',wall:'Drag to draw a wall. Walls snap straight and join at their ends.',line:'Drag to draw a line. Hold Shift for 45° steps.',arrow:'Drag from the tail to the point.',dim:'Drag between two points to measure. Set the scale first for real distances.',rect:'Drag to draw a box. Hold Shift for a square.',ellipse:'Drag to draw a circle or oval. Hold Shift for a circle.',pen:'Drag to sketch freehand.',text:'Click where the text goes, then type it in Properties.',icon:'Pick an icon, then click the plan. Each click places one.',callout:'Click to drop numbered tags: 1, 2, 3… Add a note to each in Properties.'};
 const MK_ICONS={
  door:['Door','<path d="M4 21V4"/><path d="M4 4a17 17 0 0 1 17 17"/><path d="M2 21h20"/>'],
  window:['Window','<path d="M2 9h20v6H2zM2 12h20"/>'],
@@ -7740,6 +7812,7 @@ function markSVG(m,ghost){
   if(MK_LINE.includes(m.t))hit=`<line class="mk-hit" ${L}/>`;
   switch(m.t){
    case 'wall':s=`<line ${L} stroke="${c}" stroke-width="${sw}" stroke-linecap="square"${da}/>`;break;
+   case 'door':case 'window':s=openingSVG(m,c);break;
    case 'line':s=`<line ${L} stroke="${c}" stroke-width="${sw}" stroke-linecap="round"${da}/>`;break;
    case 'arrow':{const a=Math.atan2(m.y2-m.y1,m.x2-m.x1),hl=Math.max(10,sw*4),hw=hl*.5,ca=Math.cos(a),sa=Math.sin(a),bx=m.x2-hl*ca,by=m.y2-hl*sa;
      s=`<line x1="${m.x1}" y1="${m.y1}" x2="${(m.x2-hl*.6*ca).toFixed(1)}" y2="${(m.y2-hl*.6*sa).toFixed(1)}" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"${da}/><path d="M${m.x2} ${m.y2}L${(bx+hw*sa).toFixed(1)} ${(by-hw*ca).toFixed(1)}L${(bx-hw*sa).toFixed(1)} ${(by+hw*ca).toFixed(1)}Z" fill="${c}"/>`;break}
@@ -7783,7 +7856,7 @@ function angSnap(a,b,force){const dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy);if(!
   if(force||Math.abs(q-ang)<7*Math.PI/180)return {x:Math.round(a.x+L*Math.cos(q)),y:Math.round(a.y+L*Math.sin(q))};return b}
 function mkStyle(){return S.ui.mst||(S.ui.mst={c:'ink',sw:2,dash:false,fill:false})}
 function mkFromDraw(d){
-  const st=mkStyle(),a=d.a,b=d.b,base={c:st.c,sw:d.t==='wall'?8:d.t==='dim'?1.5:st.sw,dash:d.t==='wall'||d.t==='dim'?false:st.dash};
+  const st=mkStyle(),a=d.a,b=d.b,base={c:st.c,sw:d.t==='wall'?8:d.t==='dim'?1.5:['door','window'].includes(d.t)?2:st.sw,dash:['wall','dim','door','window'].includes(d.t)?false:st.dash};
   if(MK_LINE.includes(d.t))return {...base,t:d.t,x1:a.x,y1:a.y,x2:b.x,y2:b.y};
   if(MK_BOX.includes(d.t))return {...base,t:d.t,fill:st.fill,x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w:Math.abs(b.x-a.x),h:Math.abs(b.y-a.y)};
   if(d.t==='pen')return {...base,t:'pen',pts:d.pts.slice()};
@@ -7815,6 +7888,7 @@ function mkDrawUp(){
   if(tiny){if(!d.fin&&d.t!=='pen'){d.tap=true;S.mdraw=d;renderCanvas();if(!S.tapHint){S.tapHint=1;toast((MK_BOX.includes(d.t)?'Now click or tap the opposite corner.':'Now click or tap where it ends.')+' Or drag to draw in one go. Esc cancels.')}return}
     renderCanvas();if(d.t==='pen')toast('Hold and drag to draw freehand.');return}
   if(m.t==='pen'&&m.pts.length>400)m.pts=m.pts.filter((_,i)=>i%2===0||i===m.pts.length-1);
+  if(m.t==='door'||m.t==='window')mkFitOpening(m);
   H.past.push(d.before);if(H.past.length>150)H.past.shift();H.future=[];m.id=mkId();ensurePlan().marks.push(m);save();
   S.sel={kind:'mark',id:m.id};renderToolbar();renderCanvas();renderInspector();
 }
@@ -7848,7 +7922,7 @@ function swatchRow(cur,act){return `<div class="swatches">${MK_COLORS.map(([c,n]
 function iconGrid(cur){return `<div class="icgrid">${Object.entries(MK_ICONS).map(([k,[n,p]])=>`<button data-act="mkIcon" data-ic="${k}" aria-pressed="${cur===k}" title="${n}"><svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg><span>${n}</span></button>`).join('')}</div>`}
 function widthOpts(cur,list){return list.map(v=>`<option value="${v}"${+cur===v?' selected':''}>${v}</option>`).join('')}
 function toolPanel(tool){
-  const st=mkStyle(),shape=!['text','icon','callout','std'].includes(tool),fixed=tool==='wall'||tool==='dim';
+  const st=mkStyle(),shape=!['text','icon','callout','std'].includes(tool),fixed=['wall','dim','door','window'].includes(tool);
   return `<div class="ins-h"><p class="catchip">Drawing tool</p><h3>${MK_TNAME[tool]}</h3><p>${MK_HELP[tool]} Press Esc or V to stop drawing.</p></div>
   <div class="fields">
    <div class="field"><span>Color</span>${swatchRow(st.c,'mkColor')}</div>
@@ -7878,7 +7952,8 @@ function markPanel(m){
       <div class="plh">Change symbol</div>${jsPicker(m.sym)}`}
   if(m.t==='callout')f+=`<div class="row2"><label class="field" for="mkN">Number<input id="mkN" data-mkprop="n" value="${esc(String(m.n))}"></label><label class="field" for="mkSz">Size<select id="mkSz" data-mkprop="size">${widthOpts(m.size||13,[9,11,13,16,20,26])}</select></label></div>
     <label class="field" for="mkL">Note<input id="mkL" data-mkprop="lbl" value="${esc(m.lbl||'')}" placeholder="e.g. Core drill for floor box"></label>`;
-  if(lt||MK_BOX.includes(m.t)||m.t==='pen'){const ws=m.t==='wall'?[4,6,8,12,16,24]:[1,1.5,2,3,4,6];
+  if(m.t==='door'||m.t==='window'){const wl=[...new Set([...TR_W,+m.wt||8])].sort((a,b)=>a-b);f+=`<div class="row2"><label class="field" for="mkWt">Wall thickness<select id="mkWt" data-mkprop="wt">${widthOpts(+m.wt||8,wl)}</select></label><div class="field"><span>${m.t==='door'?'Swing':'Side'}</span><div class="actions"><button class="btn sm" data-act="mkDoor" data-k="flip">Flip side</button>${m.t==='door'?'<button class="btn sm" data-act="mkDoor" data-k="hinge">Swap hinge</button>':''}</div></div></div>`}
+  if((lt&&m.t!=='door'&&m.t!=='window')||MK_BOX.includes(m.t)||m.t==='pen'){const ws=m.t==='wall'?[4,6,8,12,16,24]:[1,1.5,2,3,4,6];
     f+=`<div class="row2"><label class="field" for="mkW">${m.t==='wall'?'Thickness':'Line width'}<select id="mkW" data-mkprop="sw">${widthOpts(m.sw||2,ws)}</select></label><div class="field"><span>Style</span>${m.t!=='wall'?`<label class="check"><input type="checkbox" data-mkprop="dash" ${m.dash?'checked':''}> Dashed</label>`:''}${MK_BOX.includes(m.t)?`<label class="check"><input type="checkbox" data-mkprop="fill" ${m.fill?'checked':''}> Filled</label>`:''}</div></div>`}
   if(m.t==='dim')f+=`<label class="field" for="mkL">Label<input id="mkL" data-mkprop="lbl" value="${esc(m.lbl||'')}" placeholder="Blank shows the measured length"></label>`;
   let kv='';
@@ -7910,11 +7985,15 @@ function bgControls(b){const pct=bgSizePct(b);return `<label class="field" for="
   <label class="field" for="bgOp">Image strength · <span id="bgOpV">${Math.round((b.op??.85)*100)}%</span><input id="bgOp" type="range" min="15" max="100" step="5" value="${Math.round((b.op??.85)*100)}" data-bgprop="op"></label>
   <label class="field" for="bgDark">Darken lines · <span id="bgDarkV">${Math.round(+b.dark||0)}%</span><input id="bgDark" type="range" min="0" max="100" step="5" value="${Math.round(+b.dark||0)}" data-bgprop="dark"></label>
   <label class="check"><input type="checkbox" data-bgprop="bw" ${b.bw?'checked':''}> Black and white (drop the plan’s colors)</label>
+  <div class="plh">Trace the drawing</div>
+  <p class="muted" style="margin:0;font-size:12px">Turns the plan’s straight walls into wall lines you can move, stretch, delete and add to, with door and window tools. Openings in the walls stay open.</p>
+  <div class="actions"><button class="btn sm primary" data-act="bgTrace">${mkList().some(m=>m.tr)?'Trace again':'Trace walls'}</button>${mkList().some(m=>m.tr)?'<button class="btn sm" data-act="bgUntrace">Remove traced walls</button>':''}</div>
+  <label class="check"><input type="checkbox" data-bgprop="trthin" ${b.trThin?'checked':''}> Include thin lines (plans drawn with single thin walls)</label>
   <label class="check"><input type="checkbox" data-bgprop="lock" ${b.lock!==false?'checked':''}> Lock the image so it can’t be moved</label>`}
 function onMkProp(t){
   const m=S.sel&&S.sel.kind==='mark'&&mkById(S.sel.id);if(!m)return;const k=t.dataset.mkprop;
   if(k==='txt'){S.mkTyping=false;save();updUndo();return}
-  let v=t.type==='checkbox'?t.checked:['sw','size'].includes(k)?parseFloat(t.value):t.value;
+  let v=t.type==='checkbox'?t.checked:['sw','size','wt'].includes(k)?parseFloat(t.value):t.value;
   if(k==='n')v=t.value.trim().slice(0,4)||String(m.n);
   if(k==='lbl')v=t.value.trim().slice(0,60);
   if(['T','T2','X'].includes(k))v=t.value.trim().slice(0,12);if(k==='hgt')v=t.value.replace(/[^0-9.]/g,'').slice(0,5);if(k==='lead'||k==='leadDir')v=+t.value;if(k==='mount')v=t.value;
@@ -7929,6 +8008,9 @@ Object.assign(A,{
     if(!onPlan())setSheet('plan');else{renderToolbar();renderCanvas();renderInspector()}},
   mkColor(el){const c=el.dataset.c;mkStyle().c=c;const m=S.sel&&S.sel.kind==='mark'&&mkById(S.sel.id);if(m)mut(()=>{m.c=c});renderCanvas();renderInspector()},
   mkIcon(el){const ic=el.dataset.ic;S.ui.micon=ic;const m=S.sel&&S.sel.kind==='mark'&&mkById(S.sel.id);if(S.ui.ptool==='icon'){S.sel=null}else if(m&&m.t==='icon')mut(()=>{m.ic=ic});renderCanvas();renderInspector()},
+  mkDoor(el){const m=S.sel&&mkById(S.sel.id);if(!m)return;const k=el.dataset.k;mut(()=>{m[k]=!m[k]});renderCanvas()},
+  bgTrace(){planTrace()},
+  bgUntrace(){const n=mkList().filter(m=>m.tr).length;if(!n)return;const b=PB();mut(()=>{S.design.plan.marks=mkList().filter(m=>!m.tr);if(b&&b.opTr!=null){b.op=b.opTr;delete b.opTr}});S.sel=null;refreshDesign();toast(`Removed ${plural(n,'traced wall')}. Undo brings ${n===1?'it':'them'} back.`)},
   mkRot(el){const m=S.sel&&mkById(S.sel.id);if(!m)return;mut(()=>{m.rot=(((+m.rot||0)+(+el.dataset.d))%360+360)%360});renderCanvas()},
   mkOrder(el){const m=S.sel&&mkById(S.sel.id);if(!m)return;mut(()=>{const a=S.design.plan.marks,i=a.indexOf(m);a.splice(i,1);if(+el.dataset.d>0)a.push(m);else a.unshift(m)});renderCanvas();toast(+el.dataset.d>0?'Moved to the front.':'Moved to the back.')},
   mkClear(){const n=mkList().length;if(!n)return;mut(()=>{S.design.plan.marks=[]});S.sel=null;refreshDesign();toast(`Cleared ${plural(n,'drawing')}. Undo brings ${n===1?'it':'them'} back.`)},
@@ -7945,6 +8027,7 @@ document.addEventListener('change',e=>{const t=e.target;if(!t.dataset)return;
   if(t.dataset.mkprop){onMkProp(t);return}
   if(t.dataset.mkdef){const k=t.dataset.mkdef;mkStyle()[k]=t.type==='checkbox'?t.checked:parseFloat(t.value);return}
   if(t.dataset.bgprop){const b=PB();if(!b)return;if(t.dataset.bgprop==='op'){save();return}
+    if(t.dataset.bgprop==='trthin'){b.trThin=t.checked;save();return}
     if(t.dataset.bgprop==='dark'){S.bgDarking=false;save();updUndo();return}
     if(t.dataset.bgprop==='bw'){mut(()=>{b.bw=t.checked});renderCanvas();return}
     if(t.dataset.bgprop==='size'){S.bgSizing=false;save();updUndo();return}
