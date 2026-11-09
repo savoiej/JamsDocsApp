@@ -2192,7 +2192,7 @@ function renderToolbar0(){
      <div class="seg ptools" role="group" aria-label="Drawing tools">${MK_TOOLS.map(([k,nm,key,ic])=>`<button data-act="ptool" data-t="${k}" aria-pressed="${tool===k}" title="${nm} (${key})" aria-label="${nm}"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">${ic}</svg>${tool===k?`<span>${nm}</span>`:''}</button>`).join('')}</div>
      <span class="tsep"></span>
      <div class="seg" role="group" aria-label="Show on plan"><button data-ptoggle="cov" aria-pressed="${!!S.ui.cov}" title="Speaker, microphone and camera coverage">Coverage</button><button data-ptoggle="runs" aria-pressed="${!!S.ui.runs}" title="Cable paths between placed devices">Cable runs</button><button data-ptoggle="mkOff" aria-pressed="${!S.ui.mkOff}" title="Show or hide your drawings">Markup</button>${mkList().some(m=>m.t==='std')?`<button data-ptoggle="legOff" aria-pressed="${!S.ui.legOff}" title="Show or hide the symbol legend on the sheet">Legend</button>`:''}${PB()&&pl.useBg?`<button data-ptoggle="bgOff" aria-pressed="${!S.ui.bgOff}" title="Show or hide the uploaded plan">Plan image</button>`:''}</div>
-     <div class="seg" role="group" aria-label="Plan tools"><label class="filebtn" title="Upload a floor plan PDF or image">Upload plan<input type="file" id="bgFile2" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Upload a floor plan"></label>${pl.useBg?`<button data-act="scaleTool" aria-pressed="${!!S.planTool}">Set scale</button>`:''}<button data-act="autoPlace">Place unplaced</button></div>`;
+     <div class="seg" role="group" aria-label="Plan tools"><label class="filebtn" title="Upload a floor plan PDF or image">Upload plan<input type="file" id="bgFile2" accept=".opencalque,.dxf,application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Upload a floor plan"></label>${pl.useBg?`<button data-act="scaleTool" aria-pressed="${!!S.planTool}">Set scale</button>`:''}<button data-act="autoPlace">Place unplaced</button></div>`;
     const sg=$('#stage');if(sg)sg.classList.toggle('drawing',tool!=='select');
     return;
   }
@@ -2530,8 +2530,9 @@ function autoPlace(){
 }
 async function handleBgFile(f){
   if(!f)return;
+  if(/\.(opencalque|dxf)$/i.test(f.name||'')){handleCadFile([f]);return}
   const isPdf=f.type==='application/pdf'||/\.pdf$/i.test(f.name||''),isImg=/^image\/(png|jpeg|webp|gif)$/.test(f.type);
-  if(!isPdf&&!isImg){toast('Use a PDF, PNG, JPG or WebP floor plan. For a CAD file, export the plan to PDF first.');return}
+  if(!isPdf&&!isImg){toast('Use a PDF, PNG, JPG or WebP floor plan, an OpenCalque drawing, or a DXF from CAD.');return}
   if(f.size>40*1024*1024){toast('That file is over 40 MB. Export just the floor plan page.');return}
   toast(isPdf?'Reading the PDF…':'Loading the plan…');
   let c,pages=1;
@@ -2542,17 +2543,50 @@ async function handleBgFile(f){
       await pg.render({canvasContext:ctx,viewport:vp}).promise}
     else c=await shrinkImage(f,2800,'image/jpeg');
   }catch(e){toast(isPdf?(e&&e.message==='load'?'Couldn’t load the PDF reader. Check your connection and try again.':'Couldn’t read that PDF. Try exporting the floor plan page as an image.'):'That image couldn’t be read. Try a PNG or JPG.');return}
+  await bgFromCanvas(c,f.name,{pages})}
+/* puts a rendered plan on the current floor; with the drawing's real width (mm) the scale is set too */
+async function bgFromCanvas(c,name,opt){opt=opt||{};const pages=opt.pages||1;
   let src=null,asset=null;
   if(ASSETS){try{const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.88));const res=await ASSETS.upload(blob,{type:'image/jpeg'});asset=res.id;src='/_blob/'+res.id}catch(e){}}
   if(!src){let k=Math.min(1,1800/Math.max(c.width,c.height)),q=.8;
     for(let i=0;i<6;i++){const d=document.createElement('canvas');d.width=Math.round(c.width*k);d.height=Math.round(c.height*k);const x=d.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,d.width,d.height);x.drawImage(c,0,0,d.width,d.height);
       src=d.toDataURL('image/jpeg',q);if(src.length<190000)break;k*=.82;q=Math.max(.55,q-.05)}}
   const w=c.width,h=c.height,box={x:80,y:80,w:SW-160,h:SH-260},k=Math.min(box.w/w,box.h/h);
-  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(f.name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:Math.round(w*k),h:Math.round(h*k),pxm:null,op:.85,lock:true};pl.useBg=true;pl.calibrated=false;pl.hideRoom=false});
-  S.ui.bgOff=false;S.ui.ptool='select';S.planTool={a:null,b:null};S.sel=null;cams.plan.init=false;
+  const bw=Math.round(w*k),pxm=opt.mmW?bw/(opt.mmW/1000):null;
+  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:bw,h:Math.round(h*k),pxm,op:pxm?.95:.85,lock:true,...(opt.src?{from:opt.src}:{})};pl.useBg=true;pl.calibrated=!!pxm;if(pxm)pl.pxm=pxm;pl.hideRoom=false});
+  S.ui.bgOff=false;S.ui.ptool='select';S.planTool=pxm?null:{a:null,b:null};S.sel=null;cams.plan.init=false;
+  if(opt.quiet)return;
   if(!onPlan())setSheet('plan');else{refreshDesign();requestAnimationFrame(()=>{fit();cam.init=true})}
-  toast(`Plan uploaded${pages>1?` (page 1 of ${pages})`:''}${asset?'':'. It’s saved at reduced size here'}. Click two points a known distance apart to set the scale.`);
+  toast(pxm?`${name} is on the plan at its true scale.${asset?'':' It’s saved at reduced size here.'}`:`Plan uploaded${pages>1?` (page 1 of ${pages})`:''}${asset?'':'. It’s saved at reduced size here'}. Click two points a known distance apart to set the scale.`);
 }
+/* ---------- OpenCalque drawings and DXF files: read by OpenCalque's engine (MIT), drawn at true scale ---------- */
+let OCP=null;
+function ocLoad(){if(window.OpenCalque)return Promise.resolve(window.OpenCalque);
+  return OCP||(OCP=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='/vendor/opencalque-1.7.0.js';sc.onload=()=>window.OpenCalque?res(window.OpenCalque):rej(new Error('load'));sc.onerror=()=>{OCP=null;rej(new Error('load'))};document.head.appendChild(sc)}))}
+async function ocPageCanvas(pg){const long=4200,k=long/Math.max(pg.wMm,pg.hMm),W=Math.max(1,Math.round(pg.wMm*k)),H=Math.max(1,Math.round(pg.hMm*k));
+  const svg=pg.svg.replace(/stroke-width="([\d.]+)"/g,(m,v)=>`stroke-width="${(+v*2.2).toFixed(2)}"`).replace(/<svg\b/,`<svg width="${W}" height="${H}"`);
+  const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('draw'));i.src=url});
+    const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(img,0,0,W,H);return c}
+  finally{URL.revokeObjectURL(url)}}
+async function handleCadFile(files){
+  const dxf=files.filter(f=>/\.dxf$/i.test(f.name)),oc=files.find(f=>/\.opencalque$/i.test(f.name));
+  toast(oc?'Reading the OpenCalque drawing…':'Reading the DXF…');let OC,pages,notes=[];
+  try{OC=await ocLoad()}catch(e){toast('The drawing reader isn’t available here. Open SITREP from app.jamsdocsanddesigns.com, or export the plan to PDF.');return}
+  try{if(oc)pages=OC.fromDrawing(await oc.text());else{const r=OC.fromDXF(await Promise.all(dxf.map(async f=>({name:f.name,text:await f.text()}))));pages=r.pages;notes=r.notes}}
+  catch(e){toast(oc?'Couldn’t read that drawing'+(e&&/newer/i.test(e.message)?': it was saved by a newer OpenCalque.':'.'):'Couldn’t read that DXF. Try saving it as ASCII DXF, or export the plan to PDF.');return}
+  pages=(pages||[]).filter(p=>p.wMm>0&&p.hMm>0);if(!pages.length){toast('That drawing has nothing on it.');return}
+  if(pages.length===1){await ocPlace(pages[0],(oc||dxf[0]).name);return}
+  S.ocPending={pages,name:(oc||dxf[0]).name,notes};ocPickDialog()}
+async function ocPlace(pg,name){let c;try{c=await ocPageCanvas(pg)}catch(e){toast('Couldn’t draw that page.');return}
+  await bgFromCanvas(c,pg.name&&!/^page \d+$/i.test(pg.name)?`${name.replace(/\.[^.]+$/,'')} · ${pg.name}`:name,{mmW:pg.wMm,src:'opencalque'})}
+function ocPickDialog(){const o=S.ocPending,ov=$('#overlay');if(!o)return;
+  ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="ocH"><div class="dlgtop"><span>FLOOR PLAN</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
+   <div style="padding:18px;display:flex;flex-direction:column;gap:12px"><h2 id="ocH" style="margin:0;font-family:var(--f-display);font-size:26px">${plural(o.pages.length,'page')} in ${esc(o.name)}</h2>
+    <p class="note" style="margin:0">Each page you pick becomes a floor, with its plan at true scale. The first one goes on the floor you're on now.</p>
+    ${o.pages.map((p,i)=>`<label class="check"><input type="checkbox" data-ocpg="${i}" checked> <span><b>${esc(p.name)}</b> <span class="muted">${(p.wMm/1000).toFixed(1)} × ${(p.hMm/1000).toFixed(1)} m${p.rooms.length?` · ${plural(p.rooms.length,'room')}`:''}</span></span></label>`).join('')}
+    ${o.notes.length?`<p class="muted" style="margin:0;font-size:12px">${esc(o.notes.join(' · '))}</p>`:''}</div>
+   <div class="dlgfoot"><button class="btn" data-act="closeOverlay">Cancel</button><button class="btn primary" data-act="ocImport">Add as floors</button></div></div>`;ov.hidden=false}
 function coverNote(p,pl){
   if(!pl.calibrated)return '';const ceil=+pl.room.ceil||2.7;
   if(p.cat==='Speaker'){const r=Math.max(.5,ceil-1.2);return `<p class="note">Covers about ${(2*r).toFixed(1)} m across at seated ear height (90° dispersion, ${ceil.toFixed(1)} m ceiling). Space speakers about ${(2*r).toFixed(1)} m apart for even sound.</p>`}
@@ -2900,11 +2934,12 @@ function planSheetPanel(tg){
      <div class="row3"><label class="field" for="plW">Width (m)<input id="plW" type="number" min="2" max="14" step="0.1" data-plprop="w" value="${r.w}"></label><label class="field" for="plD">Depth (m)<input id="plD" type="number" min="2" max="8" step="0.1" data-plprop="d" value="${r.d}"></label>${ceilF}</div>`}
    <div class="plh">Floor plan</div>
    ${PB()?`<div class="kv"><span>Uploaded plan</span><b>${esc(PB().name||'Floor plan')}</b></div>`:''}
-   <div class="actions"><label class="btn filebtn">${PB()?'Replace floor plan':'Upload floor plan'}<input type="file" id="bgFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Upload a floor plan PDF or image"></label>
+   <div class="actions"><label class="btn filebtn">${PB()?'Replace floor plan':'Upload floor plan'}<input type="file" id="bgFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp,.opencalque,.dxf" aria-label="Upload a floor plan PDF or image"></label>
     ${pl.useBg?`<button class="btn" data-act="scaleTool">Set scale</button><button class="btn" data-act="useRoom">Use drawn room</button>`:`${PB()?'<button class="btn" data-act="useBg">Use uploaded plan</button>':''}<button class="btn" data-act="planBlank">${pl.hideRoom?'Show drawn room':'Start from blank'}</button>`}
     ${PB()?'<button class="btn danger" data-act="removeBg">Delete plan</button>':''}</div>
    ${PB()&&pl.useBg?bgControls(PB()):''}
-   <p class="note">Upload an architect’s PDF or a photo of the plan, set the scale, then place devices and draw on top of it. Multi-page PDFs use page 1.</p>
+   <p class="note">Upload an architect’s PDF or a photo of the plan and set the scale, or bring in a CAD file (DXF) or an OpenCalque drawing, which arrive at true scale with one floor per page. Multi-page PDFs use page 1.</p>
+   <p class="note">No plans yet? Draw the house in <a href="https://opencalque.com" target="_blank" rel="noopener">OpenCalque</a> (free, opens in a new tab): walls, doors, windows and rooms. Save the drawing and upload the .opencalque file here.</p>
    <div class="plh">Markup · ${mkList().length}</div>
    <p class="note">Use the tools above the sheet to add walls, lines, arrows, measurements, boxes, circles, freehand sketches, text, icons and numbered tags.</p>
    ${mkList().length?'<div class="actions"><button class="btn danger" data-act="mkClear">Clear all markup</button></div>':''}
@@ -6310,6 +6345,16 @@ const A={
     S.ui.flDelAsk=null;mut(()=>{const other=d.floors.find(f=>f.id!==id);flSwap(other.id);d.nodes.forEach(n=>{if(n.fp&&n.fp.fl===id)delete n.fp});d.racks.forEach(r=>{if(r.fp&&r.fp.fl===id)delete r.fp});d.floors=d.floors.filter(f=>f.id!==id);
       if(d.floors.length===1){const f=d.floors[0];d.nodes.forEach(n=>{if(n.fp)delete n.fp.fl});d.racks.forEach(r=>{if(r.fp)delete r.fp.fl});delete d.floors;delete d.floor}});
     S.sel=null;refreshDesign();requestAnimationFrame(()=>fit());toast('Floor deleted.')},
+  async ocImport(){const o=S.ocPending;if(!o)return;const pick=[...document.querySelectorAll('[data-ocpg]')].filter(x=>x.checked).map(x=>o.pages[+x.dataset.ocpg]);
+    if(!pick.length){toast('Pick at least one page.');return}closeOverlay();S.ocPending=null;toast('Drawing the floors…');
+    for(let i=0;i<pick.length;i++){const pg=pick[i];
+      if(i>0){const d=S.design;mut(()=>{if(!flList()){d.floors=[{id:'f1',name:'Floor 1',plan:null}];d.floor='f1';d.nodes.forEach(n=>{if(n.fp)n.fp.fl='f1'});d.racks.forEach(r=>{if(r.fp)r.fp.fl='f1'})}
+        const id='f'+Date.now().toString(36)+i;d.floors.push({id,name:pg.name,plan:Object.assign(newPlan(pg.name,12,9),{useBg:false})});flSwap(id)})}
+      else if(flList()&&!/^page \d+$/i.test(pg.name)){const f=flList().find(x=>x.id===flCur());if(f&&/^Floor \d+$/.test(f.name))f.name=pg.name}
+      let c;try{c=await ocPageCanvas(pg)}catch(e){toast('Couldn’t draw '+pg.name+'.');continue}
+      await bgFromCanvas(c,`${o.name.replace(/\.[^.]+$/,'')} · ${pg.name}`,{mmW:pg.wMm,src:'opencalque',quiet:i<pick.length-1})}
+    if(pick.length>1){const f0=flList()&&flList()[0];if(f0&&/^Floor \d+$/.test(f0.name)&&!/^page \d+$/i.test(pick[0].name))f0.name=pick[0].name;save();refreshDesign();requestAnimationFrame(()=>fit())}
+    toast(`${plural(pick.length,'floor')} added at true scale. Place devices on each one.`)},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
