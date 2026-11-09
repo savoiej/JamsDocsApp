@@ -1364,6 +1364,36 @@ button:not(:disabled):active{filter:brightness(.92)}
 .pe-cropmask{fill:rgba(13,43,82,.45)}
 @media (max-width:820px){.pe-body{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.pe-side{order:2;max-height:42vh;border-right:0;border-top:1px solid var(--line)}.pe-stage{order:1}}
 </style>
+<style id="dcCss">
+.dclede{margin:6px 0 16px;max-width:70ch}
+.dcfilt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}.dcfilt .inp{flex:1 1 220px;max-width:340px}
+.dcfilt .seg{overflow-x:auto;max-width:100%}
+.dcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.dccard{display:flex;flex-direction:column;overflow:hidden;padding:0}
+.dcth{display:block;width:100%;aspect-ratio:16/10;border:0;border-bottom:1px solid var(--line);background:var(--sheet);padding:10px;cursor:pointer;overflow:hidden}
+.dcth svg,.dcth img{width:100%;height:100%;display:block;object-fit:contain;transition:transform .2s ease}
+@media (hover:hover) and (pointer:fine){.dcth:hover svg,.dcth:hover img{transform:scale(1.025)}}
+.dcth .dcn rect{fill:var(--surface);stroke:var(--accent);stroke-width:4}.dcth .dcl line{stroke:var(--muted);stroke-width:4;opacity:.55}
+.dcempty{display:flex;height:100%;align-items:center;justify-content:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:8px}
+.dcbody{padding:12px 14px 4px;display:grid;gap:6px}
+.dcnm{font:600 16px var(--f-ui,inherit);color:var(--fg);border:1px solid transparent;border-radius:6px;padding:3px 6px;margin:0 -6px;background:transparent;width:calc(100% + 12px)}
+.dcnm:hover{border-color:var(--line)}.dcnm:focus{border-color:var(--accent);outline:none;background:var(--surface)}
+.dcmeta{display:flex;gap:8px;align-items:center;justify-content:space-between;color:var(--muted);font-size:12.5px}
+.dckind{font:inherit;font-size:12.5px;color:var(--accent);background:var(--accent-soft);border:0;border-radius:999px;padding:3px 8px;max-width:60%}
+.dcnote{margin:0;font-size:13px;color:var(--fg);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dcst{margin:0;font-size:12.5px;color:var(--muted)}
+.dcact{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 14px;margin-top:auto;align-items:center}
+.dcask{font-size:13px;font-weight:600;color:var(--bad);margin-right:auto}
+.dcnew{padding:16px;margin-bottom:16px}.dcnew h2{margin:0 0 10px;font-size:16px}
+.dcnewg{display:grid;grid-template-columns:2fr 1fr 1.4fr;gap:10px}.dcnewg .dcwide{grid-column:1/-1}.dcnew .actions{justify-content:flex-end;margin-top:12px;display:flex;gap:8px}
+.dcfirst{padding:28px;text-align:center;display:grid;justify-items:center;gap:8px}
+.dcbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:12px;border-radius:10px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.dcbar-l,.dcbar-r{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.dcbar-l{flex:1 1 320px}
+.dcbar #dcName{font-weight:600;min-width:0;flex:0 1 280px}
+.dcbadge{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);border-radius:999px;padding:3px 9px}
+.dcsaved{font-size:12.5px}
+@media (max-width:720px){.dcnewg{grid-template-columns:1fr}.dcbar-r{width:100%}.dcbar-r .btn{flex:1}.dcsaved{display:none}}
+</style>
 <style id="palHfh">/* ===== Hands Free Help palette: lime, gray, black (from the company logo). On when <html data-palette="hfh"> ===== */
 :root[data-palette="hfh"]{--lime:#9CCB19;--hfgray:#A9ACA6;--basalt:#111210;--basalt2:#1D1F1B;--amber:#9CCB19;--lagoon:#4F7A00}
 :root[data-palette="hfh"],:root[data-palette="hfh"][data-theme="light"]{--bg:#F3F4F1;--surface:#FFFFFF;--sunk:#E9EBE6;--line:#D5D8D0;--fg:#111210;--muted:#585B54;--accent:#4A7300;--accent-ink:#111210;--accent-soft:#ECF5D2;--ok:#2F7D32;--ok-soft:#E1F1DF;--sheet:#FBFCFA;--grid:#E8EAE4;--gridmaj:#D8DBD3}
@@ -1459,6 +1489,7 @@ button:not(:disabled):active{filter:brightness(.92)}
     <section class="view" id="v-contracts" hidden></section>
     <section class="view" id="v-assistant" hidden></section>
     <section class="view" id="v-design" hidden></section>
+    <section class="view" id="v-dcenter" hidden></section>
     <section class="view" id="v-clients" hidden></section>
     <section class="view" id="v-library" hidden></section>
     <section class="view" id="v-purchasing" hidden></section>
@@ -1645,6 +1676,14 @@ const PDU_W=1440; // 15 A × 120 V × 80% continuous
 
 /* ---------- history + autosave ---------- */
 const KEY='rackline-design-v3';
+/* Design Center: templates that belong to no project. While one is open ("studio"), S.design holds the
+   template and S.studio.back holds the project's own drawings, so nothing a template does reaches a client job. */
+const DCKEY='jdd-designs-v1';
+let DC=(()=>{try{const o=JSON.parse(localStorage.getItem(DCKEY)||'null');return Array.isArray(o)?o.filter(t=>t&&t.id&&t.design):[]}catch(e){return []}})();
+const DC_KINDS=['Conference room','Classroom','Huddle room','Smart home','Home theater','Network','Other'];
+function dcStore(){try{localStorage.setItem(DCKEY,JSON.stringify(DC))}catch(e){toast('This browser is out of room for templates. A plan image may be too large.')}if(typeof cloudMark==='function')cloudMark()}
+function dcById(id){return DC.find(t=>t.id===id)||null}
+function dcCapture(){const t=S.studio&&dcById(S.studio.id);if(!t)return;t.design=JSON.parse(JSON.stringify(S.design));t.u=uidc;t.updated=Date.now()}
 const H={past:[],future:[]};
 const snap=()=>JSON.stringify({d:S.design,u:uidc});
 function mut(fn){H.past.push(snap());if(H.past.length>150)H.past.shift();H.future=[];const r=fn();save();updUndo();return r}
@@ -1654,7 +1693,7 @@ function restore(s){const o=JSON.parse(s);S.design=o.d;uidc=o.u;S.sel=null;S.wir
 function undo(){if(!H.past.length){toast('Nothing to undo.');return}H.future.push(snap());restore(H.past.pop());save();refreshDesign()}
 function redo(){if(!H.future.length){toast('Nothing to redo.');return}H.past.push(snap());restore(H.future.pop());save();refreshDesign()}
 let REV=0; /* bumps on every save, so draft editor state resets after any design change */
-function save(){REV++;saveProjects();try{localStorage.setItem(KEY,JSON.stringify({d:S.design,u:uidc,ui:{route:S.ui.route,labels:S.ui.labels,hide:S.ui.hide,sheet:S.ui.sheet,cov:S.ui.cov,runs:S.ui.runs,palOpen:S.ui.palOpen},lib:lib.filter(p=>!BASE_LIB.some(b=>b.id===p.id)),libOv:Object.fromEntries(BASE_LIB.map(b=>[b,byId(b.id)]).filter(([b,p])=>p&&JSON.stringify(p)!==JSON.stringify(b)).map(([b,p])=>[b.id,p])),libDel:BASE_LIB.filter(b=>!byId(b.id)).map(b=>b.id)}))}catch(e){}}
+function save(){REV++;if(S.studio){dcCapture();dcStore()}saveProjects();try{localStorage.setItem(KEY,JSON.stringify({d:S.studio?S.studio.back:S.design,u:uidc,ui:{route:S.ui.route,labels:S.ui.labels,hide:S.ui.hide,sheet:S.ui.sheet,cov:S.ui.cov,runs:S.ui.runs,palOpen:S.ui.palOpen},lib:lib.filter(p=>!BASE_LIB.some(b=>b.id===p.id)),libOv:Object.fromEntries(BASE_LIB.map(b=>[b,byId(b.id)]).filter(([b,p])=>p&&JSON.stringify(p)!==JSON.stringify(b)).map(([b,p])=>[b.id,p])),libDel:BASE_LIB.filter(b=>!byId(b.id)).map(b=>b.id)}))}catch(e){}}
 /* the plan image lives outside undo history so snapshots stay small */
 const BGKEY='rackline-planbg-v1';let legacyBg=null;
 function loadBg(){try{const b=localStorage.getItem(BGKEY);if(b)legacyBg=JSON.parse(b)}catch(e){}}
@@ -1720,6 +1759,7 @@ const STD_TASKS=[['Site survey and measurements','KM',0,1,'Site visit, 9:00 AM']
 /* park the open project, then open another one */
 function switchProject(id){
   if(id===PJ.cur||!pjById(id))return false;
+  if(S.studio)dcExit(true);
   const cur=curPj(),to=pjById(id);
   Object.assign(cur,{prop:S.prop,design:S.design,u:uidc,tasks:S.tasks,time:S.time,photos:S.photos});
   S.prop=to.prop;S.tasks=to.tasks||[];S.time=to.time||[];S.photos=to.photos||[];
@@ -1732,6 +1772,7 @@ function switchProject(id){
   Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});
   save();return true}
 function createProject(f){
+  if(S.studio)dcExit(true);
   const cur=curPj(),base=S.prop,src=f.start==='copy'?JSON.parse(JSON.stringify(S.design)):null,srcU=uidc;
   Object.assign(cur,{prop:S.prop,design:S.design,u:uidc,tasks:S.tasks,time:S.time,photos:S.photos});
   const e={id:'pj'+Date.now().toString(36),job:nextJob(),site:f.site,created:dayFmt(0)};
@@ -1740,7 +1781,7 @@ function createProject(f){
   S.tasks=f.tasks?(f.taskList||STD_TASKS).map(([title,who,start,dur,ev],i)=>({id:'k'+(i+1),title,who,col:'todo',start,dur,...(ev?{ev}:{})})):[];S.tasks.forEach(tkNorm);tkFitTeam(S.tasks);
   S.time=[];S.photos=[];
   if(src){S.design=src;uidc=srcU;S.design.cables.forEach(c=>{delete c.status;delete c.note});S.design.plan.room.name=f.project}
-  else{S.design=JSON.parse(JSON.stringify(S.design));loadTemplate(f.start);const r=S.design.racks[0];if(r&&+f.rack>r.size){r.size=+f.rack;if(f.start!=='blank')autoArrange(r)}if(f.start==='blank'&&r)r.name='Equipment rack'}
+  else{S.design=JSON.parse(JSON.stringify(S.design));loadTemplate(f.start);const r=S.design.racks[0],dc=String(f.start).startsWith('dc:');if(r&&!dc&&+f.rack>r.size){r.size=+f.rack;if(f.start!=='blank')autoArrange(r)}if(f.start==='blank'&&r)r.name='Equipment rack';if(dc)S.design.plan.room.name=f.project}
   S.design.meta.rev='A';
   H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.sheet='flow';
   Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});
@@ -1999,6 +2040,7 @@ function deviceOptions(){const tg=tags(),out=[];
   return out.sort((a,b)=>tg[a.ep.uid].localeCompare(tg[b.ep.uid],undefined,{numeric:true})||(a.t==='net'?0:1)-(b.t==='net'?0:1))}
 
 function loadTemplate(kind){
+  if(String(kind).startsWith('dc:'))return dcLoadInto(kind.slice(3));
   const meta=S.design.meta||{...DEFAULT_META},meta2=S.design.meta2||{...DEFAULT_META2},meta3=S.design.meta3||{...DEFAULT_META3},meta4=S.design.meta4||{...DEFAULT_META4},meta5=S.design.meta5||{...DEFAULT_META5},meta6=S.design.meta6||{...DEFAULT_META6},meta7=S.design.meta7||{...DEFAULT_META7};
   S.design={nodes:[],cables:[],extras:[],seq:{},racks:[],panels:[],meta,meta2,meta3,meta4,meta5,meta6,meta7,plan:newPlan(S.prop.project,6,4.5)};S.sel=null;S.wire=null;S.planTool=null;
   const a=(pid,x,y)=>{const n={uid:nid(),pid,x,y};S.design.nodes.push(n);return n.uid};
@@ -2063,15 +2105,17 @@ function renderProjSwitch(){const b=$('#pjsw');if(!b)return;
   b.innerHTML=`<label class="navgroup" for="pjSel">Project</label><select class="inp" id="pjSel" aria-label="Open project">${projOptions()}</select><button class="btn sm" data-act="newProject">+ New project</button>`}
 function projOptions(){return PJ.list.map(e=>{const pr=e.id===PJ.cur?S.prop:(e.prop||{});return `<option value="${e.id}" ${e.id===PJ.cur?'selected':''}>${esc([pr.client,pr.project].filter(Boolean).join(' · ')||'Untitled project')}</option>`}).join('')}
 function badges(){renderProjSwitch();{const b=$('#bInbox');if(b&&typeof ibNeeds==='function'){const n=INBOX.convs.filter(ibNeeds).length;b.textContent=n;b.hidden=!n;b.classList.toggle('bad',n>0)}}{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}($('#bCl')||{}).textContent=S.clients.length;($('#bDesign')||{}).textContent=S.design.nodes.length;($('#bLib')||{}).textContent=lib.length;($('#bSvc')||{}).textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
-const VIEWS=['overview','assistant','design','inbox','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
+const VIEWS=['overview','assistant','design','dcenter','inbox','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
 function go(v){
   if(v==='clients'&&S.view==='clients'&&S.ui.cpage){S.ui.cpage=null}
   if(!VIEWS.includes(v))v='overview';
   if(S.tech&&TECH_HIDE.includes(v))v='projects';
+  if(S.studio&&v!=='design')dcExit(true);
   if(S.view==='design'&&v!=='design'){S.wire=null;S.drag=null;S.rdrag=null;S.pan=null;if(S.ui.fs){S.ui.fs=false;if(S.fsNative&&document.fullscreenElement)document.exitFullscreen().catch(()=>{});S.fsNative=false;document.body.classList.remove('dfs')}}
   S.view=v;document.body.classList.toggle('nlmode',v==='networks');if(typeof nlNavRender==='function')nlNavRender();if(typeof renderTopbar==='function')renderTopbar();
   VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v);
-  document.querySelectorAll('#nav [data-go]').forEach(b=>{if(b.dataset.go===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});navSync(v);
+  const nv=S.studio&&v==='design'?'dcenter':v;
+  document.querySelectorAll('#nav [data-go]').forEach(b=>{if(b.dataset.go===nv)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});navSync(nv);
   R[v]();badges();window.scrollTo(0,0);
 }
 /* ================= ROLES: technicians see no money =================
@@ -2079,7 +2123,7 @@ function go(v){
    drawings (without prices), the library (without costs), the field app and the service desk;
    money pages are hidden and invoices and contracts never load or save for them (the database
    refuses those records to techs too). */
-const TECH_HIDE=['overview','inbox','clients','proposal','billing','contracts','purchasing','estimate','assistant','settings'];
+const TECH_HIDE=['overview','dcenter','inbox','clients','proposal','billing','contracts','purchasing','estimate','assistant','settings'];
 const canPrice=()=>!S.tech;
 function techMode(){if(S.tech)return;S.tech=true;document.body.classList.add('tech');
   if(S.design&&S.design.meta6)S.design.meta6.price='none';
@@ -2148,13 +2192,15 @@ R.design0=function(){
   if(!S.design.meta6)S.design.meta6={...DEFAULT_META6};if(!S.design.meta7)S.design.meta7={...DEFAULT_META7};
   const m=S.design.meta,m2=S.design.meta2,m3=S.design.meta3,m4=S.design.meta4,m5=S.design.meta5,m6=S.design.meta6,m7=S.design.meta7,rk=onRack(),pn=onPlan(),sc=onSched(),pp=onPatch(),bm=onBom(),ipv=onIp(),cur=rk?m2:pn?m3:sc?m4:pp?m5:bm?m6:ipv?m7:m;
   $('#v-design').innerHTML=`
-  <header class="vh"><div><p class="eyebrow">${esc(cliName(S.prop))} · ${esc(S.prop.project)} · DWG ${esc(cur.dwg)} rev ${esc(m.rev)}</p><h1>${esc(cur.title)}</h1></div>
+  ${S.studio?dcStudioBar():''}
+  <header class="vh"><div><p class="eyebrow">${S.studio?`Design Center · ${esc((dcById(S.studio.id)||{}).name||'Template')}`:`${esc(cliName(S.prop))} · ${esc(S.prop.project)}`} · DWG ${esc(cur.dwg)} rev ${esc(m.rev)}</p><h1>${esc(cur.title)}</h1></div>
    <div class="actions">
-    <select class="inp" id="tplSel" aria-label="Room template" style="width:auto"><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="blank">Blank drawing set</option></select>
+    <select class="inp" id="tplSel" aria-label="Room template" style="width:auto"><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="blank">Blank drawing set</option>${dcOptions(S.studio&&S.studio.id)}</select>
     <button class="btn" data-act="loadTpl">Load</button>
+    ${S.studio||S.tech?'':'<button class="btn" data-act="dcFromProject" title="Copy these drawings into the Design Center">Save as template</button>'}
     ${rk||pn||sc||pp||bm||ipv?'':'<button class="btn" data-act="newBlock">New device block</button>'}
     <button class="btn" data-act="fsToggle" title="Work on this sheet full screen (F)">⤢ Full screen</button>
-    <button class="btn primary money" data-go="proposal">Build proposal →</button></div></header>
+    ${S.studio?'':'<button class="btn primary money" data-go="proposal">Build proposal →</button>'}</div></header>
   ${fsBarHTML(cur,!(sc||pp||bm||ipv))}
   <div class="sheets" role="tablist" aria-label="Drawing sheets">
    <button role="tab" data-sheet="flow" aria-selected="${!rk&&!pn&&!sc&&!pp&&!bm&&!ipv}"><span>${esc(m.dwg)}</span><b>${esc(m.title)}</b></button>
@@ -3983,7 +4029,7 @@ function mapByName(from,to){const m={};['in','out'].forEach(d=>{const A=d==='in'
 /* every placed copy of `fromId` becomes `toId`, keeping cables whose port exists on the new product */
 function mergeProduct(fromId,toId){const from=byId(fromId),to=byId(toId),map=mapByName(from,to);let moved=0,dropped=0;
   const doD=d=>{dropped+=remapPorts(d,fromId,map);(d.nodes||[]).forEach(n=>{if(n.pid===fromId){n.pid=toId;moved++}});(d.extras||[]).forEach(e=>{if(e.pid===fromId)e.pid=toId})};
-  mut(()=>{doD(S.design);cleanRacks()});PJ.list.forEach(e=>{if(e.id!==PJ.cur&&e.design)doD(e.design)});
+  mut(()=>{doD(S.design);cleanRacks()});if(S.studio)doD(S.studio.back);PJ.list.forEach(e=>{if(e.id!==PJ.cur&&e.design)doD(e.design)});
   lib=lib.filter(x=>x.id!==fromId);save();saveProjects();return {moved,dropped}}
 function saveProductEdit(){
   const b=S.bld,p=byId(b.editId);if(!p){closeOverlay();return}
@@ -5059,6 +5105,96 @@ document.addEventListener('input',e=>{const t=e.target;if(!t||!t.id)return;
   else if(t.id==='ibTxt'&&S.ui.ibSel)S.ui.ibDraft={id:S.ui.ibSel,t:t.value};
   else if(t.id==='ibLTxt'){const pe=ibParseEmail(t.value);if(pe){const f=(id,x)=>{const i=$('#'+id);if(i&&!i.value&&x)i.value=x};f('ibLName',pe.name);f('ibLAddr',pe.addr);f('ibLSub',pe.subject);ibLogHint()}}});
 
+/* ================= DESIGN CENTER =================
+   A library of designs that belong to no client. Opening one swaps it into the drawing editor ("studio"):
+   every edit saves to the template, and the project's own drawings wait in S.studio.back until it closes. */
+function dcClone(o){return JSON.parse(JSON.stringify(o))}
+function dcReset(){H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.padd=false;S.ui.pform=null;
+  Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});try{updUndo()}catch(e){}}
+function dcProjectDesign(){return S.studio?S.studio.back:S.design}
+/* builds a fresh design from a starting point without touching the drawings that are open */
+function dcBuild(start,name){
+  const keep=S.design,keepSel=S.sel;let d;
+  if(start==='copy')d=dcClone(dcProjectDesign());
+  else if(start.startsWith('dc:')){const t=dcById(start.slice(3));d=t?dcClone(t.design):null}
+  if(!d){S.design=dcClone(keep);loadTemplate(['huddle','classroom'].includes(start)?start:'blank');d=S.design;S.design=keep;S.sel=keepSel}
+  d=normDesign(d);if(!d)return null;
+  (d.cables||[]).forEach(c=>{delete c.status;delete c.note});
+  if(!d.racks.length)d.racks.push(newRack('Equipment rack',12));
+  if(d.plan&&d.plan.room)d.plan.room.name=name;d.meta.rev='A';return d}
+function dcNew(f){const name=String(f.name||'').trim().slice(0,80)||'Untitled design';const d=dcBuild(f.start||'blank',name);if(!d){toast('That starting point could not be copied.');return null}
+  const t={id:'dt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,kind:DC_KINDS.includes(f.kind)?f.kind:'Other',notes:String(f.notes||'').slice(0,400),created:Date.now(),updated:Date.now(),u:uidc,design:d};
+  DC.unshift(t);dcStore();return t}
+function dcEnter(id){const t=dcById(id);if(!t){toast('That template is gone.');return}
+  if(S.studio){if(S.studio.id===id){go('design');return}dcExit(true)}
+  const d=normDesign(dcClone(t.design));if(!d){toast('This template could not be opened.');return}
+  if(!d.racks.length)d.racks.push(newRack('Equipment rack',12));
+  S.studio={id,back:S.design,sheet:S.ui.sheet};S.design=d;uidc=Math.max(uidc,+t.u||0,maxUid());
+  dcReset();S.ui.sheet='flow';go('design');requestAnimationFrame(()=>{try{fit(true)}catch(e){}})}
+function dcExit(quiet){if(!S.studio)return;dcCapture();dcStore();S.design=S.studio.back;const sh=S.studio.sheet;S.studio=null;dcReset();S.ui.sheet=sh||'flow';save();
+  if(!quiet)toast('Template saved.')}
+/* a saved template replacing a project's drawings: the project keeps its own title blocks */
+function dcLoadInto(id){const t=dcById(id);if(!t){toast('That template is gone.');return}
+  const d=normDesign(dcClone(t.design));if(!d)return;
+  if(!S.studio)['meta','meta2','meta3','meta4','meta5','meta6','meta7'].forEach(k=>{if(S.design[k])d[k]=S.design[k]});
+  if(!d.racks.length)d.racks.push(newRack('Equipment rack',12));
+  S.design=d;uidc=Math.max(uidc,+t.u||0,maxUid());S.sel=null;S.wire=null;S.planTool=null;try{cleanRacks()}catch(e){}}
+function dcOptions(skip){const L=DC.filter(t=>t.id!==skip);if(!L.length)return '';
+  return `<optgroup label="My templates">${L.map(t=>`<option value="dc:${t.id}">${esc(t.name)}</option>`).join('')}</optgroup>`}
+function dcApplyCloud(raws){let ch=false;raws.forEach(r=>{let t;try{t=JSON.parse(r)}catch(e){return}if(!t||!t.id||!t.design)return;
+    const i=DC.findIndex(x=>x.id===t.id);if(i<0){DC.push(t);ch=true}else if((+t.updated||0)>(+DC[i].updated||0)&&!(S.studio&&S.studio.id===t.id)){DC[i]=t;ch=true}});
+  if(ch){DC.sort((a,b)=>(b.updated||0)-(a.updated||0));try{localStorage.setItem(DCKEY,JSON.stringify(DC))}catch(e){}}}
+function dcStats(d){const fl=Array.isArray(d.floors)&&d.floors.length?d.floors.length:(d.plan&&(d.plan.bg||(d.nodes||[]).some(n=>n.fp))?1:0);
+  return [plural((d.nodes||[]).length,'device'),plural((d.cables||[]).length,'cable'),plural((d.racks||[]).filter(r=>(r.items||[]).length).length,'rack'),fl?plural(fl,'floor'):''].filter(Boolean)}
+/* a small picture of the signal flow: one box per device, a line per cable */
+function dcThumb(d){const N=(d.nodes||[]).filter(n=>isFinite(n.x)&&isFinite(n.y));
+  const bg=d.plan&&d.plan.bg&&d.plan.bg.src;
+  if(!N.length){if(bg)return `<img src="${esc(bg)}" alt="" loading="lazy">`;return `<span class="dcempty">Blank drawing set</span>`}
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;N.forEach(n=>{x0=Math.min(x0,n.x);y0=Math.min(y0,n.y);x1=Math.max(x1,n.x+W);y1=Math.max(y1,n.y+70)});
+  const pad=40,vb=`${x0-pad} ${y0-pad} ${x1-x0+pad*2} ${y1-y0+pad*2}`,at=Object.fromEntries(N.map(n=>[n.uid,n]));
+  const ln=(d.cables||[]).map(c=>{const a=at[c.a&&c.a.uid],b=at[c.b&&c.b.uid];return a&&b?`<line x1="${a.x+W}" y1="${a.y+35}" x2="${b.x}" y2="${b.y+35}"/>`:''}).join('');
+  return `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g class="dcl">${ln}</g><g class="dcn">${N.map(n=>`<rect x="${n.x}" y="${n.y}" width="${W}" height="70" rx="8"/>`).join('')}</g></svg>`}
+function dcWhen(ms){if(!ms)return '';const d=new Date(ms),now=new Date(),same=d.toDateString()===now.toDateString();
+  return same?'Today '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):d.toLocaleDateString([],{month:'short',day:'numeric',year:d.getFullYear()===now.getFullYear()?undefined:'numeric'})}
+function dcStudioBar(){const t=dcById(S.studio.id)||{name:'Template'};
+  return `<div class="dcbar" role="region" aria-label="Template editing">
+   <div class="dcbar-l"><span class="dcbadge">Template</span><label class="sr" for="dcName">Template name</label><input class="inp" id="dcName" value="${esc(t.name)}" maxlength="80" data-dcname="${t.id}"><span class="muted dcsaved">Saves as you work · no client project is changed</span></div>
+   <div class="dcbar-r"><button class="btn" data-act="dcDup" data-id="${t.id}">Save as a copy</button><button class="btn" data-act="dcUse" data-id="${t.id}">Use in ${esc(S.prop.project||'project')}</button><button class="btn primary" data-act="dcClose">Done</button></div></div>`}
+R.dcenter=function(){
+  const q=(S.ui.dcq||'').trim().toLowerCase(),k=S.ui.dck||'';
+  const L=DC.slice().sort((a,b)=>(b.updated||0)-(a.updated||0)).filter(t=>(!k||t.kind===k)&&(!q||(t.name+' '+(t.notes||'')+' '+t.kind).toLowerCase().includes(q)));
+  const nf=S.ui.dcNew;
+  const form=nf?`<form class="panel dcnew" id="dcNewF" autocomplete="off"><h2>New design</h2>
+    <div class="dcnewg"><label class="field" for="dcnN">Name<input class="inp" id="dcnN" maxlength="80" placeholder="Executive boardroom, 12 seats" required></label>
+     <label class="field" for="dcnK">Kind<select class="inp" id="dcnK">${DC_KINDS.map(x=>`<option${x===(k||'Conference room')?' selected':''}>${x}</option>`).join('')}</select></label>
+     <label class="field" for="dcnS">Start from<select class="inp" id="dcnS"><option value="blank">Blank drawing set</option><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="copy">Copy of ${esc(S.prop.project||'this project')}’s drawings</option>${dcOptions()}</select></label>
+     <label class="field dcwide" for="dcnD">Notes<input class="inp" id="dcnD" maxlength="400" placeholder="What this design is for"></label></div>
+    <div class="actions"><button type="button" class="btn" data-act="dcNewCancel">Cancel</button><button class="btn primary" type="submit">Create and open</button></div></form>`:'';
+  const cards=L.map(t=>{const ask=S.ui.dcDelAsk===t.id;return `<article class="panel dccard">
+    <button class="dcth" data-act="dcOpen" data-id="${t.id}" aria-label="Open ${esc(t.name)}">${dcThumb(t.design)}</button>
+    <div class="dcbody"><label class="sr" for="dcn-${t.id}">Name</label><input class="dcnm" id="dcn-${t.id}" value="${esc(t.name)}" maxlength="80" data-dcname="${t.id}">
+     <div class="dcmeta"><label class="sr" for="dck-${t.id}">Kind</label><select class="dckind" id="dck-${t.id}" data-dckind="${t.id}">${DC_KINDS.map(x=>`<option${x===t.kind?' selected':''}>${x}</option>`).join('')}</select><span>${esc(dcWhen(t.updated))}</span></div>
+     ${t.notes?`<p class="dcnote">${esc(t.notes)}</p>`:''}
+     <p class="dcst">${dcStats(t.design).map(esc).join(' · ')}</p></div>
+    <div class="dcact">${ask?`<span class="dcask">Delete this template?</span><button class="btn sm" data-act="dcDelNo">Keep</button><button class="btn sm danger" data-act="dcDel" data-id="${t.id}">Delete</button>`:
+      `<button class="btn sm primary" data-act="dcOpen" data-id="${t.id}">Open</button><button class="btn sm" data-act="dcUse" data-id="${t.id}" title="Replace ${esc(S.prop.project||'the project')}’s drawings with this design">Use in project</button><button class="btn sm" data-act="dcDup" data-id="${t.id}">Duplicate</button><button class="btn sm ghost" data-act="dcDel" data-id="${t.id}" aria-label="Delete ${esc(t.name)}">Delete</button>`}</div></article>`}).join('');
+  const kinds=[...new Set(DC.map(t=>t.kind))];
+  $('#v-dcenter').innerHTML=`<header class="vh"><div><p class="eyebrow">${esc(firm())} · Design Center</p><h1>Design templates</h1></div>
+   <div class="actions"><button class="btn" data-act="dcFromProject">Save ${esc(S.prop.project||'project')} as a template</button><button class="btn primary" data-act="dcNewOpen">+ New design</button></div></header>
+   <p class="muted dclede">Build designs that aren’t tied to a client. Each one saves as a template you can start any project from, or load into a project’s drawings.</p>
+   ${form}
+   ${DC.length?`<div class="dcfilt"><label class="sr" for="dcQ">Search templates</label><input class="inp" id="dcQ" type="search" placeholder="Search templates" value="${esc(S.ui.dcq||'')}">
+     <div class="seg" role="group" aria-label="Kind"><button data-act="dcKind" data-k="" aria-pressed="${!k}">All ${DC.length}</button>${kinds.map(x=>`<button data-act="dcKind" data-k="${esc(x)}" aria-pressed="${k===x}">${esc(x)} ${DC.filter(t=>t.kind===x).length}</button>`).join('')}</div></div>`:''}
+   ${L.length?`<div class="dcgrid">${cards}</div>`:DC.length?`<div class="panel empty"><b>No templates match</b><span>Clear the search or pick another kind.</span></div>`:
+     nf?'':`<div class="panel empty dcfirst"><h2>No templates yet</h2><p class="muted">Start a design from a blank set or one of the room templates, or save the drawings of ${esc(S.prop.project||'your current project')} as your first template.</p><button class="btn primary" data-act="dcNewOpen">+ New design</button></div>`}`;
+  const F=$('#dcNewF');if(F){F.addEventListener('submit',e=>{e.preventDefault();const t=dcNew({name:$('#dcnN').value,kind:$('#dcnK').value,start:$('#dcnS').value,notes:$('#dcnD').value});if(!t)return;S.ui.dcNew=false;dcEnter(t.id);toast(`“${t.name}” created. It saves as you work.`)});setTimeout(()=>{const n=$('#dcnN');if(n)n.focus()},0)}
+  const Q=$('#dcQ');if(Q)Q.addEventListener('input',e=>{S.ui.dcq=e.target.value;const p=e.target.selectionStart;R.dcenter();const q2=$('#dcQ');if(q2){q2.focus();try{q2.setSelectionRange(p,p)}catch(x){}}});
+  $('#v-dcenter').querySelectorAll('[data-dckind]').forEach(el=>el.addEventListener('change',()=>{const t=dcById(el.dataset.dckind);if(t){t.kind=el.value;t.updated=Date.now();dcStore();R.dcenter()}}));
+};
+/* renaming a template from a card or the editing bar */
+document.addEventListener('change',e=>{const el=e.target;if(!el||!el.dataset||!el.dataset.dcname)return;const t=dcById(el.dataset.dcname);if(!t)return;
+  const v=el.value.trim().slice(0,80);if(!v){el.value=t.name;return}if(v===t.name)return;t.name=v;t.updated=Date.now();dcStore();
+  if(S.view==='design'&&S.studio)R.design();else if(S.view==='dcenter')R.dcenter()});
 /* ================= PROPOSAL ================= */
 /* ---------- drawing set attached to proposals ----------
    Captured when the proposal is sent (and again on a change order), so the client sees the sheets exactly as proposed. */
@@ -6027,7 +6163,7 @@ const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-h
 const NAVL=[
  {top:'av:overview|Dashboard',icon:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>'},
  {sec:'clients',title:'Clients & billing',icon:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h10"/>',items:['av:inbox|Client inbox|#bInbox', 'av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals', 'av:billing|Time & invoicing|#bTime', 'nl:billing|Network time & billing']},
- {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
+ {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:dcenter|Design Center', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
  {sec:'support',title:'Service',icon:'<path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1"/><rect x="17" y="13" width="4" height="6" rx="1"/>',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
  {net:true},
  {sec:'physical',title:'Physical',icon:'<rect x="4" y="3" width="16" height="7" rx="1"/><rect x="4" y="14" width="16" height="7" rx="1"/><path d="M8 6.5h.01M8 17.5h.01"/>',items:['nl:sites', 'nl:plans', 'nl:devices', 'nl:racks', 'nl:power', 'nl:cabling', 'nl:jacks', 'nl:lifecycle', 'nl:discover', 'nl:inventory|Site inventory']},
@@ -6318,7 +6454,7 @@ function openNewProject(client,edit){
     <div class="npsvc" id="npSvc">${PJ_SVCS.map(([k,l])=>`<label class="check"><input type="checkbox" data-npsvc="${k}"${svc.includes(k)?' checked':''}> ${esc(l)}</label>`).join('')}</div>
     <div class="row3"><label class="field" for="npD1">Start<input id="npD1" type="date" value="${esc(edit?P.startDate||'':isoDay(0))}"></label><label class="field" for="npD2">Target finish<input id="npD2" type="date" value="${esc(edit?P.dueDate||'':'')}"></label><label class="field" for="npPO">Client PO<input id="npPO" value="${esc(edit?P.po||'':'')}" placeholder="Optional" autocomplete="off"></label></div>
     <div id="npDraw"${edit?' hidden':''}><div class="plh">Drawings</div>
-     <div class="row2"><label class="field" for="npT">Start from<select id="npT"><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="blank">Blank drawing set</option><option value="copy">Copy of ${esc(S.prop.project)}</option></select></label>
+     <div class="row2"><label class="field" for="npT">Start from<select id="npT"><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="blank">Blank drawing set</option><option value="copy">Copy of ${esc(S.prop.project)}</option>${dcOptions()}</select></label>
       <label class="field" for="npR">Rack size<select id="npR">${RACK_SIZES.map(z=>`<option value="${z}">${z}U</option>`).join('')}</select></label></div></div>
     <div class="plh">Billing</div>
     <div class="row2"><label class="field" for="npB">How you’ll bill<select id="npB">${PJ_BILL.map(([k,l])=>`<option value="${k}"${k===(B.method||ty.bill)?' selected':''}>${esc(l)}</option>`).join('')}</select></label>
@@ -6335,7 +6471,7 @@ function openNewProject(client,edit){
    </div>
    <div class="dlgfoot"><button class="btn" data-act="closeOverlay">Cancel</button><button class="btn primary" data-act="${edit?'saveProjectDetails':'createProject'}">${edit?'Save details':'Create project'}</button></div></div>`;
   ov.hidden=false;npSync(true);
-  const T=$('#npT');if(T)T.addEventListener('change',e=>{$('#npR').disabled=e.target.value==='copy'});
+  const T=$('#npT');if(T)T.addEventListener('change',e=>{$('#npR').disabled=e.target.value==='copy'||e.target.value.startsWith('dc:')});
   setTimeout(()=>$(edit||client?'#npP':'#npC').focus(),0)}
 function npSvcs(){return [...document.querySelectorAll('[data-npsvc]')].filter(x=>x.checked).map(x=>x.dataset.npsvc)}
 function npSync(first){const ty=pjTypeOf($('#npY').value),sv=npSvcs(),b=$('#npB').value,edit=S.npf&&S.npf.edit;
@@ -6394,7 +6530,7 @@ const A={
     tkNorm(t);saveProjects();S.tkf=null;closeOverlay();R.projects();toast(isNew?`Added “${title}”.`:`Saved “${title}”.`)},
   taskDelete(el){const f=S.tkf;if(!f||!f.id)return;if(!S.tkDel){S.tkDel=true;el.textContent='Click again to delete';el.classList.add('danger');return}
     const pe=pjById(f.pid)||curPj(),arr=pjTasks(pe),t=arr.find(x=>x.id===f.id),i=arr.indexOf(t);if(i>=0)arr.splice(i,1);saveProjects();S.tkf=null;closeOverlay();R.projects();toast(`Deleted “${t?t.title:'task'}”.`)},
-  loadTpl(){const v=$('#tplSel').value;mut(()=>loadTemplate(v));cams.flow.init=false;cams.rack.init=false;cams.plan.init=false;refreshDesign();requestAnimationFrame(()=>{fit(v==='blank');cam.init=true});toast(v==='blank'?'Blank drawing set. Your previous drawings are one undo away.':'Template loaded on both sheets. Undo brings back your previous drawings.')},
+  loadTpl(){const v=$('#tplSel').value;if(v.startsWith('dc:')&&S.studio&&v.slice(3)===S.studio.id){toast('That’s the template you’re editing.');return}mut(()=>loadTemplate(v));cams.flow.init=false;cams.rack.init=false;cams.plan.init=false;refreshDesign();requestAnimationFrame(()=>{fit(v==='blank');cam.init=true});toast(v==='blank'?'Blank drawing set. Your previous drawings are one undo away.':'Template loaded on both sheets. Undo brings back your previous drawings.')},
   addNode(el){const c=viewCenter();placeNode(el.dataset.pid,c.x-W/2,c.y-40)},
   delSel(){deleteSel()},dupSel(){duplicateSel()},
   undo(){undo()},redo(){redo()},
@@ -6638,6 +6774,23 @@ const A={
     planEdit({file,pdf:e?e.kind==='pdf':/pdf/.test(file.type),page:e&&e.page,edit:e,orig:e&&e.orig})},
   bgFill(){const b=PB();if(!b)return;const A=BG_AREA,f=Math.min(A.w/b.w,A.h/b.h);mut(()=>{bgSizePct(b);bgTransform(f,b.x,b.y,A.x+(A.w-b.w*f)/2-b.x,A.y+(A.h-b.h*f)/2-b.y)});refreshDesign();requestAnimationFrame(()=>fit());toast(`Plan sized to fill the sheet (${bgSizePct(b)}%).`)},
   bgCenter(){const b=PB();if(!b)return;const A=BG_AREA;mut(()=>{bgTransform(1,b.x,b.y,Math.round(A.x+(A.w-b.w)/2-b.x),Math.round(A.y+(A.h-b.h)/2-b.y))});refreshDesign();toast('Plan centered on the sheet.')},
+  dcNewOpen(){S.ui.dcNew=true;S.ui.dcDelAsk=null;if(S.view!=='dcenter')go('dcenter');else R.dcenter()},
+  dcNewCancel(){S.ui.dcNew=false;R.dcenter()},
+  dcOpen(el){S.ui.dcDelAsk=null;dcEnter(el.dataset.id)},
+  dcKind(el){S.ui.dck=el.dataset.k||'';R.dcenter()},
+  dcDelNo(){S.ui.dcDelAsk=null;R.dcenter()},
+  dcDel(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.ui.dcDelAsk!==id){S.ui.dcDelAsk=id;R.dcenter();return}
+    S.ui.dcDelAsk=null;DC=DC.filter(x=>x.id!==id);dcStore();delete CLOUD.last['designs/'+id];
+    if(DBX&&CLOUD.ready)DBX.doc('designs/'+id).delete().catch(()=>{});R.dcenter();toast(`“${t.name}” deleted.`)},
+  dcDup(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.studio&&S.studio.id===id)dcCapture();
+    const n=dcNew({name:(t.name+' copy').slice(0,80),kind:t.kind,notes:t.notes,start:'dc:'+id});if(!n)return;
+    if(S.studio){dcEnter(n.id);toast(`Now editing “${n.name}”. The original is unchanged.`)}else{R.dcenter();toast(`“${n.name}” added.`)}},
+  dcUse(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.studio)dcExit(true);if(S.view!=='design')go('design');
+    mut(()=>loadTemplate('dc:'+id));Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});R.design();requestAnimationFrame(()=>{try{fit(true)}catch(e){}});
+    toast(`“${t.name}” loaded into ${S.prop.project||'this project'}. The previous drawings are one undo away.`)},
+  dcClose(){go('dcenter');toast('Template saved.')},
+  dcFromProject(){const n=dcNew({name:((S.prop.project||'Project')+' design').slice(0,80),kind:'Other',start:'copy'});if(!n)return;
+    if(S.view==='dcenter')R.dcenter();toast(`Saved to the Design Center as “${n.name}”.`)},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -7300,6 +7453,7 @@ const NEW_ITEMS=[
  ['Service ticket','AV service desk',()=>newTicket(null)],
  ['Network','Client Networks',()=>{nlOpen('overview');setTimeout(()=>{const api=NLF&&NLF.contentWindow&&NLF.contentWindow.NL_API;if(api)api.net('__new')},400)}]];
 function navLabelFor(){if(S.view==='networks'){const g=NLST&&NLST.view,f=[...NAVL].find(x=>x.items&&x.items.some(i=>i.startsWith('nl:'+g+'|')||i==='nl:'+g));if(!g||g==='overview')return ['Client Networks','Network overview'];const it=nlItem(g);const lab=f&&f.items.find(i=>i.split('|')[0]==='nl:'+g);return [f?f.title:'Client Networks',(lab&&lab.split('|')[1])||(it&&it.label)||'Network overview']}
+  if(S.studio&&S.view==='design')return ['Design Center',(dcById(S.studio.id)||{}).name||'Template'];
   for(const g of NAVL){if(g.top&&g.top.split('|')[0]==='av:'+S.view)return ['',g.top.split('|')[1]];if(g.items){const x=g.items.find(i=>i.split('|')[0]==='av:'+S.view);if(x)return [g.title,x.split('|')[1]]}}return ['','']}
 function renderTopbar(){const el=$('#topbar');if(!el)return;const [sec,page]=navLabelFor(),tm=typeof tbTimer==='function'?tbTimer():null;
   el.innerHTML=`<div class="crumb">${sec?`<span>${esc(sec)}</span><span aria-hidden="true">/</span>`:''}<b>${esc(page)}</b></div>
@@ -7342,7 +7496,7 @@ document.addEventListener('click',e=>{
   if(/SELECT|INPUT|OPTION|TEXTAREA|LABEL/.test(e.target.tagName)&&e.target.closest('tr[data-act]')&&!e.target.closest('[data-act]').matches('button,input,select'))return;
   const a=e.target.closest('[data-act]');
   if(a&&A[a.dataset.act]&&!a.disabled){A[a.dataset.act](a,e);if(a.dataset.go)go(a.dataset.go);return}
-  const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
+  const g=e.target.closest('[data-go]');if(g){if(S.studio&&g.dataset.go==='design'&&g.closest('#nav'))dcExit(true);go(g.dataset.go);return}
   const sh=e.target.closest('[data-sheet]');if(sh){if(sh.dataset.sheet!==S.ui.sheet)setSheet(sh.dataset.sheet);return}
   const tb=e.target.closest('[data-tab]');if(tb){S.ui.tab=tb.dataset.tab;renderInspector();return}
   const rt=e.target.closest('[data-route]');if(rt){S.ui.route=rt.dataset.route;save();renderToolbar();renderCanvas();return}
@@ -7879,7 +8033,7 @@ const CLOUD={ready:false,last:{},t:null,busy:false,pending:false,warned:false};
 function setSync(st,txt){const el=$('#sync');if(el){el.className='sync '+st;el.querySelector('span').textContent=txt}const t=$('#syncTxt');if(t)t.textContent=txt;CLOUD.state=txt}
 function cloudMark(){if(!DBX||!CLOUD.ready)return;clearTimeout(CLOUD.t);CLOUD.t=setTimeout(cloudFlush,900)}
 function libPayload(){return {lib:lib.filter(p=>!BASE_LIB.some(b=>b.id===p.id)),libOv:Object.fromEntries(BASE_LIB.map(b=>[b,byId(b.id)]).filter(([b,p])=>p&&JSON.stringify(p)!==JSON.stringify(b)).map(([b,p])=>[b.id,p])),libDel:BASE_LIB.filter(b=>!byId(b.id)).map(b=>b.id)}}
-function projectPayload(e){const cur=e.id===PJ.cur;return cur?{...e,prop:S.prop,design:S.design,u:uidc,tasks:S.tasks,time:S.time,photos:S.photos}:e}
+function projectPayload(e){const cur=e.id===PJ.cur;return cur?{...e,prop:S.prop,design:S.studio?S.studio.back:S.design,u:uidc,tasks:S.tasks,time:S.time,photos:S.photos}:e}
 function cloudPayloads(){const out={},J=o=>JSON.stringify(o);
   out['meta/settings']=J(SETTINGS);out['meta/clients']=J(S.clients);out['meta/invoices']=J(S.invoices);
   out['meta/service']=J({agreements:S.agreements,tseq:S.tseq,pipeline:S.pipeline,ticketsChunked:true});
@@ -7890,6 +8044,7 @@ function cloudPayloads(){const out={},J=o=>JSON.stringify(o);
   {const CH=100,n=Math.max(1,Math.ceil(S.registers.length/CH)),m=Math.max(n,CLOUD.regMax||0);for(let k=0;k<m;k++)out['meta/registers-'+k]=J(k<n?S.registers.slice(k*CH,(k+1)*CH):[]);CLOUD.regMax=m}
   {const CH=200,n=Math.max(1,Math.ceil(S.inventory.length/CH)),m=Math.max(n,CLOUD.invMax||0);for(let k=0;k<m;k++)out['meta/inventory-'+k]=J(k<n?S.inventory.slice(k*CH,(k+1)*CH):[]);CLOUD.invMax=m}out['meta/index']=J({cur:PJ.cur,order:PJ.list.map(e=>e.id)});
   PJ.list.forEach(e=>{const o=projectPayload(e);if(!o.design&&e.id!==PJ.cur)return;out['projects/'+e.id]=J(o)});
+  if(!S.tech)DC.forEach(t=>{out['designs/'+t.id]=J(t)});
   return out}
 async function cloudFlush(){
   if(!DBX||!CLOUD.ready)return;if(CLOUD.busy){CLOUD.pending=true;return}CLOUD.busy=true;
@@ -7906,6 +8061,7 @@ async function cloudFlush(){
 function maxUid(){let m=0;const sc=v=>{const k=/^n(\d+)$/.exec(String(v||''));if(k)m=Math.max(m,+k[1])};
   [S.design,...PJ.list.map(e=>e.design).filter(Boolean)].forEach(d=>{(d.nodes||[]).forEach(n=>sc(n.uid));(d.racks||[]).forEach(r=>(r.items||[]).forEach(i=>sc(i.id)));(d.panels||[]).forEach(p=>sc(p.id))});return m+1}
 function applyCloud(meta,pjs){
+  if(S.studio)dcExit(true);
   const P=s=>{try{return JSON.parse(s)}catch(e){return null}};
   if(meta.settings){const o=P(meta.settings);if(o&&typeof o==='object'){SETTINGS={...DEFAULT_SETTINGS,...o};try{localStorage.setItem(SKEY,JSON.stringify(SETTINGS))}catch(e){}}}
   if(meta.clients){const o=P(meta.clients);if(Array.isArray(o))S.clients=o}
@@ -7941,7 +8097,8 @@ async function cloudBoot(){
   if(!db){setSync('local','Saved in this browser only');if(S.view==='settings')R.settings();return}
   DBX=db;setSync('busy','Loading your saved work…');
   try{
-    const [ps,ms]=await Promise.all([db.collection('projects').limit(500).get(),db.collection('meta').limit(200).get()]);
+    const [ps,ms,dz]=await Promise.all([db.collection('projects').limit(500).get(),db.collection('meta').limit(200).get(),db.collection('designs').limit(200).get().catch(()=>null)]);
+    if(dz&&!S.tech)dcApplyCloud(dz.docs.map(d=>{const x=d.data();return x&&typeof x.json==='string'?x.json:null}).filter(Boolean));
     const meta={};ms.docs.forEach(d=>{const x=d.data();if(x&&typeof x.json==='string')meta[d.id]=x.json});
     const pjs=ps.docs.map(d=>{const x=d.data();return x&&typeof x.json==='string'?[d.id,x.json]:null}).filter(Boolean);
     if(!pjs.length&&!Object.keys(meta).length){CLOUD.ready=true;await cloudFlush();toast('Your projects, clients and invoices now save to the app, so they follow you to any device.');return}
@@ -12508,7 +12665,7 @@ async function saveProject(f){const p=S.dlg.obj;for(const k of ['name','client',
   S.projects.set(p.id,p);if(S.mode==='db'){try{await DB.doc('projects/'+p.id).set(strip(p))}catch(e){dbErr(e)}}else saveLocal();closeDialog();scheduleRender();toast('Saved')}
 
 document.addEventListener('click',async e=>{
-  const g=e.target.closest('[data-go]');if(g&&!e.target.closest('[data-act]')){if(g.dataset.go==='field')S.field=null;go(g.dataset.go);return}
+  const g=e.target.closest('[data-go]');if(g&&!e.target.closest('[data-act]')){if(g.dataset.go==='field')S.field=null;if(S.studio&&g.dataset.go==='design'&&g.closest('#nav'))dcExit(true);go(g.dataset.go);return}
   const b=e.target.closest('[data-act]');if(!b)return;const A=b.dataset.act,id=b.dataset.id;
   if(b.tagName==='INPUT'&&b.type==='checkbox'){if(A==='topoEnd'){S.ui.topoEndpoints=b.checked;S.cam=null;savePrefs();render()}return}
   switch(A){
