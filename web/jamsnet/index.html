@@ -6162,9 +6162,9 @@ function nlNav(st){NLST=st;try{localStorage.setItem(NLNAVK,JSON.stringify(st))}c
 const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const NAVL=[
  {top:'av:overview|Dashboard',icon:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>'},
+ {top:'av:dcenter|Design Center',icon:'<path d="M3 21l4-1 11-11-3-3L4 17z"/><path d="M14 6l3 3"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="3" width="7" height="7" rx="1"/>'},
  {sec:'clients',title:'Clients & billing',icon:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h10"/>',items:['av:inbox|Client inbox|#bInbox', 'av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals', 'av:billing|Time & invoicing|#bTime', 'nl:billing|Network time & billing']},
  {sec:'projects',title:'Projects',icon:'<path d="M4 7h16v12H4z"/><path d="M9 7V5h6v2"/><path d="M4 12h16"/>',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
- {top:'av:dcenter|Design Center',icon:'<path d="M3 21l4-1 11-11-3-3L4 17z"/><path d="M14 6l3 3"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="3" width="7" height="7" rx="1"/>'},
  {sec:'support',title:'Service',icon:'<path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1"/><rect x="17" y="13" width="4" height="6" rx="1"/>',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
  {net:true},
  {sec:'physical',title:'Physical',icon:'<rect x="4" y="3" width="16" height="7" rx="1"/><rect x="4" y="14" width="16" height="7" rx="1"/><path d="M8 6.5h.01M8 17.5h.01"/>',items:['nl:sites', 'nl:plans', 'nl:devices', 'nl:racks', 'nl:power', 'nl:cabling', 'nl:jacks', 'nl:lifecycle', 'nl:discover', 'nl:inventory|Site inventory']},
