@@ -6,7 +6,7 @@
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141b23">
 <title>Jams Docs and Designs</title>
-<meta name="description" content="AV and network design, documentation and proposals — drawn, documented and signed.">
+<meta name="description" content="As-built documentation for the AV and network systems you already have. We trace every cable, label every rack and hand you a drawing set that cuts troubleshooting time and the cost of every change.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -568,11 +568,11 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 <section class="hero">
   <div class="wrap">
     <div class="hero-copy">
-      <p class="eyebrow"><span class="tag">●</span> AV &amp; network design · drawing sets · on-site support</p>
-      <h1><span>Every cable <span class="c1" style="display:inline">drawn.</span></span><span>Every rack <span class="c2" style="display:inline">documented.</span></span><span>Every job <span class="c3" style="display:inline">signed.</span></span></h1>
-      <p class="lead"><b class="plainlead">We design, document and support the AV and network systems in offices, conference rooms, classrooms and stores.</b> You get a complete drawing set your installer can build from, a fixed price before work starts, and a team that stays on for installs and on-site support.</p>
+      <p class="eyebrow"><span class="tag">●</span> As-built documentation for existing AV &amp; network systems</p>
+      <h1><span>Every cable <span class="c1" style="display:inline">traced.</span></span><span>Every rack <span class="c2" style="display:inline">labeled.</span></span><span>Every port <span class="c3" style="display:inline">mapped.</span></span></h1>
+      <p class="lead"><b class="plainlead">Most AV and network systems get installed and never written down.</b> Then every service call starts with a tech billing you to figure out what’s there. We trace your existing system and hand you a complete as-built drawing set, so repairs and changes go faster and cost less, no matter who does the work.</p>
       <div class="hero-cta">
-        <a class="btn primary" href="#contact" data-pick="services">Request a quote</a>
+        <a class="btn primary" href="#contact" data-pick="asbuilt">Document my system</a>
         <a class="btn" href="#deliverables">See what's in the set</a>
       </div>
       <div class="hero-meta">
@@ -580,7 +580,7 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
       </div>
     </div>
 
-    <figure class="sheetfig" style="margin:0" aria-label="Example signal flow sheet E-101 for a conference room">
+    <figure class="sheetfig" style="margin:0" aria-label="Example as-built signal flow sheet E-101 for a conference room">
       <svg viewBox="0 0 640 440" role="img">
         <defs>
           <pattern id="hg" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" class="hs-g1"/></pattern>
@@ -631,12 +631,12 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
           <text class="k" x="438" y="381">PROJECT</text><text class="v" x="438" y="393">Conf Rm 3B</text>
           <text class="k" x="548" y="381">SHEET</text><text class="t" x="548" y="395">E-101</text>
           <text class="k" x="438" y="407">TITLE</text><text class="v" x="438" y="419">Signal flow</text>
-          <text class="k" x="548" y="407">REV</text><text class="v" x="548" y="419">C · 10/28/26</text>
+          <text class="k" x="548" y="407">REV</text><text class="v" x="548" y="419">AB · 10/28/26</text>
         </g>
       </svg>
       <div class="floatcard" aria-hidden="true">
-        <span class="l">Sample project · Conf Rm 3B</span>
-        <b>$20,399</b><span class="ok">● 7 cables scheduled</span>
+        <span class="l">As-built survey · Conf Rm 3B</span>
+        <b>42 cables</b><span class="ok">● traced and labeled</span>
       </div>
     </figure>
   </div>
@@ -1409,7 +1409,7 @@ if(RM){['netsvg'].forEach(id=>{const s=document.getElementById(id);s&&s.pauseAni
 
 /* contact */
 {const need=new URLSearchParams(location.search).get('need');const c=need&&document.getElementById({app:'n-app',contract:'n-svc'}[need]||'');if(c)c.checked=true}
-document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{const id={platform:'n-app',contract:'n-svc',smarthome:'n-smart'}[a.dataset.pick]||'n-av';const c=document.getElementById(id);if(c)c.checked=true}));
+document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{const id={platform:'n-app',contract:'n-svc',smarthome:'n-smart',asbuilt:'n-asb'}[a.dataset.pick]||'n-av';const c=document.getElementById(id);if(c)c.checked=true}));
 const form=document.getElementById('form');let err=document.getElementById('err');const ORIG=form?form.innerHTML:'';
 if(form)form.addEventListener('submit',async e=>{
   e.preventDefault();
