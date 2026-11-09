@@ -1358,6 +1358,10 @@ button:not(:disabled):active{filter:brightness(.92)}
 #peItems .pe-sel{stroke:#1D6FD6!important;stroke-width:calc(var(--pek,1)*3px)!important}#peItems text.pe-sel{fill:#1D6FD6!important}#peItems use.pe-sel{outline:3px solid #1D6FD6}
 @media (hover:hover) and (pointer:fine){.pe-stage[data-tool="select"] #peItems path:hover,.pe-stage[data-tool="select"] #peItems text:hover{stroke:#1D6FD6;stroke-opacity:.8}}
 .pe-er{fill:#fff;stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*1.5px);stroke-dasharray:calc(var(--pek,1)*6px) calc(var(--pek,1)*4px)}.pe-er.pe-sel{stroke-width:calc(var(--pek,1)*3px);stroke-dasharray:none}
+.pe-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:260px;overflow:auto}.pe-thumb{all:unset;cursor:pointer;display:grid;gap:2px;justify-items:center;font-size:11px;color:var(--muted);padding:4px;border-radius:6px;border:1px solid var(--line);background:#fff}.pe-thumb img{width:100%;aspect-ratio:1.3;object-fit:contain;background:#f3f3f3}.pe-thumb[aria-pressed=true]{border-color:#1D6FD6;box-shadow:0 0 0 2px rgba(29,111,214,.25);color:#1D6FD6;font-weight:600}
+.pe-wrap{flex-wrap:wrap}.pe-spk{display:flex;gap:6px;align-items:center}.pe-spk .inp{flex:1;min-width:0}.pe-kv{margin:4px 0}
+.pe-wmask{fill:rgba(15,23,32,.35);pointer-events:none}.pe-wq{fill:none;stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*2px);pointer-events:none}.pe-wh{fill:#fff;stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*3px);cursor:grab}#peStage[data-tool=warp]{cursor:grab}
+.pe-hit{fill:none;stroke:transparent;stroke-linecap:round;stroke-linejoin:round}.pe-hit.fillk{fill:transparent;stroke:none}.pe-brush.live.rs{stroke:rgba(26,160,90,.5)}.pe-brush.live.rs.fillk{fill:rgba(26,160,90,.3)}.pe-cmpl{font:600 28px Arial;fill:#1D6FD6}#peStage.busy{opacity:.6;pointer-events:none}
 .pe-brush{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round}.pe-brush.fillk{stroke:none;fill:#fff}.pe-brush.live.fillk{fill:rgba(29,111,214,.25)}#peStage:not([data-tool=select]) [data-st]{pointer-events:none}#peStage[data-tool=select] [data-st]{cursor:pointer}.pe-cur{pointer-events:none}.pe-cur .o{fill:none;stroke:#fff;stroke-width:calc(var(--pek,1)*4px)}.pe-cur .i{fill:rgba(29,111,214,.28);stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*2px)}.pe-cur .d{fill:#1D6FD6}#peStage[data-tool=brush][data-bs=free],#peStage[data-tool=brush][data-bs=line]{cursor:none}#peStage[data-tool=brush]{cursor:crosshair}.pe-opts{display:grid;gap:6px;margin:-2px 0 10px}.pe-opts .seg{display:grid!important;width:100%;overflow:hidden}.pe-g2{grid-template-columns:1fr 1fr}.pe-g5{grid-template-columns:repeat(5,1fr)}.pe-opts .seg button{justify-content:center;text-align:center;min-width:0}.pe-opts input[type=range]{width:100%}.pe-ol{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}.pe-brush.live{stroke:rgba(29,111,214,.45)}.pe-bsel{fill:rgba(29,111,214,.12);stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*2px)}.pe-bsz{margin:-4px 0 8px}
 .pe-band{fill:rgba(29,111,214,.08);stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*1px);stroke-dasharray:calc(var(--pek,1)*4px)}
 .pe-drawer{fill:#fff;stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*1.5px)}
@@ -2763,7 +2767,7 @@ function peWhiten(src){const W=src.width,H=src.height,k=16,sw=Math.max(8,Math.ro
   ox.putImageData(im,0,0);return out}
 const peLum=h=>{const m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(h||'');return m?.3*parseInt(m[1],16)+.59*parseInt(m[2],16)+.11*parseInt(m[3],16):0};
 const peIsBgFill=it=>it.k==='path'&&it.f&&!it.s&&peLum(it.f)>170;
-function peRasNow(){if(!PE.bgOff)return PE.d.ras;if(!PE.rasW)PE.rasW=peWhiten(PE.d.ras);return PE.rasW}
+function peRasNow(){const k=peProcKey();if(k==='o')return PE.d.ras;if(PE.procK!==k){PE.procC=peProc();PE.procK=k;PE.procUrl=null}return PE.procC}
 const peStyle=it=>it.k==='path'?(it.s?`s${it.s}|${Math.round(it.w*2)/2}${it.dash?'|d':''}`:`f${it.f}`):it.k;
 function peVisible(i){const it=PE.d.items[i];if(PE.removed.has(i))return false;if(it.lay&&PE.offLayers.has(it.lay))return false;if(PE.offStyles.has(peStyle(it)))return false;if(it.k==='text'&&PE.offKinds.has('text'))return false;if(it.k==='img'&&!it.base&&PE.offKinds.has('img'))return false;if(it.dash&&PE.offKinds.has('dash'))return false;if(PE.bgOff&&peIsBgFill(it))return false;return true}
 function peItemSVG(it,i){const id=`data-i="${i}"`;
@@ -2781,14 +2785,20 @@ async function planEdit(src){/* src: {file, pdf?:bool, page?, edit?} */
       const np=d.items.filter(x=>x.k==='path').length,big=d.items.some(x=>x.k==='img'&&(x.bb[2]-x.bb[0])*(x.bb[3]-x.bb[1])>.5*d.W*d.H);
       if(np<3||(big&&np<200)){const img=d.items.filter(x=>x.k==='img');d.mode='image';if(!img.length)d.items.unshift({k:'img',bb:[0,0,d.W,d.H],lay:null,base:true});else d.items=[{k:'img',bb:[0,0,d.W,d.H],lay:null,base:true},...d.items.filter(x=>x.k==='text')]}}
     else{PE.pages=1;d=peFromCanvas(await shrinkImage(src.file,2800,'image/jpeg'));d.mode='image'}
-    if(d.items.length>90000){closeOverlay();toast('That plan has too many objects to edit here. Upload it as is, or export just the floor plan page.');return}
-    PE.d=d;const e=src.edit||{};
+    if(d.items.length>90000){d={...peFromCanvas(d.ras),scale:d.scale,mode:'image'};setTimeout(()=>toast('This PDF has too many separate objects to edit one by one, so it opened as a picture. Every picture tool works on it.'),400)}
+    PE.d=d;const e=src.edit||{};PE.ink=null;PE.gaps=0;PE.mono=false;PE.geo=[];PE.rv=0;PE.procK=null;PE.hi=null;PE.hiKey=null;PE.ai=null;PE.rasW=null;PE.crop=null;PE.lines=false;PE.bgOff=false;PE.lab=null;
+    if(e.geo&&e.geo.length){const ld=ov.querySelector('.pe-load b');if(ld)ld.textContent='Rebuilding your cleanup…';await peReplayGeo(e.geo)}
+    PE.ink=e.ink??null;PE.gaps=e.gaps||0;PE.mono=!!e.mono;
     PE.removed=new Set(peUnranges(e.removed));PE.offStyles=new Set(e.offStyles||[]);PE.offLayers=new Set(e.offLayers||[]);PE.offKinds=new Set(e.offKinds||[]);
     PE.erase=(e.erase||[]).map(r=>r.slice());PE.crop=e.crop?e.crop.slice():null;PE.lines=!!e.lines;PE.bgOff=!!e.bgOff;PE.clear=e.clear!==false;PE.rasW=null;PE.scaleK=e.scale||'';
-    PE.blobOff=(e.blobs||[]).map(q=>q.slice());PE.strokes=(e.strokes||[]).map(q=>({w:q.w,k:q.k,p:q.p.map(z=>z.slice())}));PE.lab=null;PE.brush=PE.brush||24;PE.bshape=PE.bshape||'free';PE.smode=PE.smode||'box';
-    PE.sel=new Set();PE.undo=[];PE.redo=[];PE.tool=d.mode==='image'?'select':'select';PE.showRemoved=false;PE.ras=d.ras.toDataURL('image/jpeg',.85);PE.rasWurl=null;
+    PE.blobOff=(e.blobs||[]).map(q=>q.slice());PE.strokes=(e.strokes||[]).map(q=>({...q,p:q.p.map(z=>z.slice())}));PE.lab=null;PE.brush=PE.brush||24;PE.bshape=PE.bshape||'free';PE.smode=PE.smode||'box';PE.bmode=PE.bmode||'remove';PE.gapSel=PE.gapSel||'4';
+    PE.sel=new Set();PE.undo=[];PE.redo=[];PE.tool='select';PE.showRemoved=false;PE.ras=PE.d.ras.toDataURL('image/jpeg',.85);PE.rasWurl=null;
     peRender();pefit()}
-  catch(e){console.error(e);closeOverlay();toast('Couldn’t open that plan for editing. It’s been placed as is.');if(src.fallback)src.fallback()}}
+  catch(e){console.error(e);closeOverlay();const nm=e&&e.name||'';
+    if(nm==='PasswordException'){toast('This PDF is password protected. Open it, save or print a copy without the password, and upload that copy.');return}
+    if(nm==='InvalidPDFException'||nm==='FormatError'){toast('This file isn’t a readable PDF; it may be damaged. Export or download it again and upload the new copy.');return}
+    if(nm==='MissingPDFException'||nm==='UnexpectedResponseException'){toast('This PDF couldn’t be read. Upload it again.');return}
+    toast('Couldn’t open that plan for editing. It’s been placed as is.');if(src.fallback)src.fallback()}}
 /* scanned or flattened PDFs have no separate objects, so the editor finds them: every connected run of dark
    pixels is one mark (a word, a symbol, a piece of furniture). Very large ones are the walls and stay put. */
 function peLabel(){if(PE.lab)return PE.lab;const d=PE.d,W=d.W,H=d.H,c=d.ras;
@@ -2797,16 +2807,18 @@ function peLabel(){if(PE.lab)return PE.lab;const d=PE.d,W=d.W,H=d.H,c=d.ras;
   let mode=255;for(let v=120;v<256;v++)if(hist[v]>hist[mode])mode=v;const thr=Math.max(80,Math.min(200,mode-55));
   let pr=0,pg=0,pb=0,pn=0;for(let i=0;i<n;i+=97)if(Math.abs(lum[i]-mode)<=3){pr+=px[i*4];pg+=px[i*4+1];pb+=px[i*4+2];pn++}const paper=pn?[pr/pn|0,pg/pn|0,pb/pn|0]:[255,255,255];
   const L=new Int32Array(n),par=[0];const find=a=>{while(par[a]!==a){par[a]=par[par[a]];a=par[a]}return a};
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x;if(lum[i]>=thr)continue;
+  const chr=i=>{const o=i*4;return Math.max(px[o],px[o+1],px[o+2])-Math.min(px[o],px[o+1],px[o+2])};
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x;if(lum[i]>=thr&&!(lum[i]<235&&chr(i)>=60))continue;
     const nb=[x>0?L[i-1]:0,y>0?L[i-W]:0,y>0&&x>0?L[i-W-1]:0,y>0&&x<W-1?L[i-W+1]:0].filter(Boolean);
     if(!nb.length){par.push(par.length);L[i]=par.length-1;continue}
     let m=find(nb[0]);for(let k=1;k<nb.length;k++){const r=find(nb[k]);if(r!==m){if(r<m){par[m]=r;m=r}else par[r]=m}}L[i]=m}
   const map=new Int32Array(par.length);let cnt=0;for(let a=1;a<par.length;a++){const r=find(a);if(!map[r])map[r]=++cnt;map[a]=map[r]}
-  const bb=new Int32Array((cnt+1)*4).fill(-1),seed=new Int32Array(cnt+1),size=new Int32Array(cnt+1);
+  const bb=new Int32Array((cnt+1)*4).fill(-1),seed=new Int32Array(cnt+1),size=new Int32Array(cnt+1),col=new Float64Array((cnt+1)*3);
   for(let i=0;i<n;i++){if(!L[i])continue;const b=map[L[i]];L[i]=b;const x=i%W,y=(i/W)|0,o=b*4;
-    if(bb[o]<0){bb[o]=x;bb[o+1]=y;bb[o+2]=x;bb[o+3]=y;seed[b]=i}else{if(x<bb[o])bb[o]=x;if(x>bb[o+2])bb[o+2]=x;if(y>bb[o+3])bb[o+3]=y}size[b]++}
+    if(bb[o]<0){bb[o]=x;bb[o+1]=y;bb[o+2]=x;bb[o+3]=y;seed[b]=i}else{if(x<bb[o])bb[o]=x;if(x>bb[o+2])bb[o+2]=x;if(y>bb[o+3])bb[o+3]=y}size[b]++;col[b*3]+=px[i*4];col[b*3+1]+=px[i*4+1];col[b*3+2]+=px[i*4+2]}
+  for(let b=1;b<=cnt;b++){const z=size[b]||1;col[b*3]/=z;col[b*3+1]/=z;col[b*3+2]/=z}
   const struct=new Set();for(let b=1;b<=cnt;b++){const o=b*4;if(bb[o+2]-bb[o]>W*.25||bb[o+3]-bb[o+1]>H*.25)struct.add(b)}
-  return PE.lab={n:cnt,L,bb,seed,size,struct,W,H,paper,mask:{}}}
+  return PE.lab={n:cnt,L,bb,seed,size,struct,W,H,paper,col,mask:{}}}
 function peBlobAt(x,y,r){const lab=peLabel();if(!lab.n)return 0;x=Math.round(x);y=Math.round(y);r=Math.max(1,Math.round(r));
   let best=0,bd=1e9;for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=lab.W||Y>=lab.H)continue;const b=lab.L[Y*lab.W+X];if(b){const dd=dx*dx+dy*dy;if(dd<bd){bd=dd;best=b}}}return best}
 function peBlobBB(b){const o=b*4,q=PE.lab.bb;return [q[o],q[o+1],q[o+2]+1,q[o+3]+1]}
@@ -2819,43 +2831,193 @@ function peBlobMask(b){const lab=peLabel(),pc=pePaper(),key=b+':'+pc.join(',');i
   for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){if(lab.L[y*lab.W+x]!==b)continue;for(let dy=0;dy<3;dy++)for(let dx=0;dx<3;dx++){const k=((y-y0+dy)*w+(x-x0+dx))*4;a[k]=pc[0];a[k+1]=pc[1];a[k+2]=pc[2];a[k+3]=255}}
   g.putImageData(im,0,0);return lab.mask[key]={c,x:x0-1,y:y0-1,w,h,url:null}}
 function peBlobsOff(){const lab=peLabel();if(!lab.n)return [];const s=new Set();PE.blobOff.forEach(p=>{const b=lab.L[p[1]*lab.W+p[0]];if(b)s.add(b)});return [...s]}
-function peBlobsSVG(){if(!PE.blobOff.length)return '';return peBlobsOff().map(b=>{const m=peBlobMask(b);if(!m.url)m.url=m.c.toDataURL();return `<image class="pe-bl" href="${m.url}" x="${m.x}" y="${m.y}" width="${m.w}" height="${m.h}"/>`}).join('')}
+function peBlobsSVG(){if(!PE.blobOff.length)return '';const offs=peBlobsOff();
+  if(offs.length>150){const lab=peLabel(),key=offs.length+':'+pePaper().join(',')+':'+PE.blobOff.length+':'+(PE.rv||0);if(PE.blobAll&&PE.blobAll.k===key&&PE.blobAll.lab===lab)return PE.blobAll.svg;
+    const c=document.createElement('canvas');c.width=lab.W;c.height=lab.H;const x=c.getContext('2d');offs.forEach(b=>{const m=peBlobMask(b);x.drawImage(m.c,m.x,m.y)});
+    const svg=`<image class="pe-bl" href="${c.toDataURL('image/png')}" x="0" y="0" width="${lab.W}" height="${lab.H}"/>`;PE.blobAll={k:key,lab,svg};return svg}
+  return offs.map(b=>{const m=peBlobMask(b);if(!m.url)m.url=m.c.toDataURL();return `<image class="pe-bl" href="${m.url}" x="${m.x}" y="${m.y}" width="${m.w}" height="${m.h}"/>`}).join('')}
 /* brush marks: a freehand or straight stroke, or a filled rectangle or lasso shape, all in the paper's color */
-function peStrokeSVG(st,j,live){const pc=live?'':` style="${st.k==='rect'||st.k==='lasso'?'fill':'stroke'}:${pePaperCss()}"`,a=j==null?'':` data-st="${j}"`,cls=`pe-brush${live?' live':''}`,P=st.p;
-  if(st.k==='rect'){const [p,q]=[P[0],P[P.length-1]];return `<rect class="${cls} fillk"${a}${pc} x="${Math.min(p[0],q[0])}" y="${Math.min(p[1],q[1])}" width="${Math.abs(q[0]-p[0])}" height="${Math.abs(q[1]-p[1])}"/>`}
-  if(st.k==='lasso')return `<polygon class="${cls} fillk"${a}${pc} points="${P.map(q=>q.join(',')).join(' ')}"/>`;
-  return `<polyline class="${cls}"${a}${pc} points="${P.map(q=>q.join(',')).join(' ')}" stroke-width="${st.w}"/>`}
+function peShape(st,att){const P=st.p;
+  if(st.k==='rect'){const [p,q]=[P[0],P[P.length-1]];return `<rect ${att} x="${Math.min(p[0],q[0])}" y="${Math.min(p[1],q[1])}" width="${Math.abs(q[0]-p[0])}" height="${Math.abs(q[1]-p[1])}"/>`}
+  if(st.k==='lasso')return `<polygon ${att} points="${P.map(q=>q.join(',')).join(' ')}"/>`;
+  return `<polyline ${att} points="${P.map(q=>q.join(',')).join(' ')}" stroke-width="${st.w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`}
+function peStrokeSVG(st,j,live){const fk=st.k==='rect'||st.k==='lasso',a=j==null?'':` data-st="${j}"`;
+  if(live)return peShape(st,`class="pe-brush live${fk?' fillk':''}${st.r?' rs':''}"`);
+  if(st.r){const W=PE.d.W,H=PE.d.H,wh=fk?'fill="#fff"':'stroke="#fff"';
+    return `<g${a} class="pe-rst"><mask id="pem${j}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">${peShape(st,wh)}</mask><use href="#peRasB" mask="url(#pem${j})"/>${peShape(st,`class="pe-hit${fk?' fillk':''}"`)}</g>`}
+  return peShape(st,`class="pe-brush${fk?' fillk':''}"${a} style="${fk?'fill':'stroke'}:${pePaperCss()}"`)}
 function peStrokesSVG(){return PE.strokes.map((st,j)=>peStrokeSVG(st,j)).join('')}
 function peStrokeBB(st){const xs=st.p.map(q=>q[0]),ys=st.p.map(q=>q[1]),h=st.k==='rect'||st.k==='lasso'?0:st.w/2;return [Math.min(...xs)-h,Math.min(...ys)-h,Math.max(...xs)+h,Math.max(...ys)+h]}
 /* the brush pointer: a blue disc the size of the brush, ringed in white so it shows on dark lines too */
 function peCurSVG(x,y){const r=Math.max(PE.brush*PE.k/2,2*PE.k);return `<g class="pe-cur"><circle class="o" cx="${x}" cy="${y}" r="${r}"/><circle class="i" cx="${x}" cy="${y}" r="${r}"/><circle class="d" cx="${x}" cy="${y}" r="${1.5*PE.k}"/></g>`}
+/* a restore stroke paints the original picture back inside its shape */
+function peRestoreDraw(x,RS,s){const b=peStrokeBB(s),x0=Math.max(0,Math.floor(b[0])),y0=Math.max(0,Math.floor(b[1])),w=Math.min(PE.d.W,Math.ceil(b[2]))-x0,h=Math.min(PE.d.H,Math.ceil(b[3]))-y0;if(w<1||h<1)return;
+  const t=document.createElement('canvas');t.width=w;t.height=h;const g=t.getContext('2d');g.drawImage(RS,x0,y0,w,h,0,0,w,h);g.globalCompositeOperation='destination-in';g.translate(-x0,-y0);g.fillStyle='#000';g.strokeStyle='#000';g.lineCap='round';g.lineJoin='round';
+  if(s.k==='rect'){const [p,q]=[s.p[0],s.p[s.p.length-1]];g.fillRect(Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.abs(q[0]-p[0]),Math.abs(q[1]-p[1]))}
+  else{g.lineWidth=s.w;g.beginPath();s.p.forEach((q,k)=>k?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));if(s.k==='lasso'){g.closePath();g.fill()}else g.stroke()}
+  x.drawImage(t,x0,y0)}
 function peInPoly(x,y,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1]+1e-9)+a[0])c=!c}return c}
-function peSnapshot(){return {removed:[...PE.removed],offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase.map(r=>r.slice()),crop:PE.crop&&PE.crop.slice(),lines:PE.lines,bgOff:PE.bgOff,blobOff:PE.blobOff.map(q=>q.slice()),strokes:PE.strokes.slice()}}
+/* ---------- cleanup for bad files: one raster pipeline (background, ink level, black ink only, gap filling),
+   geometry fixes (straighten, flatten) that bake earlier edits into a new picture, and helpers ---------- */
+/* the picture before tone filters: what Restore paints back */
+function peBaseRas(){return PE.bgOff?(PE.rasW||(PE.rasW=peWhiten(PE.d.ras))):PE.d.ras}
+function peProcKey(){return PE.bgOff||PE.ink!=null||PE.gaps||PE.mono?`${PE.bgOff?1:0}|${PE.ink??''}|${PE.gaps||0}|${PE.mono?1:0}|${PE.rv||0}`:'o'}
+function peInkThr(){return PE.ink==null?null:Math.round(60+PE.ink*1.8)}/* slider 0..100 -> keep marks darker than 60..240 */
+function peProc(){const d=PE.d,W=d.W,H=d.H,src=PE.bgOff?(PE.rasW||(PE.rasW=peWhiten(d.ras))):d.ras;
+  if(PE.ink==null&&!PE.gaps&&!PE.mono)return src;
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);
+  const im=x.getImageData(0,0,W,H),p=im.data,n=W*H,pc=PE.bgOff?[255,255,255]:(peLabel().paper||[255,255,255]),thr=peInkThr();
+  if(thr!=null||PE.mono)for(let i=0;i<n;i++){const o=i*4,r=p[o],g=p[o+1],b=p[o+2],l=(r*299+g*587+b*114)/1000,ch=Math.max(r,g,b)-Math.min(r,g,b);
+    if((thr!=null&&l>=thr)||(PE.mono&&ch>=55)){p[o]=pc[0];p[o+1]=pc[1];p[o+2]=pc[2]}}
+  if(PE.gaps){const t=thr??Math.max(80,Math.min(200,peLuma(pc)-55)),M=new Uint8Array(n);for(let i=0;i<n;i++){const o=i*4;M[i]=(p[o]*299+p[o+1]*587+p[o+2]*114)/1000<t?1:0}
+    const r=PE.gaps,dil=peMorph(M,W,H,r,1),cl=peMorph(dil,W,H,r,0);
+    for(let i=0;i<n;i++)if(cl[i]&&!M[i]){const o=i*4;p[o]=p[o+1]=p[o+2]=45}}
+  x.putImageData(im,0,0);return c}
+const peLuma=c=>(c[0]*299+c[1]*587+c[2]*114)/1000;
+/* square dilate (on=1) or erode (on=0) of a 0/1 mask, separable */
+function peMorph(M,W,H,r,on){const T=new Uint8Array(M.length),O=new Uint8Array(M.length);
+  for(let y=0;y<H;y++){const row=y*W;for(let x=0;x<W;x++){let v=on?0:1;for(let k=-r;k<=r;k++){const xx=x+k;const m=xx<0||xx>=W?(on?0:1):M[row+xx];if(on?m:!m){v=on?1:0;break}}T[row+x]=v}}
+  for(let x=0;x<W;x++)for(let y=0;y<H;y++){let v=on?0:1;for(let k=-r;k<=r;k++){const yy=y+k;const m=yy<0||yy>=H?(on?0:1):T[yy*W+x];if(on?m:!m){v=on?1:0;break}}O[y*W+x]=v}
+  return O}
+function peProcUrl(){const k=peProcKey();if(k==='o')return PE.ras;if(PE.procK!==k){PE.procC=peProc();PE.procK=k;PE.procUrl=null}return PE.procUrl||(PE.procUrl=PE.procC.toDataURL('image/jpeg',.85))}
+
+/* everything removed so far, as data, so a later rebuild can repeat it */
+function peEditRecord(){return {removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase.map(r=>r.slice()),blobs:PE.blobOff.map(q=>q.slice()),strokes:PE.strokes.map(s=>({...s,p:s.p.map(z=>z.slice())}))}}
+function peLoadRecord(e){e=e||{};PE.removed=new Set(peUnranges(e.removed));PE.offStyles=new Set(e.offStyles||[]);PE.offLayers=new Set(e.offLayers||[]);PE.offKinds=new Set(e.offKinds||[]);
+  PE.erase=(e.erase||[]).map(r=>r.slice());PE.blobOff=(e.blobs||[]).map(q=>q.slice());PE.strokes=(e.strokes||[]).map(q=>({...q,p:q.p.map(z=>z.slice())}));PE.lab=null}
+function peHasEdits(){return PE.removed.size||PE.offStyles.size||PE.offLayers.size||PE.offKinds.size||PE.erase.length||PE.blobOff.length||PE.strokes.length}
+/* the current page with removals applied but no crop or tone filters: the starting picture for a geometry fix */
+async function peBake(){const keep={crop:PE.crop,lines:PE.lines,ink:PE.ink,gaps:PE.gaps,mono:PE.mono,bgOff:PE.bgOff};Object.assign(PE,{crop:null,lines:false,ink:null,gaps:0,mono:false,bgOff:false});
+  try{return await peOutput(false)}finally{Object.assign(PE,keep)}}
+function pePaperOf(c){try{const s=document.createElement('canvas'),k=Math.min(1,300/Math.max(c.width,c.height));s.width=Math.max(1,c.width*k|0);s.height=Math.max(1,c.height*k|0);const x=s.getContext('2d',{willReadFrequently:true});x.drawImage(c,0,0,s.width,s.height);
+  const p=x.getImageData(0,0,s.width,s.height).data,h=new Map();let best=null,bn=0;for(let i=0;i<p.length;i+=4){const k2=(p[i]>>3)+','+(p[i+1]>>3)+','+(p[i+2]>>3),v=(h.get(k2)||0)+1;h.set(k2,v);if(v>bn&&p[i]+p[i+1]+p[i+2]>360){bn=v;best=[p[i],p[i+1],p[i+2]]}}return best||[255,255,255]}catch(e){return [255,255,255]}}
+function peRotate(src,deg){const a=deg*Math.PI/180,cs=Math.abs(Math.cos(a)),sn=Math.abs(Math.sin(a)),W=Math.round(src.width*cs+src.height*sn),H=Math.round(src.width*sn+src.height*cs),pc=pePaperOf(src);
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle=`rgb(${pc})`;x.fillRect(0,0,W,H);x.imageSmoothingQuality='high';x.translate(W/2,H/2);x.rotate(a);x.drawImage(src,-src.width/2,-src.height/2);return c}
+/* projection-profile deskew: the angle at which ink lines up best in rows and columns */
+function peSkew(src){const k=Math.min(1,900/Math.max(src.width,src.height)),w=Math.max(1,src.width*k|0),h=Math.max(1,src.height*k|0),c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0,w,h);const p=x.getImageData(0,0,w,h).data,pc=pePaperOf(src),t=Math.max(70,peLuma(pc)-60),pts=[];
+  for(let y=0;y<h;y++)for(let X=0;X<w;X++){const o=(y*w+X)*4;if((p[o]*299+p[o+1]*587+p[o+2]*114)/1000<t)pts.push(X-w/2,y-h/2)}
+  if(pts.length<200)return 0;const step=Math.max(1,Math.floor(pts.length/2/40000)*2),R=Math.ceil(Math.hypot(w,h)),ha=new Float64Array(2*R+2),hb=new Float64Array(2*R+2);
+  const score=deg=>{const a=deg*Math.PI/180,s=Math.sin(a),co=Math.cos(a);ha.fill(0);hb.fill(0);for(let i=0;i<pts.length;i+=2*step){const X=pts[i],Y=pts[i+1];ha[(-X*s+Y*co+R)|0]++;hb[(X*co+Y*s+R)|0]++}
+    let v=0;for(let i=0;i<ha.length;i++)v+=ha[i]*ha[i]+hb[i]*hb[i];return v};
+  let best=0,bv=score(0);for(let d=-15;d<=15;d+=.25){const v=score(d);if(v>bv){bv=v;best=d}}
+  const c0=best;for(let d=c0-.25;d<=c0+.25;d+=.02){const v=score(d);if(v>bv){bv=v;best=d}}return Math.round(best*100)/100}
+/* flatten a photo: the four corners the person placed become a straight rectangle */
+function peHomog(src,dst){const A=[],B=[];for(let i=0;i<4;i++){const [x,y]=src[i],[u,v]=dst[i];A.push([x,y,1,0,0,0,-u*x,-u*y]);B.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);B.push(v)}
+  for(let i=0;i<8;i++){let m=i;for(let r=i+1;r<8;r++)if(Math.abs(A[r][i])>Math.abs(A[m][i]))m=r;[A[i],A[m]]=[A[m],A[i]];[B[i],B[m]]=[B[m],B[i]];
+    for(let r=0;r<8;r++){if(r===i)continue;const f=A[r][i]/A[i][i];for(let c=i;c<8;c++)A[r][c]-=f*A[i][c];B[r]-=f*B[i]}}
+  return B.map((b,i)=>b/A[i][i])}
+function peWarp(src,q){const D=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);let W=Math.round(Math.max(D(q[0],q[1]),D(q[3],q[2]))),H=Math.round(Math.max(D(q[0],q[3]),D(q[1],q[2])));
+  const sc=Math.min(1,4000/Math.max(W,H));W=Math.max(10,W*sc|0);H=Math.max(10,H*sc|0);
+  const h=peHomog([[0,0],[W,0],[W,H],[0,H]],q),sx=src.getContext?src:null,sc2=document.createElement('canvas');sc2.width=src.width;sc2.height=src.height;const g=sc2.getContext('2d',{willReadFrequently:true});g.drawImage(src,0,0);
+  const S=g.getImageData(0,0,src.width,src.height).data,SW=src.width,SH=src.height,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),im=x.createImageData(W,H),o=im.data;
+  for(let v=0;v<H;v++)for(let u=0;u<W;u++){const z=h[6]*u+h[7]*v+1,X=(h[0]*u+h[1]*v+h[2])/z,Y=(h[3]*u+h[4]*v+h[5])/z,k=(v*W+u)*4;
+    if(X<0||Y<0||X>=SW-1||Y>=SH-1){o[k]=o[k+1]=o[k+2]=o[k+3]=255;continue}const x0=X|0,y0=Y|0,fx=X-x0,fy=Y-y0,i00=(y0*SW+x0)*4,i10=i00+4,i01=i00+SW*4,i11=i01+4;
+    for(let ch=0;ch<3;ch++)o[k+ch]=(S[i00+ch]*(1-fx)+S[i10+ch]*fx)*(1-fy)+(S[i01+ch]*(1-fx)+S[i11+ch]*fx)*fy;o[k+3]=255}
+  x.putImageData(im,0,0);return c}
+/* apply a geometry fix; earlier removals are baked into the picture first so nothing is lost */
+async function peGeoApply(op,quiet){const d=PE.d,had=peHasEdits()||d.mode!=='image';
+  const base=had?await peBake():d.ras;const out=op.k==='rot'?peRotate(base,op.a):peWarp(base,op.q);
+  PE.geo.push({bake:had?peEditRecord():null,op});
+  const nd=peFromCanvas(out);nd.mode='image';nd.scale=op.k==='rot'?d.scale:null;PE.d=nd;peLoadRecord(null);PE.crop=null;PE.ras=out.toDataURL('image/jpeg',.88);PE.rasW=null;PE.procK=null;PE.rv=(PE.rv||0)+1;PE.hi=null;PE.hiKey=null;PE.ai=null;PE.blobAll=null;
+  if(!quiet){PE.sel.clear();peRender();pefit()}}
+async function peGeo(op){PE.undo.push(peSnapshot());if(PE.undo.length>200)PE.undo.shift();PE.redo=[];const ov=$('#peStage');if(ov)ov.classList.add('busy');
+  await new Promise(r=>setTimeout(r,30));try{await peGeoApply(op)}catch(e){console.error(e);toast('That change couldn’t be made to this plan.');PE.undo.pop()}}
+/* rebuild a saved cleanup: repeat each geometry fix in order on the original page */
+async function peReplayGeo(list){for(const g of list||[]){if(g.bake)peLoadRecord(g.bake);else peLoadRecord(null);const had=!!g.bake||PE.d.mode!=='image';
+  const base=had?await peBake():PE.d.ras;const out=g.op.k==='rot'?peRotate(base,g.op.a):peWarp(base,g.op.q);const nd=peFromCanvas(out);nd.mode='image';nd.scale=g.op.k==='rot'?PE.d.scale:null;PE.d=nd;PE.lab=null;PE.rasW=null;PE.geo.push(g)}}
+
+/* auto-crop: the drawing itself, without the sheet border, title block or margins */
+function peAutoCrop(){const lab=peLabel();if(!lab.n)return null;const W=lab.W,H=lab.H,q=lab.bb;let x0=1e9,y0=1e9,x1=-1,y1=-1,big=false;
+  for(let b=1;b<=lab.n;b++){const o=b*4,w=q[o+2]-q[o],h=q[o+3]-q[o+1];if(w>W*.85&&h>H*.85)continue;if(w>W*.2||h>H*.2){big=true;x0=Math.min(x0,q[o]);y0=Math.min(y0,q[o+1]);x1=Math.max(x1,q[o+2]);y1=Math.max(y1,q[o+3])}}
+  if(!big)for(let b=1;b<=lab.n;b++){const o=b*4,w=q[o+2]-q[o],h=q[o+3]-q[o+1];if(w>W*.85&&h>H*.85)continue;if(lab.size[b]>40){x0=Math.min(x0,q[o]);y0=Math.min(y0,q[o+1]);x1=Math.max(x1,q[o+2]);y1=Math.max(y1,q[o+3])}}
+  if(x1<0)return null;const pad=Math.round(Math.max(W,H)*.02);x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(W,x1+pad);y1=Math.min(H,y1+pad);return [x0,y0,x1-x0,y1-y0]}
+
+/* page thumbnails for multi-page sets */
+async function peThumbs(){if(!PE.doc||PE.pages<2)return;PE.thumbs=PE.thumbs&&PE.thumbsDoc===PE.doc?PE.thumbs:{};PE.thumbsDoc=PE.doc;const doc=PE.doc;
+  for(let i=1;i<=Math.min(PE.pages,80);i++){if(!$('.pe')||PE.doc!==doc)return;if(!PE.thumbs[i]){try{const pg=await doc.getPage(i),v1=pg.getViewport({scale:1}),vp=pg.getViewport({scale:150/Math.max(v1.width,v1.height)}),c=document.createElement('canvas');c.width=vp.width|0;c.height=vp.height|0;
+      const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:vp}).promise;PE.thumbs[i]=c.toDataURL('image/jpeg',.7)}catch(e){PE.thumbs[i]='-'}}
+    const im=document.querySelector(`.pe-thumb[data-pg="${i}"] img`);if(im&&PE.thumbs[i]!=='-')im.src=PE.thumbs[i]}}
+
+/* sharper detail when zoomed in on a PDF: the visible part is drawn again from the PDF at screen resolution */
+let peHiT=0;function peHiSchedule(){clearTimeout(peHiT);const g=$('#peHi');if(g)g.innerHTML='';peHiT=setTimeout(peHiRender,350)}
+async function peHiRender(){const d=PE.d;if(!PE.svg||!PE.src||!PE.src.pdf||!PE.doc||PE.geo.length||d.mode!=='image'||!d.scale||PE.k>.7)return;
+  const [vx,vy,vw,vh]=PE.vb,x0=Math.max(0,vx|0),y0=Math.max(0,vy|0),x1=Math.min(d.W,Math.ceil(vx+vw)),y1=Math.min(d.H,Math.ceil(vy+vh));if(x1<=x0||y1<=y0)return;
+  const f=Math.min(4,1/PE.k),cw=Math.round((x1-x0)*f),chh=Math.round((y1-y0)*f);if(cw*chh>16e6)return;const key=[x0,y0,x1,y1,f.toFixed(2),peProcKey()].join(',');if(PE.hiKey===key)return;PE.hiKey=key;
+  try{const pg=await PE.doc.getPage(PE.page),vp=pg.getViewport({scale:d.scale*f}),c=document.createElement('canvas');c.width=cw;c.height=chh;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cw,chh);
+    await pg.render({canvasContext:x,viewport:vp,transform:[1,0,0,1,-x0*f,-y0*f]}).promise;if(PE.hiKey!==key)return;
+    if(PE.bgOff||PE.ink!=null||PE.mono){const im=x.getImageData(0,0,cw,chh),p=im.data,pc=PE.bgOff?[255,255,255]:(peLabel().paper||[255,255,255]),thr=peInkThr()??(PE.bgOff?Math.max(80,peLuma(peLabel().paper||[255,255,255])-40):null);
+      for(let i=0;i<p.length;i+=4){const l=(p[i]*299+p[i+1]*587+p[i+2]*114)/1000,ch=Math.max(p[i],p[i+1],p[i+2])-Math.min(p[i],p[i+1],p[i+2]);if((thr!=null&&l>=thr)||(PE.mono&&ch>=55)){p[i]=pc[0];p[i+1]=pc[1];p[i+2]=pc[2]}}x.putImageData(im,0,0)}
+    const g=$('#peHi');if(g&&PE.hiKey===key)g.innerHTML=`<image href="${c.toDataURL('image/png')}" x="${x0}" y="${y0}" width="${x1-x0}" height="${y1-y0}" preserveAspectRatio="none"/>`}catch(e){}}
+
+/* read the title block with the assistant: drawing scale, sheet, and room names with where they sit */
+async function peReadTitle(){if(typeof SAMPLE!=='function'||!SAMPLE.json){toast('The assistant isn’t set up here, so the title block can’t be read.');return}
+  const d=PE.d,k=Math.min(1,1600/Math.max(d.W,d.H)),c=document.createElement('canvas');c.width=d.W*k|0;c.height=d.H*k|0;c.getContext('2d').drawImage(peRasNow(),0,0,c.width,c.height);
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));PE.ai={busy:true};peRender();peVB();
+  try{const keys=PE_SCALES.filter(s=>s[0]).map(s=>`"${s[0]}" = ${s[1]}`).join('; ');
+    const o=await SAMPLE.json(`This is one sheet of an architectural or building drawing set. Read its title block and the drawing.
+Return only a JSON object: {"scale": the drawing scale exactly as printed or null, "scaleKey": the matching key from this list or null (${keys}), "sheet": sheet number or null, "title": sheet title or null, "rooms": [{"name": room name as printed, "x": horizontal position of the room name as a fraction 0-1 of the image width, "y": vertical position 0-1}]}.
+List each room name that is printed inside the plan (not in the title block or notes), up to 60. If the plan shows a graphic scale only, set scale to "graphic" and scaleKey null.`,{images:[blob],modelTier:'default',cache:false});
+    const sc=o&&PE_SCALES.find(s=>s[0]&&s[0]===o.scaleKey);const rooms=Array.isArray(o&&o.rooms)?o.rooms.filter(r=>r&&r.name&&isFinite(r.x)&&isFinite(r.y)).slice(0,60):[];
+    PE.ai={scale:o&&o.scale||null,sheet:o&&o.sheet||null,title:o&&o.title||null,rooms,add:rooms.length>0};if(sc&&d.scale)PE.scaleK=sc[0];
+    toast(sc&&d.scale?`Scale set to ${sc[1]} from the title block.`:o&&o.scale?`The title block says ${o.scale}. Set the scale on the sheet after placing it.`:'No printed scale was found. Set the scale on the sheet after placing it.')}
+  catch(e){PE.ai=null;toast(e&&e.code==='not_granted'?'The assistant wasn’t allowed, so the title block wasn’t read.':'The title block couldn’t be read. Try again in a moment.')}
+  peRender();peVB()}
+/* room names found by the assistant become text labels on the sheet, where they sit on the plan */
+function peRoomLabels(rooms,crop,outW,outH,W,H){const b=S.design.plan&&S.design.plan.bg;if(!b||!rooms||!rooms.length)return 0;const cr=crop||[0,0,W,H];let n=0;
+  mut(()=>{const pl=ensurePlan();rooms.forEach(r=>{const px=r.x*W-cr[0],py=r.y*H-cr[1];if(px<0||py<0||px>cr[2]||py>cr[3])return;
+    pl.marks.push({id:mkId(),t:'text',x:Math.round(b.x+px/cr[2]*b.w),y:Math.round(b.y+py/cr[3]*b.h),txt:String(r.name).slice(0,40),size:14,bold:true,c:'ink',room:1});n++})});renderCanvas();return n}
+/* the four corner handles of Flatten */
+function peWarpDraw(){const g=$('#peWarp');if(!g)return;if(PE.tool!=='warp'||!PE.wq){g.innerHTML='';return}const q=PE.wq,r=8*PE.k;
+  g.innerHTML=`<path class="pe-wmask" fill-rule="evenodd" d="M0 0H${PE.d.W}V${PE.d.H}H0Z M${q.map(p=>p.join(' ')).join(' L')}Z"/><polygon class="pe-wq" points="${q.map(p=>p.join(',')).join(' ')}"/>${q.map((p,i)=>`<circle class="pe-wh" data-wq="${i}" cx="${p[0]}" cy="${p[1]}" r="${r}"/>`).join('')}`}
+/* sidebar sections for pictures */
+function peFixHTML(img){if(!img)return '';const thr=PE.ink;
+  return `<div class="pe-sec"><h4>Straighten</h4><div class="actions pe-wrap"><button class="btn sm" data-act="peStraight">Auto straighten</button><button class="btn sm" data-act="peRot" data-a="-90" aria-label="Turn left 90 degrees">⟲ 90°</button><button class="btn sm" data-act="peRot" data-a="90" aria-label="Turn right 90 degrees">⟳ 90°</button><button class="btn sm" data-act="peRot" data-a="-0.5" aria-label="Turn left half a degree">−0.5°</button><button class="btn sm" data-act="peRot" data-a="0.5" aria-label="Turn right half a degree">+0.5°</button></div>
+    <button class="btn sm" data-act="peTool" data-t="warp">Flatten a photo…</button><p class="muted" style="margin:0;font-size:12px">For a plan photographed at an angle: drag the four corners to the sheet's corners and it becomes a flat, square-on page.</p></div>
+   <div class="pe-sec"><h4>Ink</h4><label class="check"><input type="checkbox" id="peInkOn" ${thr!=null?'checked':''}> Ink level</label>
+    ${thr!=null?`<label class="pe-ol" for="peInk">Keep marks darker than <b id="peInkV">${thr}%</b></label><input id="peInk" type="range" min="0" max="100" step="2" value="${thr}"><p class="muted" style="margin:0;font-size:12px">Lower drops faint smudges, stains and light pencil; higher keeps faint lines on a washed-out scan.</p>`:''}
+    <label class="check"><input type="checkbox" id="peMono" ${PE.mono?'checked':''}> Black ink only <span class="muted">(drops red, blue and highlighter marks)</span></label>
+    <label class="field" for="peGaps">Fill gaps in lines<select id="peGaps" class="inp">${[[0,'Off'],[1,'Small gaps'],[2,'Medium gaps'],[3,'Large gaps']].map(([v,l])=>`<option value="${v}" ${(PE.gaps||0)===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`}
+function peAiHTML(img){const a=PE.ai,d=PE.d;
+  return `<div class="pe-sec"><h4>Title block</h4><button class="btn sm" data-act="peReadTitle" ${a&&a.busy?'disabled':''}>${a&&a.busy?'Reading…':'Read the title block'}</button>
+   <p class="muted" style="margin:0;font-size:12px">The assistant reads the printed scale, sheet number and room names.</p>
+   ${a&&!a.busy?`<div class="kv pe-kv">${a.scale?`<span>Scale</span><b>${esc(a.scale)}</b>`:''}${a.sheet?`<span>Sheet</span><b>${esc(a.sheet)}${a.title?' · '+esc(a.title):''}</b>`:''}<span>Rooms</span><b>${a.rooms.length}</b></div>
+    ${a.rooms.length?`<label class="check"><input type="checkbox" id="peRoomsAdd" ${a.add?'checked':''}> Add room names to the sheet as labels</label><p class="muted" style="margin:0;font-size:12px">${esc(a.rooms.slice(0,12).map(r=>r.name).join(', '))}${a.rooms.length>12?'…':''}</p>`:''}`:''}
+   ${img&&d.scale?`<label class="field" for="peScale">Drawing scale<select id="peScale" class="inp">${PE_SCALES.map(([k,l])=>`<option value="${k}" ${PE.scaleK===k?'selected':''}>${esc(l)}</option>`).join('')}</select></label>`:''}</div>`}
+function pePagesHTML(){if(!PE.src||!PE.src.pdf||PE.pages<2)return '';const n=Math.min(PE.pages,80);
+  return `<div class="pe-sec"><h4>Pages · ${PE.pages}</h4><div class="pe-thumbs">${Array.from({length:n},(_,i)=>i+1).map(i=>`<button class="pe-thumb" data-act="pePg" data-pg="${i}" aria-pressed="${i===PE.page}" aria-label="Page ${i}"><img alt="" src="${PE.thumbs&&PE.thumbs[i]&&PE.thumbs[i]!=='-'?PE.thumbs[i]:'data:image/gif;base64,R0lGODlhAQABAAAAACw='}"><span>${i}</span></button>`).join('')}</div>${PE.pages>n?`<p class="muted" style="margin:0;font-size:12px">Showing the first ${n}. Pick later pages from the list at the top.</p>`:''}</div>`}
+function peSnapshot(){return {removed:[...PE.removed],offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase.map(r=>r.slice()),crop:PE.crop&&PE.crop.slice(),lines:PE.lines,bgOff:PE.bgOff,blobOff:PE.blobOff.map(q=>q.slice()),strokes:PE.strokes.slice(),ink:PE.ink,gaps:PE.gaps,mono:PE.mono,d:PE.d,ras:PE.ras,geo:PE.geo.slice(),crop2:PE.crop&&PE.crop.slice()}}
 function peDo(fn){PE.undo.push(peSnapshot());if(PE.undo.length>200)PE.undo.shift();PE.redo=[];fn();peRefresh()}
-function peRestore(s){PE.removed=new Set(s.removed);PE.offStyles=new Set(s.offStyles);PE.offLayers=new Set(s.offLayers);PE.offKinds=new Set(s.offKinds);PE.erase=s.erase;PE.crop=s.crop;PE.lines=s.lines;PE.bgOff=!!s.bgOff;PE.blobOff=s.blobOff||[];PE.strokes=s.strokes||[];PE.sel.clear()}
+function peRestore(s){PE.removed=new Set(s.removed);PE.offStyles=new Set(s.offStyles);PE.offLayers=new Set(s.offLayers);PE.offKinds=new Set(s.offKinds);PE.erase=s.erase;PE.crop=s.crop;PE.lines=s.lines;PE.bgOff=!!s.bgOff;PE.blobOff=s.blobOff||[];PE.strokes=s.strokes||[];PE.ink=s.ink??null;PE.gaps=s.gaps||0;PE.mono=!!s.mono;
+  if(s.d&&s.d!==PE.d){PE.d=s.d;PE.ras=s.ras;PE.geo=s.geo||[];PE.lab=null;PE.rasW=null;PE.procK=null;PE.rv=(PE.rv||0)+1;PE.hiKey=null;PE.ai=null}PE.sel.clear()}
 const PE_SCALES=[['','Not set'],['96',"1/8\" = 1'-0\""],['64',"3/16\" = 1'-0\""],['48',"1/4\" = 1'-0\""],['32',"3/8\" = 1'-0\""],['24',"1/2\" = 1'-0\""],['m50','1:50'],['m100','1:100'],['m200','1:200']];
 function peStylesList(){const g=new Map();PE.d.items.forEach((it,i)=>{if(it.k!=='path'||PE.removed.has(i))return;const k=peStyle(it);const o=g.get(k)||{k,n:0,it};o.n++;g.set(k,o)});return [...g.values()].sort((a,b)=>b.n-a.n).slice(0,24)}
 function peRender(){const d=PE.d,ov=$('#overlay'),img=d.mode==='image',cnt=k=>d.items.filter((x,i)=>x.k===k&&!x.base&&!PE.removed.has(i)).length,dash=d.items.filter((x,i)=>x.dash&&!PE.removed.has(i)).length;
   const T=(k,l,ic)=>`<button class="pe-tool" data-act="peTool" data-t="${k}" aria-pressed="${PE.tool===k}" title="${l}">${ic}<span>${l}</span></button>`;
   ov.innerHTML=`<div class="pe" role="dialog" aria-modal="true" aria-labelledby="peH">
    <header class="pe-top"><div class="pe-title"><b id="peH">Clean up the floor plan</b><span class="muted">${esc(PE.src.file.name||'Plan')}${PE.pages>1?` · page <select id="pePage" aria-label="Page">${Array.from({length:PE.pages},(_,i)=>`<option value="${i+1}" ${i+1===PE.page?'selected':''}>${i+1}</option>`).join('')}</select> of ${PE.pages}`:''}</span></div>
-    <div class="pe-acts"><button class="btn sm" data-act="peUndo" id="peUndoB">Undo</button><button class="btn sm" data-act="peRedo" id="peRedoB">Redo</button><button class="btn sm" data-act="peFit">Fit</button>
+    <div class="pe-acts"><button class="btn sm" data-act="peUndo" id="peUndoB">Undo</button><button class="btn sm" data-act="peRedo" id="peRedoB">Redo</button><button class="btn sm" data-act="peFit">Fit</button><button class="btn sm" id="peCmpB" title="Hold to see the original (or hold C)">Hold to compare</button>
      <button class="btn sm" data-act="peCancel">Cancel</button><button class="btn sm" data-act="peDone" data-raw="1">Use as is</button><button class="btn primary sm" data-act="peDone">Use this plan</button></div></header>
    <div class="pe-body">
     <aside class="pe-side">
      <div class="pe-tools" role="group" aria-label="Tools">${T('select','Select','<svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-3 6z"/></svg>')}${T('pan','Move','<svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/></svg>')}${T('erase','White out','<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M8 10h8M8 14h5"/></svg>')}${T('brush','Brush','<svg viewBox="0 0 24 24"><path d="M20 4L9 15"/><path d="M9 15c-3 0-5 2-5 5 3 0 5-2 5-5z"/></svg>')}${T('crop','Crop','<svg viewBox="0 0 24 24"><path d="M6 2v16h16M2 6h16v16"/></svg>')}</div>
-     <p class="pe-hint">${{select:img?'Click a word, symbol or piece of furniture to select it; drag '+(PE.smode==='lasso'?'a loop around':'across')+' an area to select every mark inside. Walls are left alone. Shift adds to the selection; Delete removes it.':'Click a line, shape or text to select it; drag across an area to select everything inside. Shift adds to the selection. Delete removes it.',brush:{free:'Paint over anything to remove it, such as a note touching a wall. Hold Shift for a straight line.',line:'Drag a straight line to paint out, such as a dimension line. Set its width with Size.',rect:'Drag a rectangle to paint it out completely.',lasso:'Draw around an area of any shape to paint it out.'}[PE.bshape]+' Switch to Select to pick a brush mark and delete it.',pan:'Drag to move around. Scroll or pinch to zoom.',erase:'Drag a box over notes, stamps or anything else to cover it in white. Click a white box to select it; Delete removes it.',crop:'Drag the area to keep. Everything outside is cut off.'}[PE.tool]}</p>
-     ${PE.tool==='brush'?`<div class="pe-opts"><span class="pe-ol">Shape</span><div class="seg pe-g2" role="group" aria-label="Brush shape">${[['free','Freehand'],['line','Straight'],['rect','Rectangle'],['lasso','Lasso']].map(([v,l])=>`<button data-act="peShape" data-v="${v}" aria-pressed="${PE.bshape===v}">${l}</button>`).join('')}</div>
+     <p class="pe-hint">${{select:img?'Click a word, symbol or piece of furniture to select it; drag '+(PE.smode==='lasso'?'a loop around':'across')+' an area to select every mark inside. Walls are left alone. Shift adds to the selection; Delete removes it.':'Click a line, shape or text to select it; drag across an area to select everything inside. Shift adds to the selection. Delete removes it.',brush:{free:'Paint over anything to remove it, such as a note touching a wall. Hold Shift for a straight line.',line:'Drag a straight line to paint out, such as a dimension line. Set its width with Size.',rect:'Drag a rectangle to paint it out completely.',lasso:'Draw around an area of any shape to paint it out.'}[PE.bshape]+' Switch to Select to pick a brush mark and delete it.',pan:'Drag to move around. Scroll or pinch to zoom.',erase:'Drag a box over notes, stamps or anything else to cover it in white. Click a white box to select it; Delete removes it.',crop:'Drag the area to keep. Everything outside is cut off.',warp:'Drag the four blue corners onto the corners of the sheet in the photo, then press Flatten. Drag elsewhere to move around.'}[PE.tool]}</p>
+     ${PE.tool==='crop'?`<div class="actions pe-wrap" style="margin:-2px 0 10px"><button class="btn sm primary" data-act="peCropAuto">Crop to the drawing</button>${PE.crop?'<button class="btn sm" data-act="peCropClear">Remove crop</button>':''}</div>`:''}
+     ${PE.tool==='warp'?`<div class="actions pe-wrap" style="margin:-2px 0 10px"><button class="btn sm primary" data-act="peWarpGo">Flatten</button><button class="btn sm" data-act="peWarpReset">Reset corners</button><button class="btn sm" data-act="peTool" data-t="select">Cancel</button></div>`:''}
+     ${PE.tool==='brush'?`<div class="pe-opts"><span class="pe-ol">Paint</span><div class="seg pe-g2" role="group" aria-label="Brush paints">${[['remove','Remove'],['restore','Restore original']].map(([v,l])=>`<button data-act="peBmode" data-v="${v}" aria-pressed="${PE.bmode===v}">${l}</button>`).join('')}</div></div><div class="pe-opts"><span class="pe-ol">Shape</span><div class="seg pe-g2" role="group" aria-label="Brush shape">${[['free','Freehand'],['line','Straight'],['rect','Rectangle'],['lasso','Lasso']].map(([v,l])=>`<button data-act="peShape" data-v="${v}" aria-pressed="${PE.bshape===v}">${l}</button>`).join('')}</div>
       ${PE.bshape==='free'||PE.bshape==='line'?`<label class="pe-ol" for="peBsz">Size <b id="peBszV">${PE.brush}px</b></label><input id="peBsz" type="range" min="2" max="160" step="1" value="${PE.brush}">
       <div class="seg pe-g5" role="group" aria-label="Size presets">${[[6,'XS'],[12,'S'],[24,'M'],[48,'L'],[96,'XL']].map(([v,l])=>`<button data-act="peBrush" data-v="${v}" aria-pressed="${PE.brush===v}">${l}</button>`).join('')}</div>`:''}</div>`:''}
      ${PE.tool==='select'?`<div class="pe-opts"><span class="pe-ol">Select by</span><div class="seg pe-g2" role="group" aria-label="Selection shape">${[['box','Box'],['lasso','Lasso']].map(([v,l])=>`<button data-act="peSmode" data-v="${v}" aria-pressed="${PE.smode===v}">${l}</button>`).join('')}</div><div class="actions"><button class="btn sm" data-act="peSelAll">Select all marks</button><button class="btn sm" data-act="peSelInv">Invert</button></div></div>`:''}
      <div class="pe-selbar" id="peSelBar"></div>
+     ${pePagesHTML()}${peFixHTML(img)}
      <div class="pe-sec"><h4>Background</h4><label class="check"><input type="checkbox" id="peBgOff" ${PE.bgOff?'checked':''}> Remove background <span class="muted">${img?'paper color, shadows, stains':d.items.filter(peIsBgFill).length+' fills'}</span></label>
       <p class="muted" style="margin:0;font-size:12px">${img?'Turns the paper white and keeps the lines, even in a photo taken at an angle to the light.':'Removes light-colored fills such as room tints and page backgrounds, and whitens any scanned pictures. Solid black walls stay.'}</p>
       <label class="check"><input type="checkbox" id="peClear" ${PE.clear?'checked':''}> Only the structure on the sheet</label>
       <p class="muted" style="margin:0;font-size:12px">The white paper becomes see-through, so the sheet shows just the walls and lines with your devices on top.</p></div>
      ${img?`<div class="pe-sec"><h4>Remove in one click</h4><p class="muted" style="margin:0 0 6px;font-size:12px">Selects every mark up to this size: text, notes, dimensions, symbols. Check the selection, then press Remove.</p>
-       <div class="actions"><button class="btn sm" data-act="peSmall" data-v=".012">Text</button><button class="btn sm" data-act="peSmall" data-v=".03">+ symbols</button><button class="btn sm" data-act="peSmall" data-v=".08">+ furniture</button></div></div>
+       <div class="actions pe-wrap"><button class="btn sm" data-act="peSmall" data-v=".012">Text</button><button class="btn sm" data-act="peSmall" data-v=".03">+ symbols</button><button class="btn sm" data-act="peSmall" data-v=".08">+ furniture</button></div>
+       <div class="actions pe-wrap"><button class="btn sm" data-act="peColor">Colored marks</button><button class="btn sm" data-act="peSameColor" title="Select a mark first">Same color as selected</button></div>
+       <div class="pe-spk"><select id="peSpk" class="inp" aria-label="Speck size">${[['2','Tiny specks'],['4','Specks'],['8','Dots and dust'],['14','Small blots']].map(([v,l])=>`<option value="${v}" ${PE.gapSel===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm" data-act="peSpecks">Remove specks</button></div></div>
       <div class="pe-sec"><h4>Picture</h4><label class="check"><input type="checkbox" id="peLines" ${PE.lines?'checked':''}> Lines only <span class="muted">(drops shading, color and light marks)</span></label></div>`
      :`<div class="pe-sec"><h4>Remove in one click</h4>
        <label class="check"><input type="checkbox" data-pekind="text" ${PE.offKinds.has('text')?'':'checked'}> Text <span class="muted">${cnt('text')}</span></label>
@@ -2865,35 +3027,41 @@ function peRender(){const d=PE.d,ov=$('#overlay'),img=d.mode==='image',cnt=k=>d.
       <div class="pe-sec"><h4>Line styles</h4><p class="muted" style="margin:0 0 6px;font-size:12px">Notes, dimensions and furniture are often drawn in their own color or weight. Untick one to hide it.</p>
        ${peStylesList().map(o=>{const it=o.it;return `<label class="check pe-sty"><input type="checkbox" data-pesty="${esc(o.k)}" ${PE.offStyles.has(o.k)?'':'checked'}><svg viewBox="0 0 40 12" aria-hidden="true"><line x1="2" y1="6" x2="38" y2="6" stroke="${it.s||it.f}" stroke-width="${Math.min(6,Math.max(1,it.w))}" ${it.dash?'stroke-dasharray="5 3"':''}/></svg><span>${it.s?`${it.w.toFixed(1)} px${it.dash?' dashed':''}`:'Filled'}</span><span class="muted">${o.n}</span></label>`}).join('')}</div>
       <div class="pe-sec"><h4>Drawing scale</h4><select id="peScale" class="inp" aria-label="Drawing scale">${PE_SCALES.map(([k,l])=>`<option value="${k}" ${PE.scaleK===k?'selected':''}>${esc(l)}</option>`).join('')}</select><p class="muted" style="margin:4px 0 0;font-size:12px">From the plan's title block. Set it and the plan arrives at true scale; leave it and set the scale on the sheet.</p></div>`}
+ ${peAiHTML(img)}
      <div class="pe-sec"><label class="check"><input type="checkbox" id="peShowRm" ${PE.showRemoved?'checked':''}> Show what I removed</label>${PE.removed.size||PE.erase.length||PE.crop||PE.blobOff.length||PE.strokes.length?`<button class="btn sm" data-act="peReset">Start over</button>`:''}</div>
     </aside>
-    <div class="pe-stage" id="peStage" data-tool="${PE.tool}" data-bs="${PE.bshape||'free'}"><svg id="peSvg" xmlns="http://www.w3.org/2000/svg"><defs><image id="peRas" data-v="o" href="${PE.ras}" x="0" y="0" width="${d.W}" height="${d.H}"/>
+    <div class="pe-stage" id="peStage" data-tool="${PE.tool}" data-bs="${PE.bshape||'free'}"><svg id="peSvg" xmlns="http://www.w3.org/2000/svg"><defs><image id="peRas" data-v="o@${PE.rv||0}" href="${PE.ras}" x="0" y="0" width="${d.W}" height="${d.H}"/><image id="peRasB" data-v="o@${PE.rv||0}" href="${PE.ras}" x="0" y="0" width="${d.W}" height="${d.H}"/>
       ${d.items.map((it,i)=>it.k==='img'?`<clipPath id="pec${i}"><rect x="${it.bb[0]}" y="${it.bb[1]}" width="${it.bb[2]-it.bb[0]}" height="${it.bb[3]-it.bb[1]}"/></clipPath>`:'').join('')}</defs>
       <rect x="0" y="0" width="${d.W}" height="${d.H}" fill="#fff"/>
       <g id="peItems" font-family="Arial,Helvetica,sans-serif" fill="#333">${d.items.map((it,i)=>it.k==='img'?`<use data-i="${i}" href="#peRas" clip-path="url(#pec${i})"/>`:peItemSVG(it,i)).join('')}</g>
-      <g id="peBlobs"></g><g id="peErase"></g><g id="peBsel"></g><g id="peOver"></g><g id="peCur"></g></svg></div>
+      <g id="peHi"></g><g id="peBlobs"></g><g id="peErase"></g><g id="peBsel"></g><g id="peOver"></g><g id="peWarp"></g><g id="peCur"></g><g id="peCmp" style="display:none"><rect x="0" y="0" width="${d.W}" height="${d.H}" fill="#fff"/><image href="${PE.ras}" x="0" y="0" width="${d.W}" height="${d.H}"/><text x="${d.W/2}" y="${Math.max(30,d.H*.03)}" text-anchor="middle" class="pe-cmpl">Original</text></g></svg></div>
    </div></div>`;
   PE.svg=$('#peSvg');PE.els=[];PE.svg.querySelectorAll('#peItems [data-i]').forEach(el=>{PE.els[+el.dataset.i]=el});peBind();peRefresh()
+  const cb=$('#peCmpB');if(cb){const on=v=>{const g=$('#peCmp');if(g)g.style.display=v?'':'none'};cb.addEventListener('pointerdown',()=>on(1));['pointerup','pointerleave','pointercancel'].forEach(k=>cb.addEventListener(k,()=>on(0)))}
+  if(PE.src&&PE.src.pdf&&PE.pages>1)peThumbs();peWarpDraw();
+  const ik=$('#peInk');if(ik)ik.addEventListener('input',()=>{const v=$('#peInkV');if(v)v.textContent=ik.value+'%'});
   const bz=$('#peBsz');if(bz)bz.addEventListener('input',()=>{PE.brush=+bz.value;const v=$('#peBszV');if(v)v.textContent=PE.brush+'px';document.querySelectorAll('[data-act=peBrush]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===PE.brush)))})}
 function peRefresh(){if(!PE.svg)return;const d=PE.d;
   PE.els.forEach((el,i)=>{if(!el)return;const vis=peVisible(i);el.classList.toggle('pe-off',!vis);el.classList.toggle('pe-ghost',!vis&&PE.showRemoved);el.classList.toggle('pe-sel',PE.sel.has(i))});
   const bl=$('#peBlobs');if(bl){bl.innerHTML=peBlobsSVG();bl.style.opacity=PE.showRemoved?'.55':''}
   const bs=$('#peBsel');if(bs)bs.innerHTML=[...PE.sel].filter(v=>typeof v==='string'&&(v[0]==='b'||v[0]==='s')&&(v[0]==='b'||PE.strokes[+v.slice(1)])).map(v=>{const r=v[0]==='s'?peStrokeBB(PE.strokes[+v.slice(1)]):peBlobBB(+v.slice(1));return `<rect class="pe-bsel" x="${r[0]-2}" y="${r[1]-2}" width="${r[2]-r[0]+4}" height="${r[3]-r[1]+4}"/>`}).join('');
-  $('#peErase').innerHTML=peStrokesSVG()+PE.erase.map((r,j)=>`<rect data-er="${j}" class="pe-er${PE.sel.has('e'+j)?' pe-sel':''}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`).join('');
+  $('#peErase').innerHTML=PE.erase.map((r,j)=>`<rect data-er="${j}" class="pe-er${PE.sel.has('e'+j)?' pe-sel':''}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`).join('')+peStrokesSVG();
   const c=PE.crop;$('#peOver').innerHTML=c?`<path class="pe-cropmask" fill-rule="evenodd" d="M0 0H${d.W}V${d.H}H0Z M${c[0]} ${c[1]}h${c[2]}v${c[3]}h${-c[2]}Z"/><rect class="pe-cropline" x="${c[0]}" y="${c[1]}" width="${c[2]}" height="${c[3]}"/>`:'';
   const n=PE.sel.size,sb=$('#peSelBar');if(sb)sb.innerHTML=n?`<b>${plural(n,'object')} selected</b><button class="btn sm danger" data-act="peDel">Remove</button><button class="btn sm" data-act="peSelNone">Clear</button>${PE.showRemoved&&[...PE.sel].some(i=>typeof i==='number'&&PE.removed.has(i))?'<button class="btn sm" data-act="peRestoreSel">Put back</button>':''}`:'';
   const u=$('#peUndoB'),r=$('#peRedoB');if(u)u.disabled=!PE.undo.length;if(r)r.disabled=!PE.redo.length;
-  const ri=$('#peRas');if(ri){const want=PE.bgOff?'w':'o';if(ri.dataset.v!==want){ri.dataset.v=want;ri.setAttribute('href',PE.bgOff?(PE.rasWurl||(PE.rasWurl=peRasNow().toDataURL('image/jpeg',.85))):PE.ras)}}
+  const rb=$('#peRasB');if(rb){const want=(PE.bgOff?'w':'o')+'@'+(PE.rv||0);if(rb.dataset.v!==want){rb.dataset.v=want;rb.setAttribute('href',PE.bgOff?(PE.rasWurl&&PE.rasWurl.rv===PE.rv?PE.rasWurl.u:(PE.rasWurl={rv:PE.rv,u:peBaseRas().toDataURL('image/jpeg',.85)}).u):PE.ras)}}
+  const ri=$('#peRas');if(ri){const want=peProcKey()+'@'+(PE.rv||0);if(ri.dataset.v!==want){ri.dataset.v=want;ri.setAttribute('href',peProcUrl())}}
   const g=$('#peItems');if(g)g.style.filter=PE.lines?'grayscale(1) contrast(4) brightness(1.15)':''}
 function pefit(){const st=$('#peStage');if(!st)return;const d=PE.d,c=PE.crop||[0,0,d.W,d.H];PE.vb=[c[0]-c[2]*.03,c[1]-c[3]*.03,c[2]*1.06,c[3]*1.06];peVB()}
-function peVB(){const st=$('#peStage'),r=st.getBoundingClientRect(),vb=PE.vb,ar=r.width/Math.max(1,r.height);let [x,y,w,h]=vb;if(w/h<ar){const nw=h*ar;x-=(nw-w)/2;w=nw}else{const nh=w/ar;y-=(nh-h)/2;h=nh}PE.vb=[x,y,w,h];PE.svg.setAttribute('viewBox',PE.vb.join(' '));PE.k=w/Math.max(1,r.width);PE.svg.style.setProperty('--pek',PE.k)}
+function peVB(){const st=$('#peStage'),r=st.getBoundingClientRect(),vb=PE.vb,ar=r.width/Math.max(1,r.height);let [x,y,w,h]=vb;if(w/h<ar){const nw=h*ar;x-=(nw-w)/2;w=nw}else{const nh=w/ar;y-=(nh-h)/2;h=nh}PE.vb=[x,y,w,h];PE.svg.setAttribute('viewBox',PE.vb.join(' '));PE.k=w/Math.max(1,r.width);PE.svg.style.setProperty('--pek',PE.k);peHiSchedule();peWarpDraw()}
 function pePt(e){const r=PE.svg.getBoundingClientRect();return [PE.vb[0]+(e.clientX-r.left)*PE.k,PE.vb[1]+(e.clientY-r.top)*PE.k]}
 function peBind(){const st=$('#peStage');let drag=null;const pts=new Map();
   st.addEventListener('wheel',e=>{e.preventDefault();const [px,py]=pePt(e);
     const z=Math.exp((e.ctrlKey||e.metaKey?e.deltaY*3:e.deltaY)*0.0015);const vb=PE.vb;PE.vb=[px-(px-vb[0])*z,py-(py-vb[1])*z,vb[2]*z,vb[3]*z];peVB()},{passive:false});
   st.addEventListener('pointerdown',e=>{if(e.button===2)return;st.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
     if(pts.size===2){drag={k:'pinch',d0:peDist(pts),vb0:PE.vb.slice(),c:peMid(pts)};return}
-    const [x,y]=pePt(e),pan=PE.tool==='pan'||e.button===1||PE.space;if(!pan&&PE.tool==='brush'){const k=PE.bshape==='free'&&e.shiftKey?'line':PE.bshape;drag={k:'brush',st:{k,w:Math.max(2,Math.round(PE.brush*PE.k)),p:[[Math.round(x),Math.round(y)]]}};return}
+    const [x,y]=pePt(e),pan=PE.tool==='pan'||e.button===1||PE.space;if(!pan&&PE.tool==='brush'){const k=PE.bshape==='free'&&e.shiftKey?'line':PE.bshape;drag={k:'brush',st:{k,r:PE.bmode==='restore'?1:undefined,w:Math.max(2,Math.round(PE.brush*PE.k)),p:[[Math.round(x),Math.round(y)]]}};return}
+    if(!pan&&PE.tool==='warp'){const h=e.target.closest&&e.target.closest('[data-wq]');if(h){drag={k:'wq',i:+h.dataset.wq};return}drag={k:'pan',cx:e.clientX,cy:e.clientY,vb0:PE.vb.slice()};return}
     if(!pan&&PE.tool==='select'&&PE.smode==='lasso'&&!(e.target.closest&&e.target.closest('[data-st],[data-er]'))){drag={k:'lsel',p:[[x,y]],shift:e.shiftKey,cx:e.clientX,cy:e.clientY,x0:x,y0:y,target:e.target};return}
     drag={k:pan?'pan':PE.tool,x0:x,y0:y,cx:e.clientX,cy:e.clientY,vb0:PE.vb.slice(),moved:false,shift:e.shiftKey,target:e.target}});
   st.addEventListener('pointermove',e=>{if(!drag){const cu=$('#peCur');if(cu){if(PE.tool==='brush'&&(PE.bshape==='free'||PE.bshape==='line')&&e.pointerType!=='touch'){const [x,y]=pePt(e);cu.innerHTML=peCurSVG(x,y)}else cu.innerHTML=''}return}if(pts.has(e.pointerId))pts.set(e.pointerId,[e.clientX,e.clientY]);
@@ -2903,7 +3071,8 @@ function peBind(){const st=$('#peStage');let drag=null;const pts=new Map();
       $('#peOver').innerHTML=peStrokeSVG(S0,null,true);const cu=$('#peCur');if(cu)cu.innerHTML=S0.k==='free'||S0.k==='line'?peCurSVG(x,y):'';return}
     if(drag.k==='lsel'){const [x,y]=pePt(e);drag.p.push([x,y]);if(Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy)>4)drag.moved=true;$('#peOver').innerHTML=`<polygon class="pe-band" points="${drag.p.map(q=>q.join(',')).join(' ')}"/>`;return}
     if(Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy)>4)drag.moved=true;
-    if(drag.k==='pan'){PE.vb=[drag.vb0[0]-(e.clientX-drag.cx)*PE.k,drag.vb0[1]-(e.clientY-drag.cy)*PE.k,drag.vb0[2],drag.vb0[3]];PE.svg.setAttribute('viewBox',PE.vb.join(' '));return}
+    if(drag.k==='pan'){PE.vb=[drag.vb0[0]-(e.clientX-drag.cx)*PE.k,drag.vb0[1]-(e.clientY-drag.cy)*PE.k,drag.vb0[2],drag.vb0[3]];PE.svg.setAttribute('viewBox',PE.vb.join(' '));peHiSchedule();return}
+    if(drag.k==='wq'){const [x,y]=pePt(e);PE.wq[drag.i]=[Math.max(0,Math.min(PE.d.W,x)),Math.max(0,Math.min(PE.d.H,y))];peWarpDraw();return}
     if(drag.moved){const [x,y]=pePt(e),r=[Math.min(x,drag.x0),Math.min(y,drag.y0),Math.abs(x-drag.x0),Math.abs(y-drag.y0)];drag.r=r;
       const cls=drag.k==='erase'?'pe-drawer':drag.k==='crop'?'pe-drawcrop':'pe-band';$('#peOver').innerHTML=(PE.crop&&drag.k!=='crop'?$('#peOver').innerHTML.replace(/<rect class="pe-(band|drawer|drawcrop)"[^>]*\/>/g,''):'')+`<rect class="${cls}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`}});
   const end=e=>{pts.delete(e.pointerId);if(!drag)return;/* e is the pointerup */const g=drag;drag=null;if(g.k==='pinch'||g.k==='pan')return;
@@ -2938,8 +3107,8 @@ function peBind(){const st=$('#peStage');let drag=null;const pts=new Map();
   st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);st.addEventListener('pointerleave',()=>{const cu=$('#peCur');if(cu&&!drag)cu.innerHTML=''});
   PE.key=e=>{if(!$('.pe'))return;if(e.target&&/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName))return;
     if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();A.peDel()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?A.peRedo():A.peUndo()}
-    else if(e.key===' '){PE.space=true;$('#peStage').dataset.tool='pan'}else if(e.key==='Escape'){PE.sel.clear();peRefresh()}};
-  PE.keyup=e=>{if(e.key===' '){PE.space=false;const s=$('#peStage');if(s)s.dataset.tool=PE.tool}};
+    else if(e.key===' '){PE.space=true;$('#peStage').dataset.tool='pan'}else if(e.key.toLowerCase()==='c'&&!e.ctrlKey&&!e.metaKey){const g=$('#peCmp');if(g)g.style.display=''}else if(e.key==='Escape'){PE.sel.clear();peRefresh()}};
+  PE.keyup=e=>{if(e.key===' '){PE.space=false;const s=$('#peStage');if(s)s.dataset.tool=PE.tool}if(e.key.toLowerCase()==='c'){const g=$('#peCmp');if(g)g.style.display='none'}};
   document.removeEventListener('keydown',PE.keyH||(()=>{}));document.removeEventListener('keyup',PE.keyUpH||(()=>{}));PE.keyH=PE.key;PE.keyUpH=PE.keyup;document.addEventListener('keydown',PE.keyH);document.addEventListener('keyup',PE.keyUpH)}
 const peDist=m=>{const [a,b]=[...m.values()];return Math.hypot(a[0]-b[0],a[1]-b[1])},peMid=m=>{const [a,b]=[...m.values()];return [(a[0]+b[0])/2,(a[1]+b[1])/2]};
 /* the cleaned plan as a picture: pictures first, then lines and text, then white-outs; cropped; lines only last */
@@ -2951,7 +3120,7 @@ async function peOutput(raw){const d=PE.d,c=document.createElement('canvas');c.w
       try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});x.drawImage(im,0,0)}finally{URL.revokeObjectURL(url)}}
     x.fillStyle='#fff';PE.erase.forEach(r=>x.fillRect(r[0],r[1],r[2],r[3]));
     if(PE.blobOff.length)peBlobsOff().forEach(b=>{const m=peBlobMask(b);x.drawImage(m.c,m.x,m.y)});
-    if(PE.strokes.length){const pc=pePaperCss();x.strokeStyle=pc;x.fillStyle=pc;x.lineCap='round';x.lineJoin='round';PE.strokes.forEach(s=>{if(s.k==='rect'){const [p,q]=[s.p[0],s.p[s.p.length-1]];x.fillRect(Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.abs(q[0]-p[0]),Math.abs(q[1]-p[1]));return}
+    if(PE.strokes.length){const pc=pePaperCss();x.strokeStyle=pc;x.fillStyle=pc;x.lineCap='round';x.lineJoin='round';const RS0=peBaseRas();PE.strokes.forEach(s=>{if(s.r){peRestoreDraw(x,RS0,s);return}x.fillStyle=pc;x.strokeStyle=pc;if(s.k==='rect'){const [p,q]=[s.p[0],s.p[s.p.length-1]];x.fillRect(Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.abs(q[0]-p[0]),Math.abs(q[1]-p[1]));return}
       x.lineWidth=s.w;x.beginPath();s.p.forEach((q,k)=>k?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));if(s.k==='lasso'){x.closePath();x.fill()}else x.stroke()})}}
   let out=c;const cr=!raw&&PE.crop;if(cr){out=document.createElement('canvas');out.width=cr[2];out.height=cr[3];const o=out.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,cr[2],cr[3]);o.drawImage(c,cr[0],cr[1],cr[2],cr[3],0,0,cr[2],cr[3])}
   if(!raw&&PE.lines){const o=out.getContext('2d'),id=o.getImageData(0,0,out.width,out.height),p=id.data;
@@ -2967,6 +3136,12 @@ document.addEventListener('change',e=>{const t=e.target;if(!t||!PE.d||!$('.pe'))
   else if(t.id==='peLines'){peDo(()=>{PE.lines=t.checked})}
   else if(t.id==='peBgOff'){if(t.checked&&!PE.rasW)toast('Whitening the background…');setTimeout(()=>peDo(()=>{PE.bgOff=t.checked}),20)}
   else if(t.id==='peShowRm'){PE.showRemoved=t.checked;peRefresh()}
+  else if(t.id==='peInkOn'){peDo(()=>{PE.ink=t.checked?60:null});peRender();peVB()}
+  else if(t.id==='peInk'){peDo(()=>{PE.ink=+t.value})}
+  else if(t.id==='peMono'){peDo(()=>{PE.mono=t.checked})}
+  else if(t.id==='peGaps'){toast('Filling gaps…');setTimeout(()=>peDo(()=>{PE.gaps=+t.value}),20)}
+  else if(t.id==='peRoomsAdd'){if(PE.ai)PE.ai.add=t.checked}
+  else if(t.id==='peSpk'){PE.gapSel=t.value}
   else if(t.id==='peClear'){PE.clear=t.checked}
   else if(t.id==='peScale'){PE.scaleK=t.value}
   else if(t.id==='pePage'){planEdit({...PE.src,page:+t.value,edit:null})}});
@@ -6933,7 +7108,7 @@ const A={
       await bgFromCanvas(c,`${o.name.replace(/\.[^.]+$/,'')} · ${pg.name}`,{mmW:pg.wMm,src:'opencalque',clear:true,quiet:i<pick.length-1})}
     if(pick.length>1){const f0=flList()&&flList()[0];if(f0&&/^Floor \d+$/.test(f0.name)&&!/^page \d+$/i.test(pick[0].name))f0.name=pick[0].name;save();refreshDesign();requestAnimationFrame(()=>fit())}
     toast(`${plural(pick.length,'floor')} added at true scale. Place devices on each one.`)},
-  peTool(el){PE.tool=el.dataset.t;peRender();peVB()},
+  peTool(el){PE.tool=el.dataset.t;if(PE.tool==='warp'&&!PE.wq)A.peWarpReset();peRender();peVB()},
   peUndo(){if(!PE.undo.length)return;PE.redo.push(peSnapshot());peRestore(PE.undo.pop());peRender();peVB()},
   peRedo(){if(!PE.redo.length)return;PE.undo.push(peSnapshot());peRestore(PE.redo.pop());peRender();peVB()},
   peFit(){pefit()},
@@ -6943,9 +7118,26 @@ const A={
       const er=[...PE.sel].filter(i=>typeof i==='string'&&i[0]==='e').map(s=>+s.slice(1));PE.erase=PE.erase.filter((r,j)=>!er.includes(j));
     [...PE.sel].filter(i=>typeof i==='number').forEach(i=>PE.removed.add(i));PE.sel.clear()});const vb=PE.vb;peRender();PE.vb=vb;peVB()},
   peRestoreSel(){peDo(()=>{[...PE.sel].forEach(i=>{if(typeof i==='number')PE.removed.delete(i)});PE.sel.clear()});const vb=PE.vb;peRender();PE.vb=vb;peVB()},
-  peReset(){peDo(()=>{PE.removed.clear();PE.offStyles.clear();PE.offLayers.clear();PE.offKinds.clear();PE.erase=[];PE.crop=null;PE.lines=false;PE.bgOff=false;PE.blobOff=[];PE.strokes=[];PE.sel.clear()});peRender();pefit()},
+  peReset(){peDo(()=>{PE.removed.clear();PE.offStyles.clear();PE.offLayers.clear();PE.offKinds.clear();PE.erase=[];PE.crop=null;PE.lines=false;PE.bgOff=false;PE.blobOff=[];PE.strokes=[];PE.ink=null;PE.gaps=0;PE.mono=false;PE.lab=null;PE.sel.clear()});peRender();pefit()},
   peBrush(el){PE.brush=+el.dataset.v;peRender();peVB()},
   peShape(el){PE.bshape=el.dataset.v;peRender();peVB()},
+  peBmode(el){PE.bmode=el.dataset.v;peRender();peVB()},
+  async peStraight(){toast('Finding the angle…');await new Promise(r=>setTimeout(r,30));const a=peSkew(PE.d.ras);if(Math.abs(a)<.05){toast('The plan is already straight.');return}await peGeo({k:'rot',a:-a});toast(`Straightened by ${Math.abs(a).toFixed(2)}°.`)},
+  async peRot(el){await peGeo({k:'rot',a:+el.dataset.a})},
+  pePg(el){const n=+el.dataset.pg;if(n===PE.page)return;planEdit({...PE.src,page:n,edit:null})},
+  peReadTitle(){peReadTitle()},
+  peCropAuto(){const r=peAutoCrop();if(!r){toast('The drawing area couldn’t be found. Drag the area to keep instead.');return}peDo(()=>{PE.crop=r});peRender();pefit()},
+  peCropClear(){peDo(()=>{PE.crop=null});peRender();pefit()},
+  peWarpReset(){const W=PE.d.W,H=PE.d.H,i=Math.round(Math.min(W,H)*.05);PE.wq=[[i,i],[W-i,i],[W-i,H-i],[i,H-i]];peWarpDraw()},
+  async peWarpGo(){const q=PE.wq;if(!q)return;PE.tool='select';await peGeo({k:'warp',q:q.map(p=>p.map(Math.round))});PE.wq=null;toast('Flattened. Use Auto straighten if it still leans.')},
+  peColor(){const lab=peLabel(),off=new Set(peBlobsOff()),c=lab.col;PE.sel.clear();for(let b=1;b<=lab.n;b++){if(lab.struct.has(b)||off.has(b))continue;const r=c[b*3],g=c[b*3+1],bl=c[b*3+2];if(Math.max(r,g,bl)-Math.min(r,g,bl)>=45)PE.sel.add('b'+b)}
+    peRefresh();toast(PE.sel.size?`${plural(PE.sel.size,'colored mark')} selected. Press Remove to take them out.`:'No colored marks were found. Black ink only also drops colored lines that touch the walls.')},
+  peSameColor(){const lab=peLabel(),c=lab.col,ref=[...PE.sel].filter(v=>typeof v==='string'&&v[0]==='b').map(v=>+v.slice(1));if(!ref.length){toast('Click a mark first, then pick Same color as selected.');return}
+    const m=[0,1,2].map(k=>ref.reduce((a,b)=>a+c[b*3+k],0)/ref.length),off=new Set(peBlobsOff());
+    for(let b=1;b<=lab.n;b++){if(lab.struct.has(b)||off.has(b))continue;if(Math.hypot(c[b*3]-m[0],c[b*3+1]-m[1],c[b*3+2]-m[2])<55)PE.sel.add('b'+b)}peRefresh();toast(`${plural(PE.sel.size,'mark')} of that color selected.`)},
+  peSpecks(){const lab=peLabel(),s=+(PE.gapSel||4),off=new Set(peBlobsOff()),q=lab.bb,add=[];
+    for(let b=1;b<=lab.n;b++){if(lab.struct.has(b)||off.has(b))continue;const o=b*4;if(Math.max(q[o+2]-q[o],q[o+3]-q[o+1])<s&&lab.size[b]<=s*s){const z=lab.seed[b];add.push([z%lab.W,(z/lab.W)|0])}}
+    if(!add.length){toast('No specks that small were found.');return}peDo(()=>{PE.blobOff.push(...add)});toast(`${plural(add.length,'speck')} removed.`)},
   peSmode(el){PE.smode=el.dataset.v;peRender();peVB()},
   peSelAll(){PE.sel.clear();if(PE.d.mode==='image'){const lab=peLabel(),off=new Set(peBlobsOff());for(let b=1;b<=lab.n;b++)if(!lab.struct.has(b)&&!off.has(b))PE.sel.add('b'+b)}
     else PE.d.items.forEach((it,i)=>{if(!it.base&&peVisible(i))PE.sel.add(i)});PE.strokes.forEach((x,j)=>PE.sel.add('s'+j));peRefresh()},
@@ -6957,12 +7149,12 @@ const A={
   peCancel(){const keep=PE.src&&PE.src.onCancel;closeOverlay();PE.svg=null;if(keep)keep()},
   async peDone(el){const raw=!!el.dataset.raw,src=PE.src;el.disabled=true;el.textContent='Saving…';
     let c;try{c=await peOutput(raw)}catch(e){console.error(e);el.disabled=false;el.textContent=raw?'Use as is':'Use this plan';toast('Couldn’t draw the cleaned plan. Try again, or use it as is.');return}
-    const edit=raw?{v:1,kind:src.pdf?'pdf':'img',page:PE.page,clear:PE.clear}:{v:1,kind:src.pdf?'pdf':'img',page:PE.page,removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase,crop:PE.crop,lines:PE.lines,bgOff:PE.bgOff,clear:PE.clear,scale:PE.scaleK,blobs:PE.blobOff,strokes:PE.strokes};
+    const edit=raw?{v:1,kind:src.pdf?'pdf':'img',page:PE.page,clear:PE.clear}:{v:1,kind:src.pdf?'pdf':'img',page:PE.page,removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase,crop:PE.crop,lines:PE.lines,bgOff:PE.bgOff,clear:PE.clear,scale:PE.scaleK,blobs:PE.blobOff,strokes:PE.strokes,geo:PE.geo,ink:PE.ink,gaps:PE.gaps,mono:PE.mono};
     let orig=src.orig||null;if(!orig&&ASSETS&&src.file.size<19e6){try{const res=await ASSETS.upload(src.file,{type:src.file.type||(src.pdf?'application/pdf':'image/jpeg')});orig=res.id}catch(e){}}
-    PE_ORIG=src.file;const mm=raw?null:peScaleMm(c.width);
+    PE_ORIG=src.file;const mm=raw?null:peScaleMm(c.width);const rooms=!raw&&PE.ai&&PE.ai.add?PE.ai.rooms:null,rcrop=PE.crop&&PE.crop.slice(),rW=PE.d.W,rH=PE.d.H;
     closeOverlay();PE.svg=null;
     await bgFromCanvas(c,src.file.name||'Floor plan',{pages:PE.pages,mmW:mm||undefined,clear:PE.clear,edit:{...edit,orig,name:src.file.name||''}});
-    const nOff=PE.removed.size+(PE.blobOff||[]).length;if(!raw)toast(`Plan cleaned up${mm?' and set to true scale':''}. ${nOff?plural(nOff,'object')+' removed. ':''}You can clean it again any time from the floor plan panel.`)},
+    const nOff=PE.removed.size+(PE.blobOff||[]).length,nRm=rooms?peRoomLabels(rooms,rcrop,c.width,c.height,rW,rH):0;if(!raw)toast(`Plan cleaned up${mm?' and set to true scale':''}. ${nOff?plural(nOff,'object')+' removed. ':''}${nRm?plural(nRm,'room label')+' added. ':''}You can clean it again any time from the floor plan panel.`)},
   async peReopen(){const pl=S.design.plan,bg=pl&&pl.bg,e=bg&&bg.edit;let file=PE_ORIG&&e&&PE_ORIG.name===e.name?PE_ORIG:null;
     if(!file&&e&&e.orig){try{const r=await fetch('/_blob/'+e.orig);if(r.ok){const b=await r.blob();file=new File([b],e.name||'plan',{type:b.type})}}catch(x){}}
     if(!file){toast('The original file isn’t saved here. Upload the PDF again to clean it up.');return}
