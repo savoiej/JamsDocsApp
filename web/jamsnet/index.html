@@ -2590,7 +2590,7 @@ function renderPlan(){
   const pl=ensurePlan(),tg=tags(),bg=PB();
   const fli=flList()?flList().findIndex(f=>f.id===flCur()):-1;
   let s=sheetSVG({...S.design.meta,...S.design.meta3,...(fli>=0?{dwg:flDwg(fli),title:`${S.design.meta3.title} · ${flName(flCur())}`}:{}),scale:pl.calibrated?'AS SHOWN':'NTS'});
-  if(pl.useBg&&bg){if(!S.ui.bgOff)s+=`<image class="pl-bg" data-bg="1" href="${esc(bg.src)}" x="${bg.x}" y="${bg.y}" width="${bg.w}" height="${bg.h}" preserveAspectRatio="none" style="opacity:${bg.op??.85};pointer-events:${bg.lock===false?'auto':'none'}"/>`}
+  if(pl.useBg&&bg){if(!S.ui.bgOff)s+=bgFilter(bg)+`<image class="pl-bg" data-bg="1" href="${esc(bg.src)}"${bgFilterRef(bg)} x="${bg.x}" y="${bg.y}" width="${bg.w}" height="${bg.h}" preserveAspectRatio="none" style="opacity:${bg.op??.85};pointer-events:${bg.lock===false?'auto':'none'}"/>`}
   else if(!pl.hideRoom)s+=roomSVG(pl);
   s+=marksSVG()+jsLegendSVG()+scaleBar(pl)+coverageSVG()+runsSVG();
   S.design.racks.forEach(r=>{if(onFl(r))s+=rackSymSVG(r,isSel('prack',r.id))});
@@ -7899,10 +7899,17 @@ function bgTransform(f,cx,cy,dx,dy){const b=PB(),pl=S.design.plan;dx=dx||0;dy=dy
   (pl.marks||[]).forEach(m=>{['x','x1','x2'].forEach(k=>{if(m[k]!=null)m[k]=X(m[k])});['y','y1','y2'].forEach(k=>{if(m[k]!=null)m[k]=Y(m[k])});['w','h','r'].forEach(k=>{if(typeof m[k]==='number')m[k]*=f});if(m.pts)m.pts=m.pts.map(([x,y])=>[X(x),Y(y)])})}
 const BG_AREA={x:30,y:30,w:SW-60,h:SH-190};
 function bgSizePct(b){if(!b.base)b.base=b.w;return Math.round(b.w/b.base*100)}
+/* darkening the plan: a gamma curve pulls grey lines toward black while white paper stays white */
+function bgFid(b){const d=Math.round(+b.dark||0),bw=b.bw?1:0;return d||bw?`bgdk-${d}-${bw}`:''}
+function bgFilter(b){const id=bgFid(b);if(!id)return '';const e=(1+(+b.dark||0)*.06).toFixed(2),f=`<feFuncR type="gamma" exponent="${e}"/><feFuncG type="gamma" exponent="${e}"/><feFuncB type="gamma" exponent="${e}"/>`;
+  return `<filter id="${id}" color-interpolation-filters="sRGB" x="0" y="0" width="1" height="1">${b.bw?'<feColorMatrix type="saturate" values="0"/>':''}<feComponentTransfer>${f}</feComponentTransfer></filter>`}
+function bgFilterRef(b){const id=bgFid(b);return id?` filter="url(#${id})"`:''}
 function bgControls(b){const pct=bgSizePct(b);return `<label class="field" for="bgSize">Size on the sheet · <span id="bgSizeV">${pct}%</span><input id="bgSize" type="range" min="25" max="400" step="5" value="${Math.min(400,Math.max(25,pct))}" data-bgprop="size"></label>
   <div class="actions"><button class="btn sm" data-act="bgFill">Fill the sheet</button><button class="btn sm" data-act="bgCenter">Center</button></div>
   <p class="muted" style="margin:0;font-size:12px">Devices and markup on this floor grow with the plan${S.design.plan.calibrated?', and the scale stays true':''}.</p>
   <label class="field" for="bgOp">Image strength · <span id="bgOpV">${Math.round((b.op??.85)*100)}%</span><input id="bgOp" type="range" min="15" max="100" step="5" value="${Math.round((b.op??.85)*100)}" data-bgprop="op"></label>
+  <label class="field" for="bgDark">Darken lines · <span id="bgDarkV">${Math.round(+b.dark||0)}%</span><input id="bgDark" type="range" min="0" max="100" step="5" value="${Math.round(+b.dark||0)}" data-bgprop="dark"></label>
+  <label class="check"><input type="checkbox" data-bgprop="bw" ${b.bw?'checked':''}> Black and white (drop the plan’s colors)</label>
   <label class="check"><input type="checkbox" data-bgprop="lock" ${b.lock!==false?'checked':''}> Lock the image so it can’t be moved</label>`}
 function onMkProp(t){
   const m=S.sel&&S.sel.kind==='mark'&&mkById(S.sel.id);if(!m)return;const k=t.dataset.mkprop;
@@ -7932,11 +7939,14 @@ document.addEventListener('input',e=>{const t=e.target;if(!t.dataset)return;
   if(t.dataset.mkprop==='txt'){const m=S.sel&&mkById(S.sel.id);if(!m)return;if(!S.mkTyping){H.past.push(snap());H.future=[];S.mkTyping=true}m.txt=t.value;renderCanvas();return}
   if(t.dataset.bgprop==='size'){const b=PB();if(!b)return;if(!S.bgSizing){H.past.push(snap());if(H.past.length>150)H.past.shift();H.future=[];S.bgSizing=true}
     const want=b.base*(+t.value)/100,f=want/b.w;if(Math.abs(f-1)>.001)bgTransform(f,b.x+b.w/2,b.y+b.h/2);const l=$('#bgSizeV');if(l)l.textContent=t.value+'%';renderCanvas();return}
-  if(t.dataset.bgprop==='op'){const b=PB();if(!b)return;b.op=(+t.value)/100;const l=$('#bgOpV');if(l)l.textContent=t.value+'%';renderCanvas()}});
+  if(t.dataset.bgprop==='op'){const b=PB();if(!b)return;b.op=(+t.value)/100;const l=$('#bgOpV');if(l)l.textContent=t.value+'%';renderCanvas();return}
+  if(t.dataset.bgprop==='dark'){const b=PB();if(!b)return;if(!S.bgDarking){H.past.push(snap());if(H.past.length>150)H.past.shift();H.future=[];S.bgDarking=true}b.dark=+t.value;const l=$('#bgDarkV');if(l)l.textContent=t.value+'%';renderCanvas()}});
 document.addEventListener('change',e=>{const t=e.target;if(!t.dataset)return;
   if(t.dataset.mkprop){onMkProp(t);return}
   if(t.dataset.mkdef){const k=t.dataset.mkdef;mkStyle()[k]=t.type==='checkbox'?t.checked:parseFloat(t.value);return}
   if(t.dataset.bgprop){const b=PB();if(!b)return;if(t.dataset.bgprop==='op'){save();return}
+    if(t.dataset.bgprop==='dark'){S.bgDarking=false;save();updUndo();return}
+    if(t.dataset.bgprop==='bw'){mut(()=>{b.bw=t.checked});renderCanvas();return}
     if(t.dataset.bgprop==='size'){S.bgSizing=false;save();updUndo();return}
     mut(()=>{b.lock=t.checked});if(b.lock&&S.sel&&S.sel.kind==='bg')S.sel=null;refreshDesign();toast(b.lock?'Plan image locked.':'Plan image unlocked. Drag it on the sheet to line it up.')}});
 
