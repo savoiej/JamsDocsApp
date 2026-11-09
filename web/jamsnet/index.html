@@ -2576,15 +2576,23 @@ async function handleBgFile(f,direct){
   }catch(e){toast(isPdf?(e&&e.message==='load'?'Couldn’t load the PDF reader. Check your connection and try again.':'Couldn’t read that PDF. Try exporting the floor plan page as an image.'):'That image couldn’t be read. Try a PNG or JPG.');return}
   await bgFromCanvas(c,f.name,{pages})}
 /* puts a rendered plan on the current floor; with the drawing's real width (mm) the scale is set too */
-async function bgFromCanvas(c,name,opt){opt=opt||{};const pages=opt.pages||1;
-  let src=null,asset=null;
-  if(ASSETS){try{const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.88));const res=await ASSETS.upload(blob,{type:'image/jpeg'});asset=res.id;src='/_blob/'+res.id}catch(e){}}
+/* only the structure: white paper becomes see-through, lines keep their color with soft edges */
+function planClear(src){const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);
+  const im=x.getImageData(0,0,c.width,c.height),p=im.data;
+  for(let i=0;i<p.length;i+=4){const r=p[i],g=p[i+1],b=p[i+2],mn=Math.min(r,g,b),a=mn>=240?0:mn<=120?255:Math.round((240-mn)/120*255);
+    if(a===0){p[i+3]=0;continue}const t=a/255;/* undo the white mix so faint edges keep the line's color */
+    p[i]=Math.max(0,Math.min(255,Math.round((r-255*(1-t))/t)));p[i+1]=Math.max(0,Math.min(255,Math.round((g-255*(1-t))/t)));p[i+2]=Math.max(0,Math.min(255,Math.round((b-255*(1-t))/t)));p[i+3]=a}
+  x.putImageData(im,0,0);return c}
+async function bgFromCanvas(c,name,opt){opt=opt||{};const pages=opt.pages||1,clear=!!opt.clear;
+  if(clear)c=planClear(c);
+  let src=null,asset=null;const T=clear?'image/png':'image/jpeg';
+  if(ASSETS){try{let blob=await new Promise(r=>c.toBlob(r,T,.88));if(clear&&blob.size>6e6)blob=await new Promise(r=>c.toBlob(r,'image/webp',.9));const res=await ASSETS.upload(blob,{type:blob.type});asset=res.id;src='/_blob/'+res.id}catch(e){}}
   if(!src){let k=Math.min(1,1800/Math.max(c.width,c.height)),q=.8;
-    for(let i=0;i<6;i++){const d=document.createElement('canvas');d.width=Math.round(c.width*k);d.height=Math.round(c.height*k);const x=d.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,d.width,d.height);x.drawImage(c,0,0,d.width,d.height);
-      src=d.toDataURL('image/jpeg',q);if(src.length<190000)break;k*=.82;q=Math.max(.55,q-.05)}}
+    for(let i=0;i<6;i++){const d=document.createElement('canvas');d.width=Math.round(c.width*k);d.height=Math.round(c.height*k);const x=d.getContext('2d');if(!clear){x.fillStyle='#fff';x.fillRect(0,0,d.width,d.height)}x.drawImage(c,0,0,d.width,d.height);
+      if(clear){src=d.toDataURL('image/webp',q);if(!/^data:image\/webp/.test(src))src=d.toDataURL('image/png')}else src=d.toDataURL('image/jpeg',q);if(src.length<190000)break;k*=.82;q=Math.max(.55,q-.05)}}
   const w=c.width,h=c.height,box={x:80,y:80,w:SW-160,h:SH-260},k=Math.min(box.w/w,box.h/h);
   const bw=Math.round(w*k),pxm=opt.mmW?bw/(opt.mmW/1000):null;
-  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:bw,h:Math.round(h*k),pxm,op:pxm?.95:.85,lock:true,...(opt.src?{from:opt.src}:{}),...(opt.edit?{edit:opt.edit}:{})};pl.useBg=true;pl.calibrated=!!pxm;if(pxm)pl.pxm=pxm;pl.hideRoom=false});
+  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:bw,h:Math.round(h*k),pxm,op:clear?1:pxm?.95:.85,lock:true,...(clear?{clear:true}:{}),...(opt.src?{from:opt.src}:{}),...(opt.edit?{edit:opt.edit}:{})};pl.useBg=true;pl.calibrated=!!pxm;if(pxm)pl.pxm=pxm;pl.hideRoom=false});
   S.ui.bgOff=false;S.ui.ptool='select';S.planTool=pxm?null:{a:null,b:null};S.sel=null;cams.plan.init=false;
   if(opt.quiet)return;
   if(!onPlan())setSheet('plan');else{refreshDesign();requestAnimationFrame(()=>{fit();cam.init=true})}
@@ -2698,7 +2706,7 @@ async function planEdit(src){/* src: {file, pdf?:bool, page?, edit?} */
     if(d.items.length>90000){closeOverlay();toast('That plan has too many objects to edit here. Upload it as is, or export just the floor plan page.');return}
     PE.d=d;const e=src.edit||{};
     PE.removed=new Set(peUnranges(e.removed));PE.offStyles=new Set(e.offStyles||[]);PE.offLayers=new Set(e.offLayers||[]);PE.offKinds=new Set(e.offKinds||[]);
-    PE.erase=(e.erase||[]).map(r=>r.slice());PE.crop=e.crop?e.crop.slice():null;PE.lines=!!e.lines;PE.bgOff=!!e.bgOff;PE.rasW=null;PE.scaleK=e.scale||'';
+    PE.erase=(e.erase||[]).map(r=>r.slice());PE.crop=e.crop?e.crop.slice():null;PE.lines=!!e.lines;PE.bgOff=!!e.bgOff;PE.clear=e.clear!==false;PE.rasW=null;PE.scaleK=e.scale||'';
     PE.sel=new Set();PE.undo=[];PE.redo=[];PE.tool=d.mode==='image'?'erase':'select';PE.showRemoved=false;PE.ras=d.ras.toDataURL('image/jpeg',.85);PE.rasWurl=null;
     peRender();pefit()}
   catch(e){console.error(e);closeOverlay();toast('Couldn’t open that plan for editing. It’s been placed as is.');if(src.fallback)src.fallback()}}
@@ -2719,7 +2727,9 @@ function peRender(){const d=PE.d,ov=$('#overlay'),img=d.mode==='image',cnt=k=>d.
      <p class="pe-hint">${{select:'Click a line, shape or text to select it; drag across an area to select everything inside. Shift adds to the selection. Delete removes it.',pan:'Drag to move around. Scroll or pinch to zoom.',erase:'Drag a box over notes, stamps or anything else to cover it in white. Click a white box to select it; Delete removes it.',crop:'Drag the area to keep. Everything outside is cut off.'}[PE.tool]}</p>
      <div class="pe-selbar" id="peSelBar"></div>
      <div class="pe-sec"><h4>Background</h4><label class="check"><input type="checkbox" id="peBgOff" ${PE.bgOff?'checked':''}> Remove background <span class="muted">${img?'paper color, shadows, stains':d.items.filter(peIsBgFill).length+' fills'}</span></label>
-      <p class="muted" style="margin:0;font-size:12px">${img?'Turns the paper white and keeps the lines, even in a photo taken at an angle to the light.':'Removes light-colored fills such as room tints and page backgrounds, and whitens any scanned pictures. Solid black walls stay.'}</p></div>
+      <p class="muted" style="margin:0;font-size:12px">${img?'Turns the paper white and keeps the lines, even in a photo taken at an angle to the light.':'Removes light-colored fills such as room tints and page backgrounds, and whitens any scanned pictures. Solid black walls stay.'}</p>
+      <label class="check"><input type="checkbox" id="peClear" ${PE.clear?'checked':''}> Only the structure on the sheet</label>
+      <p class="muted" style="margin:0;font-size:12px">The white paper becomes see-through, so the sheet shows just the walls and lines with your devices on top.</p></div>
      ${img?`<div class="pe-sec"><h4>Picture</h4><label class="check"><input type="checkbox" id="peLines" ${PE.lines?'checked':''}> Lines only <span class="muted">(drops shading, color and light marks)</span></label></div>`
      :`<div class="pe-sec"><h4>Remove in one click</h4>
        <label class="check"><input type="checkbox" data-pekind="text" ${PE.offKinds.has('text')?'':'checked'}> Text <span class="muted">${cnt('text')}</span></label>
@@ -2804,6 +2814,7 @@ document.addEventListener('change',e=>{const t=e.target;if(!t||!PE.d||!$('.pe'))
   else if(t.id==='peLines'){peDo(()=>{PE.lines=t.checked})}
   else if(t.id==='peBgOff'){if(t.checked&&!PE.rasW)toast('Whitening the background…');setTimeout(()=>peDo(()=>{PE.bgOff=t.checked}),20)}
   else if(t.id==='peShowRm'){PE.showRemoved=t.checked;peRefresh()}
+  else if(t.id==='peClear'){PE.clear=t.checked}
   else if(t.id==='peScale'){PE.scaleK=t.value}
   else if(t.id==='pePage'){planEdit({...PE.src,page:+t.value,edit:null})}});
 
@@ -2827,7 +2838,7 @@ async function handleCadFile(files){
   if(pages.length===1){await ocPlace(pages[0],(oc||dxf[0]).name);return}
   S.ocPending={pages,name:(oc||dxf[0]).name,notes};ocPickDialog()}
 async function ocPlace(pg,name){let c;try{c=await ocPageCanvas(pg)}catch(e){toast('Couldn’t draw that page.');return}
-  await bgFromCanvas(c,pg.name&&!/^page \d+$/i.test(pg.name)?`${name.replace(/\.[^.]+$/,'')} · ${pg.name}`:name,{mmW:pg.wMm,src:'opencalque'})}
+  await bgFromCanvas(c,pg.name&&!/^page \d+$/i.test(pg.name)?`${name.replace(/\.[^.]+$/,'')} · ${pg.name}`:name,{mmW:pg.wMm,src:'opencalque',clear:true})}
 function ocPickDialog(){const o=S.ocPending,ov=$('#overlay');if(!o)return;
   ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="ocH"><div class="dlgtop"><span>FLOOR PLAN</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
    <div style="padding:18px;display:flex;flex-direction:column;gap:12px"><h2 id="ocH" style="margin:0;font-family:var(--f-display);font-size:26px">${plural(o.pages.length,'page')} in ${esc(o.name)}</h2>
@@ -6600,7 +6611,7 @@ const A={
         const id='f'+Date.now().toString(36)+i;d.floors.push({id,name:pg.name,plan:Object.assign(newPlan(pg.name,12,9),{useBg:false})});flSwap(id)})}
       else if(flList()&&!/^page \d+$/i.test(pg.name)){const f=flList().find(x=>x.id===flCur());if(f&&/^Floor \d+$/.test(f.name))f.name=pg.name}
       let c;try{c=await ocPageCanvas(pg)}catch(e){toast('Couldn’t draw '+pg.name+'.');continue}
-      await bgFromCanvas(c,`${o.name.replace(/\.[^.]+$/,'')} · ${pg.name}`,{mmW:pg.wMm,src:'opencalque',quiet:i<pick.length-1})}
+      await bgFromCanvas(c,`${o.name.replace(/\.[^.]+$/,'')} · ${pg.name}`,{mmW:pg.wMm,src:'opencalque',clear:true,quiet:i<pick.length-1})}
     if(pick.length>1){const f0=flList()&&flList()[0];if(f0&&/^Floor \d+$/.test(f0.name)&&!/^page \d+$/i.test(pick[0].name))f0.name=pick[0].name;save();refreshDesign();requestAnimationFrame(()=>fit())}
     toast(`${plural(pick.length,'floor')} added at true scale. Place devices on each one.`)},
   peTool(el){PE.tool=el.dataset.t;peRender();peVB()},
@@ -6615,11 +6626,11 @@ const A={
   peCancel(){const keep=PE.src&&PE.src.onCancel;closeOverlay();PE.svg=null;if(keep)keep()},
   async peDone(el){const raw=!!el.dataset.raw,src=PE.src;el.disabled=true;el.textContent='Saving…';
     let c;try{c=await peOutput(raw)}catch(e){console.error(e);el.disabled=false;el.textContent=raw?'Use as is':'Use this plan';toast('Couldn’t draw the cleaned plan. Try again, or use it as is.');return}
-    const edit=raw?{v:1,kind:src.pdf?'pdf':'img',page:PE.page}:{v:1,kind:src.pdf?'pdf':'img',page:PE.page,removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase,crop:PE.crop,lines:PE.lines,bgOff:PE.bgOff,scale:PE.scaleK};
+    const edit=raw?{v:1,kind:src.pdf?'pdf':'img',page:PE.page,clear:PE.clear}:{v:1,kind:src.pdf?'pdf':'img',page:PE.page,removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase,crop:PE.crop,lines:PE.lines,bgOff:PE.bgOff,clear:PE.clear,scale:PE.scaleK};
     let orig=src.orig||null;if(!orig&&ASSETS&&src.file.size<19e6){try{const res=await ASSETS.upload(src.file,{type:src.file.type||(src.pdf?'application/pdf':'image/jpeg')});orig=res.id}catch(e){}}
     PE_ORIG=src.file;const mm=raw?null:peScaleMm(c.width);
     closeOverlay();PE.svg=null;
-    await bgFromCanvas(c,src.file.name||'Floor plan',{pages:PE.pages,mmW:mm||undefined,edit:{...edit,orig,name:src.file.name||''}});
+    await bgFromCanvas(c,src.file.name||'Floor plan',{pages:PE.pages,mmW:mm||undefined,clear:PE.clear,edit:{...edit,orig,name:src.file.name||''}});
     if(!raw)toast(`Plan cleaned up${mm?' and set to true scale':''}. ${PE.removed.size?plural(PE.removed.size,'object')+' removed. ':''}You can clean it again any time from the floor plan panel.`)},
   async peReopen(){const pl=S.design.plan,bg=pl&&pl.bg,e=bg&&bg.edit;let file=PE_ORIG&&e&&PE_ORIG.name===e.name?PE_ORIG:null;
     if(!file&&e&&e.orig){try{const r=await fetch('/_blob/'+e.orig);if(r.ok){const b=await r.blob();file=new File([b],e.name||'plan',{type:b.type})}}catch(x){}}
