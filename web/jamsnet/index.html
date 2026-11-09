@@ -2661,8 +2661,25 @@ async function peExtract(lib,doc,pno){
   return {W,H,scale,items,layers,ras,pageW:v1.width,pageH:v1.height}}
 /* a photo or a scan: one picture item, cleaned with the eraser, crop and lines only */
 function peFromCanvas(c){return {W:c.width,H:c.height,scale:null,items:[{k:'img',bb:[0,0,c.width,c.height],lay:null,base:true}],layers:[],ras:c}}
+/* the page as white paper: estimate the paper's brightness everywhere (shadows, color, stains),
+   from a small copy with a max filter so dark lines don't count, then divide it out */
+function peWhiten(src){const W=src.width,H=src.height,k=16,sw=Math.max(8,Math.round(W/k)),sh=Math.max(8,Math.round(H/k));
+  const sm=document.createElement('canvas');sm.width=sw;sm.height=sh;const sx=sm.getContext('2d',{willReadFrequently:true});sx.imageSmoothingQuality='high';sx.drawImage(src,0,0,sw,sh);
+  let a=sx.getImageData(0,0,sw,sh);for(let it=0;it<6;it++){const b=new Uint8ClampedArray(a.data);for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){const o=(y*sw+x)*4;for(let ch=0;ch<3;ch++){let m=0;
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const yy=Math.min(sh-1,Math.max(0,y+dy)),xx=Math.min(sw-1,Math.max(0,x+dx));const v=a.data[(yy*sw+xx)*4+ch];if(v>m)m=v}b[o+ch]=m}}a=new ImageData(b,sw,sh)}
+  sx.putImageData(a,0,0);const bl=document.createElement('canvas');bl.width=sw;bl.height=sh;const bx=bl.getContext('2d');bx.filter='blur(2px)';bx.drawImage(sm,0,0);
+  const bg=document.createElement('canvas');bg.width=W;bg.height=H;const gx=bg.getContext('2d',{willReadFrequently:true});gx.imageSmoothingQuality='high';gx.drawImage(bl,0,0,W,H);
+  const out=document.createElement('canvas');out.width=W;out.height=H;const ox=out.getContext('2d',{willReadFrequently:true});ox.drawImage(src,0,0);
+  const im=ox.getImageData(0,0,W,H),p=im.data,q=gx.getImageData(0,0,W,H).data;
+  for(let i=0;i<p.length;i+=4){let mn=255;for(let ch=0;ch<3;ch++){const v=Math.min(255,p[i+ch]*255/Math.max(40,q[i+ch]));p[i+ch]=v;if(v<mn)mn=v}
+    const mx=Math.max(p[i],p[i+1],p[i+2]),lum=.3*p[i]+.59*p[i+1]+.11*p[i+2];
+    if(mn>198||(lum>145&&mx&&(mx-mn)/mx>.08)){p[i]=p[i+1]=p[i+2]=255}else{for(let ch=0;ch<3;ch++)p[i+ch]=Math.max(0,(p[i+ch]-30)*255/225)}}
+  ox.putImageData(im,0,0);return out}
+const peLum=h=>{const m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(h||'');return m?.3*parseInt(m[1],16)+.59*parseInt(m[2],16)+.11*parseInt(m[3],16):0};
+const peIsBgFill=it=>it.k==='path'&&it.f&&!it.s&&peLum(it.f)>170;
+function peRasNow(){if(!PE.bgOff)return PE.d.ras;if(!PE.rasW)PE.rasW=peWhiten(PE.d.ras);return PE.rasW}
 const peStyle=it=>it.k==='path'?(it.s?`s${it.s}|${Math.round(it.w*2)/2}${it.dash?'|d':''}`:`f${it.f}`):it.k;
-function peVisible(i){const it=PE.d.items[i];if(PE.removed.has(i))return false;if(it.lay&&PE.offLayers.has(it.lay))return false;if(PE.offStyles.has(peStyle(it)))return false;if(it.k==='text'&&PE.offKinds.has('text'))return false;if(it.k==='img'&&!it.base&&PE.offKinds.has('img'))return false;if(it.dash&&PE.offKinds.has('dash'))return false;return true}
+function peVisible(i){const it=PE.d.items[i];if(PE.removed.has(i))return false;if(it.lay&&PE.offLayers.has(it.lay))return false;if(PE.offStyles.has(peStyle(it)))return false;if(it.k==='text'&&PE.offKinds.has('text'))return false;if(it.k==='img'&&!it.base&&PE.offKinds.has('img'))return false;if(it.dash&&PE.offKinds.has('dash'))return false;if(PE.bgOff&&peIsBgFill(it))return false;return true}
 function peItemSVG(it,i){const id=`data-i="${i}"`;
   if(it.k==='path')return `<path ${id} d="${it.d}" fill="${it.f||'none'}" stroke="${it.s||'none'}" stroke-width="${it.w}"${it.dash?' stroke-dasharray="6 4"':''}/>`;
   if(it.k==='text')return `<text ${id} x="${it.x}" y="${it.y}" font-size="${it.size}" transform="rotate(${it.rot} ${it.x} ${it.y})"${it.w?` textLength="${it.w}" lengthAdjust="spacingAndGlyphs"`:''}>${esc(it.str)}</text>`;
@@ -2681,13 +2698,13 @@ async function planEdit(src){/* src: {file, pdf?:bool, page?, edit?} */
     if(d.items.length>90000){closeOverlay();toast('That plan has too many objects to edit here. Upload it as is, or export just the floor plan page.');return}
     PE.d=d;const e=src.edit||{};
     PE.removed=new Set(peUnranges(e.removed));PE.offStyles=new Set(e.offStyles||[]);PE.offLayers=new Set(e.offLayers||[]);PE.offKinds=new Set(e.offKinds||[]);
-    PE.erase=(e.erase||[]).map(r=>r.slice());PE.crop=e.crop?e.crop.slice():null;PE.lines=!!e.lines;PE.scaleK=e.scale||'';
-    PE.sel=new Set();PE.undo=[];PE.redo=[];PE.tool=d.mode==='image'?'erase':'select';PE.showRemoved=false;PE.ras=d.ras.toDataURL('image/jpeg',.85);
+    PE.erase=(e.erase||[]).map(r=>r.slice());PE.crop=e.crop?e.crop.slice():null;PE.lines=!!e.lines;PE.bgOff=!!e.bgOff;PE.rasW=null;PE.scaleK=e.scale||'';
+    PE.sel=new Set();PE.undo=[];PE.redo=[];PE.tool=d.mode==='image'?'erase':'select';PE.showRemoved=false;PE.ras=d.ras.toDataURL('image/jpeg',.85);PE.rasWurl=null;
     peRender();pefit()}
   catch(e){console.error(e);closeOverlay();toast('Couldn’t open that plan for editing. It’s been placed as is.');if(src.fallback)src.fallback()}}
-function peSnapshot(){return {removed:[...PE.removed],offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase.map(r=>r.slice()),crop:PE.crop&&PE.crop.slice(),lines:PE.lines}}
+function peSnapshot(){return {removed:[...PE.removed],offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase.map(r=>r.slice()),crop:PE.crop&&PE.crop.slice(),lines:PE.lines,bgOff:PE.bgOff}}
 function peDo(fn){PE.undo.push(peSnapshot());if(PE.undo.length>200)PE.undo.shift();PE.redo=[];fn();peRefresh()}
-function peRestore(s){PE.removed=new Set(s.removed);PE.offStyles=new Set(s.offStyles);PE.offLayers=new Set(s.offLayers);PE.offKinds=new Set(s.offKinds);PE.erase=s.erase;PE.crop=s.crop;PE.lines=s.lines;PE.sel.clear()}
+function peRestore(s){PE.removed=new Set(s.removed);PE.offStyles=new Set(s.offStyles);PE.offLayers=new Set(s.offLayers);PE.offKinds=new Set(s.offKinds);PE.erase=s.erase;PE.crop=s.crop;PE.lines=s.lines;PE.bgOff=!!s.bgOff;PE.sel.clear()}
 const PE_SCALES=[['','Not set'],['96',"1/8\" = 1'-0\""],['64',"3/16\" = 1'-0\""],['48',"1/4\" = 1'-0\""],['32',"3/8\" = 1'-0\""],['24',"1/2\" = 1'-0\""],['m50','1:50'],['m100','1:100'],['m200','1:200']];
 function peStylesList(){const g=new Map();PE.d.items.forEach((it,i)=>{if(it.k!=='path'||PE.removed.has(i))return;const k=peStyle(it);const o=g.get(k)||{k,n:0,it};o.n++;g.set(k,o)});return [...g.values()].sort((a,b)=>b.n-a.n).slice(0,24)}
 function peRender(){const d=PE.d,ov=$('#overlay'),img=d.mode==='image',cnt=k=>d.items.filter((x,i)=>x.k===k&&!x.base&&!PE.removed.has(i)).length,dash=d.items.filter((x,i)=>x.dash&&!PE.removed.has(i)).length;
@@ -2701,6 +2718,8 @@ function peRender(){const d=PE.d,ov=$('#overlay'),img=d.mode==='image',cnt=k=>d.
      <div class="pe-tools" role="group" aria-label="Tools">${T('select','Select','<svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-3 6z"/></svg>')}${T('pan','Move','<svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/></svg>')}${T('erase','White out','<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M8 10h8M8 14h5"/></svg>')}${T('crop','Crop','<svg viewBox="0 0 24 24"><path d="M6 2v16h16M2 6h16v16"/></svg>')}</div>
      <p class="pe-hint">${{select:'Click a line, shape or text to select it; drag across an area to select everything inside. Shift adds to the selection. Delete removes it.',pan:'Drag to move around. Scroll or pinch to zoom.',erase:'Drag a box over notes, stamps or anything else to cover it in white. Click a white box to select it; Delete removes it.',crop:'Drag the area to keep. Everything outside is cut off.'}[PE.tool]}</p>
      <div class="pe-selbar" id="peSelBar"></div>
+     <div class="pe-sec"><h4>Background</h4><label class="check"><input type="checkbox" id="peBgOff" ${PE.bgOff?'checked':''}> Remove background <span class="muted">${img?'paper color, shadows, stains':d.items.filter(peIsBgFill).length+' fills'}</span></label>
+      <p class="muted" style="margin:0;font-size:12px">${img?'Turns the paper white and keeps the lines, even in a photo taken at an angle to the light.':'Removes light-colored fills such as room tints and page backgrounds, and whitens any scanned pictures. Solid black walls stay.'}</p></div>
      ${img?`<div class="pe-sec"><h4>Picture</h4><label class="check"><input type="checkbox" id="peLines" ${PE.lines?'checked':''}> Lines only <span class="muted">(drops shading, color and light marks)</span></label></div>`
      :`<div class="pe-sec"><h4>Remove in one click</h4>
        <label class="check"><input type="checkbox" data-pekind="text" ${PE.offKinds.has('text')?'':'checked'}> Text <span class="muted">${cnt('text')}</span></label>
@@ -2712,7 +2731,7 @@ function peRender(){const d=PE.d,ov=$('#overlay'),img=d.mode==='image',cnt=k=>d.
       <div class="pe-sec"><h4>Drawing scale</h4><select id="peScale" class="inp" aria-label="Drawing scale">${PE_SCALES.map(([k,l])=>`<option value="${k}" ${PE.scaleK===k?'selected':''}>${esc(l)}</option>`).join('')}</select><p class="muted" style="margin:4px 0 0;font-size:12px">From the plan's title block. Set it and the plan arrives at true scale; leave it and set the scale on the sheet.</p></div>`}
      <div class="pe-sec"><label class="check"><input type="checkbox" id="peShowRm" ${PE.showRemoved?'checked':''}> Show what I removed</label>${PE.removed.size||PE.erase.length||PE.crop?`<button class="btn sm" data-act="peReset">Start over</button>`:''}</div>
     </aside>
-    <div class="pe-stage" id="peStage" data-tool="${PE.tool}"><svg id="peSvg" xmlns="http://www.w3.org/2000/svg"><defs><image id="peRas" href="${PE.ras}" x="0" y="0" width="${d.W}" height="${d.H}"/>
+    <div class="pe-stage" id="peStage" data-tool="${PE.tool}"><svg id="peSvg" xmlns="http://www.w3.org/2000/svg"><defs><image id="peRas" data-v="o" href="${PE.ras}" x="0" y="0" width="${d.W}" height="${d.H}"/>
       ${d.items.map((it,i)=>it.k==='img'?`<clipPath id="pec${i}"><rect x="${it.bb[0]}" y="${it.bb[1]}" width="${it.bb[2]-it.bb[0]}" height="${it.bb[3]-it.bb[1]}"/></clipPath>`:'').join('')}</defs>
       <rect x="0" y="0" width="${d.W}" height="${d.H}" fill="#fff"/>
       <g id="peItems" font-family="Arial,Helvetica,sans-serif" fill="#333">${d.items.map((it,i)=>it.k==='img'?`<use data-i="${i}" href="#peRas" clip-path="url(#pec${i})"/>`:peItemSVG(it,i)).join('')}</g>
@@ -2725,6 +2744,7 @@ function peRefresh(){if(!PE.svg)return;const d=PE.d;
   const c=PE.crop;$('#peOver').innerHTML=c?`<path class="pe-cropmask" fill-rule="evenodd" d="M0 0H${d.W}V${d.H}H0Z M${c[0]} ${c[1]}h${c[2]}v${c[3]}h${-c[2]}Z"/><rect class="pe-cropline" x="${c[0]}" y="${c[1]}" width="${c[2]}" height="${c[3]}"/>`:'';
   const n=PE.sel.size,sb=$('#peSelBar');if(sb)sb.innerHTML=n?`<b>${plural(n,'object')} selected</b><button class="btn sm danger" data-act="peDel">Remove</button><button class="btn sm" data-act="peSelNone">Clear</button>${PE.showRemoved&&[...PE.sel].some(i=>typeof i==='number'&&PE.removed.has(i))?'<button class="btn sm" data-act="peRestoreSel">Put back</button>':''}`:'';
   const u=$('#peUndoB'),r=$('#peRedoB');if(u)u.disabled=!PE.undo.length;if(r)r.disabled=!PE.redo.length;
+  const ri=$('#peRas');if(ri){const want=PE.bgOff?'w':'o';if(ri.dataset.v!==want){ri.dataset.v=want;ri.setAttribute('href',PE.bgOff?(PE.rasWurl||(PE.rasWurl=peRasNow().toDataURL('image/jpeg',.85))):PE.ras)}}
   const g=$('#peItems');if(g)g.style.filter=PE.lines?'grayscale(1) contrast(4) brightness(1.15)':''}
 function pefit(){const st=$('#peStage');if(!st)return;const d=PE.d,c=PE.crop||[0,0,d.W,d.H];PE.vb=[c[0]-c[2]*.03,c[1]-c[3]*.03,c[2]*1.06,c[3]*1.06];peVB()}
 function peVB(){const st=$('#peStage'),r=st.getBoundingClientRect(),vb=PE.vb,ar=r.width/Math.max(1,r.height);let [x,y,w,h]=vb;if(w/h<ar){const nw=h*ar;x-=(nw-w)/2;w=nw}else{const nh=w/ar;y-=(nh-h)/2;h=nh}PE.vb=[x,y,w,h];PE.svg.setAttribute('viewBox',PE.vb.join(' '));PE.k=w/Math.max(1,r.width);PE.svg.style.setProperty('--pek',PE.k)}
@@ -2764,8 +2784,8 @@ function peBind(){const st=$('#peStage');let drag=null;const pts=new Map();
 const peDist=m=>{const [a,b]=[...m.values()];return Math.hypot(a[0]-b[0],a[1]-b[1])},peMid=m=>{const [a,b]=[...m.values()];return [(a[0]+b[0])/2,(a[1]+b[1])/2]};
 /* the cleaned plan as a picture: pictures first, then lines and text, then white-outs; cropped; lines only last */
 async function peOutput(raw){const d=PE.d,c=document.createElement('canvas');c.width=d.W;c.height=d.H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,d.W,d.H);
-  if(raw){x.drawImage(d.ras,0,0)}else{
-    d.items.forEach((it,i)=>{if(it.k==='img'&&peVisible(i)){const b=it.bb;x.drawImage(d.ras,b[0],b[1],b[2]-b[0],b[3]-b[1],b[0],b[1],b[2]-b[0],b[3]-b[1])}});
+  if(raw){x.drawImage(d.ras,0,0)}else{const RS=peRasNow();
+    d.items.forEach((it,i)=>{if(it.k==='img'&&peVisible(i)){const b=it.bb;x.drawImage(RS,b[0],b[1],b[2]-b[0],b[3]-b[1],b[0],b[1],b[2]-b[0],b[3]-b[1])}});
     const vec=d.items.map((it,i)=>it.k!=='img'&&peVisible(i)?peItemSVG(it,i):'').join('');
     if(vec){const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${d.W}" height="${d.H}" viewBox="0 0 ${d.W} ${d.H}"><g font-family="Arial,Helvetica,sans-serif" fill="#333">${vec}</g></svg>`,url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
       try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});x.drawImage(im,0,0)}finally{URL.revokeObjectURL(url)}}
@@ -2782,6 +2802,7 @@ document.addEventListener('change',e=>{const t=e.target;if(!t||!PE.d||!$('.pe'))
   else if(t.dataset.pelay){peDo(()=>{t.checked?PE.offLayers.delete(t.dataset.pelay):PE.offLayers.add(t.dataset.pelay)})}
   else if(t.dataset.pesty){peDo(()=>{t.checked?PE.offStyles.delete(t.dataset.pesty):PE.offStyles.add(t.dataset.pesty)})}
   else if(t.id==='peLines'){peDo(()=>{PE.lines=t.checked})}
+  else if(t.id==='peBgOff'){if(t.checked&&!PE.rasW)toast('Whitening the background…');setTimeout(()=>peDo(()=>{PE.bgOff=t.checked}),20)}
   else if(t.id==='peShowRm'){PE.showRemoved=t.checked;peRefresh()}
   else if(t.id==='peScale'){PE.scaleK=t.value}
   else if(t.id==='pePage'){planEdit({...PE.src,page:+t.value,edit:null})}});
@@ -6590,11 +6611,11 @@ const A={
   peDel(){if(!PE.sel||!PE.sel.size)return;peDo(()=>{const er=[...PE.sel].filter(i=>typeof i==='string').map(s=>+s.slice(1));PE.erase=PE.erase.filter((r,j)=>!er.includes(j));
     [...PE.sel].filter(i=>typeof i==='number').forEach(i=>PE.removed.add(i));PE.sel.clear()});const vb=PE.vb;peRender();PE.vb=vb;peVB()},
   peRestoreSel(){peDo(()=>{[...PE.sel].forEach(i=>{if(typeof i==='number')PE.removed.delete(i)});PE.sel.clear()});const vb=PE.vb;peRender();PE.vb=vb;peVB()},
-  peReset(){peDo(()=>{PE.removed.clear();PE.offStyles.clear();PE.offLayers.clear();PE.offKinds.clear();PE.erase=[];PE.crop=null;PE.lines=false;PE.sel.clear()});peRender();pefit()},
+  peReset(){peDo(()=>{PE.removed.clear();PE.offStyles.clear();PE.offLayers.clear();PE.offKinds.clear();PE.erase=[];PE.crop=null;PE.lines=false;PE.bgOff=false;PE.sel.clear()});peRender();pefit()},
   peCancel(){const keep=PE.src&&PE.src.onCancel;closeOverlay();PE.svg=null;if(keep)keep()},
   async peDone(el){const raw=!!el.dataset.raw,src=PE.src;el.disabled=true;el.textContent='Saving…';
     let c;try{c=await peOutput(raw)}catch(e){console.error(e);el.disabled=false;el.textContent=raw?'Use as is':'Use this plan';toast('Couldn’t draw the cleaned plan. Try again, or use it as is.');return}
-    const edit=raw?{v:1,kind:src.pdf?'pdf':'img',page:PE.page}:{v:1,kind:src.pdf?'pdf':'img',page:PE.page,removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase,crop:PE.crop,lines:PE.lines,scale:PE.scaleK};
+    const edit=raw?{v:1,kind:src.pdf?'pdf':'img',page:PE.page}:{v:1,kind:src.pdf?'pdf':'img',page:PE.page,removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase,crop:PE.crop,lines:PE.lines,bgOff:PE.bgOff,scale:PE.scaleK};
     let orig=src.orig||null;if(!orig&&ASSETS&&src.file.size<19e6){try{const res=await ASSETS.upload(src.file,{type:src.file.type||(src.pdf?'application/pdf':'image/jpeg')});orig=res.id}catch(e){}}
     PE_ORIG=src.file;const mm=raw?null:peScaleMm(c.width);
     closeOverlay();PE.svg=null;
