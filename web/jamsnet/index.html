@@ -2590,9 +2590,9 @@ async function bgFromCanvas(c,name,opt){opt=opt||{};const pages=opt.pages||1,cle
   if(!src){let k=Math.min(1,1800/Math.max(c.width,c.height)),q=.8;
     for(let i=0;i<6;i++){const d=document.createElement('canvas');d.width=Math.round(c.width*k);d.height=Math.round(c.height*k);const x=d.getContext('2d');if(!clear){x.fillStyle='#fff';x.fillRect(0,0,d.width,d.height)}x.drawImage(c,0,0,d.width,d.height);
       if(clear){src=d.toDataURL('image/webp',q);if(!/^data:image\/webp/.test(src))src=d.toDataURL('image/png')}else src=d.toDataURL('image/jpeg',q);if(src.length<190000)break;k*=.82;q=Math.max(.55,q-.05)}}
-  const w=c.width,h=c.height,box={x:80,y:80,w:SW-160,h:SH-260},k=Math.min(box.w/w,box.h/h);
+  const w=c.width,h=c.height,A=BG_AREA,k=Math.min(A.w/w,A.h/h),box={x:Math.round(A.x+(A.w-w*k)/2),y:Math.round(A.y+(A.h-h*k)/2)};
   const bw=Math.round(w*k),pxm=opt.mmW?bw/(opt.mmW/1000):null;
-  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:bw,h:Math.round(h*k),pxm,op:clear?1:pxm?.95:.85,lock:true,...(clear?{clear:true}:{}),...(opt.src?{from:opt.src}:{}),...(opt.edit?{edit:opt.edit}:{})};pl.useBg=true;pl.calibrated=!!pxm;if(pxm)pl.pxm=pxm;pl.hideRoom=false});
+  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:bw,base:bw,h:Math.round(h*k),pxm,op:clear?1:pxm?.95:.85,lock:true,...(clear?{clear:true}:{}),...(opt.src?{from:opt.src}:{}),...(opt.edit?{edit:opt.edit}:{})};pl.useBg=true;pl.calibrated=!!pxm;if(pxm)pl.pxm=pxm;pl.hideRoom=false});
   S.ui.bgOff=false;S.ui.ptool='select';S.planTool=pxm?null:{a:null,b:null};S.sel=null;cams.plan.init=false;
   if(opt.quiet)return;
   if(!onPlan())setSheet('plan');else{refreshDesign();requestAnimationFrame(()=>{fit();cam.init=true})}
@@ -6636,6 +6636,8 @@ const A={
     if(!file&&e&&e.orig){try{const r=await fetch('/_blob/'+e.orig);if(r.ok){const b=await r.blob();file=new File([b],e.name||'plan',{type:b.type})}}catch(x){}}
     if(!file){toast('The original file isn’t saved here. Upload the PDF again to clean it up.');return}
     planEdit({file,pdf:e?e.kind==='pdf':/pdf/.test(file.type),page:e&&e.page,edit:e,orig:e&&e.orig})},
+  bgFill(){const b=PB();if(!b)return;const A=BG_AREA,f=Math.min(A.w/b.w,A.h/b.h);mut(()=>{bgSizePct(b);bgTransform(f,b.x,b.y,A.x+(A.w-b.w*f)/2-b.x,A.y+(A.h-b.h*f)/2-b.y)});refreshDesign();requestAnimationFrame(()=>fit());toast(`Plan sized to fill the sheet (${bgSizePct(b)}%).`)},
+  bgCenter(){const b=PB();if(!b)return;const A=BG_AREA;mut(()=>{bgTransform(1,b.x,b.y,Math.round(A.x+(A.w-b.w)/2-b.x),Math.round(A.y+(A.h-b.h)/2-b.y))});refreshDesign();toast('Plan centered on the sheet.')},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -7698,7 +7700,18 @@ function markPanel(m){
 function bgPanel(){const b=PB();
   return `<div class="ins-h"><p class="catchip">Floor plan image</p><h3>${esc(b.name||'Floor plan')}</h3><p>It’s unlocked, so you can drag it to line it up. Lock it again when it’s in place.</p></div>
   <div class="fields">${bgControls(b)}</div>`}
-function bgControls(b){return `<label class="field" for="bgOp">Image strength · <span id="bgOpV">${Math.round((b.op??.85)*100)}%</span><input id="bgOp" type="range" min="15" max="100" step="5" value="${Math.round((b.op??.85)*100)}" data-bgprop="op"></label>
+/* resize the plan image about a point, carrying everything drawn on this floor with it and keeping the scale true */
+function bgTransform(f,cx,cy,dx,dy){const b=PB(),pl=S.design.plan;dx=dx||0;dy=dy||0;const X=v=>cx+(v-cx)*f+dx,Y=v=>cy+(v-cy)*f+dy;
+  b.x=Math.round(X(b.x));b.y=Math.round(Y(b.y));b.w=Math.round(b.w*f);b.h=Math.round(b.h*f);if(b.pxm)b.pxm*=f;if(pl.pxm)pl.pxm*=f;
+  S.design.nodes.forEach(n=>{if(onFl(n)&&!racked(n.uid)){n.fp.x=Math.round(X(n.fp.x));n.fp.y=Math.round(Y(n.fp.y))}});
+  S.design.racks.forEach(r=>{if(onFl(r)){r.fp.x=Math.round(X(r.fp.x));r.fp.y=Math.round(Y(r.fp.y))}});
+  (pl.marks||[]).forEach(m=>{['x','x1','x2'].forEach(k=>{if(m[k]!=null)m[k]=X(m[k])});['y','y1','y2'].forEach(k=>{if(m[k]!=null)m[k]=Y(m[k])});['w','h','r'].forEach(k=>{if(typeof m[k]==='number')m[k]*=f});if(m.pts)m.pts=m.pts.map(([x,y])=>[X(x),Y(y)])})}
+const BG_AREA={x:30,y:30,w:SW-60,h:SH-190};
+function bgSizePct(b){if(!b.base)b.base=b.w;return Math.round(b.w/b.base*100)}
+function bgControls(b){const pct=bgSizePct(b);return `<label class="field" for="bgSize">Size on the sheet · <span id="bgSizeV">${pct}%</span><input id="bgSize" type="range" min="25" max="400" step="5" value="${Math.min(400,Math.max(25,pct))}" data-bgprop="size"></label>
+  <div class="actions"><button class="btn sm" data-act="bgFill">Fill the sheet</button><button class="btn sm" data-act="bgCenter">Center</button></div>
+  <p class="muted" style="margin:0;font-size:12px">Devices and markup on this floor grow with the plan${S.design.plan.calibrated?', and the scale stays true':''}.</p>
+  <label class="field" for="bgOp">Image strength · <span id="bgOpV">${Math.round((b.op??.85)*100)}%</span><input id="bgOp" type="range" min="15" max="100" step="5" value="${Math.round((b.op??.85)*100)}" data-bgprop="op"></label>
   <label class="check"><input type="checkbox" data-bgprop="lock" ${b.lock!==false?'checked':''}> Lock the image so it can’t be moved</label>`}
 function onMkProp(t){
   const m=S.sel&&S.sel.kind==='mark'&&mkById(S.sel.id);if(!m)return;const k=t.dataset.mkprop;
@@ -7726,11 +7739,14 @@ Object.assign(A,{
 });
 document.addEventListener('input',e=>{const t=e.target;if(!t.dataset)return;
   if(t.dataset.mkprop==='txt'){const m=S.sel&&mkById(S.sel.id);if(!m)return;if(!S.mkTyping){H.past.push(snap());H.future=[];S.mkTyping=true}m.txt=t.value;renderCanvas();return}
+  if(t.dataset.bgprop==='size'){const b=PB();if(!b)return;if(!S.bgSizing){H.past.push(snap());if(H.past.length>150)H.past.shift();H.future=[];S.bgSizing=true}
+    const want=b.base*(+t.value)/100,f=want/b.w;if(Math.abs(f-1)>.001)bgTransform(f,b.x+b.w/2,b.y+b.h/2);const l=$('#bgSizeV');if(l)l.textContent=t.value+'%';renderCanvas();return}
   if(t.dataset.bgprop==='op'){const b=PB();if(!b)return;b.op=(+t.value)/100;const l=$('#bgOpV');if(l)l.textContent=t.value+'%';renderCanvas()}});
 document.addEventListener('change',e=>{const t=e.target;if(!t.dataset)return;
   if(t.dataset.mkprop){onMkProp(t);return}
   if(t.dataset.mkdef){const k=t.dataset.mkdef;mkStyle()[k]=t.type==='checkbox'?t.checked:parseFloat(t.value);return}
   if(t.dataset.bgprop){const b=PB();if(!b)return;if(t.dataset.bgprop==='op'){save();return}
+    if(t.dataset.bgprop==='size'){S.bgSizing=false;save();updUndo();return}
     mut(()=>{b.lock=t.checked});if(b.lock&&S.sel&&S.sel.kind==='bg')S.sel=null;refreshDesign();toast(b.lock?'Plan image locked.':'Plan image unlocked. Drag it on the sheet to line it up.')}});
 
 /* ================= J-STD-710 SYMBOLS: AV, communications, security, HVAC, control, vacuum, furnishings and electrical, by the standard's construction rules =================
