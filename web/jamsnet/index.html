@@ -1331,6 +1331,9 @@ button:not(:disabled):active{filter:brightness(.92)}
   #v-inbox.ibreading .vh,#v-inbox.ibreading .ibbar{display:none}
 }
 </style>
+<style>.flseg{display:flex;flex-wrap:wrap;gap:6px}.flseg button{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:1px;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:84px;touch-action:manipulation}
+.flseg button b{font-size:13px}.flseg button small{font:500 10.5px var(--f-mono);color:var(--muted)}.flseg button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}.flseg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+</style>
 <style id="palHfh">/* ===== Hands Free Help palette: lime, gray, black (from the company logo). On when <html data-palette="hfh"> ===== */
 :root[data-palette="hfh"]{--lime:#9CCB19;--hfgray:#A9ACA6;--basalt:#111210;--basalt2:#1D1F1B;--amber:#9CCB19;--lagoon:#4F7A00}
 :root[data-palette="hfh"],:root[data-palette="hfh"][data-theme="light"]{--bg:#F3F4F1;--surface:#FFFFFF;--sunk:#E9EBE6;--line:#D5D8D0;--fg:#111210;--muted:#585B54;--accent:#4A7300;--accent-ink:#111210;--accent-soft:#ECF5D2;--ok:#2F7D32;--ok-soft:#E1F1DF;--sheet:#FBFCFA;--grid:#E8EAE4;--gridmaj:#D8DBD3}
@@ -1471,7 +1474,7 @@ const plural=(n,w,ws)=>n+' '+(n===1?w:(ws||w+'s'));
 const SIG={hdmi:{label:'HDMI / video',short:'HDMI',pre:'V',cls:'video'},audio:{label:'Audio',short:'Audio',pre:'A',cls:'audio'},net:{label:'Network / PoE',short:'Network',pre:'N',cls:'net'},usb:{label:'USB',short:'USB',pre:'U',cls:'usb'},ctrl:{label:'Control',short:'Control',pre:'C',cls:'ctrl'},tel:{label:'Telephony / T1',short:'Telco',pre:'T',cls:'tel'}};
 /* network and telephone lines carry both ways, so either end can be the source */
 const BIDI=t=>t==='net'||t==='tel';
-const CAT_PRE={Display:'DS',Switcher:'SW',Camera:'CAM',Microphone:'MIC',DSP:'DSP',Amplifier:'AMP',Speaker:'SPK',Network:'NET',Control:'CP',Source:'SRC','Wall plate':'WP',Extender:'EXT',Soundbar:'VB',Telephony:'GW',Module:'MOD',Other:'DEV'};
+const CAT_PRE={Lighting:'LT',Shade:'SH',Climate:'TS',Doorbell:'DB',Lock:'LK',Sensor:'SEN',Security:'SEC',Projector:'PJ',Display:'DS',Switcher:'SW',Camera:'CAM',Microphone:'MIC',DSP:'DSP',Amplifier:'AMP',Speaker:'SPK',Network:'NET',Control:'CP',Source:'SRC','Wall plate':'WP',Extender:'EXT',Soundbar:'VB',Telephony:'GW',Module:'MOD',Other:'DEV'};
 const ports=s=>!s?[]:s.split('|').map(x=>{const [t,...n]=x.split(':');return {t:t.trim(),n:n.join(':').trim()}});
 
 /* ---------- product library (fictional brands, sample pricing) ---------- */
@@ -1485,6 +1488,36 @@ const BASE_LIB=[
  Object.assign(L('AV-S8300E','Avaya','S8300E','Module','Communication Manager server module (slot V1 only)',0,0,1,'net:Services|usb:USB','',0,0),{fits:'Avaya S8300 server'}),
  Object.assign(L('AV-MM711','Avaya','MM711','Module','Analog media module, 8 analog trunk or station ports',0,0,.75,'tel:Analog 1|tel:Analog 2|tel:Analog 3|tel:Analog 4|tel:Analog 5|tel:Analog 6|tel:Analog 7|tel:Analog 8','',0,0),{fits:'Avaya G4x0 media module'}),
  Object.assign(L('AV-MM710B','Avaya','MM710B','Module','T1/E1 media module with built-in CSU, ISDN PRI capable',0,0,.75,'tel:T1/E1','',0,0),{fits:'Avaya G4x0 media module'}),
+
+ /* smart home starter set: fictional brands and sample prices, replace with your own price lists */
+ L('LT-KP6','Kipuka Home','KH-K6','Lighting','6-button scene keypad, wall box, engraved buttons',138,215,1,'ctrl:Lighting bus','',0,1,'wall'),
+ L('LT-DIM','Kipuka Home','KH-D600','Lighting','Smart dimmer, 600 W LED/incandescent, single gang',62,99,.5,'ctrl:Lighting bus','',0,1,'wall'),
+ L('LT-SW','Kipuka Home','KH-S15','Lighting','Smart switch, 15 A, single gang',48,79,.5,'ctrl:Lighting bus','',0,1,'wall'),
+ L('LT-PROC','Kipuka Home','KH-P100','Lighting','Lighting processor, 100 devices, panel mount',540,845,2,'net:LAN','ctrl:Lighting bus 1|ctrl:Lighting bus 2',0,8,'wall'),
+ L('SH-ROL','Kipuka Home','KH-R40','Shade','Motorized roller shade, up to 2.4 m wide, low voltage',395,640,1.5,'ctrl:Shade bus','',0,6,'wall'),
+ L('TS-SM','Kipuka Home','KH-T2','Climate','Smart thermostat, Wi-Fi and C-wire, one HVAC zone',139,229,1,'net:Wi-Fi','',0,2,'wall'),
+ L('SEN-OCC','Kipuka Home','KH-M1','Sensor','Ceiling occupancy and light sensor, wireless',39,65,.25,'ctrl:Wireless','',0,0,'ceiling'),
+ L('SEN-DW','Kipuka Home','KH-C1','Sensor','Door and window contact sensor, wireless',22,39,.25,'ctrl:Wireless','',0,0,'wall'),
+ L('CP-HUB','Kipuka Home','KH-H1','Control','Smart home controller and app, whole-house scenes',620,995,3,'net:LAN|ctrl:Wireless','ctrl:IR/RS-232 1|ctrl:IR/RS-232 2',1,10,'rack'),
+ L('CP-RMT','Kipuka Home','KH-R10','Control','Handheld remote with touch screen, for theater and TV rooms',260,420,.5,'ctrl:Wireless','',0,0,'wall'),
+ L('DB-VID','Anchorline','AL-DB2','Doorbell','Video doorbell, 2K, PoE or 24 V, two-way talk',145,239,1,'net:PoE','',0,6,'wall'),
+ L('LK-DB','Anchorline','AL-L5','Lock','Smart deadbolt, keypad and app, Z-Wave',189,299,1,'ctrl:Wireless','',0,0,'wall'),
+ L('SEC-PNL','Anchorline','AL-S8','Security','Alarm panel with touchscreen, cellular backup',340,560,2,'net:LAN|ctrl:Wireless','',0,10,'wall'),
+ L('CAM-TUR','Anchorline','AL-T4','Camera','4 MP turret camera, night vision, outdoor, PoE',118,195,1.5,'net:PoE','',0,7,'wall'),
+ L('CAM-BUL','Anchorline','AL-B8','Camera','4K bullet camera, 40 m night vision, outdoor, PoE',165,269,1.5,'net:PoE','',0,9,'wall'),
+ L('NVR-8','Anchorline','AL-R8','Network','8-channel recorder, 8 PoE ports, 4 TB',420,680,2,'net:LAN','net:PoE 1|net:PoE 2|net:PoE 3|net:PoE 4|net:PoE 5|net:PoE 6|net:PoE 7|net:PoE 8|hdmi:HDMI Out',1,60,'rack'),
+ L('NET-AP7','Ridgeway','RW-AP7','Network','Wi-Fi 7 ceiling access point, PoE+',189,299,1,'net:PoE+','',0,22,'ceiling'),
+ L('NET-SW16','Ridgeway','RW-S16P','Network','16-port managed PoE+ switch, 2 SFP+',380,595,1.5,'net:Uplink','net:Port 1|net:Port 2|net:Port 3|net:Port 4|net:Port 5|net:Port 6|net:Port 7|net:Port 8|net:Port 9|net:Port 10|net:Port 11|net:Port 12|net:Port 13|net:Port 14|net:Port 15|net:Port 16',1,40,'rack'),
+ L('NET-GW','Ridgeway','RW-G1','Network','Router and firewall, multi-gig WAN',290,449,1.5,'net:WAN','net:LAN 1|net:LAN 2|net:LAN 3|net:LAN 4',1,15,'rack'),
+ L('SPK-IC6','Mele Audio','MA-IC6','Speaker','6.5" in-ceiling speaker, each, paintable grille',95,159,.75,'audio:Speaker in','',0,0,'ceiling'),
+ L('SPK-IC8','Mele Audio','MA-IC8','Speaker','8" in-ceiling speaker, each, for larger rooms and patios',139,229,.75,'audio:Speaker in','',0,0,'ceiling'),
+ L('SPK-LCR','Mele Audio','MA-LCR','Speaker','In-wall LCR speaker, theater front channels',260,429,1,'audio:Speaker in','',0,0,'wall'),
+ L('SPK-SUB','Mele Audio','MA-S12','Speaker','12" powered subwoofer, 500 W',420,699,.5,'audio:LFE in','',0,90,'floor'),
+ L('AMP-8Z','Mele Audio','MA-A8','Amplifier','8-zone whole-house amplifier, 16 × 50 W',890,1450,2,'audio:Input 1|audio:Input 2|audio:Input 3|audio:Input 4|net:LAN','audio:Zone 1|audio:Zone 2|audio:Zone 3|audio:Zone 4|audio:Zone 5|audio:Zone 6|audio:Zone 7|audio:Zone 8',2,180,'rack'),
+ L('SRC-STR4','Mele Audio','MA-ST4','Source','4-stream music streamer, AirPlay and Spotify Connect',590,949,1,'net:LAN','audio:Stream 1|audio:Stream 2|audio:Stream 3|audio:Stream 4',1,15,'rack'),
+ L('AMP-AVR','Mele Audio','MA-R9','Amplifier','9.2-channel theater receiver, Dolby Atmos, 8K HDMI',1180,1899,2,'hdmi:HDMI 1|hdmi:HDMI 2|hdmi:HDMI 3|hdmi:HDMI 4|net:LAN','hdmi:HDMI Out|audio:Speakers 9.2|audio:Sub 1|audio:Sub 2',3,220,'rack'),
+ L('PJ-4K','Halverd','HV-L4K','Projector','4K laser projector, 3,000 lumens, ceiling mount',2390,3599,3,'hdmi:HDMI|ctrl:RS-232|net:LAN','',0,330,'ceiling'),
+ L('SCR-120','Halverd','HV-S120','Display','120" fixed-frame projection screen, 16:9',780,1249,2,'ctrl:12 V trigger','',0,0,'wall'),
  L('DS-75','Halverd','HV-75Q','Display','75" 4K commercial display',1480,2199,2,'hdmi:HDMI 1|hdmi:HDMI 2|ctrl:RS-232|net:LAN','',0,210),
  L('DS-55','Halverd','HV-55Q','Display','55" 4K commercial display',890,1349,1.5,'hdmi:HDMI 1|hdmi:HDMI 2|ctrl:RS-232|net:LAN','',0,130),
  L('SW-41','Ostrava Signal','OS-41U','Switcher','4×1 HDMI / USB-C presentation switcher',890,1295,1,'hdmi:HDMI 1|hdmi:HDMI 2|hdmi:HDMI 3|usb:USB Cam|net:LAN','hdmi:HDMI Out|hdmi:HDMI Mirror|usb:USB Host',1,30),
@@ -1537,7 +1570,7 @@ const BASE_LIB=[
  C('CBL-T1','LW-T1X','T1/E1 cable, RJ-48C',14,24,.2,'tel')
 ];
 const RACK_ACC=['RK-BL1','RK-BL2','RK-VT1','RK-CM1','RK-1U','PDU-8'];
-BASE_LIB.find(p=>p.id==='DS-75').planW=1.68;BASE_LIB.find(p=>p.id==='DS-55').planW=1.23;
+BASE_LIB.find(p=>p.id==='DS-75').planW=1.68;BASE_LIB.find(p=>p.id==='SCR-120').planW=2.66;BASE_LIB.find(p=>p.id==='DS-55').planW=1.23;
 let lib=BASE_LIB.map(p=>JSON.parse(JSON.stringify(p)));
 const byId=id=>lib.find(p=>p.id===id);
 /* modules (p.fits = the slot type they go in) are never placed on their own; a chassis with slots is placeable even with no ports of its own */
@@ -1603,6 +1636,7 @@ function normDesign(d){if(!d||!Array.isArray(d.nodes))return null;const o={d};
   o.d.extras=o.d.extras||[];o.d.seq=o.d.seq||{};o.d.racks=o.d.racks||[];
   o.d.meta3=Object.assign({...DEFAULT_META3},o.d.meta3||{});o.d.meta4=Object.assign({...DEFAULT_META4},o.d.meta4||{});
   o.d.meta5=Object.assign({...DEFAULT_META5},o.d.meta5||{});o.d.meta6=Object.assign({...DEFAULT_META6},o.d.meta6||{});o.d.meta7=Object.assign({...DEFAULT_META7},o.d.meta7||{});o.d.panels=Array.isArray(o.d.panels)?o.d.panels:[];o.d.panels.forEach(p=>{p.map=p.map||{}});if(!o.d.plan)o.d.plan=newPlan(S.prop.project,6,4.5);
+  if(Array.isArray(o.d.floors)&&o.d.floors.length){if(!o.d.floors.some(f=>f.id===o.d.floor))o.d.floor=o.d.floors[0].id;o.d.floors.forEach(f=>{if(f.id===o.d.floor)f.plan=null})}else{delete o.d.floors;delete o.d.floor}
   return o.d}
 function loadSaved(){try{const raw=localStorage.getItem(KEY);if(!raw)return false;const o=JSON.parse(raw);
   (o.lib||[]).forEach(p=>{if(!byId(p.id))lib.push(p)});
@@ -1964,7 +1998,7 @@ function loadTemplate(kind){
 }
 
 /* ---------- BOM & quote ---------- */
-const CAT_ORDER=['Display','Switcher','Source','Wall plate','Extender','Camera','Microphone','Soundbar','DSP','Amplifier','Speaker','Control','Network','Telephony','Module','Patch panel','Other','Rack','Accessory','Cable'];
+const CAT_ORDER=['Lighting','Shade','Climate','Doorbell','Lock','Sensor','Security','Projector','Display','Switcher','Source','Wall plate','Extender','Camera','Microphone','Soundbar','DSP','Amplifier','Speaker','Control','Network','Telephony','Module','Patch panel','Other','Rack','Accessory','Cable'];
 const ci=c=>{const i=CAT_ORDER.indexOf(c);return i<0?40:i};
 function bom(){
   const m=new Map();const add=(pid,q)=>m.set(pid,(m.get(pid)||0)+q);
@@ -2430,7 +2464,7 @@ function rackSymSVG(r,sel){
 }
 function coverageSVG(){
   const pl=S.design.plan;if(!S.ui.cov||!pl.calibrated)return '';const k=pl.pxm,ceil=+pl.room.ceil||2.7;let s='';
-  S.design.nodes.forEach(n=>{if(!n.fp||racked(n.uid))return;const p=prod(n),x=n.fp.x,y=n.fp.y,rot=n.fp.rot||0;
+  S.design.nodes.forEach(n=>{if(!onFl(n)||racked(n.uid))return;const p=prod(n),x=n.fp.x,y=n.fp.y,rot=n.fp.rot||0;
     if(p.cat==='Speaker')s+=`<circle class="cov audio" cx="${x}" cy="${y}" r="${Math.max(.5,ceil-1.2)*k}"/>`;
     else if(p.cat==='Microphone')s+=`<circle class="cov mic" cx="${x}" cy="${y}" r="${3*k}"/>`;
     else if(p.cat==='Camera'){const R=6*k,a=35*Math.PI/180;s+=`<path class="cov video" transform="translate(${x} ${y}) rotate(${rot})" d="M0 0L${(-Math.sin(a)*R).toFixed(1)} ${(Math.cos(a)*R).toFixed(1)}A${R} ${R} 0 0 0 ${(Math.sin(a)*R).toFixed(1)} ${(Math.cos(a)*R).toFixed(1)}Z"/>`}});
@@ -2439,6 +2473,7 @@ function coverageSVG(){
 function runsSVG(){
   if(!S.ui.runs)return '';let s='',lb='';
   S.design.cables.forEach((c,i)=>{if(S.ui.hide[c.type])return;const A=locate(c.a.uid),B=locate(c.b.uid);if(!A||!B||(A.rack&&A.rack===B.rack))return;
+    if(flList()){const fo=u=>{const rk=racked(u);return rk?flOf(rk.r):flOf(node(u))};if(fo(c.a.uid)!==flCur()||fo(c.b.uid)!==flCur())return}
     const o=((i%7)-3)*4,cls=SIG[c.type].cls,hi=isSel('cable',c.id)||(S.sel&&S.sel.kind==='pnode'&&(c.a.uid===S.sel.id||c.b.uid===S.sel.id))||(S.sel&&S.sel.kind==='prack'&&(A.rack&&A.rack.id===S.sel.id||B.rack&&B.rack.id===S.sel.id));
     s+=`<path class="run ${cls}${hi?' hi':''}" d="M${A.x+o} ${A.y+o}H${B.x+o}V${B.y}"/>`;
     if(hi){const t=`${c.id} · ${lenOf(c)} m`,w=t.length*5.6+12;lb+=`<g class="clab ${cls}"><rect x="${B.x+o-w/2}" y="${A.y+o-7}" width="${w}" height="14" rx="3"/><text x="${B.x+o}" y="${A.y+o+3}" text-anchor="middle">${esc(t)}</text></g>`}});
@@ -2446,12 +2481,13 @@ function runsSVG(){
 }
 function renderPlan(){
   const pl=ensurePlan(),tg=tags(),bg=PB();
-  let s=sheetSVG({...S.design.meta,...S.design.meta3,scale:pl.calibrated?'AS SHOWN':'NTS'});
+  const fli=flList()?flList().findIndex(f=>f.id===flCur()):-1;
+  let s=sheetSVG({...S.design.meta,...S.design.meta3,...(fli>=0?{dwg:flDwg(fli),title:`${S.design.meta3.title} · ${flName(flCur())}`}:{}),scale:pl.calibrated?'AS SHOWN':'NTS'});
   if(pl.useBg&&bg){if(!S.ui.bgOff)s+=`<image class="pl-bg" data-bg="1" href="${esc(bg.src)}" x="${bg.x}" y="${bg.y}" width="${bg.w}" height="${bg.h}" preserveAspectRatio="none" style="opacity:${bg.op??.85};pointer-events:${bg.lock===false?'auto':'none'}"/>`}
   else if(!pl.hideRoom)s+=roomSVG(pl);
   s+=marksSVG()+jsLegendSVG()+scaleBar(pl)+coverageSVG()+runsSVG();
-  S.design.racks.forEach(r=>{if(r.fp)s+=rackSymSVG(r,isSel('prack',r.id))});
-  S.design.nodes.forEach(n=>{if(n.fp&&!racked(n.uid))s+=nodeSymSVG(n,prod(n),tg[n.uid],isSel('pnode',n.uid))});
+  S.design.racks.forEach(r=>{if(onFl(r))s+=rackSymSVG(r,isSel('prack',r.id))});
+  S.design.nodes.forEach(n=>{if(onFl(n)&&!racked(n.uid))s+=nodeSymSVG(n,prod(n),tg[n.uid],isSel('pnode',n.uid))});
   const t=S.planTool;
   if(t&&t.a){s+=`<circle class="sc-pt" cx="${t.a.x}" cy="${t.a.y}" r="5"/>`;const b=t.b||t.hover;if(b)s+=`<line class="sc-line" x1="${t.a.x}" y1="${t.a.y}" x2="${b.x}" y2="${b.y}"/><circle class="sc-pt" cx="${b.x}" cy="${b.y}" r="5"/>`}
   s+=marksSelSVG();
@@ -2476,9 +2512,9 @@ function planUp(){const d=S.pdrag;S.pdrag=null;if(d.moved){H.past.push(d.before)
 function planPlace(kind,ref,pt){
   pt=pt||viewCenter();const x=Math.round(pt.x/5)*5,y=Math.round(pt.y/5)*5;
   const res=mut(()=>{
-    if(kind==='prack'){const r=rackById(ref);r.fp={x,y};return {k:'prack',id:r.id}}
+    if(kind==='prack'){const r=rackById(ref);r.fp={x,y,...flTag()};return {k:'prack',id:r.id}}
     let n;if(kind==='lib'){const p=byId(ref),sp=flowSpot(p);n={uid:nid(),pid:ref,x:sp.x,y:sp.y};S.design.nodes.push(n)}else n=node(ref);
-    n.fp={x,y,rot:0};return {k:'pnode',id:n.uid,lib:kind==='lib'}});
+    n.fp={x,y,rot:0,...flTag()};return {k:'pnode',id:n.uid,lib:kind==='lib'}});
   S.sel={kind:res.k,id:res.id};S.ui.tab='props';refreshDesign();
   if(res.k==='prack'){toast(`${rackById(res.id).name} placed. Every device in it now measures cables from here.`);return}
   const p=prod(node(res.id)),nm=tags()[res.id];
@@ -2489,7 +2525,7 @@ function autoPlace(){
   let x0,y0,maxX;
   const bg=PB();if(pl.useBg&&bg){x0=bg.x+60;y0=Math.min(bg.y+bg.h-60,SH-160);maxX=bg.x+bg.w-40}
   else{x0=RO.x+.6*pl.pxm;y0=RO.y+(pl.room.d-.6)*pl.pxm;maxX=RO.x+pl.room.w*pl.pxm-40}
-  mut(()=>{let x=x0,y=y0;un.forEach(o=>{o.fp={x:Math.round(x),y:Math.round(y),rot:0};x+=90;if(x>maxX){x=x0;y-=90}})});
+  mut(()=>{let x=x0,y=y0;un.forEach(o=>{o.fp={x:Math.round(x),y:Math.round(y),rot:0,...flTag()};x+=90;if(x>maxX){x=x0;y-=90}})});
   refreshDesign();toast(`Placed ${plural(un.length,'item')} in a row. Drag each one to where it goes.`);
 }
 async function handleBgFile(f){
@@ -2830,15 +2866,34 @@ function renderInspector(){
   if(S.sel&&S.sel.kind==='cable'){const c=S.design.cables.find(x=>x.id===S.sel.id);if(c){box.innerHTML=cablePanel(c,tg);return}}
   box.innerHTML=sheetPanel(tg);
 }
+/* ---------- floors: each floor has its own plan (blueprint, scale, markup); devices remember their floor ----------
+   The active floor's plan lives in S.design.plan; the others wait in S.design.floors[i].plan. A single-floor project has no floors list. */
+const flList=()=>S.design&&Array.isArray(S.design.floors)&&S.design.floors.length?S.design.floors:null;
+const flCur=()=>flList()?S.design.floor:null;
+const flOf=o=>o&&o.fp?(o.fp.fl||(flList()?flList()[0].id:null)):null;
+const onFl=o=>!!(o&&o.fp)&&(!flList()||flOf(o)===flCur());
+const flTag=()=>flList()?{fl:flCur()}:{};
+function flName(id){const f=(flList()||[]).find(x=>x.id===id);return f?f.name:''}
+function flSwap(id){const fl=flList();if(!fl||id===S.design.floor)return;const cur=fl.find(f=>f.id===S.design.floor),nx=fl.find(f=>f.id===id);if(!cur||!nx)return;
+  cur.plan=S.design.plan;S.design.plan=nx.plan||Object.assign(newPlan(nx.name,12,9),{useBg:false});nx.plan=null;S.design.floor=id}
+function flDwg(i){const d=String(S.design.meta3.dwg||'E-301'),m=/^(.*?)(\d+)$/.exec(d);return m?m[1]+String(+m[2]+i).padStart(m[2].length,'0'):d+'.'+(i+1)}
+function flFloorsHTML(){const fl=flList(),tg=tags();
+  if(!fl)return `<div class="plh">Floors</div><p class="note" style="margin:0">One floor so far. Add a floor for each level of the building; each gets its own blueprint, scale and sheet in the drawing set.</p><div class="actions"><button class="btn" data-act="flAdd">+ Add a floor</button></div>`;
+  const cur=fl.find(f=>f.id===S.design.floor)||fl[0],cnt=id=>S.design.nodes.filter(n=>n.fp&&!racked(n.uid)&&flOf(n)===id).length+S.design.racks.filter(r=>r.fp&&flOf(r)===id).length;
+  return `<div class="plh">Floors · ${fl.length}</div>
+   <div class="flseg" role="group" aria-label="Floor">${fl.map((f,i)=>`<button data-act="flGo" data-id="${f.id}" aria-pressed="${f.id===cur.id}"><b>${esc(f.name)}</b><small>${esc(flDwg(i))} · ${cnt(f.id)}</small></button>`).join('')}</div>
+   <label class="field" for="flName">Floor name<input id="flName" data-flname="${cur.id}" value="${esc(cur.name)}" placeholder="e.g. Ground floor"></label>
+   <div class="actions"><button class="btn" data-act="flAdd">+ Add a floor</button>${fl.length>1?`<button class="btn danger" data-act="flDel" data-id="${cur.id}">Delete this floor</button>`:''}</div>`}
 function planSheetPanel(tg){
   const pl=S.design.plan,m3=S.design.meta3,r=pl.room,iss=designIssues().filter(i=>i.plan);
   const total=S.design.nodes.filter(n=>!racked(n.uid)).length+S.design.racks.length;
-  const placed=S.design.nodes.filter(n=>!racked(n.uid)&&n.fp).length+S.design.racks.filter(x=>x.fp).length;
+  const placed=S.design.nodes.filter(n=>!racked(n.uid)&&n.fp).length+S.design.racks.filter(x=>x.fp).length;/* every floor */
   const runs=S.design.cables.filter(c=>planLen(c)!=null);
   const ceilF=`<label class="field" for="plC">Ceiling (m)<input id="plC" type="number" min="2.2" max="8" step="0.1" data-plprop="ceil" value="${r.ceil}"></label>`;
   return `<div class="ins-h"><p class="catchip">Sheet</p><h3>${esc(m3.dwg)} · ${esc(m3.title)}</h3><p>${pl.useBg?'Drawn over your uploaded plan.':'A drawn room. Upload an architect’s plan to work over it instead.'}</p></div>
   <div class="fields">
    <div class="row2"><label class="field" for="m3T">Sheet title<input id="m3T" data-m3prop="title" value="${esc(m3.title)}"></label><label class="field" for="m3D">Drawing no.<input id="m3D" data-m3prop="dwg" value="${esc(m3.dwg)}"></label></div>
+   ${flFloorsHTML()}
    <div class="plh">Room</div>
    ${pl.useBg?`${ceilF}<div class="kv"><span>Scale</span><b>${pl.calibrated?`1 m = ${pl.pxm.toFixed(1)} px`:'Not set yet'}</b></div>`
     :`<label class="field" for="plN">Room name<input id="plN" data-plprop="name" value="${esc(r.name)}"></label>
@@ -3150,6 +3205,7 @@ function onPropChange(t){
   const v=t.value.trim();
   if(t.dataset.mprop){const k=t.dataset.mprop;mut(()=>S.design.meta[k]=v||DEFAULT_META[k]);R.design();return}
   if(t.dataset.m2prop){const k=t.dataset.m2prop;mut(()=>S.design.meta2[k]=v||DEFAULT_META2[k]);R.design();return}
+  if(t.dataset.flname){const f=(flList()||[]).find(x=>x.id===t.dataset.flname);if(f){mut(()=>{f.name=v||'Floor'});R.design();return}}
   if(t.dataset.m3prop){const k=t.dataset.m3prop;mut(()=>S.design.meta3[k]=v||DEFAULT_META3[k]);R.design();return}
   if(t.dataset.plprop){const k=t.dataset.plprop,r=S.design.plan.room;
     if(k==='name')mut(()=>r.name=v||'Room');
@@ -4740,7 +4796,9 @@ function snapSched(){const rows=schedRows().sort((a,b)=>a.id.localeCompare(b.id,
     sum:`${plural(rows.length,'cable run')} · ${tot} m`}}
 function drawingSet(){const d=S.design,at=S.prop.attach||{};
   return {at:dayFmt(0)+' '+nowT(),rev:d.meta.rev,sheets:DSHEETS.filter(([k])=>at[k]!==false).map(([k,mk])=>{const m=d[mk],x={k,dwg:m.dwg,title:m.title};
-    if(k==='patch'){const p=snapPatch();x.html=p.html;x.sum=p.sum}else if(k==='sched'){const p=snapSched();x.html=p.html;x.sum=p.sum}else if(k==='bom'){const p=snapBom();x.html=p.html;x.sum=p.sum}else if(k==='ip'){const p=snapIp();x.html=p.html;x.sum=p.sum}else x.svg=snapCanvas(k);return x})}}
+    if(k==='patch'){const p=snapPatch();x.html=p.html;x.sum=p.sum}else if(k==='sched'){const p=snapSched();x.html=p.html;x.sum=p.sum}else if(k==='bom'){const p=snapBom();x.html=p.html;x.sum=p.sum}else if(k==='ip'){const p=snapIp();x.html=p.html;x.sum=p.sum}
+    else if(k==='plan'&&flList()){const back=flCur(),out=flList().map((f,i)=>{flSwap(f.id);return {k,fl:f.id,dwg:flDwg(i),title:`${m.title} · ${f.name}`,svg:snapCanvas(k)}});flSwap(back);return out}
+    else x.svg=snapCanvas(k);return x}).flat()}}
 const sheetSet=()=>S.prop.drawings||S.liveSet||(S.liveSet=drawingSet());
 const sheetList=set=>set.sheets.map(s=>s.dwg).join(', ');
 function sheetBody(sh){return sh.svg!=null?`<svg class="dsheet" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="${esc(sh.dwg+' '+sh.title)}">${snapDefs()}${sh.svg}</svg>`
@@ -4944,7 +5002,32 @@ function sowGenerate(){
   const deliv=[`- Drawing set: ${set.sheets.length?listAnd(set.sheets.map(s=>`${s.dwg} ${s.title}`)):listAnd(DSHEETS.map(([k,mk])=>`${d[mk].dwg} ${d[mk].title}`))}`,
     '- As-built drawings and the final cable schedule at closeout','- Programming files and a one-page user guide for the room',
     '- One year warranty on workmanship from substantial completion; equipment carries the manufacturer’s warranty'].join('\n');
+  if((P.ptype||'')==='smarthome')return sowSmartHome({P,d,all,set,site,ts,sched});
   return {overview,system:sys.join('\n'),work,owner,excl,sched,deliv};
+}
+/* scope of work for a smart home: written for the homeowner and the general contractor */
+function sowSmartHome({P,d,all,set,site,sched}){
+  const where=x=>{const f=x.n.fp&&flList()?flName(flOf(x.n)):'';return [f,x.n.loc].filter(Boolean).join(', ')};
+  const line=x=>`- ${x.t}: ${x.p.mfr} ${x.p.model}, ${lc1(x.p.desc)}${where(x)?` (${where(x)})`:''}`;
+  const G=[['Lighting, shades and climate',['Lighting','Shade','Climate','Sensor']],['Cameras, doorbell, locks and security',['Camera','Doorbell','Lock','Security']],['Music and whole-house audio',['Speaker','Amplifier','Source']],['Video and home theater',['Projector','Display','Switcher','Soundbar','Extender']],['Control',['Control']],['Network and Wi-Fi',['Network']]];
+  const used=new Set(),groups=G.map(([t,cs])=>{const xs=all.filter(x=>cs.includes(x.p.cat)&&!(x.p.cat==='Speaker'&&/LCR|subwoofer/i.test(x.p.desc)&&t.startsWith('Music')));xs.forEach(x=>used.add(x));return [t,xs]});
+  /* theater speakers belong with the theater */
+  const th=all.filter(x=>x.p.cat==='Speaker'&&/LCR|subwoofer/i.test(x.p.desc));if(th.length){groups[3][1].push(...th);th.forEach(x=>used.add(x))}
+  const rest=all.filter(x=>!used.has(x)&&x.p.cat!=='Cable'&&x.p.cat!=='Accessory');if(rest.length)groups.push(['Other equipment',rest]);
+  const has=t=>groups.some(([g,xs])=>g.startsWith(t)&&xs.length);
+  const feats=[has('Lighting')&&'lighting scenes and shades from keypads and the app',has('Cameras')&&'cameras, a video doorbell and locks you can check from anywhere',has('Music')&&'music in every zone',has('Video')&&'a home theater',has('Network')&&'strong Wi-Fi throughout'].filter(Boolean);
+  const floors=flList()?flList().map(f=>f.name):[];
+  const overview=`${firm()} will design, pre-wire, install and program a smart home system for ${P.project}${P.client?` for ${P.client}`:''}${site?`, ${site}`:''}.\n${feats.length?`The finished home has ${listAnd(feats)}, all run from one app.`:''}\nThe design is laid out on the home's blueprints${floors.length?` (${listAnd(floors)})`:''} in drawing set ${listAnd([...new Set((set.sheets.length?set.sheets.map(s=>s.dwg):DSHEETS.flatMap(([k,mk])=>k==='plan'&&flList()?flList().map((f,i)=>flDwg(i)):[d[mk].dwg])))])}, revision ${d.meta.rev}. Anything not shown there is outside this scope unless added by change order.`;
+  const system=groups.filter(([t,xs])=>xs.length).map(([t,xs])=>`## ${t}\n${xs.map(line).join('\n')}`).join('\n')||'Equipment is listed once devices are placed in the design.';
+  const work=['## Pre-wire (walls open)','- Walk the house with the general contractor before insulation and drywall, and mark every device location','- Run and label low-voltage cable from each location to the equipment location: network, speaker, camera, doorbell, shade and keypad wiring','- Set low-voltage brackets and back boxes where the electrician isn\'t setting them','- Photograph every wall before drywall and keep the photos with the as-built drawings',
+    '## Trim-out (after paint)','- Install and connect keypads, dimmers, speakers, cameras, the doorbell, access points and the equipment rack','- Program lighting scenes, schedules, music zones, cameras and the theater','- Set up the app on the homeowners\' phones and connect the home\'s internet service',
+    '## Handoff','- Walk the homeowners through the system and leave a one-page guide','- Deliver as-built drawings, the cable schedule and device passwords'].join('\n');
+  const owner=['## General contractor','- Open framing at the pre-wire walkthrough, with time for the low-voltage crew before insulation','- Deep switch boxes at keypad and dimmer locations, and blocking at TV, screen and projector locations','- A 20 A dedicated circuit at the equipment location and power at each camera, doorbell transformer and shade motor location','- Notice before drywall so wiring can be checked',
+    '## Homeowner','- Decisions on finishes, keypad engravings and scene names by the dates in the schedule','- Internet service active before trim-out','- App accounts and streaming service subscriptions'].join('\n');
+  const excl=['- Line-voltage electrical work, panels and new circuits (by the electrician)','- Drywall repair, patching and painting after changes requested once walls are closed','- Moving devices after pre-wire if the plan changes, unless added by change order','- Monthly monitoring, cloud video storage and streaming subscriptions','- Permits, unless required for low-voltage work'].join('\n');
+  const deliv=[`- Device plan for each floor and the full drawing set`,'- Equipment list and cable schedule for the contractor','- Pre-drywall photos of every wall','- As-built drawings, device passwords and a one-page homeowner guide at handoff','- One year warranty on workmanship; equipment carries the manufacturer\'s warranty'].join('\n');
+  const sch=S.tasks.length?sched:'Design and the proposal come first. Pre-wire is scheduled with the general contractor before insulation, and trim-out after paint. Dates are confirmed at contract signing.';
+  return {overview,system,work,owner,excl,sched:sch,deliv};
 }
 /* the sections as they will be sent: generated text, with the user's edits and exclusions applied */
 /* every section in order: the generated ones, then your own; titles can be renamed and sections moved */
@@ -5856,7 +5939,7 @@ function designIssues(){
     if(pl.useBg&&!pl.calibrated)out.push({plan:true,m:'The uploaded plan has no scale yet, so cable lengths can’t be measured from it.',fix:{label:'Set scale',act:'scaleTool',arg:''}});
     if(pl.calibrated){const ceil=+pl.room.ceil||2.7,rr=Math.max(.5,ceil-1.2)*pl.pxm;
       const sp=S.design.nodes.filter(n=>n.fp&&!racked(n.uid)&&prod(n).cat==='Speaker');
-      for(let i=0;i<sp.length;i++)for(let j=i+1;j<sp.length;j++){const d=Math.hypot(sp[i].fp.x-sp[j].fp.x,sp[i].fp.y-sp[j].fp.y);
+      for(let i=0;i<sp.length;i++)for(let j=i+1;j<sp.length;j++){if(flOf(sp[i])!==flOf(sp[j]))continue;const d=Math.hypot(sp[i].fp.x-sp[j].fp.x,sp[i].fp.y-sp[j].fp.y);
         if(d>2.6*rr)out.push({plan:true,m:`<b>${tags()[sp[i].uid]}</b> and <b>${tags()[sp[j].uid]}</b> are ${(d/pl.pxm).toFixed(1)} m apart, which leaves a gap in coverage at a ${ceil.toFixed(1)} m ceiling.`})}}}
   out.push(...patchIssues());
   return out;
@@ -5908,6 +5991,7 @@ const PJ_TYPES=[
  {k:'support',l:'Onsite support / service call',svc:['onsite'],bill:'hourly',tasks:'support'},
  {k:'install',l:'Equipment install',svc:['proposal','install'],bill:'fixed',tasks:'install'},
  {k:'maint',l:'Maintenance visit',svc:['maint','onsite'],bill:'contract',tasks:'maint'},
+ {k:'smarthome',l:'Smart home design & install',svc:['design','proposal','cabling','install','programming','training'],bill:'fixed',tasks:'smarthome'},
  {k:'consult',l:'Consulting & design',svc:['consult','design'],bill:'hourly',tasks:'consult'},
  {k:'training',l:'Training',svc:['training'],bill:'hourly',tasks:'training'},
  {k:'other',l:'Other',svc:[],bill:'hourly',tasks:''}];
@@ -5918,6 +6002,7 @@ const PJ_TASKSETS={
  support:[['Triage and schedule the visit','JS',0,1],['Onsite visit','KM',1,1,'Service visit'],['Resolve and document the fix','KM',1,1],['Follow up with the client','JS',3,1]],
  install:[['Receive and stage equipment','DL',0,1],['Install and mount','DL',2,1,'Install day, 8:00 AM'],['Connect and test','KM',3,1],['Show the client how it works','KM',3,1],['Closeout and handover','JS',4,1]],
  maint:[['Schedule the visit','JS',0,1],['Inspect and test systems','KM',2,1,'Maintenance visit'],['Firmware and updates','KM',2,1],['Send findings and recommendations','JS',3,1]],
+ smarthome:[['Get the blueprints and walk them with the client','JS',0,1,'Plan review, 10:00 AM'],['Design lighting, shades and climate','KM',2,2],['Design cameras, doorbell, locks and security','KM',4,1],['Design audio, video and theater','KM',5,2],['Design Wi-Fi and the network','KM',7,1],['Proposal and client review','JS',8,1],['Pre-wire walkthrough with the contractor','DL',14,1,'Pre-wire walk, 8:00 AM'],['Low-voltage pre-wire','DL',15,3,'Pre-wire crew, 7:30 AM'],['Trim-out and install devices','DL',45,3,'Trim-out, 8:00 AM'],['Program scenes and the app','KM',48,2],['Show the homeowner how it works','KM',50,1,'Homeowner walkthrough'],['Closeout and as-built handoff','JS',51,1]],
  consult:[['Discovery meeting','JS',0,1,'Discovery, 10:00 AM'],['Requirements and site review','KM',2,1],['Design and recommendations','KM',3,3],['Present and revise','JS',7,1]],
  training:[['Prepare training materials','KM',0,2],['Deliver training session','KM',3,1,'Training session'],['Follow-up questions','JS',5,1]]};
 function pjTaskList(k){if(k==='av')return STD_TASKS;return PJ_TASKSETS[k]||[]}
@@ -6091,8 +6176,9 @@ const A={
   rotate(el){if(!S.sel||S.sel.kind!=='pnode')return;const n=node(S.sel.id);mut(()=>{n.fp.rot=(((n.fp.rot||0)+(+el.dataset.d))%360+360)%360});renderCanvas();renderInspector()},
   showRack(el){setSheet('rack',{kind:'rack',id:el.dataset.id})},
   showOnPlan(el){const uid=el.dataset.id,rk=racked(uid),n=node(uid);
-    if(rk){if(!rk.r.fp)mut(()=>{rk.r.fp=planCenter()});setSheet('plan',{kind:'prack',id:rk.r.id});return}
-    if(!n.fp){mut(()=>{n.fp={...planCenter(),rot:0}});toast(`${tags()[uid]} placed in the middle of the room. Drag it where it goes.`)}
+    if(rk){if(!rk.r.fp)mut(()=>{rk.r.fp={...planCenter(),...flTag()}});else if(flList()&&flOf(rk.r)!==flCur())flSwap(flOf(rk.r));setSheet('plan',{kind:'prack',id:rk.r.id});return}
+    if(n.fp&&flList()&&flOf(n)!==flCur()){flSwap(flOf(n));toast(`${tags()[uid]} is on ${flName(flCur())}.`)}
+    if(!n.fp){mut(()=>{n.fp={...planCenter(),rot:0,...flTag()}});toast(`${tags()[uid]} placed in the middle of the room. Drag it where it goes.`)}
     setSheet('plan',{kind:'pnode',id:uid})},
   openPlan(){S.ui.sheet='plan';cam=cams.plan;S.sel=null;save();go('design')},
   rackAddSel(el){const v=$('#rAdd').value;if(!v)return;const i=v.indexOf(':'),u=($('#rAddU')||{}).value;placeInRack(v.slice(0,i),v.slice(i+1),el.dataset.rid,u?+u:null)},
@@ -6215,6 +6301,15 @@ const A={
   ibRuleAdd(el){const i=$('#ibRuleIn'),val=(i.value||'').trim();if(!val){toast('Type an email, @domain, phone or channel.');i.focus();return}
     INBOX.rules.push({id:'r'+Date.now().toString(36),value:ibNorm(val),clientId:el.dataset.id});INBOX.convs.forEach(x=>{if(!x.clientId){const m=ibMatch(ibFirstIn(x).addr);if(m)x.clientId=m}});saveInbox();R.clients();badges();toast('Rule added.')},
   ibRuleDel(el){INBOX.rules=INBOX.rules.filter(r=>r.id!==el.dataset.id);saveInbox();R.clients();toast('Rule removed.')},
+  flAdd(){const d=S.design;mut(()=>{if(!flList()){d.floors=[{id:'f1',name:'Floor 1',plan:null}];d.floor='f1';d.nodes.forEach(n=>{if(n.fp)n.fp.fl='f1'});d.racks.forEach(r=>{if(r.fp)r.fp.fl='f1'})}
+      const id='f'+Date.now().toString(36),name='Floor '+(d.floors.length+1);d.floors.push({id,name,plan:Object.assign(newPlan(name,12,9),{useBg:false})});flSwap(id)});
+    S.sel=null;refreshDesign();requestAnimationFrame(()=>fit());toast(`${flName(flCur())} added. Upload its blueprint and set the scale.`)},
+  flGo(el){if(el.dataset.id===flCur())return;flSwap(el.dataset.id);S.sel=null;save();refreshDesign();requestAnimationFrame(()=>fit())},
+  flDel(el){const d=S.design,id=el.dataset.id,on=d.nodes.filter(n=>n.fp&&flOf(n)===id).length+d.racks.filter(r=>r.fp&&flOf(r)===id).length;
+    if(on&&S.ui.flDelAsk!==id){S.ui.flDelAsk=id;toast(`${plural(on,'item')} on ${flName(id)} will come off the plan (they stay in the project). Press Delete this floor again to confirm.`);return}
+    S.ui.flDelAsk=null;mut(()=>{const other=d.floors.find(f=>f.id!==id);flSwap(other.id);d.nodes.forEach(n=>{if(n.fp&&n.fp.fl===id)delete n.fp});d.racks.forEach(r=>{if(r.fp&&r.fp.fl===id)delete r.fp});d.floors=d.floors.filter(f=>f.id!==id);
+      if(d.floors.length===1){const f=d.floors[0];d.nodes.forEach(n=>{if(n.fp)delete n.fp.fl});d.racks.forEach(r=>{if(r.fp)delete r.fp.fl});delete d.floors;delete d.floor}});
+    S.sel=null;refreshDesign();requestAnimationFrame(()=>fit());toast('Floor deleted.')},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
@@ -6969,7 +7064,7 @@ document.addEventListener('change',e=>{const t=e.target;
     const moved=applyRackSize(p,ru,mount,null);save();badges();
     toast(`${p.model}: ${ru?`${ru}U${mount==='shelf'?' on a shelf':''}`:'not rack-mounted'}.${ru?' It shows on the rack sheet now.':''}${moved.length?` ${moved.join(', ')} no longer ${moved.length>1?'fit their':'fits its'} slot and ${moved.length>1?'were':'was'} unracked.`:''}`);return}
   if(t.dataset&&t.dataset.ripos){moveRItemTo(t);return}
-  if(t.dataset&&(t.dataset.nprop||t.dataset.cprop||t.dataset.mprop||t.dataset.m2prop||t.dataset.m3prop||t.dataset.plprop||t.dataset.rprop))onPropChange(t)});
+  if(t.dataset&&(t.dataset.nprop||t.dataset.cprop||t.dataset.mprop||t.dataset.m2prop||t.dataset.m3prop||t.dataset.plprop||t.dataset.rprop||t.dataset.flname))onPropChange(t)});
 /* scope edits save as you type, without redrawing the proposal under the cursor */
 let sowT,SOWRT=null;
 function sowStore(el){const P=S.prop;if(!P||P.sowSent||!el.isConnected)return;const k=el.dataset.sowrt;P.sowEdits=P.sowEdits||{};P.sowEdits[k]=sowFromHTML(el)}

@@ -648,6 +648,26 @@ footer .brand b{color:#fff}footer .brand small{color:#A9BCD6}
 footer p{color:#A9BCD6}
 footer a.fmail{color:#fff}
 @media (hover:hover) and (pointer:fine){footer a.fmail:hover{color:var(--c-yellow)}}
+
+/* ---------- smart homes ---------- */
+.shgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:28px;align-items:stretch}
+.shaud{display:flex;flex-direction:column;gap:16px}
+.shcard{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);border-top:5px solid var(--c-yellow)}
+.shcard+.shcard{border-top-color:var(--c-blue)}
+.shcard h3{margin:0 0 10px;font-size:20px}
+.shcard ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;color:var(--muted)}.shcard li b{color:var(--ink)}
+.shfig{margin:0;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+.shfig svg{display:block;width:100%;height:auto;border-radius:6px}
+.shsys{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.shsys li{display:inline-flex;align-items:center;gap:8px;padding:7px 13px 7px 10px;border:1px solid var(--line);border-radius:999px;background:var(--sheet);font-weight:600;font-size:14px;color:var(--ink)}
+.shsys li::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.shsteps{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;counter-reset:sh}
+.shsteps li{counter-increment:sh;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.shsteps li::before{content:counter(sh);width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font:700 14px var(--f-display);margin-bottom:4px}
+.shsteps b{font-size:15px;color:var(--ink)}.shsteps span{font-size:14px;color:var(--muted)}
+.shcta{margin:24px 0 0;display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center}.shcta span{color:var(--muted);font-size:14px}
+@media (max-width:980px){.shgrid{grid-template-columns:1fr}.shsteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.shsteps{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -660,6 +680,7 @@ footer a.fmail{color:#fff}
     </a>
     <nav class="links" aria-label="Sections">
       <a href="#services">Services</a>
+      <a href="#smarthome">Smart homes</a>
       <a href="#deliverables">Drawing set</a>
       <a href="#process">How we work</a>
       <a href="#faq">FAQ</a>
@@ -970,6 +991,72 @@ footer a.fmail{color:#fff}
     </div>
   </div>
 </section>
+<section class="sec" id="smarthome">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow">Smart homes</p>
+      <h2>Smart home design, drawn on your blueprints.</h2>
+      <p class="lead">For builders, contractors and homeowners. Send the house plans and we lay out every keypad, camera, speaker and access point on each floor, then hand over a pre-wire plan before the drywall goes up.</p>
+    </div>
+    <div class="shgrid">
+      <div class="shaud">
+        <article class="shcard rv">
+          <h3>For builders and contractors</h3>
+          <ul>
+            <li><b>A pre-wire plan for each floor</b>, with every low-voltage location marked on the architect's drawings.</li>
+            <li><b>A cable schedule</b> your crew or ours can follow, and an equipment list priced for your bid.</li>
+            <li><b>A walkthrough before insulation</b>, so nothing is missed once the walls close.</li>
+          </ul>
+        </article>
+        <article class="shcard rv">
+          <h3>For homeowners</h3>
+          <ul>
+            <li><b>See every device on your own plans</b> before anything is bought or installed.</li>
+            <li><b>One app</b> for lights, shades, cameras, locks, music and climate.</li>
+            <li><b>Theater and whole-house audio</b> laid out for each room's size and seating.</li>
+          </ul>
+        </article>
+      </div>
+      <figure class="shfig rv" aria-label="A house floor plan with smart home devices placed in each room">
+        <svg viewBox="0 0 520 400" role="img" aria-labelledby="shfigt"><title id="shfigt">Ground floor plan with lighting keypads, cameras, a video doorbell, speakers, Wi-Fi and a theater laid out</title>
+          <defs><pattern id="shgrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern></defs>
+          <rect width="520" height="400" fill="var(--sheet)"/><rect width="520" height="400" fill="url(#shgrid)"/>
+          <g fill="none" stroke="var(--ink)" stroke-width="5" stroke-linejoin="miter">
+            <rect x="30" y="30" width="460" height="320"/><path d="M200 30V200M30 200H330M330 30V350M200 270V350"/>
+          </g>
+          <g fill="var(--sheet)"><rect x="96" y="346" width="44" height="9"/><rect x="250" y="196" width="40" height="9"/><rect x="196" y="110" width="9" height="40"/></g>
+          <g font-family="var(--f-mono)" font-size="11" fill="var(--muted)" letter-spacing=".08em"><text x="62" y="120">GARAGE</text><text x="232" y="120">KITCHEN</text><text x="372" y="190">THEATER</text><text x="62" y="250">ENTRY</text><text x="232" y="250">LIVING</text></g>
+          <g class="shsym">
+            <g transform="translate(118 368)"><rect x="-10" y="-10" width="20" height="20" rx="3" fill="var(--sheet)" stroke="var(--c-orange)" stroke-width="2.5"/><circle r="4" fill="var(--c-orange)"/></g>
+            <g transform="translate(46 46)"><rect x="-10" y="-8" width="20" height="12" rx="2" fill="var(--sheet)" stroke="var(--c-orange)" stroke-width="2.5"/><path d="M-5 4h10l-3 6h-4z" fill="var(--c-orange)"/></g>
+            <g transform="translate(474 46)"><rect x="-10" y="-8" width="20" height="12" rx="2" fill="var(--sheet)" stroke="var(--c-orange)" stroke-width="2.5"/><path d="M-5 4h10l-3 6h-4z" fill="var(--c-orange)"/></g>
+            <g transform="translate(214 222)"><rect x="-9" y="-12" width="18" height="24" rx="3" fill="var(--sheet)" stroke="var(--c-yellow)" stroke-width="2.5"/><g fill="var(--c-yellow)"><rect x="-5" y="-8" width="10" height="3"/><rect x="-5" y="-2" width="10" height="3"/><rect x="-5" y="4" width="10" height="3"/></g></g>
+            <g transform="translate(345 60)"><rect x="-9" y="-12" width="18" height="24" rx="3" fill="var(--sheet)" stroke="var(--c-yellow)" stroke-width="2.5"/><g fill="var(--c-yellow)"><rect x="-5" y="-8" width="10" height="3"/><rect x="-5" y="-2" width="10" height="3"/><rect x="-5" y="4" width="10" height="3"/></g></g>
+            <g fill="var(--sheet)" stroke="var(--c-green)" stroke-width="2.5"><circle cx="230" cy="300" r="10"/><circle cx="300" cy="300" r="10"/><circle cx="240" cy="70" r="10"/><circle cx="300" cy="70" r="10"/></g>
+            <g fill="var(--c-green)"><circle cx="230" cy="300" r="3.5"/><circle cx="300" cy="300" r="3.5"/><circle cx="240" cy="70" r="3.5"/><circle cx="300" cy="70" r="3.5"/></g>
+            <g transform="translate(265 160)"><circle r="13" fill="var(--sheet)" stroke="var(--c-blue)" stroke-width="2.5"/><path d="M-6 1a8.5 8.5 0 0 1 12 0M-3 4a4.2 4.2 0 0 1 6 0" fill="none" stroke="var(--c-blue)" stroke-width="2" stroke-linecap="round"/><circle cy="7" r="1.6" fill="var(--c-blue)"/></g>
+            <g transform="translate(410 300)"><rect x="-44" y="-4" width="88" height="8" rx="1" fill="var(--c-blue)"/></g>
+            <g transform="translate(410 120)"><rect x="-14" y="-9" width="28" height="18" rx="3" fill="var(--sheet)" stroke="var(--c-blue)" stroke-width="2.5"/><path d="M-4 9 0 16 4 9" fill="none" stroke="var(--c-blue)" stroke-width="2"/></g>
+            <g fill="var(--sheet)" stroke="var(--c-green)" stroke-width="2.5"><circle cx="370" cy="250" r="10"/><circle cx="450" cy="250" r="10"/></g>
+          </g>
+          <g font-family="var(--f-mono)" font-size="9.5" fill="var(--ink)" font-weight="600"><text x="132" y="372">DB-1</text><text x="60" y="64">CAM-1</text><text x="440" y="64">CAM-2</text><text x="226" y="226">LT-1</text><text x="282" y="164">AP-1</text><text x="372" y="140">PJ-1</text><text x="376" y="320">SCREEN</text></g>
+          <g transform="translate(330 368)" font-family="var(--f-mono)" font-size="9" fill="var(--muted)"><text>E-301 · GROUND FLOOR · REV A</text></g>
+        </svg>
+      </figure>
+    </div>
+    <ul class="shsys" aria-label="Systems we design">
+      <li style="--c:var(--c-yellow)">Smart lighting &amp; keypads</li><li style="--c:var(--c-orange)">Video doorbells</li><li style="--c:var(--c-orange)">CCTV cameras</li><li style="--c:var(--c-blue)">Home theaters</li><li style="--c:var(--c-green)">Whole-house audio</li><li style="--c:var(--c-blue)">Wi-Fi &amp; network</li><li style="--c:var(--c-yellow)">Motorized shades</li><li style="--c:var(--c-black)">Smart locks</li><li style="--c:var(--c-black)">Security systems</li><li style="--c:var(--c-white)">Climate control</li>
+    </ul>
+    <ol class="shsteps">
+      <li><b>Send the blueprints</b><span>A PDF from the architect or a photo of the plans, one per floor.</span></li>
+      <li><b>Design each floor</b><span>Devices placed room by room, with what each one does.</span></li>
+      <li><b>Proposal and pre-wire plan</b><span>Equipment, labor and the drawing set, ready to approve.</span></li>
+      <li><b>Pre-wire before drywall</b><span>Walked with the builder, then wired and photographed.</span></li>
+      <li><b>Trim-out and handoff</b><span>Installed, programmed, and shown to the homeowners.</span></li>
+    </ol>
+    <p class="shcta"><a class="btn primary" href="#contact" data-pick="smarthome">Start a smart home design</a><span>Tell us about the home and the build schedule. We'll ask for the plans when we reply.</span></p>
+  </div>
+</section>
 <section class="sec" id="deliverables">
   <div class="wrap">
     <div class="sechead">
@@ -1138,6 +1225,7 @@ footer a.fmail{color:#fff}
       <div class="fld full"><span style="font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">What do you need?</span>
         <div class="chips" role="group" aria-label="What do you need">
           <label class="sv"><input type="checkbox" id="n-av" value="AV system design"><span>AV design</span></label>
+          <label class="sa"><input type="checkbox" id="n-smart" value="Smart home design"><span>Smart home</span></label>
           <label class="sn"><input type="checkbox" id="n-rack" value="Rack elevations and cable schedules"><span>Racks &amp; cabling</span></label>
           <label class="su"><input type="checkbox" id="n-net" value="Network documentation"><span>Network docs</span></label>
           <label class="sa"><input type="checkbox" id="n-prop" value="Proposals and BOMs"><span>Proposals</span></label>
@@ -1604,7 +1692,7 @@ if(RM){['netsvg'].forEach(id=>{const s=document.getElementById(id);s&&s.pauseAni
 
 /* contact */
 {const need=new URLSearchParams(location.search).get('need');const c=need&&document.getElementById({app:'n-app',contract:'n-svc'}[need]||'');if(c)c.checked=true}
-document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{const id={platform:'n-app',contract:'n-svc'}[a.dataset.pick]||'n-av';const c=document.getElementById(id);if(c)c.checked=true}));
+document.querySelectorAll('[data-pick]').forEach(a=>a.addEventListener('click',()=>{const id={platform:'n-app',contract:'n-svc',smarthome:'n-smart'}[a.dataset.pick]||'n-av';const c=document.getElementById(id);if(c)c.checked=true}));
 const form=document.getElementById('form');let err=document.getElementById('err');const ORIG=form?form.innerHTML:'';
 if(form)form.addEventListener('submit',async e=>{
   e.preventDefault();
