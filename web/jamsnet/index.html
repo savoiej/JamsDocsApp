@@ -1334,6 +1334,36 @@ button:not(:disabled):active{filter:brightness(.92)}
 <style>.flseg{display:flex;flex-wrap:wrap;gap:6px}.flseg button{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:1px;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:84px;touch-action:manipulation}
 .flseg button b{font-size:13px}.flseg button small{font:500 10.5px var(--f-mono);color:var(--muted)}.flseg button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}.flseg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 </style>
+<style>/* ---------- floor plan cleanup ---------- */
+.pe{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.pe-load{margin:auto;display:flex;flex-direction:column;gap:6px;text-align:center;max-width:360px;padding:24px}
+.pe-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);background:var(--surface)}
+.pe-title{display:flex;flex-direction:column;gap:2px}.pe-title b{font-size:16px}.pe-title .muted{font-size:12.5px}.pe-title select{font:inherit;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--fg)}
+.pe-acts{display:flex;gap:6px;flex-wrap:wrap}
+.pe-body{flex:1;display:grid;grid-template-columns:290px minmax(0,1fr);min-height:0}
+.pe-side{border-right:1px solid var(--line);background:var(--surface);overflow-y:auto;overscroll-behavior:contain;padding:12px;display:flex;flex-direction:column;gap:12px}
+.pe-tools{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.pe-tool{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border:1px solid var(--line);border-radius:8px;font-size:11.5px;font-weight:600;color:var(--fg);touch-action:manipulation}
+.pe-tool svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pe-tool[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.pe-tool:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pe-hint{margin:0;font-size:12.5px;color:var(--muted)}
+.pe-selbar:not(:empty){display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:8px;font-size:13px}
+.pe-sec{display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--line);padding-top:10px}.pe-sec h4{margin:0 0 2px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pe-sec .check{display:flex;align-items:center;gap:7px;font-size:13.5px}.pe-sec .check .muted{margin-left:auto;font-size:12px}
+.pe-sty svg{width:40px;height:12px;flex:none;background:#fff;border-radius:2px}
+.pe-stage{position:relative;overflow:hidden;background:var(--sunk);touch-action:none;cursor:crosshair}
+.pe-stage[data-tool="select"]{cursor:default}.pe-stage[data-tool="pan"]{cursor:grab}
+.pe-stage svg{display:block;width:100%;height:100%;user-select:none;-webkit-user-select:none}
+#peItems .pe-off{display:none}#peItems .pe-ghost{display:inline;opacity:.35;stroke:#E2553F!important;fill:none}#peItems text.pe-ghost{fill:#E2553F!important}
+#peItems .pe-sel{stroke:#1D6FD6!important;stroke-width:calc(var(--pek,1)*3px)!important}#peItems text.pe-sel{fill:#1D6FD6!important}#peItems use.pe-sel{outline:3px solid #1D6FD6}
+@media (hover:hover) and (pointer:fine){.pe-stage[data-tool="select"] #peItems path:hover,.pe-stage[data-tool="select"] #peItems text:hover{stroke:#1D6FD6;stroke-opacity:.8}}
+.pe-er{fill:#fff;stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*1.5px);stroke-dasharray:calc(var(--pek,1)*6px) calc(var(--pek,1)*4px)}.pe-er.pe-sel{stroke-width:calc(var(--pek,1)*3px);stroke-dasharray:none}
+.pe-band{fill:rgba(29,111,214,.08);stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*1px);stroke-dasharray:calc(var(--pek,1)*4px)}
+.pe-drawer{fill:#fff;stroke:#1D6FD6;stroke-width:calc(var(--pek,1)*1.5px)}
+.pe-drawcrop,.pe-cropline{fill:none;stroke:#F07A1A;stroke-width:calc(var(--pek,1)*2px);stroke-dasharray:calc(var(--pek,1)*8px) calc(var(--pek,1)*5px)}
+.pe-cropmask{fill:rgba(13,43,82,.45)}
+@media (max-width:820px){.pe-body{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.pe-side{order:2;max-height:42vh;border-right:0;border-top:1px solid var(--line)}.pe-stage{order:1}}
+</style>
 <style id="palHfh">/* ===== Hands Free Help palette: lime, gray, black (from the company logo). On when <html data-palette="hfh"> ===== */
 :root[data-palette="hfh"]{--lime:#9CCB19;--hfgray:#A9ACA6;--basalt:#111210;--basalt2:#1D1F1B;--amber:#9CCB19;--lagoon:#4F7A00}
 :root[data-palette="hfh"],:root[data-palette="hfh"][data-theme="light"]{--bg:#F3F4F1;--surface:#FFFFFF;--sunk:#E9EBE6;--line:#D5D8D0;--fg:#111210;--muted:#585B54;--accent:#4A7300;--accent-ink:#111210;--accent-soft:#ECF5D2;--ok:#2F7D32;--ok-soft:#E1F1DF;--sheet:#FBFCFA;--grid:#E8EAE4;--gridmaj:#D8DBD3}
@@ -2528,12 +2558,13 @@ function autoPlace(){
   mut(()=>{let x=x0,y=y0;un.forEach(o=>{o.fp={x:Math.round(x),y:Math.round(y),rot:0,...flTag()};x+=90;if(x>maxX){x=x0;y-=90}})});
   refreshDesign();toast(`Placed ${plural(un.length,'item')} in a row. Drag each one to where it goes.`);
 }
-async function handleBgFile(f){
+async function handleBgFile(f,direct){
   if(!f)return;
   if(/\.(opencalque|dxf)$/i.test(f.name||'')){handleCadFile([f]);return}
   const isPdf=f.type==='application/pdf'||/\.pdf$/i.test(f.name||''),isImg=/^image\/(png|jpeg|webp|gif)$/.test(f.type);
   if(!isPdf&&!isImg){toast('Use a PDF, PNG, JPG or WebP floor plan, an OpenCalque drawing, or a DXF from CAD.');return}
   if(f.size>40*1024*1024){toast('That file is over 40 MB. Export just the floor plan page.');return}
+  if(!direct){planEdit({file:f,pdf:isPdf,fallback:()=>handleBgFile(f,true)});return}
   toast(isPdf?'Reading the PDF…':'Loading the plan…');
   let c,pages=1;
   try{
@@ -2553,12 +2584,208 @@ async function bgFromCanvas(c,name,opt){opt=opt||{};const pages=opt.pages||1;
       src=d.toDataURL('image/jpeg',q);if(src.length<190000)break;k*=.82;q=Math.max(.55,q-.05)}}
   const w=c.width,h=c.height,box={x:80,y:80,w:SW-160,h:SH-260},k=Math.min(box.w/w,box.h/h);
   const bw=Math.round(w*k),pxm=opt.mmW?bw/(opt.mmW/1000):null;
-  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:bw,h:Math.round(h*k),pxm,op:pxm?.95:.85,lock:true,...(opt.src?{from:opt.src}:{})};pl.useBg=true;pl.calibrated=!!pxm;if(pxm)pl.pxm=pxm;pl.hideRoom=false});
+  mut(()=>{const pl=ensurePlan();pl.bg={src,asset,name:String(name||'Floor plan').slice(0,80),x:box.x,y:box.y,w:bw,h:Math.round(h*k),pxm,op:pxm?.95:.85,lock:true,...(opt.src?{from:opt.src}:{}),...(opt.edit?{edit:opt.edit}:{})};pl.useBg=true;pl.calibrated=!!pxm;if(pxm)pl.pxm=pxm;pl.hideRoom=false});
   S.ui.bgOff=false;S.ui.ptool='select';S.planTool=pxm?null:{a:null,b:null};S.sel=null;cams.plan.init=false;
   if(opt.quiet)return;
   if(!onPlan())setSheet('plan');else{refreshDesign();requestAnimationFrame(()=>{fit();cam.init=true})}
   toast(pxm?`${name} is on the plan at its true scale.${asset?'':' It’s saved at reduced size here.'}`:`Plan uploaded${pages>1?` (page 1 of ${pages})`:''}${asset?'':'. It’s saved at reduced size here'}. Click two points a known distance apart to set the scale.`);
 }
+let PE_ORIG=null;
+/* ================= FLOOR PLAN CLEANUP =================
+   An architect's PDF from CAD keeps its lines, shapes and text as separate objects. The editor pulls
+   them out (pdf.js operator list + text layer) so each can be selected and removed, by click, by box,
+   by kind (all text, dashed lines, images), by line style, or by the PDF's own layers. Scans and
+   photos get an eraser, crop and "lines only". The result becomes the plan image; the edits and the
+   original file are kept so the plan can be cleaned again. */
+const PE={};
+const peHex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+const peMul=(m,n)=>[m[0]*n[0]+m[2]*n[1],m[1]*n[0]+m[3]*n[1],m[0]*n[2]+m[2]*n[3],m[1]*n[2]+m[3]*n[3],m[0]*n[4]+m[2]*n[5]+m[4],m[1]*n[4]+m[3]*n[5]+m[5]];
+const peAp=(m,x,y)=>[m[0]*x+m[2]*y+m[4],m[1]*x+m[3]*y+m[5]];
+const peRanges=a=>{a=[...new Set(a)].sort((x,y)=>x-y);const out=[];for(let i=0;i<a.length;){let j=i;while(j+1<a.length&&a[j+1]===a[j]+1)j++;out.push(j>i?a[i]+'-'+a[j]:''+a[i]);i=j+1}return out.join(',')};
+const peUnranges=s=>String(s||'').split(',').filter(Boolean).flatMap(p=>{const [a,b]=p.split('-').map(Number);if(isNaN(b))return [a];const o=[];for(let i=a;i<=b;i++)o.push(i);return o});
+/* the page as editable items, in pixels of a viewport whose longer side is 2800 */
+async function peExtract(lib,doc,pno){
+  const page=await doc.getPage(pno),v1=page.getViewport({scale:1}),scale=Math.min(5,2800/Math.max(v1.width,v1.height)),vp=page.getViewport({scale});
+  const W=Math.round(vp.width),H=Math.round(vp.height);
+  /* a full render: images are cut from it, and it's the fallback for anything not drawn as vectors */
+  const ras=document.createElement('canvas');ras.width=W;ras.height=H;const rctx=ras.getContext('2d');rctx.fillStyle='#fff';rctx.fillRect(0,0,W,H);
+  await page.render({canvasContext:rctx,viewport:vp}).promise;
+  const ol=await page.getOperatorList(),O=lib.OPS,items=[];
+  let layers=[];try{const cfg=await doc.getOptionalContentConfig();const g=cfg.getGroups&&cfg.getGroups();if(g)layers=Object.entries(g).map(([id,v])=>({id,name:(v&&v.name)||id}))}catch(e){}
+  let st={m:vp.transform.slice(),lw:1,dash:false,sc:'#000000',fc:'#000000'};const stack=[],ocs=[];let path=null,pbb=null;
+  const lay=()=>ocs.length?ocs[ocs.length-1]:null;
+  const addPt=(x,y)=>{const [a,b]=peAp(st.m,x,y);if(a<pbb[0])pbb[0]=a;if(b<pbb[1])pbb[1]=b;if(a>pbb[2])pbb[2]=a;if(b>pbb[3])pbb[3]=b;return a.toFixed(1)+' '+b.toFixed(1)};
+  const flush=(stroke,fill)=>{if(path&&path.length&&(stroke||fill)){const sw=Math.max(.6,st.lw*Math.sqrt(Math.abs(st.m[0]*st.m[3]-st.m[1]*st.m[2])));
+      items.push({k:'path',d:path.join(''),s:stroke?st.sc:null,f:fill?st.fc:null,w:+sw.toFixed(2),dash:stroke&&st.dash,lay:lay(),bb:pbb.map(v=>Math.round(v))})}path=null;pbb=null};
+  const fn=ol.fnArray,ar=ol.argsArray;let cx=0,cy=0;
+  for(let i=0;i<fn.length;i++){const f=fn[i],a=ar[i];
+    switch(f){
+      case O.save:stack.push({...st,m:st.m.slice()});break;
+      case O.restore:if(stack.length)st=stack.pop();break;
+      case O.transform:st.m=peMul(st.m,a);break;
+      case O.paintFormXObjectBegin:stack.push({...st,m:st.m.slice()});if(a[0])st.m=peMul(st.m,a[0]);break;
+      case O.paintFormXObjectEnd:if(stack.length)st=stack.pop();break;
+      case O.setLineWidth:st.lw=a[0];break;
+      case O.setDash:st.dash=!!(a[0]&&a[0].length&&a[0].some(v=>v>0));break;
+      case O.setStrokeRGBColor:st.sc=typeof a[0]==='string'?a[0]:peHex(a[0],a[1],a[2]);break;
+      case O.setFillRGBColor:st.fc=typeof a[0]==='string'?a[0]:peHex(a[0],a[1],a[2]);break;
+      case O.beginMarkedContentProps:ocs.push(a[0]==='OC'&&a[1]&&a[1].id?a[1].id:lay());break;
+      case O.beginMarkedContent:ocs.push(lay());break;
+      case O.endMarkedContent:ocs.pop();break;
+      case O.constructPath:{const ops=a[0],args=a[1];if(!path){path=[];pbb=[1e9,1e9,-1e9,-1e9]}let j=0;
+        for(const op of ops){
+          if(op===O.moveTo){cx=args[j++];cy=args[j++];path.push('M'+addPt(cx,cy))}
+          else if(op===O.lineTo){cx=args[j++];cy=args[j++];path.push('L'+addPt(cx,cy))}
+          else if(op===O.curveTo){const p=[args[j++],args[j++],args[j++],args[j++],args[j++],args[j++]];path.push('C'+addPt(p[0],p[1])+' '+addPt(p[2],p[3])+' '+addPt(p[4],p[5]));cx=p[4];cy=p[5]}
+          else if(op===O.curveTo2){const p=[args[j++],args[j++],args[j++],args[j++]];path.push('C'+addPt(cx,cy)+' '+addPt(p[0],p[1])+' '+addPt(p[2],p[3]));cx=p[2];cy=p[3]}
+          else if(op===O.curveTo3){const p=[args[j++],args[j++],args[j++],args[j++]];path.push('C'+addPt(p[0],p[1])+' '+addPt(p[2],p[3])+' '+addPt(p[2],p[3]));cx=p[2];cy=p[3]}
+          else if(op===O.closePath)path.push('Z');
+          else if(op===O.rectangle){const [x,y,w,h]=[args[j++],args[j++],args[j++],args[j++]];path.push('M'+addPt(x,y)+'L'+addPt(x+w,y)+'L'+addPt(x+w,y+h)+'L'+addPt(x,y+h)+'Z');cx=x;cy=y}}
+        break}
+      case O.stroke:flush(true,false);break;
+      case O.closeStroke:if(path)path.push('Z');flush(true,false);break;
+      case O.fill:case O.eoFill:flush(false,true);break;
+      case O.fillStroke:case O.eoFillStroke:flush(true,true);break;
+      case O.closeFillStroke:case O.closeEOFillStroke:if(path)path.push('Z');flush(true,true);break;
+      case O.endPath:path=null;pbb=null;break;
+      case O.paintImageXObject:case O.paintInlineImageXObject:case O.paintImageMaskXObject:case O.paintImageXObjectRepeat:{
+        const c=[[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>peAp(st.m,x,y)),xs=c.map(p=>p[0]),ys=c.map(p=>p[1]);
+        const bb=[Math.floor(Math.min(...xs)),Math.floor(Math.min(...ys)),Math.ceil(Math.max(...xs)),Math.ceil(Math.max(...ys))];
+        if(bb[2]-bb[0]>2&&bb[3]-bb[1]>2)items.push({k:'img',lay:lay(),bb:[Math.max(0,bb[0]),Math.max(0,bb[1]),Math.min(W,bb[2]),Math.min(H,bb[3])]});break}
+    }}
+  const tc=await page.getTextContent();
+  tc.items.forEach(t=>{if(!t.str||!t.str.trim())return;const m=lib.Util.transform(vp.transform,t.transform),size=Math.hypot(m[2],m[3]),rot=Math.atan2(m[1],m[0]),w=(t.width||0)*scale;
+    const x=m[4],y=m[5],ca=Math.cos(rot),sa=Math.sin(rot),pts=[[x,y],[x+w*ca,y+w*sa],[x+size*sa,y-size*ca],[x+w*ca+size*sa,y+w*sa-size*ca]];
+    items.push({k:'text',str:t.str,x:+x.toFixed(1),y:+y.toFixed(1),size:+size.toFixed(1),rot:+(rot*180/Math.PI).toFixed(1),w:+w.toFixed(1),lay:null,
+      bb:[Math.min(...pts.map(p=>p[0])),Math.min(...pts.map(p=>p[1])),Math.max(...pts.map(p=>p[0])),Math.max(...pts.map(p=>p[1]))].map(v=>Math.round(v))})});
+  return {W,H,scale,items,layers,ras,pageW:v1.width,pageH:v1.height}}
+/* a photo or a scan: one picture item, cleaned with the eraser, crop and lines only */
+function peFromCanvas(c){return {W:c.width,H:c.height,scale:null,items:[{k:'img',bb:[0,0,c.width,c.height],lay:null,base:true}],layers:[],ras:c}}
+const peStyle=it=>it.k==='path'?(it.s?`s${it.s}|${Math.round(it.w*2)/2}${it.dash?'|d':''}`:`f${it.f}`):it.k;
+function peVisible(i){const it=PE.d.items[i];if(PE.removed.has(i))return false;if(it.lay&&PE.offLayers.has(it.lay))return false;if(PE.offStyles.has(peStyle(it)))return false;if(it.k==='text'&&PE.offKinds.has('text'))return false;if(it.k==='img'&&!it.base&&PE.offKinds.has('img'))return false;if(it.dash&&PE.offKinds.has('dash'))return false;return true}
+function peItemSVG(it,i){const id=`data-i="${i}"`;
+  if(it.k==='path')return `<path ${id} d="${it.d}" fill="${it.f||'none'}" stroke="${it.s||'none'}" stroke-width="${it.w}"${it.dash?' stroke-dasharray="6 4"':''}/>`;
+  if(it.k==='text')return `<text ${id} x="${it.x}" y="${it.y}" font-size="${it.size}" transform="rotate(${it.rot} ${it.x} ${it.y})"${it.w?` textLength="${it.w}" lengthAdjust="spacingAndGlyphs"`:''}>${esc(it.str)}</text>`;
+  if(it.k==='img')return `<use ${id} href="#peRas" clip-path="inset(0)" /><rect ${id} class="peimg" x="${it.bb[0]}" y="${it.bb[1]}" width="${it.bb[2]-it.bb[0]}" height="${it.bb[3]-it.bb[1]}"/>`;
+  return ''}
+/* open the editor for a PDF page or a picture */
+async function planEdit(src){/* src: {file, pdf?:bool, page?, edit?} */
+  const ov=$('#overlay');PE.src=src;PE.page=src.page||1;
+  ov.innerHTML=`<div class="pe" role="dialog" aria-modal="true" aria-label="Clean up the floor plan"><div class="pe-load"><b>Reading the plan…</b><span class="muted">Pulling out its lines, text and pictures so you can remove what you don't need.</span></div></div>`;ov.hidden=false;
+  try{let d;
+    if(src.pdf){const lib=await loadPdfjs();if(!PE.doc||PE.docFile!==src.file){PE.doc=await lib.getDocument({data:new Uint8Array(await src.file.arrayBuffer())}).promise;PE.docFile=src.file}
+      PE.pages=PE.doc.numPages;d=await peExtract(lib,PE.doc,PE.page);
+      const np=d.items.filter(x=>x.k==='path').length,big=d.items.some(x=>x.k==='img'&&(x.bb[2]-x.bb[0])*(x.bb[3]-x.bb[1])>.5*d.W*d.H);
+      if(np<3||(big&&np<200)){const img=d.items.filter(x=>x.k==='img');d.mode='image';if(!img.length)d.items.unshift({k:'img',bb:[0,0,d.W,d.H],lay:null,base:true});else d.items=[{k:'img',bb:[0,0,d.W,d.H],lay:null,base:true},...d.items.filter(x=>x.k==='text')]}}
+    else{PE.pages=1;d=peFromCanvas(await shrinkImage(src.file,2800,'image/jpeg'));d.mode='image'}
+    if(d.items.length>90000){closeOverlay();toast('That plan has too many objects to edit here. Upload it as is, or export just the floor plan page.');return}
+    PE.d=d;const e=src.edit||{};
+    PE.removed=new Set(peUnranges(e.removed));PE.offStyles=new Set(e.offStyles||[]);PE.offLayers=new Set(e.offLayers||[]);PE.offKinds=new Set(e.offKinds||[]);
+    PE.erase=(e.erase||[]).map(r=>r.slice());PE.crop=e.crop?e.crop.slice():null;PE.lines=!!e.lines;PE.scaleK=e.scale||'';
+    PE.sel=new Set();PE.undo=[];PE.redo=[];PE.tool=d.mode==='image'?'erase':'select';PE.showRemoved=false;PE.ras=d.ras.toDataURL('image/jpeg',.85);
+    peRender();pefit()}
+  catch(e){console.error(e);closeOverlay();toast('Couldn’t open that plan for editing. It’s been placed as is.');if(src.fallback)src.fallback()}}
+function peSnapshot(){return {removed:[...PE.removed],offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase.map(r=>r.slice()),crop:PE.crop&&PE.crop.slice(),lines:PE.lines}}
+function peDo(fn){PE.undo.push(peSnapshot());if(PE.undo.length>200)PE.undo.shift();PE.redo=[];fn();peRefresh()}
+function peRestore(s){PE.removed=new Set(s.removed);PE.offStyles=new Set(s.offStyles);PE.offLayers=new Set(s.offLayers);PE.offKinds=new Set(s.offKinds);PE.erase=s.erase;PE.crop=s.crop;PE.lines=s.lines;PE.sel.clear()}
+const PE_SCALES=[['','Not set'],['96',"1/8\" = 1'-0\""],['64',"3/16\" = 1'-0\""],['48',"1/4\" = 1'-0\""],['32',"3/8\" = 1'-0\""],['24',"1/2\" = 1'-0\""],['m50','1:50'],['m100','1:100'],['m200','1:200']];
+function peStylesList(){const g=new Map();PE.d.items.forEach((it,i)=>{if(it.k!=='path'||PE.removed.has(i))return;const k=peStyle(it);const o=g.get(k)||{k,n:0,it};o.n++;g.set(k,o)});return [...g.values()].sort((a,b)=>b.n-a.n).slice(0,24)}
+function peRender(){const d=PE.d,ov=$('#overlay'),img=d.mode==='image',cnt=k=>d.items.filter((x,i)=>x.k===k&&!x.base&&!PE.removed.has(i)).length,dash=d.items.filter((x,i)=>x.dash&&!PE.removed.has(i)).length;
+  const T=(k,l,ic)=>`<button class="pe-tool" data-act="peTool" data-t="${k}" aria-pressed="${PE.tool===k}" title="${l}">${ic}<span>${l}</span></button>`;
+  ov.innerHTML=`<div class="pe" role="dialog" aria-modal="true" aria-labelledby="peH">
+   <header class="pe-top"><div class="pe-title"><b id="peH">Clean up the floor plan</b><span class="muted">${esc(PE.src.file.name||'Plan')}${PE.pages>1?` · page <select id="pePage" aria-label="Page">${Array.from({length:PE.pages},(_,i)=>`<option value="${i+1}" ${i+1===PE.page?'selected':''}>${i+1}</option>`).join('')}</select> of ${PE.pages}`:''}</span></div>
+    <div class="pe-acts"><button class="btn sm" data-act="peUndo" id="peUndoB">Undo</button><button class="btn sm" data-act="peRedo" id="peRedoB">Redo</button><button class="btn sm" data-act="peFit">Fit</button>
+     <button class="btn sm" data-act="peCancel">Cancel</button><button class="btn sm" data-act="peDone" data-raw="1">Use as is</button><button class="btn primary sm" data-act="peDone">Use this plan</button></div></header>
+   <div class="pe-body">
+    <aside class="pe-side">
+     <div class="pe-tools" role="group" aria-label="Tools">${T('select','Select','<svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-3 6z"/></svg>')}${T('pan','Move','<svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/></svg>')}${T('erase','White out','<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M8 10h8M8 14h5"/></svg>')}${T('crop','Crop','<svg viewBox="0 0 24 24"><path d="M6 2v16h16M2 6h16v16"/></svg>')}</div>
+     <p class="pe-hint">${{select:'Click a line, shape or text to select it; drag across an area to select everything inside. Shift adds to the selection. Delete removes it.',pan:'Drag to move around. Scroll or pinch to zoom.',erase:'Drag a box over notes, stamps or anything else to cover it in white. Click a white box to select it; Delete removes it.',crop:'Drag the area to keep. Everything outside is cut off.'}[PE.tool]}</p>
+     <div class="pe-selbar" id="peSelBar"></div>
+     ${img?`<div class="pe-sec"><h4>Picture</h4><label class="check"><input type="checkbox" id="peLines" ${PE.lines?'checked':''}> Lines only <span class="muted">(drops shading, color and light marks)</span></label></div>`
+     :`<div class="pe-sec"><h4>Remove in one click</h4>
+       <label class="check"><input type="checkbox" data-pekind="text" ${PE.offKinds.has('text')?'':'checked'}> Text <span class="muted">${cnt('text')}</span></label>
+       <label class="check"><input type="checkbox" data-pekind="dash" ${PE.offKinds.has('dash')?'':'checked'}> Dashed lines <span class="muted">${dash}</span></label>
+       <label class="check"><input type="checkbox" data-pekind="img" ${PE.offKinds.has('img')?'':'checked'}> Pictures and logos <span class="muted">${cnt('img')}</span></label></div>
+      ${d.layers.length?`<div class="pe-sec"><h4>PDF layers</h4>${d.layers.map(l=>`<label class="check"><input type="checkbox" data-pelay="${esc(l.id)}" ${PE.offLayers.has(l.id)?'':'checked'}> ${esc(l.name)} <span class="muted">${d.items.filter(x=>x.lay===l.id).length}</span></label>`).join('')}</div>`:''}
+      <div class="pe-sec"><h4>Line styles</h4><p class="muted" style="margin:0 0 6px;font-size:12px">Notes, dimensions and furniture are often drawn in their own color or weight. Untick one to hide it.</p>
+       ${peStylesList().map(o=>{const it=o.it;return `<label class="check pe-sty"><input type="checkbox" data-pesty="${esc(o.k)}" ${PE.offStyles.has(o.k)?'':'checked'}><svg viewBox="0 0 40 12" aria-hidden="true"><line x1="2" y1="6" x2="38" y2="6" stroke="${it.s||it.f}" stroke-width="${Math.min(6,Math.max(1,it.w))}" ${it.dash?'stroke-dasharray="5 3"':''}/></svg><span>${it.s?`${it.w.toFixed(1)} px${it.dash?' dashed':''}`:'Filled'}</span><span class="muted">${o.n}</span></label>`}).join('')}</div>
+      <div class="pe-sec"><h4>Drawing scale</h4><select id="peScale" class="inp" aria-label="Drawing scale">${PE_SCALES.map(([k,l])=>`<option value="${k}" ${PE.scaleK===k?'selected':''}>${esc(l)}</option>`).join('')}</select><p class="muted" style="margin:4px 0 0;font-size:12px">From the plan's title block. Set it and the plan arrives at true scale; leave it and set the scale on the sheet.</p></div>`}
+     <div class="pe-sec"><label class="check"><input type="checkbox" id="peShowRm" ${PE.showRemoved?'checked':''}> Show what I removed</label>${PE.removed.size||PE.erase.length||PE.crop?`<button class="btn sm" data-act="peReset">Start over</button>`:''}</div>
+    </aside>
+    <div class="pe-stage" id="peStage" data-tool="${PE.tool}"><svg id="peSvg" xmlns="http://www.w3.org/2000/svg"><defs><image id="peRas" href="${PE.ras}" x="0" y="0" width="${d.W}" height="${d.H}"/>
+      ${d.items.map((it,i)=>it.k==='img'?`<clipPath id="pec${i}"><rect x="${it.bb[0]}" y="${it.bb[1]}" width="${it.bb[2]-it.bb[0]}" height="${it.bb[3]-it.bb[1]}"/></clipPath>`:'').join('')}</defs>
+      <rect x="0" y="0" width="${d.W}" height="${d.H}" fill="#fff"/>
+      <g id="peItems" font-family="Arial,Helvetica,sans-serif" fill="#333">${d.items.map((it,i)=>it.k==='img'?`<use data-i="${i}" href="#peRas" clip-path="url(#pec${i})"/>`:peItemSVG(it,i)).join('')}</g>
+      <g id="peErase"></g><g id="peOver"></g></svg></div>
+   </div></div>`;
+  PE.svg=$('#peSvg');PE.els=[];PE.svg.querySelectorAll('#peItems [data-i]').forEach(el=>{PE.els[+el.dataset.i]=el});peBind();peRefresh()}
+function peRefresh(){if(!PE.svg)return;const d=PE.d;
+  PE.els.forEach((el,i)=>{if(!el)return;const vis=peVisible(i);el.classList.toggle('pe-off',!vis);el.classList.toggle('pe-ghost',!vis&&PE.showRemoved);el.classList.toggle('pe-sel',PE.sel.has(i))});
+  $('#peErase').innerHTML=PE.erase.map((r,j)=>`<rect data-er="${j}" class="pe-er${PE.sel.has('e'+j)?' pe-sel':''}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`).join('');
+  const c=PE.crop;$('#peOver').innerHTML=c?`<path class="pe-cropmask" fill-rule="evenodd" d="M0 0H${d.W}V${d.H}H0Z M${c[0]} ${c[1]}h${c[2]}v${c[3]}h${-c[2]}Z"/><rect class="pe-cropline" x="${c[0]}" y="${c[1]}" width="${c[2]}" height="${c[3]}"/>`:'';
+  const n=PE.sel.size,sb=$('#peSelBar');if(sb)sb.innerHTML=n?`<b>${plural(n,'object')} selected</b><button class="btn sm danger" data-act="peDel">Remove</button><button class="btn sm" data-act="peSelNone">Clear</button>${PE.showRemoved&&[...PE.sel].some(i=>typeof i==='number'&&PE.removed.has(i))?'<button class="btn sm" data-act="peRestoreSel">Put back</button>':''}`:'';
+  const u=$('#peUndoB'),r=$('#peRedoB');if(u)u.disabled=!PE.undo.length;if(r)r.disabled=!PE.redo.length;
+  const g=$('#peItems');if(g)g.style.filter=PE.lines?'grayscale(1) contrast(4) brightness(1.15)':''}
+function pefit(){const st=$('#peStage');if(!st)return;const d=PE.d,c=PE.crop||[0,0,d.W,d.H];PE.vb=[c[0]-c[2]*.03,c[1]-c[3]*.03,c[2]*1.06,c[3]*1.06];peVB()}
+function peVB(){const st=$('#peStage'),r=st.getBoundingClientRect(),vb=PE.vb,ar=r.width/Math.max(1,r.height);let [x,y,w,h]=vb;if(w/h<ar){const nw=h*ar;x-=(nw-w)/2;w=nw}else{const nh=w/ar;y-=(nh-h)/2;h=nh}PE.vb=[x,y,w,h];PE.svg.setAttribute('viewBox',PE.vb.join(' '));PE.k=w/Math.max(1,r.width);PE.svg.style.setProperty('--pek',PE.k)}
+function pePt(e){const r=PE.svg.getBoundingClientRect();return [PE.vb[0]+(e.clientX-r.left)*PE.k,PE.vb[1]+(e.clientY-r.top)*PE.k]}
+function peBind(){const st=$('#peStage');let drag=null;const pts=new Map();
+  st.addEventListener('wheel',e=>{e.preventDefault();const [px,py]=pePt(e);
+    const z=Math.exp((e.ctrlKey||e.metaKey?e.deltaY*3:e.deltaY)*0.0015);const vb=PE.vb;PE.vb=[px-(px-vb[0])*z,py-(py-vb[1])*z,vb[2]*z,vb[3]*z];peVB()},{passive:false});
+  st.addEventListener('pointerdown',e=>{if(e.button===2)return;st.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2){drag={k:'pinch',d0:peDist(pts),vb0:PE.vb.slice(),c:peMid(pts)};return}
+    const [x,y]=pePt(e),pan=PE.tool==='pan'||e.button===1||PE.space;drag={k:pan?'pan':PE.tool,x0:x,y0:y,cx:e.clientX,cy:e.clientY,vb0:PE.vb.slice(),moved:false,shift:e.shiftKey,target:e.target}});
+  st.addEventListener('pointermove',e=>{if(!drag)return;if(pts.has(e.pointerId))pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(drag.k==='pinch'&&pts.size===2){const z=drag.d0/Math.max(1,peDist(pts)),r=PE.svg.getBoundingClientRect(),c=drag.c,vb=drag.vb0,px=vb[0]+(c[0]-r.left)*vb[2]/r.width,py=vb[1]+(c[1]-r.top)*vb[3]/r.height;PE.vb=[px-(px-vb[0])*z,py-(py-vb[1])*z,vb[2]*z,vb[3]*z];peVB();return}
+    if(Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy)>4)drag.moved=true;
+    if(drag.k==='pan'){PE.vb=[drag.vb0[0]-(e.clientX-drag.cx)*PE.k,drag.vb0[1]-(e.clientY-drag.cy)*PE.k,drag.vb0[2],drag.vb0[3]];PE.svg.setAttribute('viewBox',PE.vb.join(' '));return}
+    if(drag.moved){const [x,y]=pePt(e),r=[Math.min(x,drag.x0),Math.min(y,drag.y0),Math.abs(x-drag.x0),Math.abs(y-drag.y0)];drag.r=r;
+      const cls=drag.k==='erase'?'pe-drawer':drag.k==='crop'?'pe-drawcrop':'pe-band';$('#peOver').innerHTML=(PE.crop&&drag.k!=='crop'?$('#peOver').innerHTML.replace(/<rect class="pe-(band|drawer|drawcrop)"[^>]*\/>/g,''):'')+`<rect class="${cls}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`}});
+  const end=e=>{pts.delete(e.pointerId);if(!drag)return;/* e is the pointerup */const g=drag;drag=null;if(g.k==='pinch'||g.k==='pan')return;
+    if(g.moved&&g.r&&g.r[2]>2&&g.r[3]>2){const r=g.r;
+      if(g.k==='erase')peDo(()=>PE.erase.push(r.map(Math.round)));
+      else if(g.k==='crop')peDo(()=>{PE.crop=r.map(Math.round)});
+      else{const hit=[];PE.d.items.forEach((it,i)=>{if(!(peVisible(i)||PE.showRemoved&&PE.removed.has(i)))return;if(it.base)return;const b=it.bb;if(b[0]>=r[0]&&b[1]>=r[1]&&b[2]<=r[0]+r[2]&&b[3]<=r[1]+r[3])hit.push(i)});
+        if(!g.shift)PE.sel.clear();hit.forEach(i=>PE.sel.add(i));peRefresh()}}
+    else{let t=g.target&&g.target.closest?g.target.closest('[data-i],[data-er]'):null;
+      if(!t||(t.dataset.i!=null&&PE.d.items[+t.dataset.i].base)){/* a few pixels of slack around thin lines */
+        outer:for(const r of [3,6,9])for(let a=0;a<8;a++){const ex=e.clientX+Math.cos(a*Math.PI/4)*r,ey=e.clientY+Math.sin(a*Math.PI/4)*r;
+          for(const el of document.elementsFromPoint(ex,ey)){const h=el.closest&&el.closest('#peItems [data-i],#peErase [data-er]');if(h&&!(h.dataset.i!=null&&PE.d.items[+h.dataset.i].base)){t=h;break outer}}}}
+      if(!g.shift)PE.sel.clear();
+      if(t&&t.dataset.er!=null)PE.sel.add('e'+t.dataset.er);else if(t&&t.dataset.i!=null&&!PE.d.items[+t.dataset.i].base){const i=+t.dataset.i;PE.sel.has(i)&&g.shift?PE.sel.delete(i):PE.sel.add(i)}
+      peRefresh()}
+    $('#peOver')&&peRefresh()};
+  st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);
+  PE.key=e=>{if(!$('.pe'))return;if(e.target&&/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName))return;
+    if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();A.peDel()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?A.peRedo():A.peUndo()}
+    else if(e.key===' '){PE.space=true;$('#peStage').dataset.tool='pan'}else if(e.key==='Escape'){PE.sel.clear();peRefresh()}};
+  PE.keyup=e=>{if(e.key===' '){PE.space=false;const s=$('#peStage');if(s)s.dataset.tool=PE.tool}};
+  document.removeEventListener('keydown',PE.keyH||(()=>{}));document.removeEventListener('keyup',PE.keyUpH||(()=>{}));PE.keyH=PE.key;PE.keyUpH=PE.keyup;document.addEventListener('keydown',PE.keyH);document.addEventListener('keyup',PE.keyUpH)}
+const peDist=m=>{const [a,b]=[...m.values()];return Math.hypot(a[0]-b[0],a[1]-b[1])},peMid=m=>{const [a,b]=[...m.values()];return [(a[0]+b[0])/2,(a[1]+b[1])/2]};
+/* the cleaned plan as a picture: pictures first, then lines and text, then white-outs; cropped; lines only last */
+async function peOutput(raw){const d=PE.d,c=document.createElement('canvas');c.width=d.W;c.height=d.H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,d.W,d.H);
+  if(raw){x.drawImage(d.ras,0,0)}else{
+    d.items.forEach((it,i)=>{if(it.k==='img'&&peVisible(i)){const b=it.bb;x.drawImage(d.ras,b[0],b[1],b[2]-b[0],b[3]-b[1],b[0],b[1],b[2]-b[0],b[3]-b[1])}});
+    const vec=d.items.map((it,i)=>it.k!=='img'&&peVisible(i)?peItemSVG(it,i):'').join('');
+    if(vec){const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${d.W}" height="${d.H}" viewBox="0 0 ${d.W} ${d.H}"><g font-family="Arial,Helvetica,sans-serif" fill="#333">${vec}</g></svg>`,url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
+      try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});x.drawImage(im,0,0)}finally{URL.revokeObjectURL(url)}}
+    x.fillStyle='#fff';PE.erase.forEach(r=>x.fillRect(r[0],r[1],r[2],r[3]))}
+  let out=c;const cr=!raw&&PE.crop;if(cr){out=document.createElement('canvas');out.width=cr[2];out.height=cr[3];const o=out.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,cr[2],cr[3]);o.drawImage(c,cr[0],cr[1],cr[2],cr[3],0,0,cr[2],cr[3])}
+  if(!raw&&PE.lines){const o=out.getContext('2d'),id=o.getImageData(0,0,out.width,out.height),p=id.data;
+    for(let i=0;i<p.length;i+=4){const r=p[i],g=p[i+1],b=p[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),lum=.3*r+.59*g+.11*b,sat=mx?(mx-mn)/mx:0;const v=(lum<120&&sat<.35)?0:255;p[i]=p[i+1]=p[i+2]=v}o.putImageData(id,0,0)}
+  return out}
+function peScaleMm(outW){/* real width of the output in millimetres, from the drawing scale */
+  const k=PE.scaleK;if(!k||!PE.d.scale)return null;const paperIn=outW/PE.d.scale/72;return k[0]==='m'?paperIn*25.4*+k.slice(1):paperIn*25.4*+k}
+
+document.addEventListener('change',e=>{const t=e.target;if(!t||!PE.d||!$('.pe'))return;
+  if(t.dataset.pekind){peDo(()=>{t.checked?PE.offKinds.delete(t.dataset.pekind):PE.offKinds.add(t.dataset.pekind)})}
+  else if(t.dataset.pelay){peDo(()=>{t.checked?PE.offLayers.delete(t.dataset.pelay):PE.offLayers.add(t.dataset.pelay)})}
+  else if(t.dataset.pesty){peDo(()=>{t.checked?PE.offStyles.delete(t.dataset.pesty):PE.offStyles.add(t.dataset.pesty)})}
+  else if(t.id==='peLines'){peDo(()=>{PE.lines=t.checked})}
+  else if(t.id==='peShowRm'){PE.showRemoved=t.checked;peRefresh()}
+  else if(t.id==='peScale'){PE.scaleK=t.value}
+  else if(t.id==='pePage'){planEdit({...PE.src,page:+t.value,edit:null})}});
+
 /* ---------- OpenCalque drawings and DXF files: read by OpenCalque's engine (MIT), drawn at true scale ---------- */
 let OCP=null;
 function ocLoad(){if(window.OpenCalque)return Promise.resolve(window.OpenCalque);
@@ -2934,7 +3161,7 @@ function planSheetPanel(tg){
      <div class="row3"><label class="field" for="plW">Width (m)<input id="plW" type="number" min="2" max="14" step="0.1" data-plprop="w" value="${r.w}"></label><label class="field" for="plD">Depth (m)<input id="plD" type="number" min="2" max="8" step="0.1" data-plprop="d" value="${r.d}"></label>${ceilF}</div>`}
    <div class="plh">Floor plan</div>
    ${PB()?`<div class="kv"><span>Uploaded plan</span><b>${esc(PB().name||'Floor plan')}</b></div>`:''}
-   <div class="actions"><label class="btn filebtn">${PB()?'Replace floor plan':'Upload floor plan'}<input type="file" id="bgFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp,.opencalque,.dxf" aria-label="Upload a floor plan PDF or image"></label>
+   <div class="actions">${PB()&&((PB().edit&&PB().edit.orig)||PE_ORIG)?`<button class="btn primary" data-act="peReopen">Clean up plan</button>`:''}<label class="btn filebtn">${PB()?'Replace floor plan':'Upload floor plan'}<input type="file" id="bgFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp,.opencalque,.dxf" aria-label="Upload a floor plan PDF or image"></label>
     ${pl.useBg?`<button class="btn" data-act="scaleTool">Set scale</button><button class="btn" data-act="useRoom">Use drawn room</button>`:`${PB()?'<button class="btn" data-act="useBg">Use uploaded plan</button>':''}<button class="btn" data-act="planBlank">${pl.hideRoom?'Show drawn room':'Start from blank'}</button>`}
     ${PB()?'<button class="btn danger" data-act="removeBg">Delete plan</button>':''}</div>
    ${PB()&&pl.useBg?bgControls(PB()):''}
@@ -6355,6 +6582,28 @@ const A={
       await bgFromCanvas(c,`${o.name.replace(/\.[^.]+$/,'')} · ${pg.name}`,{mmW:pg.wMm,src:'opencalque',quiet:i<pick.length-1})}
     if(pick.length>1){const f0=flList()&&flList()[0];if(f0&&/^Floor \d+$/.test(f0.name)&&!/^page \d+$/i.test(pick[0].name))f0.name=pick[0].name;save();refreshDesign();requestAnimationFrame(()=>fit())}
     toast(`${plural(pick.length,'floor')} added at true scale. Place devices on each one.`)},
+  peTool(el){PE.tool=el.dataset.t;peRender();peVB()},
+  peUndo(){if(!PE.undo.length)return;PE.redo.push(peSnapshot());peRestore(PE.undo.pop());peRender();peVB()},
+  peRedo(){if(!PE.redo.length)return;PE.undo.push(peSnapshot());peRestore(PE.redo.pop());peRender();peVB()},
+  peFit(){pefit()},
+  peSelNone(){PE.sel.clear();peRefresh()},
+  peDel(){if(!PE.sel||!PE.sel.size)return;peDo(()=>{const er=[...PE.sel].filter(i=>typeof i==='string').map(s=>+s.slice(1));PE.erase=PE.erase.filter((r,j)=>!er.includes(j));
+    [...PE.sel].filter(i=>typeof i==='number').forEach(i=>PE.removed.add(i));PE.sel.clear()});const vb=PE.vb;peRender();PE.vb=vb;peVB()},
+  peRestoreSel(){peDo(()=>{[...PE.sel].forEach(i=>{if(typeof i==='number')PE.removed.delete(i)});PE.sel.clear()});const vb=PE.vb;peRender();PE.vb=vb;peVB()},
+  peReset(){peDo(()=>{PE.removed.clear();PE.offStyles.clear();PE.offLayers.clear();PE.offKinds.clear();PE.erase=[];PE.crop=null;PE.lines=false;PE.sel.clear()});peRender();pefit()},
+  peCancel(){const keep=PE.src&&PE.src.onCancel;closeOverlay();PE.svg=null;if(keep)keep()},
+  async peDone(el){const raw=!!el.dataset.raw,src=PE.src;el.disabled=true;el.textContent='Saving…';
+    let c;try{c=await peOutput(raw)}catch(e){console.error(e);el.disabled=false;el.textContent=raw?'Use as is':'Use this plan';toast('Couldn’t draw the cleaned plan. Try again, or use it as is.');return}
+    const edit=raw?{v:1,kind:src.pdf?'pdf':'img',page:PE.page}:{v:1,kind:src.pdf?'pdf':'img',page:PE.page,removed:peRanges([...PE.removed]),offStyles:[...PE.offStyles],offLayers:[...PE.offLayers],offKinds:[...PE.offKinds],erase:PE.erase,crop:PE.crop,lines:PE.lines,scale:PE.scaleK};
+    let orig=src.orig||null;if(!orig&&ASSETS&&src.file.size<19e6){try{const res=await ASSETS.upload(src.file,{type:src.file.type||(src.pdf?'application/pdf':'image/jpeg')});orig=res.id}catch(e){}}
+    PE_ORIG=src.file;const mm=raw?null:peScaleMm(c.width);
+    closeOverlay();PE.svg=null;
+    await bgFromCanvas(c,src.file.name||'Floor plan',{pages:PE.pages,mmW:mm||undefined,edit:{...edit,orig,name:src.file.name||''}});
+    if(!raw)toast(`Plan cleaned up${mm?' and set to true scale':''}. ${PE.removed.size?plural(PE.removed.size,'object')+' removed. ':''}You can clean it again any time from the floor plan panel.`)},
+  async peReopen(){const pl=S.design.plan,bg=pl&&pl.bg,e=bg&&bg.edit;let file=PE_ORIG&&e&&PE_ORIG.name===e.name?PE_ORIG:null;
+    if(!file&&e&&e.orig){try{const r=await fetch('/_blob/'+e.orig);if(r.ok){const b=await r.blob();file=new File([b],e.name||'plan',{type:b.type})}}catch(x){}}
+    if(!file){toast('The original file isn’t saved here. Upload the PDF again to clean it up.');return}
+    planEdit({file,pdf:e?e.kind==='pdf':/pdf/.test(file.type),page:e&&e.page,edit:e,orig:e&&e.orig})},
   bomAdd(el){const pid=el.dataset.pid,p=byId(pid);if(!p)return;const inp=document.getElementById('bmn-'+pid),n=Math.max(1,Math.round(+(inp&&inp.value)||1));
     mut(()=>{const ex=S.design.extras.find(e=>e.pid===pid);if(ex)ex.qty+=n;else S.design.extras.push({pid,qty:n})});refreshDesign();toast(`Added ${n} × ${p.model} to the bill of materials.`)},
   copyBom(){copyText(bomCSV(),'Bill of materials')},
