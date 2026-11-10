@@ -196,6 +196,34 @@ h3{font-size:24px;line-height:1.05;font-weight:600}
 @keyframes vzring{0%{transform:scale(.25);opacity:.7}100%{transform:scale(1);opacity:0}}
 @keyframes vzblink{50%{opacity:.45}}
 @media (prefers-reduced-motion: reduce){.vz *{animation:none!important}.vz .ring,.vz .flow{display:none}}
+/* live title block beside the form */
+.tbp{position:relative;background:var(--sheet);border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:14px 14px}
+.tbp-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--sheet);border-bottom:1.5px solid var(--ink);font:700 16px var(--f-display);letter-spacing:.05em;text-transform:uppercase}
+.tbp-st{font:500 10.5px var(--f-mono);letter-spacing:.08em;color:var(--muted)}
+.tbp-idx{list-style:none;margin:0;padding:12px 14px 14px;display:grid;gap:4px;min-height:52px}
+.tbp-idx li{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;align-items:baseline;font-size:13px;color:var(--ink);animation:tbpin .35s cubic-bezier(.23,1,.32,1) backwards}
+.tbp-idx li span{font:600 11.5px var(--f-mono);color:var(--c,var(--muted))}
+.tbp-idx li.out{animation:tbpout .2s ease forwards}
+@keyframes tbpin{from{opacity:0;transform:translateX(-8px)}}
+@keyframes tbpout{to{opacity:0;transform:translateX(8px)}}
+.tbp-tb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 14px 14px;background:var(--sheet);border:1.2px solid var(--ink)}
+.tbp-brand{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--ink);font:700 13px var(--f-display);letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.tbp-brand svg{width:18px;height:18px}
+.tbp-c{min-width:0;padding:6px 10px 7px;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2)}
+.tbp-c:nth-child(3n+5){border-right:0}.tbp-c:nth-last-child(-n+4){border-bottom:0}
+.tbp-c.wide{grid-column:1/-1;border-right:0}
+.tbp-c i{display:block;font:500 9px var(--f-mono);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tbp-c b{display:block;font:600 13.5px/1.25 var(--f-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.tbp-c.wide b{font:700 21px/1.1 var(--f-display);letter-spacing:.03em;text-transform:uppercase}
+.tbp-c b.ph{color:color-mix(in srgb,var(--muted) 70%,transparent)}
+.tbp-c b.live{animation:tbpflash .5s ease}
+@keyframes tbpflash{from{background:color-mix(in srgb,var(--accent) 22%,transparent)}}
+.tbp-no{font:700 15px var(--f-display)!important}
+.tbp-c b.draft{color:var(--warn)}.tbp-c b.issued{color:var(--node)}
+.tbp-stamp{position:absolute;right:22px;top:46px;padding:6px 12px 7px;border:2.5px solid var(--node);border-radius:4px;color:var(--node);font:800 20px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;text-align:center;rotate:-7deg;background:color-mix(in srgb,var(--sheet) 80%,transparent);opacity:0;scale:1.8;pointer-events:none;transition:opacity .2s ease,scale .45s cubic-bezier(.23,1,.32,1)}
+.tbp-stamp small{display:block;margin-top:3px;font:600 8.5px var(--f-mono);letter-spacing:.1em}
+.tbp.issued .tbp-stamp{opacity:1;scale:1}
+@media (prefers-reduced-motion: reduce){.tbp-idx li,.tbp-c b.live{animation:none}.tbp-stamp{transition:none}}
 /* hover to trace */
 .hf .hf-hit{fill:none;stroke:transparent;stroke-width:9;pointer-events:stroke;cursor:crosshair}
 .hf-c>:not(.hf-hit),.hf-lc>:not(.hf-hit){pointer-events:none}
@@ -1477,6 +1505,21 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
         <li><div><b>Scope call</b>We confirm requirements, site access and timeline.</div></li>
         <li><div><b>Drawings and proposal</b>You review the set and sign online.</div></li>
       </ol>
+      <aside class="tbp" aria-label="Preview of your drawing set">
+        <div class="tbp-hd"><span>Your drawing set</span><span class="tbp-st" id="tbp-st">Rev 0 · Draft</span></div>
+        <ol class="tbp-idx" id="tbp-idx"></ol>
+        <div class="tbp-tb">
+          <div class="tbp-brand"><svg viewBox="0 0 128 128" aria-hidden="true"><use href="#jlogo"/></svg>Jams Docs and Designs</div>
+          <div class="tbp-c wide"><i>Project</i><b id="tbp-co" class="ph">Your company</b></div>
+          <div class="tbp-c"><i>Prepared for</i><b id="tbp-nm" class="ph">Your name</b></div>
+          <div class="tbp-c"><i>Sheet</i><b class="tbp-no">E-001</b></div>
+          <div class="tbp-c"><i>Scope</i><b id="tbp-sz"></b></div>
+          <div class="tbp-c"><i>Timeline</i><b id="tbp-wh"></b></div>
+          <div class="tbp-c"><i>Date</i><b id="tbp-dt"></b></div>
+          <div class="tbp-c"><i>Status</i><b id="tbp-ss" class="draft">Draft</b></div>
+        </div>
+        <div class="tbp-stamp" id="tbp-stamp" aria-hidden="true">Request issued<small>We'll reply by email</small></div>
+      </aside>
     </div>
     <form class="form" id="form" novalidate>
       <div class="fld"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required></div>
@@ -2016,5 +2059,23 @@ document.addEventListener('click',function(e){if(cur&&!svg.contains(e.target))cl
 svg.addEventListener('keydown',function(e){var k=e.key;if(k==='ArrowRight'||k==='ArrowDown'||k==='ArrowLeft'||k==='ArrowUp'){e.preventDefault();touched=true;ki=(ki+(k==='ArrowRight'||k==='ArrowDown'?1:-1)+cs.length)%cs.length;trace(cs[ki])}else if(k==='Escape')clear()});
 svg.addEventListener('blur',clear);addEventListener('resize',function(){if(cur)place(cur)});
 if(!rm.matches)setTimeout(function(){if(touched)return;var d=cs[10];trace(d);setTimeout(function(){if(!touched&&cur===d)clear()},2200)},4300)})();</script>
+<script>(function(){var f=document.getElementById('form'),bx=document.querySelector('.tbp');if(!f||!bx)return;
+var SH={'n-asb':[['A-001','As-built drawing set','sv'],['E-501','Wire labels','sc']],'n-av':[['E-101','Signal flow','sv'],['E-301','Floor plan','sa']],'n-smart':[['H-101','Home floor plans and devices','sa']],
+'n-rack':[['E-201','Rack elevations','sn'],['E-401','Cable schedule','su']],'n-net':[['N-101','Network diagram','su']],'n-prop':[['P-1001','Proposal and bill of materials','sa']],
+'n-inst':[['I-101','Install notes','sc']],'n-onsite':[['S-101','Site visit log','sv']],'n-svc':[['S-201','Service plan','sn']],'n-app':[['APP','SITREP app access','sc']]};
+var idx=document.getElementById('tbp-idx'),$=function(i){return document.getElementById(i)},shown={};
+var d=new Date();$('tbp-dt').textContent=(d.getMonth()+1)+'/'+d.getDate()+'/'+String(d.getFullYear()).slice(2);
+function set(id,val,ph){var e=$(id);if(!e)return;var t=val||ph;if(e.textContent===t)return;e.textContent=t;e.classList.toggle('ph',!val);if(val){e.classList.remove('live');void e.offsetWidth;e.classList.add('live')}}
+function sheets(){var list=[['E-001','Cover, legend and symbols','']];f.querySelectorAll('.chips input:checked').forEach(function(c){(SH[c.id]||[]).forEach(function(x){if(!list.some(function(y){return y[0]===x[0]}))list.push(x)})});list.sort(function(a,b){return a[0]<b[0]?-1:1});return list}
+function draw(){var list=sheets(),want={};list.forEach(function(x){want[x[0]]=1});
+ [].slice.call(idx.children).forEach(function(li){if(!want[li.dataset.n]&&!li.classList.contains('out')){li.classList.add('out');setTimeout(function(){li.remove()},200);delete shown[li.dataset.n]}});
+ list.forEach(function(x,i){var li=idx.querySelector('li[data-n="'+x[0]+'"]:not(.out)');if(!li){li=document.createElement('li');li.dataset.n=x[0];li.className=x[2];li.innerHTML='<span></span>';li.firstChild.textContent=x[0];li.appendChild(document.createTextNode(x[1]))}
+  var at=[].filter.call(idx.children,function(n){return !n.classList.contains('out')})[i];if(at!==li)idx.insertBefore(li,at||null)})}
+function upd(){var v=function(i){var e=$(i);return e?e.value.trim():''};set('tbp-co',v('f-co'),'Your company');set('tbp-nm',v('f-name'),'Your name');set('tbp-sz',v('f-size'),'');set('tbp-wh',v('f-when'),'');draw()}
+function reset(){bx.classList.remove('issued');$('tbp-ss').textContent='Draft';$('tbp-ss').className='draft';$('tbp-st').textContent='Rev 0 · Draft';upd()}
+f.addEventListener('input',upd);f.addEventListener('change',upd);
+document.querySelectorAll('[data-pick]').forEach(function(a){a.addEventListener('click',function(){setTimeout(upd,30)})});
+new MutationObserver(function(){if(f.querySelector('.done')){bx.classList.add('issued');$('tbp-ss').textContent='Issued';$('tbp-ss').className='issued';$('tbp-st').textContent='Rev 0 · Issued'}else if(bx.classList.contains('issued'))reset()}).observe(f,{childList:true});
+upd()})();</script>
 </body>
 </html>
