@@ -51,19 +51,24 @@ p{text-wrap:pretty}
 
 /* ------------------------------------------------------------------ the loom (signature move) */
 .loom{position:fixed;top:0;right:0;bottom:0;width:var(--loom);z-index:var(--sc-z-chrome);pointer-events:none}
-.loom svg.cables{position:absolute;top:0;bottom:0;right:40px;width:34px;height:100%}
+.loom svg.cables{position:absolute;top:0;bottom:0;right:40px;width:42px;height:100%}
 .loom ol{list-style:none;margin:0;padding:0;position:absolute;inset:0}
-.loom li{position:absolute;right:26px;width:62px;transform:translateY(-50%)}
+.loom li{position:absolute;right:22px;width:80px;transform:translateY(-50%)}
 .sleeve{pointer-events:auto;display:grid;gap:1px;padding:5px 6px 4px;background:#FBFCFC;color:#132231;border-radius:3px;text-decoration:none;
   box-shadow:0 1px 1px hsl(212 40% 10%/.25),0 4px 10px -2px hsl(212 40% 10%/.35),inset 0 -2px 0 rgba(19,34,49,.08);
-  clip-path:inset(0 0 0 100%);transform:translateX(34px);opacity:.0;
-  transition:clip-path 420ms var(--sc-ease-out),transform 420ms var(--sc-ease-out),opacity 200ms linear,background-color var(--sc-d-fast),color var(--sc-d-fast)}
-.sleeve b{font:600 10.5px/1.1 var(--sc-font-mono);letter-spacing:.04em}
-.sleeve span{font:500 8.5px/1.1 var(--sc-font-mono);letter-spacing:.06em;text-transform:uppercase;color:#4B5C68;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  clip-path:inset(0 0 100% 0);transform:translateY(var(--from,0px));opacity:0;
+  transition:clip-path 360ms var(--sc-ease-out),transform 900ms var(--sc-ease-drawer) 260ms,opacity 120ms linear,background-color var(--sc-d-fast),color var(--sc-d-fast)}
+.sleeve b{font:600 12.5px/1.1 var(--sc-font-mono);letter-spacing:.03em}
+.sleeve span{font:500 9.5px/1.15 var(--sc-font-mono);letter-spacing:.06em;text-transform:uppercase;color:#4B5C68;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sleeve.on,.sleeve:focus-visible{clip-path:inset(0 0 0 0);transform:none;opacity:1}
+.sleeve:focus-visible{transition:none}
 .sleeve.cur{background:#FF9A52;color:#10223A}.sleeve.cur span{color:#10223A}
 @media (hover:hover) and (pointer:fine){.sleeve.on:hover{transform:translateX(-3px)}}
-.loom .printer{position:absolute;right:8px;top:12px;font:600 9px/1 var(--sc-font-mono);letter-spacing:.08em;color:#4B5C68;writing-mode:vertical-rl;transform:rotate(180deg);opacity:.0}
+.loom .printer{position:absolute;right:14px;top:14px;width:94px;height:46px;border-radius:6px;background:#1B2B3B;box-shadow:0 2px 3px hsl(212 40% 6%/.4),0 10px 22px -6px hsl(212 40% 6%/.5),inset 0 1px 0 rgba(255,255,255,.12);z-index:2}
+.loom .printer::before{content:"";position:absolute;left:10px;right:10px;bottom:7px;height:4px;border-radius:2px;background:#0B141D}
+.loom .printer::after{content:"";position:absolute;right:10px;top:10px;width:6px;height:6px;border-radius:50%;background:#3DDC84;box-shadow:0 0 0 2px rgba(61,220,132,.18)}
+.loom .printer i{position:absolute;left:10px;top:9px;font:600 8.5px/1.2 var(--sc-font-mono);letter-spacing:.1em;color:#A9B8C5;font-style:normal}
+.loom .printer.busy::after{background:#FF9A52;box-shadow:0 0 0 3px rgba(255,154,82,.25)}
 .folio{display:none}
 @media (min-width:1100px){
   .has-loom .sc-wrap{padding-right:calc(var(--sc-gutter) + var(--loom) - 24px)}
@@ -82,7 +87,7 @@ p{text-wrap:pretty}
 
 /* ------------------------------------------------------------------ G-001 cover: layered planes */
 .cover .sc-stage{display:grid;place-items:center;padding:clamp(14px,3vw,40px)}
-.cv-room{position:relative;width:min(1240px,calc(100vw - var(--loom) - 32px));height:min(86svh,760px)}
+.cv-room{position:relative;width:min(1340px,calc(100vw - var(--loom) - 28px));height:min(92svh,860px)}
 .cv-plane{position:absolute;inset:0;max-width:none}
 .cv-stack .pg{position:absolute;inset:3% 2% 4% 4%;background:#F9FBFB;border:1px solid var(--line);box-shadow:var(--sc-e1)}
 .cv-stack .pg:nth-child(1){transform:translate(calc(18px + var(--sc-p,0)*26px),calc(14px + var(--sc-p,0)*18px)) rotate(calc(1.3deg + var(--sc-p,0)*1.6deg))}
@@ -92,12 +97,12 @@ p{text-wrap:pretty}
 .cv-sheet::after{content:"";position:absolute;inset:14px;background-image:linear-gradient(#EEF2F3 1px,transparent 1px),linear-gradient(90deg,#EEF2F3 1px,transparent 1px);background-size:24px 24px;opacity:.9;pointer-events:none}
 .zones{position:absolute;inset:0;pointer-events:none;z-index:1}
 .zones span{position:absolute;font:500 10px/1 var(--sc-font-mono);color:#6A7A85}
-.cv-copy{position:absolute;z-index:3;left:clamp(30px,5%,72px);top:clamp(30px,7%,80px);max-width:min(700px,60%)}
+.cv-copy{position:absolute;z-index:3;left:clamp(30px,5%,72px);top:clamp(28px,6%,70px);max-width:min(820px,64%)}
 .cv-copy .brand{display:flex;align-items:center;gap:12px;margin-bottom:clamp(14px,3svh,32px);text-decoration:none;color:#132231}
 .cv-copy .brand img{width:40px;height:40px;border-radius:50%}
 .cv-copy .brand b{font:780 15px/1.1 var(--sc-font-display);letter-spacing:.02em;text-transform:uppercase;font-variation-settings:"wdth" 112}
 .cv-copy .brand small{display:block;font:500 10px/1.3 var(--sc-font-mono);letter-spacing:.1em;color:#4B5C68;text-transform:uppercase}
-.cv-copy h1{font-size:clamp(2.4rem,min(5.2vw,7.6svh),5.4rem);line-height:.94;font-weight:800;font-variation-settings:"wdth" 72;text-transform:uppercase;letter-spacing:-.02em;color:#132231}
+.cv-copy h1{font-size:clamp(2.4rem,min(6.1vw,9.2svh),6.6rem);line-height:.92;font-weight:820;font-variation-settings:"wdth" 70;text-transform:uppercase;letter-spacing:-.02em;color:#132231}
 .cv-copy h1 span{display:block}
 .cv-copy h1 em{font-style:normal;color:var(--k)}
 .cv-copy p{margin:clamp(14px,2.2svh,24px) 0 clamp(16px,2.6svh,28px);max-width:40ch;color:#33434F;font-size:var(--sc-t-lg);line-height:1.45}
@@ -107,7 +112,17 @@ p{text-wrap:pretty}
 .tblock img{width:18px;height:18px;border-radius:50%}
 .tblock small{display:block;font:500 8.5px/1.2 var(--sc-font-mono);letter-spacing:.1em;color:#6A7A85;text-transform:uppercase}
 .tblock b{font:600 12.5px/1.3 var(--sc-font-mono)}
-.tblock .stat b{color:#B4470E}
+.tblock .stat{position:relative}.tblock .stat b{color:#B4470E}
+.tblock .stat .was{position:absolute;left:9px;bottom:6px;color:#6A7A85;opacity:calc(1 - clamp(0,(var(--sc-p,0) - .38)*5,1))}
+.tblock .stat .was::after{content:"";position:absolute;left:-2px;right:-2px;top:52%;height:1.5px;background:#C9302C;transform:scaleX(clamp(0,(var(--sc-p,0) - .2)*6,1));transform-origin:0 50%}
+.tblock .stat .now{opacity:clamp(0,(var(--sc-p,0) - .42)*5,1)}
+.dwgidx{position:absolute;z-index:3;left:clamp(30px,5%,72px);bottom:calc(4% + 30px);width:min(380px,32%);font:500 11px/1 var(--sc-font-mono);letter-spacing:.06em;color:#132231}
+.dwgidx b{display:block;font:600 10px/1 var(--sc-font-mono);letter-spacing:.12em;color:#6A7A85;margin-bottom:8px}
+.dwgidx ol{list-style:none;margin:0;padding:0;border-top:1.5px solid #132231}
+.dwgidx li a{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;padding:7px 2px;border-bottom:1px solid #C9D3D8;text-decoration:none;color:inherit;min-height:30px}
+.dwgidx li a span:last-child{color:#6A7A85}
+@media (hover:hover) and (pointer:fine){.dwgidx li a:hover{background:#FFF1E6;color:#B4470E}}
+@media (max-height:760px){.dwgidx{display:none}}
 .cv-vellum{left:auto;right:4%;top:5%;width:min(480px,36%);height:auto;bottom:auto;z-index:4}
 .vellum{position:relative;aspect-ratio:1.05;background:rgba(240,246,248,.58);backdrop-filter:blur(1.2px);-webkit-backdrop-filter:blur(1.2px);border:1px solid rgba(120,140,150,.35);box-shadow:0 6px 22px -6px hsl(212 40% 10%/.25);transform:rotate(calc(-5deg + var(--sc-p,0)*3.5deg)) translateX(calc(var(--sc-p,0)*-26px));transform-origin:70% 20%}
 .vellum svg{position:absolute;inset:0;width:100%;height:100%}
@@ -127,6 +142,7 @@ p{text-wrap:pretty}
   .cv-tape{display:none}
   .tblock{width:calc(100% - 4% - 30px);right:calc(2% + 14px)}
   .zones{display:none}
+  .dwgidx{display:none}
 }
 @media (max-width:420px){.cv-vellum{bottom:3%;width:44%}.tblock>div:nth-child(n+4){display:none}}
 
@@ -152,15 +168,17 @@ p{text-wrap:pretty}
 .inter p{margin-top:14px;color:var(--sc-ink-soft);font-size:var(--sc-t-lg)}
 
 /* ------------------------------------------------------------------ E-SET: the set assembles (peak) */
-.set .sc-stage{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(0,1.6fr);align-items:center;gap:clamp(20px,4vw,64px);padding-inline:var(--sc-gutter);padding-right:calc(var(--sc-gutter) + var(--loom) - 24px)}
+.set .sc-stage{display:grid;grid-template-columns:minmax(250px,.58fr) minmax(0,2fr);align-items:center;gap:clamp(20px,4vw,64px);padding-inline:var(--sc-gutter);padding-right:calc(var(--sc-gutter) + var(--loom) - 24px)}
 .set-copy{position:relative;height:min(60svh,520px)}
 .set-copy>div{position:absolute;inset:auto 0 0 0;top:0}
 .set-copy .mono{color:var(--cob-accent)}
 .set-copy h2{font-size:var(--sc-t-2xl);font-variation-settings:"wdth" 92;margin:10px 0 12px}
-.set-copy h3{font-size:var(--sc-t-xl);font-variation-settings:"wdth" 96;margin:10px 0 10px}
+.set-copy h3{font-size:var(--sc-t-2xl);font-variation-settings:"wdth" 90;margin:10px 0 12px;line-height:1}
+.set-copy .mono{font-size:13px}
+.set-copy .of{display:block;margin-top:18px;font:500 11px/1 var(--sc-font-mono);letter-spacing:.12em;color:var(--sc-ink-soft)}
 .set-copy p{margin:0;color:var(--sc-ink-soft);font-size:var(--sc-t-lg);line-height:1.5;max-width:34ch}
-.table{position:relative;height:min(70svh,640px);perspective:1600px}
-.sh{position:absolute;left:4%;top:6%;width:84%;aspect-ratio:420/297;background:#fff;border:1px solid #C9D3D8;box-shadow:0 2px 4px hsl(214 70% 4%/.22),0 18px 40px -10px hsl(214 70% 4%/.5);transform-origin:50% 60%;will-change:transform;opacity:0}
+.table{position:relative;height:min(82svh,760px)}
+.sh{position:absolute;left:0;top:0;width:600px;aspect-ratio:420/297;transform-origin:0 0;background:#fff;border:1px solid #C9D3D8;box-shadow:0 2px 4px hsl(214 70% 4%/.22),0 18px 40px -10px hsl(214 70% 4%/.5);will-change:transform;opacity:0}
 .sh svg{position:absolute;inset:0;width:100%;height:100%}
 .sh .fr{fill:none;stroke:#132231;stroke-width:1.2}
 .sh .gl{stroke:#EEF2F3;stroke-width:.6}
@@ -170,18 +188,20 @@ p{text-wrap:pretty}
 .sh .k{font:500 5.2px var(--sc-font-mono);fill:#6A7A85;letter-spacing:.06em}
 .sh .t{font:600 7px var(--sc-font-mono);fill:#132231}
 .sh .h{font:780 8px var(--sc-font-display);fill:#132231;letter-spacing:.02em}
+.thl{position:absolute;left:0;top:0;font:600 11px/1 var(--sc-font-mono);letter-spacing:.06em;color:var(--cob-soft);opacity:0;white-space:nowrap;transition:color var(--sc-d-fast)}
+.thl.cur{color:var(--cob-accent)}
 .sh .lb{opacity:clamp(0,calc(var(--d,1)*2.6 - 1.4),1)}
 .sh .row{opacity:clamp(0,calc(var(--d,1)*10 - var(--i)),1)}
 .sh .dev{fill:#fff;stroke:#132231;stroke-width:1}
 .sh .devh{fill:#EEF2F3}
-.stamp{position:absolute;right:6%;bottom:10%;z-index:30;transform:rotate(-9deg) scale(var(--s,1.6));opacity:var(--o,0);border:3px solid #FF9A52;color:#FF9A52;padding:8px 14px 6px;font:800 clamp(18px,2.2vw,30px)/1 var(--sc-font-display);letter-spacing:.06em;text-transform:uppercase;font-variation-settings:"wdth" 110;background:color-mix(in oklab,var(--cob-deep) 70%,transparent);border-radius:3px}
+.stamp{position:absolute;right:22%;bottom:12%;z-index:30;transform:rotate(-9deg) scale(var(--s,1.6));opacity:var(--o,0);border:3px solid #FF9A52;color:#FF9A52;padding:8px 14px 6px;font:800 clamp(18px,2.2vw,30px)/1 var(--sc-font-display);letter-spacing:.06em;text-transform:uppercase;font-variation-settings:"wdth" 110;background:color-mix(in oklab,var(--cob-deep) 70%,transparent);border-radius:3px}
 .stamp small{display:block;font:600 10px/1.4 var(--sc-font-mono);letter-spacing:.1em;margin-top:2px}
 @media (max-width:860px){
   .set .sc-stage{grid-template-columns:1fr;grid-template-rows:auto 1fr;align-content:start;padding-top:calc(64px + env(safe-area-inset-top,0px));padding-right:var(--sc-gutter);gap:10px}
   .set-copy{height:auto;min-height:30svh;order:2}
   .set-copy>div{position:absolute}
-  .table{height:46svh;order:1}
-  .sh{left:0;width:96%}
+  .table{height:50svh;order:1}
+  .stamp{right:6%;bottom:4%}
   .set-copy p{font-size:var(--sc-t-base)}
 }
 
@@ -211,10 +231,13 @@ p{text-wrap:pretty}
 .save .lede{margin:16px 0 0;color:var(--sc-ink-soft);font-size:var(--sc-t-lg);max-width:52ch}
 .scen{margin-top:clamp(36px,6vh,64px);display:grid;gap:clamp(18px,3vh,28px)}
 .scen article{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);gap:0;border-top:1px solid color-mix(in oklab,var(--cob-ink) 22%,transparent)}
-.scen h3{font-size:var(--sc-t-xl);font-variation-settings:"wdth" 94;padding:22px 24px 22px 0}
+.scen h3{font-size:var(--sc-t-2xl);line-height:1.02;font-variation-settings:"wdth" 94;padding:22px 24px 22px 0}
 .scen .side{padding:22px 24px;display:flex;flex-direction:column;gap:8px}
 .scen .side small{font:600 11px/1 var(--sc-font-mono);letter-spacing:.1em;text-transform:uppercase}
-.scen .side p{margin:0;line-height:1.5}
+.scen .side p{margin:0;line-height:1.5;font-size:var(--sc-t-lg)}
+.scen .colhd{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);font:600 11px/1 var(--sc-font-mono);letter-spacing:.12em;text-transform:uppercase}
+.scen .colhd span:nth-child(2){padding-left:24px;color:#E6A2A0}.scen .colhd span:nth-child(3){padding-left:24px;color:var(--cob-accent)}
+@media (max-width:860px){.scen .colhd{display:none}}
 .scen .wo{color:var(--cob-soft)}
 .scen .wo small{color:#E6A2A0}
 .scen .wi{background:#F6F9FA;color:#132231;box-shadow:var(--sc-e2)}
@@ -295,6 +318,7 @@ p{text-wrap:pretty}
     </g>
     <g fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1"><path d="M2 0V1000M7.6 0V1000M13.2 0V1000M18.8 0V1000M24.4 0V1000M30 0V1000"/></g>
   </svg>
+  <div class="printer" id="printer" aria-hidden="true"><i>LABEL<br>PRINTER</i></div>
   <ol id="loomList"></ol>
 </nav>
 <details class="folio" id="folio"><summary><i></i><span id="folioNow">G-001 Cover</span></summary><ol id="folioList"></ol></details>
@@ -316,10 +340,16 @@ p{text-wrap:pretty}
           <p>We trace, document and properly label your AV and network systems on site, and hand you the drawing set.</p>
           <a class="btn" href="#i001" data-pick="asbuilt">Document my system <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg></a>
         </div>
+        <nav class="dwgidx" aria-label="Sheet index"><b>Sheet index</b><ol>
+          <li><a href="#a101"><span>A-101</span><span>As found</span><span>01</span></a></li>
+          <li><a href="#eset"><span>E-SET</span><span>The drawing set</span><span>02</span></a></li>
+          <li><a href="#t101"><span>T-101</span><span>On site</span><span>03</span></a></li>
+          <li><a href="#c101"><span>C-101</span><span>What it saves</span><span>04</span></a></li>
+          <li><a href="#i001"><span>I-001</span><span>Request</span><span>05</span></a></li></ol></nav>
         <div class="tblock" aria-label="Title block">
           <div><img src="/logo.png" alt="" width="18" height="18">Jams Docs and Designs</div>
           <div><small>Set</small><b>Your site</b></div><div><small>Sheet</small><b>G-001</b></div>
-          <div><small>Title</small><b>Cover sheet</b></div><div class="stat"><small>Status</small><b>As-built</b></div>
+          <div><small>Title</small><b>Cover sheet</b></div><div class="stat"><small>Status</small><b class="was">As found</b><b class="now">As-built</b></div>
         </div>
       </div>
       <div class="cv-plane cv-vellum" data-sc-parallax="-2.2" aria-hidden="true">
@@ -397,16 +427,17 @@ p{text-wrap:pretty}
 <section class="set g-deep" id="eset" data-sheet="E-SET" data-title="The set" data-sc-act="pin" data-sc-span="5.6">
   <div data-sc-stage>
     <div class="set-copy">
-      <div data-sc-cue="0 0.2 0"><p class="mono">The drawing set</p><h2>Here’s what you get.</h2><p>Five kinds of sheet, built from what we traced. Sample drawings shown.</p></div>
-      <div data-sc-cue="0.16 0.34"><p class="mono">A-101</p><h3>Floor plan</h3><p>Where every display, mic, speaker, camera and wall plate actually is.</p></div>
-      <div data-sc-cue="0.31 0.49"><p class="mono">E-101</p><h3>Signal flow</h3><p>How each signal gets from source to screen, cable by cable.</p></div>
-      <div data-sc-cue="0.46 0.64"><p class="mono">E-201</p><h3>Rack elevation</h3><p>What’s in every rack, with every port and its label.</p></div>
-      <div data-sc-cue="0.61 0.79"><p class="mono">E-301</p><h3>Cable schedule</h3><p>Every cable’s number, from, to and type. Also delivered as a spreadsheet.</p></div>
-      <div data-sc-cue="0.74 0.93 0.15 0.2"><p class="mono">L-001</p><h3>Labels</h3><p>Print-ready labels that match the drawings, and we put them on.</p></div>
-      <div data-sc-cue="0.9 1 0.06 0"><p class="mono">Issued as-built</p><h2>One set. On paper and on the wall.</h2><p>Any tech can open it and start on the right cable.</p></div>
+      <div data-sc-cue="0 0.1 0"><p class="mono">The drawing set</p><h2>Here’s what you get.</h2><p>Five kinds of sheet, built from what we traced. Sample drawings shown.</p></div>
+      <div data-sc-cue="0.07 0.22"><p class="mono">A-101 · Sheet 1 of 5</p><h3>Floor plan</h3><p>Where every display, mic, speaker, camera and wall plate actually is.</p></div>
+      <div data-sc-cue="0.21 0.38"><p class="mono">E-101 · Sheet 2 of 5</p><h3>Signal flow</h3><p>How each signal gets from source to screen, cable by cable.</p></div>
+      <div data-sc-cue="0.37 0.54"><p class="mono">E-201 · Sheet 3 of 5</p><h3>Rack elevation</h3><p>What’s in every rack, with every port and its label.</p></div>
+      <div data-sc-cue="0.53 0.70"><p class="mono">E-301 · Sheet 4 of 5</p><h3>Cable schedule</h3><p>Every cable’s number, from, to and type. Also delivered as a spreadsheet.</p></div>
+      <div data-sc-cue="0.69 0.86"><p class="mono">L-001 · Sheet 5 of 5</p><h3>Labels</h3><p>Print-ready labels that match the drawings, and we put them on.</p></div>
+      <div data-sc-cue="0.85 1 0.08 0"><p class="mono">Issued as-built</p><h2>One set. On paper and on the wall.</h2><p>Any tech can open it and start on the right cable.</p></div>
     </div>
     <div class="table" id="table" aria-hidden="true">
       <div class="sh" data-i="0"></div><div class="sh" data-i="1"></div><div class="sh" data-i="2"></div><div class="sh" data-i="3"></div><div class="sh" data-i="4"></div>
+      <div class="thl" data-t="0">A-101</div><div class="thl" data-t="1">E-101</div><div class="thl" data-t="2">E-201</div><div class="thl" data-t="3">E-301</div><div class="thl" data-t="4">L-001</div>
       <div class="stamp" id="stamp">As-built<small>Rev 0 · issued</small></div>
     </div>
   </div>
@@ -444,6 +475,7 @@ p{text-wrap:pretty}
     <div class="sheethead"><span class="no">C-101</span><span class="ti">What it saves</span></div>
     <div data-sc-in><h2>Where the set pays for itself.</h2><p class="lede">You pay for documentation once. You pay for a tech’s search time on every call without it.</p></div>
     <div class="scen">
+      <div class="colhd" aria-hidden="true"><span>When…</span><span>Without the set</span><span>With the set</span></div>
       <article><h3>A display in the boardroom goes dark.</h3>
         <div class="side wo"><small>Without the set</small><p>The tech traces the cable from the wall plate back to the rack, port by port, on your clock.</p></div>
         <div class="side wi" data-sc-reveal="left" data-sc-reveal-at="0.12 0.42"><small>With the set</small><p>The label says <b>V-104</b>. Sheet E-101 says it lands on the switcher, output 4. Check it, fix it, done.</p></div></article>
@@ -533,21 +565,27 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),seg=(t,a,b)=>clamp((t-a)/(b-a),0,
 
 /* ---------------- the label loom: passing a sheet prints its label onto the bundle ---------------- */
 const sheets=$$('[data-sheet]');const list=$('#loomList'),flist=$('#folioList');
-sheets.forEach((s,i)=>{const top=8+i*(84/(sheets.length-1||1));
+sheets.forEach((s,i)=>{const top=14+i*(80/(sheets.length-1||1));
   const li=document.createElement('li');li.style.top=top+'%';
   li.innerHTML=`<a class="sleeve" href="#${s.id}" data-k="${i}"><b>${s.dataset.sheet}</b><span>${s.dataset.title}</span></a>`;list.appendChild(li);
   const fl=document.createElement('li');fl.innerHTML=`<a href="#${s.id}" data-k="${i}"><b>${s.dataset.sheet}</b>${s.dataset.title}</a>`;flist.appendChild(fl)});
 const sleeves=$$('.sleeve'),flinks=$$('#folioList a');let printed=-1,cur=-1;
 function loom(){const mid=innerHeight*.5;let c=0;sheets.forEach((s,i)=>{if(s.getBoundingClientRect().top<=mid)c=i});
   if(innerHeight+scrollY>=document.documentElement.scrollHeight-4)c=sheets.length-1;
-  if(c>printed){for(let i=printed+1;i<=c;i++){const sl=sleeves[i];if(sl)setTimeout(()=>sl.classList.add('on'),RM?0:(i-printed-1)*140)}printed=c}
+  if(c>printed){const pr=$('#printer');for(let i=printed+1;i<=c;i++){const sl=sleeves[i];if(!sl)continue;
+      const slot=sl.parentElement.getBoundingClientRect(),from=(pr.getBoundingClientRect().bottom-4)-(slot.top+slot.height/2);
+      sl.style.transition='none';sl.style.setProperty('--from',from.toFixed(0)+'px');void sl.offsetWidth;sl.style.transition='';
+      setTimeout(()=>{sl.classList.add('on');if(pr){pr.classList.add('busy');clearTimeout(pr._t);pr._t=setTimeout(()=>pr.classList.remove('busy'),900)}},RM?0:40+(i-printed-1)*420)}printed=c}
   if(c!==cur){cur=c;sleeves.forEach((s,i)=>s.classList.toggle('cur',i===c));flinks.forEach((a,i)=>a.toggleAttribute('aria-current',i===c));$('#folioNow').textContent=sheets[c].dataset.sheet+' '+sheets[c].dataset.title}}
 flinks.forEach(a=>a.addEventListener('click',()=>$('#folio').open=false));
 addEventListener('scroll',loom,{passive:true});addEventListener('resize',loom);loom();
+/* the cover's sheet index only shows when it has room below the button */
+const idx=$('.dwgidx'),cta=$('.cv-copy .btn');function fitIdx(){if(!idx||!cta)return;idx.style.visibility='';const a=cta.getBoundingClientRect().bottom,b=idx.getBoundingClientRect().top;idx.style.visibility=b-a<20?'hidden':''}
+fitIdx();addEventListener('resize',fitIdx);document.fonts&&document.fonts.ready.then(fitIdx);
 
 /* ---------------- E-SET: five sheets fly in, draw themselves and stack; then the stamp ---------------- */
 const TB=(no,title)=>`<rect class="fr" x="8" y="8" width="404" height="281"/><g class="fr"><rect x="300" y="252" width="112" height="37"/><path d="M300 264H412M356 264V289M300 276H356"/></g>
-<text class="h" x="304" y="261">JAMS DOCS AND DESIGNS</text><text class="k" x="304" y="271">SHEET</text><text class="t" x="304" y="285">${no}</text><text class="k" x="360" y="271">TITLE</text><text class="t" x="360" y="283" style="font-size:6px">${title}</text>`;
+<text class="h" x="304" y="261" style="font-size:6.2px">JAMS DOCS AND DESIGNS</text><text class="k" x="304" y="271">SHEET</text><text class="t" x="304" y="285">${no}</text><text class="k" x="360" y="271">TITLE</text><text class="t" x="360" y="283" style="font-size:6px">${title}</text>`;
 const GRID=(()=>{let g='';for(let x=20;x<300;x+=16)g+=`M${x} 12V286`;for(let y=20;y<286;y+=16)g+=`M12 ${y}H408`;return `<path class="gl" d="${g}"/>`})();
 const SH=[
  ['A-101','FLOOR PLAN',`
@@ -584,17 +622,32 @@ const SH=[
 const shEls=$$('#table .sh');
 shEls.forEach((el,i)=>{const [no,title,body]=SH[i];el.innerHTML=`<svg viewBox="0 0 420 297">${GRID}${TB(no,title)}${body}</svg>`});
 const setAct=$('#eset'),stamp=$('#stamp');
-const W=[[.10,.24],[.25,.39],[.40,.54],[.55,.69],[.70,.84]];
-function setFrame(){
-  const p=RM?1:parseFloat(getComputedStyle(setAct).getPropertyValue('--sc-p'))||0;
-  const narrow=innerWidth<861;
-  shEls.forEach((el,i)=>{const [a,b]=W[i];const t=seg(p,a,a+(b-a)*.55),d=seg(p,a+(b-a)*.35,b);
-    const k=eo(t),fx=(1-k)*(narrow?110:70),fy=(1-k)*-12,rot=(1-k)*9+(i-2)*1.2;
-    const sx=i*(narrow?5:9),sy=i*(narrow?-4:-8);
-    el.style.opacity=t>0?Math.min(1,t*3):0;
-    el.style.transform=`translate(calc(${fx}vw + ${sx}px), calc(${fy}vh + ${sy}px)) rotate(${rot}deg)`;
-    el.style.setProperty('--d',RM?1:d.toFixed(3));el.style.zIndex=i+1});
-  const s=seg(p,.86,.93);stamp.style.setProperty('--o',s>0?1:0);stamp.style.setProperty('--s',(1.6-eo(s)*.6).toFixed(3))}
+const W=[0,1,2,3,4].map(i=>[.06+i*.16,.06+(i+1)*.16]);const thls=$$('#table .thl');
+let TL=null;function layout(){const t=$('#table');const w=t.clientWidth,h=t.clientHeight,narrow=innerWidth<861;
+  const tw=narrow?w*.2:Math.min(w*.17,170),th=tw*297/420,gap=narrow?6:12,colX=w-tw,col0=(h-(5*th+4*gap))/2;
+  let fw=Math.min((w-tw-(narrow?10:96)),h*.9*420/297);const fh=fw*297/420;
+  TL={w,h,tw,th,gap,colX,col0,fw,fh,fx:(w-tw-(narrow?10:96)-fw)/2,fy:(h-fh)/2,narrow};
+  shEls.forEach(el=>el.style.width=fw+'px');
+  thls.forEach((l,i)=>{l.style.transform=`translate(${colX-(narrow?0:62)}px,${col0+i*(th+gap)+th/2-5}px)`;if(narrow)l.style.display='none'})}
+function setFrame(){if(!TL)layout();
+  const p=RM?1:parseFloat(getComputedStyle(setAct).getPropertyValue('--sc-p'))||0;const L=TL,fin=seg(p,.86,.96),fe=eo(fin);let cur=-1;
+  shEls.forEach((el,i)=>{const [a,b]=W[i],w=b-a;
+    const arrive=eo(seg(p,a-.05,a+w*.3)),draw=seg(p,a+w*.15,a+w*.78),file=eo(seg(p,b-w*.18,b+w*.1));
+    if(p>=a-.05&&p<b+w*.1)cur=i;
+    // focus pose, entering from the right and below
+    let x=L.fx+(1-arrive)*L.w*.75,y=L.fy+(1-arrive)*L.h*.18,sc=1,r=(1-arrive)*8;
+    // filed into the index column
+    const tx=L.colX,ty=L.col0+i*(L.th+L.gap),ts=L.tw/L.fw;
+    x+= (tx-x)*file;y+=(ty-y)*file;sc+= (ts-sc)*file;r*=1-file;
+    // finale: the whole set fans out on the table
+    if(fin>0){const fs=.74,cx=L.fx+L.fw*(1-fs)/2+(i-2)*L.fw*.07,cy=L.fy+L.fh*(1-fs)/2+(2-Math.abs(i-2))*-6+12;
+      x+=(cx-x)*fe;y+=(cy-y)*fe;sc+=(fs-sc)*fe;r+=((i-2)*3.2-r)*fe}
+    el.style.opacity=arrive>0?Math.min(1,arrive*3):0;
+    el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) scale(${sc.toFixed(4)}) rotate(${r.toFixed(2)}deg)`;
+    el.style.setProperty('--d',RM?1:draw.toFixed(3));el.style.zIndex=fin>0?i+1:(file>0&&file<1?20:(i===cur?10:i+1));
+    const tl=thls[i];if(tl){tl.style.opacity=(file*(1-fin)).toFixed(2);tl.classList.toggle('cur',i===cur)}});
+  const s=seg(p,.9,.97);stamp.style.setProperty('--o',s>0?1:0);stamp.style.setProperty('--s',(1.6-eo(s)*.6).toFixed(3))}
+addEventListener('resize',()=>{TL=null;setFrame()});
 if(RM){setFrame()}else{let raf=0;const loop=()=>{setFrame();raf=requestAnimationFrame(loop)};
   new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){if(!raf)loop()}else{cancelAnimationFrame(raf);raf=0}}),{rootMargin:'50% 0px'}).observe(setAct);setFrame()}
 
