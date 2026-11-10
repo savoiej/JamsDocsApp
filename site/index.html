@@ -130,38 +130,54 @@ h3{font-size:24px;line-height:1.05;font-weight:600}
 .hero h1.h1-nb{font-size:clamp(40px,3.7vw + 10px,72px);line-height:.92}
 .hero-copy .lead.sm{font-size:16px}
 .hero .wrap{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)}
+.sk{--c:var(--rail)}
 .hf-hd text{font:700 15px var(--f-display);letter-spacing:.08em}
 .hf-hd .bad{fill:var(--bad)} .hf-hd .ok{fill:var(--node)}
-.hf-hd .strike{stroke:var(--bad);stroke-width:1.6}
 .hf-hd .sub{font:500 8px var(--f-mono);fill:var(--muted);letter-spacing:.08em;text-transform:uppercase}
 .hf-match{stroke:var(--line2);stroke-width:1;stroke-dasharray:6 4}
 .hf-rack{fill:var(--gear);stroke:var(--gear2);stroke-width:1.5}
 .hf-rail{fill:var(--gear2)}
-.hf-u rect:first-child{fill:var(--gear2);stroke:#4d5865;stroke-width:.8}
-.hf-jack{fill:#1a1f25;stroke:#5a6572;stroke-width:.6}
-.hf-scr{fill:#2f6fb0;opacity:.7}
-.hf-knob{fill:#1a1f25;stroke:#6b7682;stroke-width:.8}
+.hf-face{fill:var(--gear2);stroke:#4d5865;stroke-width:.8}
+.hf-jack{fill:#14181d;stroke:#5a6572;stroke-width:.6}
+.hf-term{fill:#14181d;stroke:#6b7682;stroke-width:.8}
+.hf-scr{fill:#2f6fb0;opacity:.75}
+.hf-led{fill:#5fd16a;animation:hfled 2.6s ease-in-out infinite}
+.hf-u:nth-child(odd) .hf-led{animation-delay:1.1s}
+@keyframes hfled{50%{opacity:.25}}
 .hf-tag{font:600 7.5px var(--f-mono);fill:var(--muted);letter-spacing:.06em}
-.hf-cord{fill:none;stroke:var(--c);stroke-width:2.6;stroke-linecap:round;opacity:.9}
-.hf-q text{font:700 17px var(--f-mono);fill:var(--warn)}
+.hf-cord{fill:none;stroke:var(--c);stroke-width:2.4;stroke-linecap:round;opacity:.92}
+.hf-boot{fill:var(--c);stroke:rgba(0,0,0,.4);stroke-width:.6}
+.hf-q text{font:700 17px var(--f-mono);fill:var(--warn);animation:hfq 2.8s ease-in-out infinite alternate}
+.hf-q text:nth-child(2){animation-delay:.7s}.hf-q text:nth-child(3){animation-delay:1.4s}.hf-q text:nth-child(4){animation-delay:2.1s}
+@keyframes hfq{from{opacity:.3}to{opacity:1}}
 .hf-tape{fill:#efe4c2;stroke:#cdbd8e;stroke-width:.6}
 .hf-tapet{font:600 7px var(--f-mono);fill:#5d4b2a;letter-spacing:.04em}
 .hf-foot{font:600 12px var(--f-body);fill:var(--ink)}
 .hf-foot2{font:500 9px var(--f-mono);fill:var(--muted)}
-.hf-neat{stroke-width:1.8;stroke-linecap:round}
-.hf-call path{fill:none;stroke:var(--c);stroke-width:.9}
+.hf-scan line{stroke:var(--accent);stroke-width:1.2}
+.hf-scan{animation:hfscan 4.6s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes hfscan{0%{transform:translateY(30px);opacity:0}12%{opacity:1}86%{opacity:1}100%{transform:translateY(266px);opacity:0}}
+.hf-run{fill:none;stroke:var(--c);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100 100;animation:hfdraw .6s cubic-bezier(.65,0,.35,1) var(--d) backwards}
+@keyframes hfdraw{from{stroke-dashoffset:100}}
+.hf-pop{transform-box:fill-box;transform-origin:center;animation:hfpop .38s cubic-bezier(.23,1,.32,1) var(--d) backwards}
+@keyframes hfpop{from{opacity:0;transform:scale(.2)}}
+.hf-flow{fill:none;stroke:color-mix(in srgb,var(--c) 30%,#fff);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:7 200;animation:hfflow var(--f) cubic-bezier(.45,0,.55,1) calc(3.2s + var(--fd)) infinite backwards}
+@keyframes hfflow{from{stroke-dashoffset:7}to{stroke-dashoffset:-100}}
+.hf-sleeve{fill:#f4f6f8;stroke:rgba(0,0,0,.35);stroke-width:.4}
+.hf-call path{fill:none;stroke:var(--c);stroke-width:.9;stroke-dasharray:100 100;animation:hfdraw .5s ease var(--d) backwards}
 .hf-call circle{fill:var(--c)}
 .hf-call rect{fill:var(--sheet);stroke:var(--c);stroke-width:1}
 .hf-call text{font:600 7.5px var(--f-mono);fill:var(--ink)}
+.hf-call>:not(path){animation:hffade .3s ease calc(var(--d) + .4s) backwards}
+@keyframes hffade{from{opacity:0}}
 .hs-tb .v.ok{fill:var(--node)}
 .hf-stamp rect{fill:none;stroke:var(--node);stroke-width:2}
 .hf-stamp .s1{font:800 15px var(--f-display);fill:var(--node);letter-spacing:.08em}
 .hf-stamp .s2{font:600 6.5px var(--f-mono);fill:var(--node);letter-spacing:.1em}
-.hf-stamp{transform-box:fill-box;transform-origin:center;transform:rotate(-6deg);animation:stamp .45s cubic-bezier(.23,1,.32,1) 1.8s backwards}
-@keyframes stamp{from{opacity:0;transform:rotate(-6deg) scale(1.6)}}
-@media (prefers-reduced-motion: reduce){.hf-stamp{animation:none}}
+.hf-stamp{transform-box:fill-box;transform-origin:center;transform:rotate(-6deg);animation:stamp .45s cubic-bezier(.23,1,.32,1) 3.1s backwards}
+@keyframes stamp{from{opacity:0;transform:rotate(-6deg) scale(1.7)}}
+@media (prefers-reduced-motion: reduce){.hf *,.hf-stamp{animation:none!important}.hf-scan,.hf-flow{display:none}}
 @media (max-width:640px){.sheetfig .floatcard{position:static;margin-top:12px;width:max-content;max-width:100%}}
-
 /* section frame */
 .sec{padding-block:96px;position:relative}
 .sec + .sec{border-top:1px solid var(--line)}
@@ -621,233 +637,348 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
     </div>
 
     <figure class="sheetfig" style="margin:0">
-      <svg viewBox="0 0 640 440" role="img" aria-labelledby="hfT">
-<title id="hfT">The same equipment rack shown twice: as found, with tangled unlabeled cables and question marks, and as-built, with every cable dressed, labeled and numbered to match the drawing</title>
-<defs><pattern id="hg" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" class="hs-g1"/></pattern><clipPath id="hfL"><rect x="14" y="14" width="306" height="412"/></clipPath></defs>
-<rect class="hs-sheet" x="0" y="0" width="640" height="440"/>
-<rect x="14" y="14" width="612" height="412" fill="url(#hg)"/>
-<rect class="hs-edge" x="14" y="14" width="612" height="412"/>
+      <svg viewBox="0 0 640 440" role="img" aria-labelledby="hfT" class="hf">
+<title id="hfT">The same equipment rack shown twice: as found, with tangled unlabeled patch cords, and as-built, with every cable dressed port to port, labeled and numbered to match the drawing</title>
+<defs><pattern id="hg" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" class="hs-g1"/></pattern><clipPath id="hfL"><rect x="15" y="15" width="302" height="410"/></clipPath><linearGradient id="hfBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity="0"/><stop offset="1" stop-color="var(--accent)" stop-opacity=".22"/></linearGradient></defs>
+<rect class="hs-sheet" x="0" y="0" width="640" height="440"/><rect x="14" y="14" width="612" height="412" fill="url(#hg)"/><rect class="hs-edge" x="14" y="14" width="612" height="412"/>
 <g class="hs-zone"><text x="86" y="10">A</text><text x="239" y="10">B</text><text x="392" y="10">C</text><text x="545" y="10">D</text><text x="4" y="92">1</text><text x="4" y="218">2</text><text x="4" y="344">3</text></g>
-<g class="hf-hd"><text x="30" y="38" class="bad">AS FOUND</text><text x="334" y="38" class="ok">AS-BUILT</text><text x="30" y="52" class="sub">No drawings · no labels</text><text x="334" y="52" class="sub">Traced · documented · labeled</text></g>
+<g class="hf-hd"><text x="30" y="36" class="bad">AS FOUND</text><text x="334" y="36" class="ok">AS-BUILT</text><text x="30" y="48" class="sub">No drawings · no labels</text><text x="334" y="48" class="sub">Traced · documented · labeled</text></g>
 <line x1="318" y1="22" x2="318" y2="420" class="hf-match"/>
-<rect class="hf-rack" x="56" y="58" width="180" height="270" rx="3"/>
-<rect class="hf-rail" x="60" y="60" width="6" height="266"/><rect class="hf-rail" x="226" y="60" width="6" height="266"/>
-<g class="hf-u"><rect x="68" y="66" width="156" height="22" rx="2"/>
-<rect class="hf-jack" x="74.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="86.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="97.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="109.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="120.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="132.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="143.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="155.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="166.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="178.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="189.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="201.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-rack" x="70" y="56" width="180" height="234" rx="3"/>
+<rect class="hf-rail" x="74" y="58" width="6" height="230"/><rect class="hf-rail" x="240" y="58" width="6" height="230"/>
+<g class="hf-u"><rect class="hf-face" x="82" y="66" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="88.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="100.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="111.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="123.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="134.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="146.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="157.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="169.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="180.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="192.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="203.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="215.0" y="74.0" width="7" height="6" rx="1"/>
 </g>
-<g class="hf-u"><rect x="68" y="94" width="156" height="22" rx="2"/>
-<rect class="hf-jack" x="74.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="86.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="97.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="109.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="120.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="132.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="143.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="155.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="166.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="178.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="189.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="201.0" y="102" width="7" height="6" rx="1"/>
+<g class="hf-u"><rect class="hf-face" x="82" y="94" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="88.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="100.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="111.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="123.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="134.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="146.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="157.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="169.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="180.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="192.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="203.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="215.0" y="102.0" width="7" height="6" rx="1"/>
 </g>
-<g class="hf-u"><rect x="68" y="122" width="156" height="22" rx="2"/>
-<rect class="hf-jack" x="74.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="86.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="97.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="109.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="120.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="132.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="143.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="155.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="166.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="178.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="189.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="201.0" y="130" width="7" height="6" rx="1"/>
+<g class="hf-u"><rect class="hf-face" x="82" y="122" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="88.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="100.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="111.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="123.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="134.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="146.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="157.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="169.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="180.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="192.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="203.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="215.0" y="130.0" width="7" height="6" rx="1"/>
 </g>
-<g class="hf-u"><rect x="68" y="156" width="156" height="36" rx="2"/>
-<rect class="hf-scr" x="76" y="169" width="26" height="10" rx="1.5"/>
-<circle class="hf-knob" cx="118" cy="174" r="3"/>
-<circle class="hf-knob" cx="130" cy="174" r="3"/>
-<circle class="hf-knob" cx="142" cy="174" r="3"/>
-<circle class="hf-knob" cx="154" cy="174" r="3"/>
-<circle class="hf-knob" cx="166" cy="174" r="3"/>
-<circle class="hf-knob" cx="178" cy="174" r="3"/>
+<g class="hf-u"><rect class="hf-face" x="82" y="152" width="156" height="30" rx="2"/>
+<rect class="hf-jack" x="88.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="100.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="111.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="123.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="134.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="146.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="157.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="169.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-scr" x="192" y="162" width="38" height="10" rx="1.5"/>
+<circle class="hf-led" cx="186" cy="167" r="1.6"/>
 </g>
-<g class="hf-u"><rect x="68" y="204" width="156" height="22" rx="2"/>
-<rect class="hf-scr" x="76" y="210" width="26" height="10" rx="1.5"/>
-<circle class="hf-knob" cx="118" cy="215" r="3"/>
-<circle class="hf-knob" cx="130" cy="215" r="3"/>
-<circle class="hf-knob" cx="142" cy="215" r="3"/>
-<circle class="hf-knob" cx="154" cy="215" r="3"/>
-<circle class="hf-knob" cx="166" cy="215" r="3"/>
-<circle class="hf-knob" cx="178" cy="215" r="3"/>
+<g class="hf-u"><rect class="hf-face" x="82" y="190" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="88.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="100.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="111.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="123.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="134.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="146.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="157.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="169.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-scr" x="192" y="196" width="38" height="10" rx="1.5"/>
+<circle class="hf-led" cx="186" cy="201" r="1.6"/>
 </g>
-<g class="hf-u"><rect x="68" y="238" width="156" height="36" rx="2"/>
-<rect class="hf-scr" x="76" y="251" width="26" height="10" rx="1.5"/>
-<circle class="hf-knob" cx="118" cy="256" r="3"/>
-<circle class="hf-knob" cx="130" cy="256" r="3"/>
-<circle class="hf-knob" cx="142" cy="256" r="3"/>
-<circle class="hf-knob" cx="154" cy="256" r="3"/>
-<circle class="hf-knob" cx="166" cy="256" r="3"/>
-<circle class="hf-knob" cx="178" cy="256" r="3"/>
+<g class="hf-u"><rect class="hf-face" x="82" y="220" width="156" height="30" rx="2"/>
+<circle class="hf-term" cx="92.0" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="103.5" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="115.0" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="126.5" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="138.0" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="149.5" cy="235.0" r="3.2"/>
+<rect class="hf-scr" x="192" y="230" width="38" height="10" rx="1.5"/>
+<circle class="hf-led" cx="186" cy="235" r="1.6"/>
 </g>
-<g class="hf-u"><rect x="68" y="292" width="156" height="26" rx="2"/>
-<rect class="hf-jack" x="78" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="95" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="112" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="129" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="146" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="163" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="180" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="197" y="301" width="9" height="8" rx="1.5"/>
+<g class="hf-u"><rect class="hf-face" x="82" y="258" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="87.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="110.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="133.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="156.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="179.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="202.5" y="265.0" width="9" height="8" rx="1.5"/>
 </g>
-<g clip-path="url(#hfL)" class="hf-mess">
-<path class="hf-cord sa" d="M101 108 C175 140 151 206 226 255"/>
-<path class="hf-cord sn" d="M90 136 C104 157 62 240 47 264"/>
-<path class="hf-cord sn" d="M78 136 C89 201 -7 193 64 253"/>
-<path class="hf-cord sn" d="M136 80 C141 151 46 155 52 239"/>
-<path class="hf-cord sa" d="M124 80 C123 121 113 141 122 204"/>
-<path class="hf-cord sv" d="M90 136 C173 158 291 151 281 226"/>
-<path class="hf-cord sa" d="M136 136 C216 186 74 277 44 301"/>
-<path class="hf-cord sa" d="M193 136 C165 219 260 247 286 310"/>
-<path class="hf-cord su" d="M78 80 C77 109 213 276 230 315"/>
-<path class="hf-cord sn" d="M147 136 C84 165 205 286 253 322"/>
-<path class="hf-cord su" d="M182 80 C149 106 285 173 220 260"/>
-<path class="hf-cord sv" d="M158 136 C141 166 149 186 62 237"/>
-<path class="hf-cord sv" d="M136 136 C156 158 -20 274 32 321"/>
-<path class="hf-cord sa" d="M136 136 C102 163 275 165 230 236"/>
+<g clip-path="url(#hfL)">
+<path class="hf-cord sv" d="M172.5 167.0C227 277 63 247 172.5 201.0"><animate class="hf-sway" attributeName="d" dur="4.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M172.5 167.0C227 277 63 247 172.5 201.0;M172.5 167.0C219 277 55 247 172.5 201.0;M172.5 167.0C227 277 63 247 172.5 201.0"/></path>
+<path class="hf-cord sn" d="M126.5 201.0C25 260 153 297 103.5 235.0"><animate class="hf-sway" attributeName="d" dur="4.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 201.0C25 260 153 297 103.5 235.0;M126.5 201.0C18 260 147 297 103.5 235.0;M126.5 201.0C25 260 153 297 103.5 235.0"/></path>
+<path class="hf-cord sa" d="M115.0 201.0C27 284 157 228 103.5 167.0"><animate class="hf-sway" attributeName="d" dur="6.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M115.0 201.0C27 284 157 228 103.5 167.0;M115.0 201.0C34 284 164 228 103.5 167.0;M115.0 201.0C27 284 157 228 103.5 167.0"/></path>
+<path class="hf-cord su" d="M115.0 167.0C63 268 205 190 103.5 133.0"><animate class="hf-sway" attributeName="d" dur="6.3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M115.0 167.0C63 268 205 190 103.5 133.0;M115.0 167.0C54 268 196 190 103.5 133.0;M115.0 167.0C63 268 205 190 103.5 133.0"/></path>
+<path class="hf-cord sc" d="M161.0 201.0C105 294 278 183 172.5 77.0"><animate class="hf-sway" attributeName="d" dur="5.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 201.0C105 294 278 183 172.5 77.0;M161.0 201.0C96 294 269 183 172.5 77.0;M161.0 201.0C105 294 278 183 172.5 77.0"/></path>
+<path class="hf-cord sn" d="M103.5 201.0C43 253 179 155 92.0 77.0"><animate class="hf-sway" attributeName="d" dur="6.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M103.5 201.0C43 253 179 155 92.0 77.0;M103.5 201.0C50 253 186 155 92.0 77.0;M103.5 201.0C43 253 179 155 92.0 77.0"/></path>
+<path class="hf-cord sv" d="M126.5 77.0C224 141 169 161 195.5 105.0"><animate class="hf-sway" attributeName="d" dur="5.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 77.0C224 141 169 161 195.5 105.0;M126.5 77.0C218 141 163 161 195.5 105.0;M126.5 77.0C224 141 169 161 195.5 105.0"/></path>
+<path class="hf-cord sn" d="M161.0 167.0C88 261 226 182 184.0 133.0"><animate class="hf-sway" attributeName="d" dur="5.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 167.0C88 261 226 182 184.0 133.0;M161.0 167.0C93 261 232 182 184.0 133.0;M161.0 167.0C88 261 226 182 184.0 133.0"/></path>
+<path class="hf-cord sv" d="M149.5 77.0C73 128 176 187 126.5 133.0"><animate class="hf-sway" attributeName="d" dur="6.0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M149.5 77.0C73 128 176 187 126.5 133.0;M149.5 77.0C65 128 168 187 126.5 133.0;M149.5 77.0C73 128 176 187 126.5 133.0"/></path>
+<path class="hf-cord sn" d="M126.5 167.0C62 243 230 145 207.0 77.0"><animate class="hf-sway" attributeName="d" dur="5.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 167.0C62 243 230 145 207.0 77.0;M126.5 167.0C54 243 222 145 207.0 77.0;M126.5 167.0C62 243 230 145 207.0 77.0"/></path>
+<path class="hf-cord sa" d="M161.0 133.0C207 199 34 187 103.5 77.0"><animate class="hf-sway" attributeName="d" dur="6.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 133.0C207 199 34 187 103.5 77.0;M161.0 133.0C198 199 26 187 103.5 77.0;M161.0 133.0C207 199 34 187 103.5 77.0"/></path>
+<path class="hf-cord su" d="M218.5 105.0C331 173 -6 325 92.0 235.0"><animate class="hf-sway" attributeName="d" dur="6.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M218.5 105.0C331 173 -6 325 92.0 235.0;M218.5 105.0C323 173 -13 325 92.0 235.0;M218.5 105.0C331 173 -6 325 92.0 235.0"/></path>
+<path class="hf-cord sc" d="M92.0 167.0C5 253 213 175 138.0 105.0"><animate class="hf-sway" attributeName="d" dur="7.0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M92.0 167.0C5 253 213 175 138.0 105.0;M92.0 167.0C-0 253 207 175 138.0 105.0;M92.0 167.0C5 253 213 175 138.0 105.0"/></path>
 </g>
-<g class="hf-q"><text x="252" y="96">??</text><text x="28" y="176">??</text><text x="262" y="214">??</text><text x="40" y="300">??</text></g>
-<g transform="rotate(-6 126 250)"><rect class="hf-tape" x="96" y="242" width="64" height="16"/><text class="hf-tapet" x="128" y="253" text-anchor="middle">DO NOT UNPLUG</text></g>
-<g transform="rotate(5 210 318)"><rect class="hf-tape" x="184" y="310" width="52" height="16"/><text class="hf-tapet" x="210" y="321" text-anchor="middle">STEVE?</text></g>
-<text class="hf-foot" x="30" y="352">Every service call starts with a search.</text>
-<text class="hf-foot2" x="30" y="370">Billed tech time, every visit.</text>
-<rect class="hf-rack" x="380" y="58" width="180" height="270" rx="3"/>
-<rect class="hf-rail" x="384" y="60" width="6" height="266"/><rect class="hf-rail" x="550" y="60" width="6" height="266"/>
-<g class="hf-u hs-dev" style="animation-delay:0.00s"><rect x="392" y="66" width="156" height="22" rx="2"/>
-<rect class="hf-jack" x="398.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="410.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="421.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="433.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="444.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="456.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="467.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="479.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="490.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="502.0" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="513.5" y="74" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="525.0" y="74" width="7" height="6" rx="1"/>
-<text class="hf-tag" x="376" y="80" text-anchor="end">PP-1</text>
+<rect class="hf-boot sv" x="169.3" y="163.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sv" x="169.3" y="197.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="123.3" y="197.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="100.3" y="231.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sa" x="111.8" y="197.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sa" x="100.3" y="163.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot su" x="111.8" y="163.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot su" x="100.3" y="129.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sc" x="157.8" y="197.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sc" x="169.3" y="73.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="100.3" y="197.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="88.8" y="73.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sv" x="123.3" y="73.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sv" x="192.3" y="101.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="157.8" y="163.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="180.8" y="129.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sv" x="146.3" y="73.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sv" x="123.3" y="129.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="123.3" y="163.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sn" x="203.8" y="73.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sa" x="157.8" y="129.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sa" x="100.3" y="73.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot su" x="215.3" y="101.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot su" x="88.8" y="231.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sc" x="88.8" y="163.4" width="6.4" height="7.2" rx="1.2"/>
+<rect class="hf-boot sc" x="134.8" y="101.4" width="6.4" height="7.2" rx="1.2"/>
+<g class="hf-scan"><rect x="56" y="0" width="208" height="26" fill="url(#hfBeam)"/><line x1="56" y1="26" x2="264" y2="26"/></g>
+<g class="hf-q"><text x="262" y="92">??</text><text x="26" y="168">??</text><text x="270" y="214">??</text><text x="34" y="262">??</text></g>
+<g transform="rotate(-6 128 176)"><rect class="hf-tape" x="96" y="168" width="64" height="16"/><text class="hf-tapet" x="128" y="179" text-anchor="middle">DO NOT UNPLUG</text></g>
+<g transform="rotate(5 214 300)"><rect class="hf-tape" x="190" y="292" width="48" height="16"/><text class="hf-tapet" x="214" y="303" text-anchor="middle">STEVE?</text></g>
+<text class="hf-foot" x="30" y="330">Every service call starts with a search.</text><text class="hf-foot2" x="30" y="346">Billed tech time, every visit.</text>
+<rect class="hf-rack" x="382" y="56" width="180" height="234" rx="3"/>
+<rect class="hf-rail" x="386" y="58" width="6" height="230"/><rect class="hf-rail" x="552" y="58" width="6" height="230"/>
+<g class="hf-u"><rect class="hf-face" x="394" y="66" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="400.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="412.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="423.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="435.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="446.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="458.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="469.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="481.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="492.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="504.0" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="515.5" y="74.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="527.0" y="74.0" width="7" height="6" rx="1"/>
 </g>
-<g class="hf-u hs-dev" style="animation-delay:0.05s"><rect x="392" y="94" width="156" height="22" rx="2"/>
-<rect class="hf-jack" x="398.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="410.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="421.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="433.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="444.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="456.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="467.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="479.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="490.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="502.0" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="513.5" y="102" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="525.0" y="102" width="7" height="6" rx="1"/>
-<text class="hf-tag" x="376" y="108" text-anchor="end">SW-1</text>
+<text class="hf-tag" x="377" y="79.6" text-anchor="end">PP-1</text>
+<g class="hf-u"><rect class="hf-face" x="394" y="94" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="400.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="412.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="423.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="435.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="446.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="458.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="469.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="481.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="492.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="504.0" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="515.5" y="102.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="527.0" y="102.0" width="7" height="6" rx="1"/>
 </g>
-<g class="hf-u hs-dev" style="animation-delay:0.10s"><rect x="392" y="122" width="156" height="22" rx="2"/>
-<rect class="hf-jack" x="398.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="410.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="421.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="433.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="444.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="456.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="467.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="479.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="490.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="502.0" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="513.5" y="130" width="7" height="6" rx="1"/>
-<rect class="hf-jack" x="525.0" y="130" width="7" height="6" rx="1"/>
-<text class="hf-tag" x="376" y="136" text-anchor="end">PP-2</text>
+<text class="hf-tag" x="377" y="107.6" text-anchor="end">SW-1</text>
+<g class="hf-u"><rect class="hf-face" x="394" y="122" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="400.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="412.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="423.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="435.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="446.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="458.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="469.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="481.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="492.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="504.0" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="515.5" y="130.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="527.0" y="130.0" width="7" height="6" rx="1"/>
 </g>
-<g class="hf-u hs-dev" style="animation-delay:0.15s"><rect x="392" y="156" width="156" height="36" rx="2"/>
-<rect class="hf-scr" x="400" y="169" width="26" height="10" rx="1.5"/>
-<circle class="hf-knob" cx="442" cy="174" r="3"/>
-<circle class="hf-knob" cx="454" cy="174" r="3"/>
-<circle class="hf-knob" cx="466" cy="174" r="3"/>
-<circle class="hf-knob" cx="478" cy="174" r="3"/>
-<circle class="hf-knob" cx="490" cy="174" r="3"/>
-<circle class="hf-knob" cx="502" cy="174" r="3"/>
-<text class="hf-tag" x="376" y="177" text-anchor="end">SWR-1</text>
+<text class="hf-tag" x="377" y="135.6" text-anchor="end">PP-2</text>
+<g class="hf-u"><rect class="hf-face" x="394" y="152" width="156" height="30" rx="2"/>
+<rect class="hf-jack" x="400.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="412.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="423.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="435.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="446.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="458.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="469.5" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="481.0" y="164.0" width="7" height="6" rx="1"/>
+<rect class="hf-scr" x="504" y="162" width="38" height="10" rx="1.5"/>
+<circle class="hf-led" cx="498" cy="167" r="1.6"/>
 </g>
-<g class="hf-u hs-dev" style="animation-delay:0.20s"><rect x="392" y="204" width="156" height="22" rx="2"/>
-<rect class="hf-scr" x="400" y="210" width="26" height="10" rx="1.5"/>
-<circle class="hf-knob" cx="442" cy="215" r="3"/>
-<circle class="hf-knob" cx="454" cy="215" r="3"/>
-<circle class="hf-knob" cx="466" cy="215" r="3"/>
-<circle class="hf-knob" cx="478" cy="215" r="3"/>
-<circle class="hf-knob" cx="490" cy="215" r="3"/>
-<circle class="hf-knob" cx="502" cy="215" r="3"/>
-<text class="hf-tag" x="376" y="218" text-anchor="end">DSP-1</text>
+<text class="hf-tag" x="377" y="169.6" text-anchor="end">SWR-1</text>
+<g class="hf-u"><rect class="hf-face" x="394" y="190" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="400.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="412.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="423.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="435.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="446.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="458.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="469.5" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="481.0" y="198.0" width="7" height="6" rx="1"/>
+<rect class="hf-scr" x="504" y="196" width="38" height="10" rx="1.5"/>
+<circle class="hf-led" cx="498" cy="201" r="1.6"/>
 </g>
-<g class="hf-u hs-dev" style="animation-delay:0.25s"><rect x="392" y="238" width="156" height="36" rx="2"/>
-<rect class="hf-scr" x="400" y="251" width="26" height="10" rx="1.5"/>
-<circle class="hf-knob" cx="442" cy="256" r="3"/>
-<circle class="hf-knob" cx="454" cy="256" r="3"/>
-<circle class="hf-knob" cx="466" cy="256" r="3"/>
-<circle class="hf-knob" cx="478" cy="256" r="3"/>
-<circle class="hf-knob" cx="490" cy="256" r="3"/>
-<circle class="hf-knob" cx="502" cy="256" r="3"/>
-<text class="hf-tag" x="376" y="259" text-anchor="end">AMP-1</text>
+<text class="hf-tag" x="377" y="203.6" text-anchor="end">DSP-1</text>
+<g class="hf-u"><rect class="hf-face" x="394" y="220" width="156" height="30" rx="2"/>
+<circle class="hf-term" cx="404.0" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="415.5" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="427.0" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="438.5" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="450.0" cy="235.0" r="3.2"/>
+<circle class="hf-term" cx="461.5" cy="235.0" r="3.2"/>
+<rect class="hf-scr" x="504" y="230" width="38" height="10" rx="1.5"/>
+<circle class="hf-led" cx="498" cy="235" r="1.6"/>
 </g>
-<g class="hf-u hs-dev" style="animation-delay:0.30s"><rect x="392" y="292" width="156" height="26" rx="2"/>
-<rect class="hf-jack" x="402" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="419" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="436" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="453" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="470" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="487" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="504" y="301" width="9" height="8" rx="1.5"/>
-<rect class="hf-jack" x="521" y="301" width="9" height="8" rx="1.5"/>
-<text class="hf-tag" x="376" y="308" text-anchor="end">PDU-1</text>
+<text class="hf-tag" x="377" y="237.6" text-anchor="end">AMP-1</text>
+<g class="hf-u"><rect class="hf-face" x="394" y="258" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="399.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="422.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="445.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="468.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="491.5" y="265.0" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="514.5" y="265.0" width="9" height="8" rx="1.5"/>
 </g>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.40s" d="M402.0 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.44s" d="M413.5 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.48s" d="M425.0 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.52s" d="M436.5 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.56s" d="M448.0 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.60s" d="M459.5 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.64s" d="M471.0 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.68s" d="M482.5 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.72s" d="M494.0 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.76s" d="M505.5 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.80s" d="M517.0 83V113"/>
-<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.84s" d="M528.5 83V113"/>
-<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:0.88s" d="M402.0 139V150H442.0V164"/>
-<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:0.92s" d="M425.0 139V150H454.0V164"/>
-<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:0.96s" d="M448.0 139V150H466.0V164"/>
-<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:1.00s" d="M471.0 139V150H478.0V164"/>
-<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:1.04s" d="M494.0 139V150H490.0V164"/>
-<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:1.08s" d="M517.0 139V150H502.0V164"/>
-<path class="hs-cable hf-neat sa" pathLength="100" style="animation-delay:1.0s" d="M478 228V246"/>
-<path class="hs-cable hf-neat su" pathLength="100" style="animation-delay:1.05s" d="M502 228V246"/>
-<g class="hs-dev hf-call sn" style="animation-delay:1.20s"><path d="M414 90L576 88H586"/><circle cx="414" cy="90" r="2.2"/><rect x="586" y="80" width="36" height="15" rx="2"/><text x="589" y="91">N-201</text></g>
-<g class="hs-dev hf-call sn" style="animation-delay:1.28s"><path d="M460 90L576 112H586"/><circle cx="460" cy="90" r="2.2"/><rect x="586" y="104" width="36" height="15" rx="2"/><text x="589" y="115">N-206</text></g>
-<g class="hs-dev hf-call sv" style="animation-delay:1.36s"><path d="M448 146L576 150H586"/><circle cx="448" cy="146" r="2.2"/><rect x="586" y="142" width="36" height="15" rx="2"/><text x="589" y="153">V-104</text></g>
-<g class="hs-dev hf-call sa" style="animation-delay:1.44s"><path d="M478 236L576 230H586"/><circle cx="478" cy="236" r="2.2"/><rect x="586" y="222" width="36" height="15" rx="2"/><text x="589" y="233">A-101</text></g>
-<g class="hs-dev hf-call su" style="animation-delay:1.52s"><path d="M502 236L576 254H586"/><circle cx="502" cy="236" r="2.2"/><rect x="586" y="246" width="36" height="15" rx="2"/><text x="589" y="257">U-101</text></g>
-<g class="hs-dev hf-call sc" style="animation-delay:1.60s"><path d="M540 305L576 300H586"/><circle cx="540" cy="305" r="2.2"/><rect x="586" y="292" width="36" height="15" rx="2"/><text x="589" y="303">PDU-1·A</text></g>
+<text class="hf-tag" x="377" y="271.6" text-anchor="end">PDU-1</text>
+<path class="hf-run sn" pathLength="100" style="--d:0.50s" d="M404.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.57s" d="M415.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.64s" d="M427.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.71s" d="M438.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.78s" d="M450.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.85s" d="M461.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.92s" d="M473.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.99s" d="M484.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:1.06s" d="M496.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:1.13s" d="M507.5 77.0V105.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.20s" d="M404.0 133.0V167.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.27s" d="M415.5 133.0V167.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.34s" d="M427.0 133.0V167.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.41s" d="M438.5 133.0V167.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.48s" d="M450.0 167.0V201.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.55s" d="M461.5 167.0V201.0"/>
+<path class="hf-run su" pathLength="100" style="--d:1.62s" d="M473.0 167.0V201.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.69s" d="M404.0 201.0V235.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.76s" d="M415.5 201.0V235.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.83s" d="M427.0 201.0V235.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.90s" d="M438.5 201.0V235.0"/>
+<path class="hf-run sc" pathLength="100" style="--d:1.97s" d="M530.5 105.0V110.0Q530.5 114.0 534.5 114.0H538Q542 114.0 542 118.0V154.0Q542 158.0 538 158.0H488.5Q484.5 158.0 484.5 162.0V167.0"/>
+<path class="hf-run sk" pathLength="100" style="--d:2.04s" d="M461.5 235.0V249.0Q461.5 252.0 458.5 252.0H453.0Q450.0 252.0 450.0 255.0V269.0"/>
+<rect class="hf-boot sn hf-pop" x="400.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.50s"/>
+<rect class="hf-boot sn hf-pop" x="400.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:0.95s"/>
+<rect class="hf-boot sn hf-pop" x="412.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.57s"/>
+<rect class="hf-boot sn hf-pop" x="412.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.02s"/>
+<rect class="hf-boot sn hf-pop" x="423.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.64s"/>
+<rect class="hf-boot sn hf-pop" x="423.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.09s"/>
+<rect class="hf-boot sn hf-pop" x="435.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.71s"/>
+<rect class="hf-boot sn hf-pop" x="435.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.16s"/>
+<rect class="hf-boot sn hf-pop" x="446.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.78s"/>
+<rect class="hf-boot sn hf-pop" x="446.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.23s"/>
+<rect class="hf-boot sn hf-pop" x="458.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.85s"/>
+<rect class="hf-boot sn hf-pop" x="458.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.30s"/>
+<rect class="hf-boot sn hf-pop" x="469.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.92s"/>
+<rect class="hf-boot sn hf-pop" x="469.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.37s"/>
+<rect class="hf-boot sn hf-pop" x="481.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.99s"/>
+<rect class="hf-boot sn hf-pop" x="481.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.44s"/>
+<rect class="hf-boot sn hf-pop" x="492.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:1.06s"/>
+<rect class="hf-boot sn hf-pop" x="492.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.51s"/>
+<rect class="hf-boot sn hf-pop" x="504.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:1.13s"/>
+<rect class="hf-boot sn hf-pop" x="504.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.58s"/>
+<rect class="hf-boot sv hf-pop" x="400.8" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.20s"/>
+<rect class="hf-boot sv hf-pop" x="400.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.65s"/>
+<rect class="hf-boot sv hf-pop" x="412.3" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.27s"/>
+<rect class="hf-boot sv hf-pop" x="412.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.72s"/>
+<rect class="hf-boot sv hf-pop" x="423.8" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.34s"/>
+<rect class="hf-boot sv hf-pop" x="423.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.79s"/>
+<rect class="hf-boot sv hf-pop" x="435.3" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.41s"/>
+<rect class="hf-boot sv hf-pop" x="435.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.86s"/>
+<rect class="hf-boot sa hf-pop" x="446.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.48s"/>
+<rect class="hf-boot sa hf-pop" x="446.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.93s"/>
+<rect class="hf-boot sa hf-pop" x="458.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.55s"/>
+<rect class="hf-boot sa hf-pop" x="458.3" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:2.00s"/>
+<rect class="hf-boot su hf-pop" x="469.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.62s"/>
+<rect class="hf-boot su hf-pop" x="469.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:2.07s"/>
+<rect class="hf-boot sa hf-pop" x="400.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.69s"/>
+<rect class="hf-boot sa hf-pop" x="400.8" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.14s"/>
+<rect class="hf-boot sa hf-pop" x="412.3" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.76s"/>
+<rect class="hf-boot sa hf-pop" x="412.3" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.21s"/>
+<rect class="hf-boot sa hf-pop" x="423.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.83s"/>
+<rect class="hf-boot sa hf-pop" x="423.8" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.28s"/>
+<rect class="hf-boot sa hf-pop" x="435.3" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.90s"/>
+<rect class="hf-boot sa hf-pop" x="435.3" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.35s"/>
+<rect class="hf-boot sc hf-pop" x="527.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.97s"/>
+<rect class="hf-boot sc hf-pop" x="481.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:2.42s"/>
+<rect class="hf-boot sk hf-pop" x="458.3" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.04s"/>
+<rect class="hf-boot sk hf-pop" x="446.8" y="265.4" width="6.4" height="7.2" rx="1.2" style="--d:2.49s"/>
+<path class="hf-flow sn" pathLength="100" style="--f:2.40s;--fd:0.00s" d="M404.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:2.77s;--fd:0.53s" d="M415.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.14s;--fd:1.06s" d="M427.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.51s;--fd:1.59s" d="M438.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.88s;--fd:2.12s" d="M450.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:4.25s;--fd:2.65s" d="M461.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:4.62s;--fd:0.18s" d="M473.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:4.99s;--fd:0.71s" d="M484.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:2.76s;--fd:1.24s" d="M496.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.13s;--fd:1.77s" d="M507.5 77.0V105.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:3.50s;--fd:2.30s" d="M404.0 133.0V167.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:3.87s;--fd:2.83s" d="M415.5 133.0V167.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:4.24s;--fd:0.36s" d="M427.0 133.0V167.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:4.61s;--fd:0.89s" d="M438.5 133.0V167.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:4.98s;--fd:1.42s" d="M450.0 167.0V201.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:2.75s;--fd:1.95s" d="M461.5 167.0V201.0"/>
+<path class="hf-flow su" pathLength="100" style="--f:3.12s;--fd:2.48s" d="M473.0 167.0V201.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:3.49s;--fd:0.01s" d="M404.0 201.0V235.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:3.86s;--fd:0.54s" d="M415.5 201.0V235.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:4.23s;--fd:1.07s" d="M427.0 201.0V235.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:4.60s;--fd:1.60s" d="M438.5 201.0V235.0"/>
+<path class="hf-flow sc" pathLength="100" style="--f:4.97s;--fd:2.13s" d="M530.5 105.0V110.0Q530.5 114.0 534.5 114.0H538Q542 114.0 542 118.0V154.0Q542 158.0 538 158.0H488.5Q484.5 158.0 484.5 162.0V167.0"/>
+<rect class="hf-sleeve hf-pop" style="--d:1.90s" x="401.4" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:1.93s" x="412.9" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:1.96s" x="424.4" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:1.99s" x="435.9" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:2.02s" x="447.4" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:2.05s" x="458.9" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:2.08s" x="470.4" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:2.11s" x="481.9" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:2.14s" x="493.4" y="88.5" width="5.2" height="5"/>
+<rect class="hf-sleeve hf-pop" style="--d:2.17s" x="504.9" y="88.5" width="5.2" height="5"/>
+<g class="hf-call sn" style="--d:2.10s"><path pathLength="100" d="M507.5 91L574 72H581"/><circle cx="507.5" cy="91" r="1.8"/><rect x="581" y="64.5" width="49" height="15" rx="2"/><text x="585" y="75">N-201…210</text></g>
+<g class="hf-call sv" style="--d:2.22s"><path pathLength="100" d="M438.5 150L574 134H581"/><circle cx="438.5" cy="150" r="1.8"/><rect x="581" y="126.5" width="49" height="15" rx="2"/><text x="585" y="137">V-101…104</text></g>
+<g class="hf-call sc" style="--d:2.34s"><path pathLength="100" d="M542.0 136L574 108H599"/><circle cx="542.0" cy="136" r="1.8"/><rect x="599" y="100.5" width="31" height="15" rx="2"/><text x="603" y="111">C-101</text></g>
+<g class="hf-call sa" style="--d:2.46s"><path pathLength="100" d="M461.5 186L574 162H581"/><circle cx="461.5" cy="186" r="1.8"/><rect x="581" y="154.5" width="49" height="15" rx="2"/><text x="585" y="165">A-101/102</text></g>
+<g class="hf-call su" style="--d:2.58s"><path pathLength="100" d="M473.0 186L574 186H599"/><circle cx="473.0" cy="186" r="1.8"/><rect x="599" y="178.5" width="31" height="15" rx="2"/><text x="603" y="189">U-101</text></g>
+<g class="hf-call sa" style="--d:2.70s"><path pathLength="100" d="M438.5 214L574 212H581"/><circle cx="438.5" cy="214" r="1.8"/><rect x="581" y="204.5" width="49" height="15" rx="2"/><text x="585" y="215">A-201…204</text></g>
+<g class="hf-call sk" style="--d:2.82s"><path pathLength="100" d="M463.5 247L574 246H604"/><circle cx="463.5" cy="247" r="1.8"/><rect x="604" y="238.5" width="26" height="15" rx="2"/><text x="608" y="249">P-01</text></g>
 <g class="hs-tb"><rect x="430" y="350" width="196" height="76"/><line x1="430" y1="372" x2="626" y2="372"/><line x1="430" y1="398" x2="626" y2="398"/><line x1="540" y1="372" x2="540" y2="426"/><use href="#jlogo" x="434" y="352.5" width="17" height="17"/><text class="o" x="456" y="366">JAMS DOCS AND DESIGNS</text><text class="k" x="438" y="381">PROJECT</text><text class="v" x="438" y="393">MDF · Rack 1</text><text class="k" x="548" y="381">SHEET</text><text class="t" x="548" y="395">E-201</text><text class="k" x="438" y="407">TITLE</text><text class="v" x="438" y="419">Rack elevation</text><text class="k" x="548" y="407">STATUS</text><text class="v ok" x="548" y="419">As-built · Rev 0</text></g>
-<g class="hf-stamp"><rect x="334" y="360" width="84" height="40" rx="3"/><text x="376" y="378" text-anchor="middle" class="s1">AS-BUILT</text><text x="376" y="392" text-anchor="middle" class="s2">VERIFIED ON SITE</text></g>
+<g class="hf-stamp"><rect x="334" y="352" width="84" height="40" rx="3"/><text x="376" y="370" text-anchor="middle" class="s1">AS-BUILT</text><text x="376" y="384" text-anchor="middle" class="s2">VERIFIED ON SITE</text></g>
 </svg>
       <div class="floatcard" aria-hidden="true">
         <span class="l">As-built survey · MDF Rack 1</span>
@@ -1663,5 +1794,6 @@ dlg.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(cur+1);if(e.key=
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 </script>
+<script>(function(){var f=document.querySelector("svg.hf");if(!f)return;var m=matchMedia("(prefers-reduced-motion: reduce)");function u(){m.matches?f.pauseAnimations():f.unpauseAnimations()}u();m.addEventListener&&m.addEventListener("change",u);if("IntersectionObserver"in window)new IntersectionObserver(function(e){if(m.matches)return;e[0].isIntersecting?f.unpauseAnimations():f.pauseAnimations()}).observe(f)})();</script>
 </body>
 </html>
