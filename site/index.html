@@ -196,6 +196,90 @@ h3{font-size:24px;line-height:1.05;font-weight:600}
 @keyframes vzring{0%{transform:scale(.25);opacity:.7}100%{transform:scale(1);opacity:0}}
 @keyframes vzblink{50%{opacity:.45}}
 @media (prefers-reduced-motion: reduce){.vz *{animation:none!important}.vz .ring,.vz .flow{display:none}}
+/* smart home: system index + live plan */
+#smarthome{--c-purple:#8556c4}
+.shgrid{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr)!important;align-items:start!important;gap:32px!important}
+.shidx{background:var(--sheet);border:1.5px solid var(--ink);border-radius:4px;overflow:hidden}
+.shidx .hd{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1.5px solid var(--ink);font:700 18px var(--f-display);letter-spacing:.05em;text-transform:uppercase}
+.shidx .hd span{font:500 11px var(--f-mono);color:var(--muted);letter-spacing:.08em;align-self:center}
+.shidx table{width:100%;border-collapse:collapse;font-size:14px}
+.shidx td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.shidx tr:last-child td{border-bottom:0}
+.shidx td.s{font:600 13px var(--f-mono);white-space:nowrap;width:1%;color:var(--c)}
+.shidx td b{display:block;font-weight:600}.shidx td small{color:var(--muted);font-size:13px}
+.shidx tr{cursor:pointer;transition:background .2s}
+.shidx tr:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+@media (hover:hover) and (pointer:fine){.shidx tr:hover{background:var(--paper)}}
+.shidx tr.on{background:color-mix(in srgb,var(--c) 10%,var(--sheet))}
+.shidx tr.on td.s{box-shadow:inset 3px 0 0 var(--c)}
+.shidx tr.on td:last-child{position:relative}.shidx tr.on td:last-child::after{content:"→";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--c);font-weight:700}
+.shfig{padding:0!important;border:1.5px solid var(--ink)!important;border-radius:4px!important;overflow:hidden}
+.shfig svg{border-radius:0!important}
+.shcap{padding:10px 14px;border-top:1px solid var(--line);font-size:14px;color:var(--muted);background:var(--sheet)}
+.shaud{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:28px}
+.shcard{border-radius:4px!important;border:1.5px solid var(--ink)!important;box-shadow:none!important;padding:0!important;overflow:hidden}
+.shcard h3{margin:0!important;padding:11px 16px;border-bottom:1.5px solid var(--ink);font-size:17px!important;letter-spacing:.05em;text-transform:uppercase}
+.shcard ul{padding:14px 18px 16px 34px!important}
+/* plan drawing */
+.shp{display:block;width:100%;height:auto}
+.shp .edge{fill:none;stroke:var(--line2)}
+.shp .wall{fill:none;stroke:var(--ink);stroke-width:5;stroke-linejoin:miter;stroke-dasharray:100 100;animation:shdraw 1.2s cubic-bezier(.65,0,.35,1) backwards}
+.shp .rooms text{font:500 9.5px var(--f-mono);letter-spacing:.1em;fill:var(--muted)}
+.shp .th{--c:var(--c-blue)}
+.shp .scr{fill:var(--c-blue)}.shp .seat{fill:var(--sunk);stroke:var(--line2)}
+.shp .beam{fill:url(#shBeam);animation:shflick 3.2s ease-in-out infinite}
+.shp .dv .b{fill:var(--sheet);stroke:var(--c);stroke-width:2.2}
+.shp .dv .f{fill:var(--c)}.shp .dv .w{fill:none;stroke:var(--c);stroke-width:1.6;stroke-linecap:round}
+.shp .glow{fill:var(--c);opacity:.16}
+.shp .fov{fill:var(--c);fill-opacity:.12;stroke:var(--c);stroke-opacity:.45;stroke-width:1;stroke-dasharray:3 3}
+.shp .sweep{animation:shsweep 5s ease-in-out infinite alternate}
+.shp .ring{fill:none;stroke:var(--c);stroke-width:1.4;transform-box:fill-box;transform-origin:center;animation:shring 2.4s ease-out infinite}
+.shp .ring.r2{animation-delay:1.2s}
+.shp .rip{fill:var(--c);fill-opacity:.07;stroke:var(--c);stroke-opacity:.35;transform-box:fill-box;transform-origin:center;animation:shrip 3.6s ease-out infinite}
+.shp .rip.r2{animation-delay:1.8s}
+.shp .dv,.shp .tagl text,.shp .th{transition:opacity .35s ease}
+.shp .tagl text{font:600 8px var(--f-mono);fill:var(--ink)}
+.shp .hr{fill:none;stroke:var(--c);stroke-width:1.4;stroke-linejoin:round;opacity:0;stroke-dasharray:100 100;transition:opacity .3s}
+.shp .pp{transform-box:fill-box;transform-origin:center}
+.shp.go .dv .pp{animation:shpop .45s cubic-bezier(.23,1,.32,1) var(--d) backwards}
+.shp .schd .sp{fill:var(--sheet);stroke:var(--line2)}
+.shp .schd .sh{font:700 12px var(--f-display);letter-spacing:.08em;fill:var(--ink)}.shp .schd .sl{stroke:var(--ink)}
+.shp .sch{display:none}.shp .sn{font:600 8.5px var(--f-body);fill:var(--ink)}.shp .sc{font:700 11px var(--f-display);fill:var(--ink)}
+.shp .st{font:700 8.5px var(--f-mono)}.shp .sd{font:500 7px var(--f-body);fill:var(--muted)}
+.shp.go .sr{animation:shin .35s cubic-bezier(.23,1,.32,1) var(--d) backwards}
+.shp .tb rect{fill:var(--sheet);stroke:var(--ink);stroke-width:1.2}.shp .tb line{stroke:var(--ink);stroke-width:.8}
+.shp .tb .o{font:700 12px var(--f-display);letter-spacing:.05em;fill:var(--accent)}.shp .tb .k{font:500 7px var(--f-mono);letter-spacing:.1em;fill:var(--muted)}
+.shp .tb .v{font:600 11px var(--f-body);fill:var(--ink)}.shp .tb .t{font:700 17px var(--f-display);fill:var(--ink)}
+.shp[data-sys="all"] .sch[data-for="all"]{display:block}
+.shp[data-sys="lt"] .sch[data-for="lt"]{display:block}
+.shp[data-sys="cm"] .sch[data-for="cm"]{display:block}
+.shp[data-sys="au"] .sch[data-for="au"]{display:block}
+.shp[data-sys="th"] .sch[data-for="th"]{display:block}
+.shp[data-sys="wf"] .sch[data-for="wf"]{display:block}
+.shp[data-sys="pw"] .sch[data-for="pw"]{display:block}
+.shp[data-sys="lt"] .dv:not(.lt),.shp[data-sys="lt"] .tagl text:not(.lt){opacity:.1}
+.shp[data-sys="lt"] .dv:not(.lt) .fx{display:none}
+.shp[data-sys="cm"] .dv:not(.cm),.shp[data-sys="cm"] .tagl text:not(.cm){opacity:.1}
+.shp[data-sys="cm"] .dv:not(.cm) .fx{display:none}
+.shp[data-sys="au"] .dv:not(.au),.shp[data-sys="au"] .tagl text:not(.au){opacity:.1}
+.shp[data-sys="au"] .dv:not(.au) .fx{display:none}
+.shp[data-sys="th"] .dv:not(.th),.shp[data-sys="th"] .tagl text:not(.th){opacity:.1}
+.shp[data-sys="th"] .dv:not(.th) .fx{display:none}
+.shp[data-sys="wf"] .dv:not(.wf),.shp[data-sys="wf"] .tagl text:not(.wf){opacity:.1}
+.shp[data-sys="wf"] .dv:not(.wf) .fx{display:none}
+.shp[data-sys="pw"] .dv{opacity:.55}.shp[data-sys="pw"] .dv .fx,.shp[data-sys="pw"] .tagl text{display:none}.shp[data-sys="pw"] .th{opacity:.3}
+.shp[data-sys="pw"] .hr{opacity:1;animation:shdraw .7s cubic-bezier(.65,0,.35,1) var(--d) backwards}
+.shp[data-sys="pw"] .dv.wf{opacity:1}
+.shp[data-sys="all"] .tagl text{opacity:.85}
+@keyframes shdraw{from{stroke-dashoffset:100}}
+@keyframes shpop{from{opacity:0;transform:scale(.3)}}
+@keyframes shin{from{opacity:0;transform:translateX(8px)}}
+@keyframes shsweep{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+@keyframes shring{0%{transform:scale(1);opacity:.8}100%{transform:scale(3.4);opacity:0}}
+@keyframes shrip{0%{transform:scale(.15);opacity:.9}100%{transform:scale(1);opacity:0}}
+@keyframes shflick{0%,100%{opacity:.85}40%{opacity:1}55%{opacity:.7}70%{opacity:.95}}
+@media (max-width:980px){.shaud{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.shp *{animation:none!important}}
 /* label lookup */
 .lk{display:grid;gap:8px;padding:14px 16px;background:var(--sheet);border:1px solid var(--line2);border-radius:8px}
 .lk label{font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -1374,7 +1458,179 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
       <p class="lead">For builders, contractors and homeowners. Send the house plans and we lay out every keypad, camera, speaker and access point on each floor, then hand over a pre-wire plan before the drywall goes up.</p>
     </div>
     <div class="shgrid">
-      <div class="shaud">
+      <div class="shidx rv">
+        <div class="hd">System index <span>Kona residence · Rev A</span></div>
+        <table><tr tabindex="0" role="button" aria-pressed="true" data-sys="all" class="on" style="--c:var(--accent)"><td class="s">H-000</td><td><b>All systems</b><small>Every device on one floor plan</small></td></tr><tr tabindex="0" role="button" aria-pressed="false" data-sys="lt" style="--c:var(--c-yellow)"><td class="s">H-101</td><td><b>Lighting &amp; keypads</b><small>Scenes, keypads and dimmable fixtures</small></td></tr><tr tabindex="0" role="button" aria-pressed="false" data-sys="cm" style="--c:var(--c-orange)"><td class="s">H-201</td><td><b>Cameras &amp; doorbell</b><small>Coverage for every door and the driveway</small></td></tr><tr tabindex="0" role="button" aria-pressed="false" data-sys="au" style="--c:var(--c-green)"><td class="s">H-301</td><td><b>Whole-house audio</b><small>Speakers by room, one app to play</small></td></tr><tr tabindex="0" role="button" aria-pressed="false" data-sys="th" style="--c:var(--c-blue)"><td class="s">H-401</td><td><b>Home theater</b><small>Screen, projector, seating and surround</small></td></tr><tr tabindex="0" role="button" aria-pressed="false" data-sys="wf" style="--c:var(--c-purple)"><td class="s">H-501</td><td><b>Wi-Fi &amp; network</b><small>Access points placed for the walls</small></td></tr><tr tabindex="0" role="button" aria-pressed="false" data-sys="pw" style="--c:var(--ink)"><td class="s">H-601</td><td><b>Pre-wire plan</b><small>Every cable home-run to the media panel</small></td></tr></table>
+      </div>
+      <figure class="shfig rv">
+        <svg class="shp" viewBox="0 0 560 420" role="img" aria-labelledby="shpT" data-sys="all">
+<title id="shpT">Ground floor plan of a home with lighting keypads and fixtures, cameras and a doorbell, whole-house audio, a home theater, Wi-Fi access points and the pre-wire plan</title>
+<defs><pattern id="shg2" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern><linearGradient id="shBeam" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="var(--c-blue)" stop-opacity=".45"/><stop offset="1" stop-color="var(--c-blue)" stop-opacity=".05"/></linearGradient><clipPath id="shClip"><rect x="20" y="20" width="400" height="320"/></clipPath></defs>
+<rect width="560" height="420" fill="var(--sheet)"/><rect x="8" y="8" width="544" height="404" fill="url(#shg2)"/><rect class="edge" x="8" y="8" width="544" height="404"/>
+<g class="rooms"><text x="44" y="84">GARAGE</text><text x="200" y="40" class="rn">KITCHEN</text><text x="340" y="44">THEATER</text><text x="44" y="316">ENTRY</text><text x="200" y="190" class="rn">LIVING</text></g>
+<g class="th dv"><g class="fx"><path class="beam" d="M355 255L305 34H405Z"/></g><rect class="scr" x="305" y="27" width="100" height="7" rx="1"/><rect class="seat" x="318" y="150" width="74" height="13" rx="4"/><rect class="seat" x="318" y="184" width="74" height="13" rx="4"/></g>
+<path class="hr" style="--c:var(--c-yellow);--d:0.15s;--f:2.20s" pathLength="100" d="M172 318V176H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.20s;--f:2.55s" pathLength="100" d="M172 42V178H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.25s;--f:2.90s" pathLength="100" d="M36 200V180H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.30s;--f:3.25s" pathLength="100" d="M302 318V182H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.35s;--f:3.60s" pathLength="100" d="M195 70V184H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.40s;--f:2.20s" pathLength="100" d="M260 70V186H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.45s;--f:2.55s" pathLength="100" d="M195 128V188H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.50s;--f:2.90s" pathLength="100" d="M260 128V176H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.55s;--f:3.25s" pathLength="100" d="M195 215V178H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.60s;--f:3.60s" pathLength="100" d="M260 215V180H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.65s;--f:2.20s" pathLength="100" d="M195 292V182H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.70s;--f:2.55s" pathLength="100" d="M260 292V184H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.75s;--f:2.90s" pathLength="100" d="M62 232V186H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.80s;--f:3.25s" pathLength="100" d="M122 232V188H54V150H51"/>
+<path class="hr" style="--c:var(--c-yellow);--d:0.85s;--f:3.60s" pathLength="100" d="M92 95V176H54V150H51"/>
+<path class="hr" style="--c:var(--c-orange);--d:0.90s;--f:2.20s" pathLength="100" d="M30 30V178H54V150H51"/>
+<path class="hr" style="--c:var(--c-orange);--d:0.95s;--f:2.55s" pathLength="100" d="M410 30V180H54V150H51"/>
+<path class="hr" style="--c:var(--c-orange);--d:1.00s;--f:2.90s" pathLength="100" d="M30 330V182H54V150H51"/>
+<path class="hr" style="--c:var(--c-orange);--d:1.05s;--f:3.25s" pathLength="100" d="M95 332V184H54V150H51"/>
+<path class="hr" style="--c:var(--c-green);--d:1.10s;--f:3.60s" pathLength="100" d="M205 98V186H54V150H51"/>
+<path class="hr" style="--c:var(--c-green);--d:1.15s;--f:2.20s" pathLength="100" d="M250 98V188H54V150H51"/>
+<path class="hr" style="--c:var(--c-green);--d:1.20s;--f:2.55s" pathLength="100" d="M205 255V176H54V150H51"/>
+<path class="hr" style="--c:var(--c-green);--d:1.25s;--f:2.90s" pathLength="100" d="M250 255V178H54V150H51"/>
+<path class="hr" style="--c:var(--c-green);--d:1.30s;--f:3.25s" pathLength="100" d="M92 282V180H54V150H51"/>
+<path class="hr" style="--c:var(--c-blue);--d:1.35s;--f:3.60s" pathLength="100" d="M355 262V182H54V150H51"/>
+<path class="hr" style="--c:var(--c-blue);--d:1.40s;--f:2.20s" pathLength="100" d="M300 120V184H54V150H51"/>
+<path class="hr" style="--c:var(--c-blue);--d:1.45s;--f:2.55s" pathLength="100" d="M410 120V186H54V150H51"/>
+<path class="hr" style="--c:var(--c-blue);--d:1.50s;--f:2.90s" pathLength="100" d="M300 215V188H54V150H51"/>
+<path class="hr" style="--c:var(--c-blue);--d:1.55s;--f:3.25s" pathLength="100" d="M410 215V176H54V150H51"/>
+<path class="hr" style="--c:var(--c-purple);--d:1.60s;--f:3.60s" pathLength="100" d="M228 150V178H54V150H51"/>
+<path class="hr" style="--c:var(--c-purple);--d:1.65s;--f:2.20s" pathLength="100" d="M92 186V180H54V150H51"/>
+<path class="hr" style="--c:var(--c-purple);--d:1.70s;--f:2.55s" pathLength="100" d="M355 300V182H54V150H51"/>
+<g clip-path="url(#shClip)">
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.25s" transform="translate(172 318)"><g class="pp"><rect class="b" x="-7" y="-9" width="14" height="18" rx="2"/><path class="f" d="M-4 -5h8M-4 0h8M-4 5h8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.29s" transform="translate(172 42)"><g class="pp"><rect class="b" x="-7" y="-9" width="14" height="18" rx="2"/><path class="f" d="M-4 -5h8M-4 0h8M-4 5h8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.32s" transform="translate(36 200)"><g class="pp"><rect class="b" x="-7" y="-9" width="14" height="18" rx="2"/><path class="f" d="M-4 -5h8M-4 0h8M-4 5h8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.35s" transform="translate(302 318)"><g class="pp"><rect class="b" x="-7" y="-9" width="14" height="18" rx="2"/><path class="f" d="M-4 -5h8M-4 0h8M-4 5h8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.39s" transform="translate(195 70)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.43s" transform="translate(260 70)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.46s" transform="translate(195 128)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.49s" transform="translate(260 128)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.53s" transform="translate(195 215)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.57s" transform="translate(260 215)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.60s" transform="translate(195 292)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.64s" transform="translate(260 292)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.67s" transform="translate(62 232)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.71s" transform="translate(122 232)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv lt" style="--c:var(--c-yellow);--d:0.74s" transform="translate(92 95)"><g class="pp"><circle class="glow fx" r="17"/><circle class="b" r="5"/><circle class="f" r="1.8"/></g></g>
+<g class="dv cm" style="--c:var(--c-orange);--d:0.78s" transform="translate(30 30)"><g class="pp"><g transform="rotate(45)"><g class="sweep fx"><path class="fov" d="M0 0L98.9 -48.2A110 110 0 0 1 98.9 48.2Z"/></g><rect class="b" x="-6" y="-5" width="16" height="10" rx="2"/><circle class="f" cx="10" r="2.4"/></g></g></g>
+<g class="dv cm" style="--c:var(--c-orange);--d:0.81s" transform="translate(410 30)"><g class="pp"><g transform="rotate(135)"><g class="sweep fx"><path class="fov" d="M0 0L98.9 -48.2A110 110 0 0 1 98.9 48.2Z"/></g><rect class="b" x="-6" y="-5" width="16" height="10" rx="2"/><circle class="f" cx="10" r="2.4"/></g></g></g>
+<g class="dv cm" style="--c:var(--c-orange);--d:0.85s" transform="translate(30 330)"><g class="pp"><g transform="rotate(-45)"><g class="sweep fx"><path class="fov" d="M0 0L98.9 -48.2A110 110 0 0 1 98.9 48.2Z"/></g><rect class="b" x="-6" y="-5" width="16" height="10" rx="2"/><circle class="f" cx="10" r="2.4"/></g></g></g>
+<g class="dv cm" style="--c:var(--c-orange);--d:0.88s" transform="translate(95 332)"><g class="pp"><circle class="ring fx" r="7"/><circle class="ring fx r2" r="7"/><rect class="b" x="-5" y="-8" width="10" height="16" rx="3"/><circle class="f" cy="2" r="2.2"/></g></g>
+<g class="dv au" style="--c:var(--c-green);--d:0.92s" transform="translate(205 98)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv au" style="--c:var(--c-green);--d:0.95s" transform="translate(250 98)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv au" style="--c:var(--c-green);--d:0.99s" transform="translate(205 255)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv au" style="--c:var(--c-green);--d:1.02s" transform="translate(250 255)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv au" style="--c:var(--c-green);--d:1.06s" transform="translate(92 282)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv th" style="--c:var(--c-blue);--d:1.09s" transform="translate(355 262)"><g class="pp"><rect class="b" x="-11" y="-7" width="22" height="14" rx="2"/><circle class="f" cy="-7" r="3"/></g></g>
+<g class="dv th" style="--c:var(--c-blue);--d:1.12s" transform="translate(300 120)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv th" style="--c:var(--c-blue);--d:1.16s" transform="translate(410 120)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv th" style="--c:var(--c-blue);--d:1.20s" transform="translate(300 215)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv th" style="--c:var(--c-blue);--d:1.23s" transform="translate(410 215)"><g class="pp"><circle class="ring fx" r="8"/><circle class="ring fx r2" r="8"/><circle class="b" r="8"/><circle class="f" r="3"/></g></g>
+<g class="dv wf" style="--c:var(--c-purple);--d:1.27s" transform="translate(228 150)"><g class="pp"><circle class="rip fx" r="78"/><circle class="rip fx r2" r="78"/><circle class="b" r="9"/><path class="w" d="M-5 1a7 7 0 0 1 10 0M-2.5 3.6a3.4 3.4 0 0 1 5 0"/><circle class="f" cy="5.6" r="1.3"/></g></g>
+<g class="dv wf" style="--c:var(--c-purple);--d:1.30s" transform="translate(92 186)"><g class="pp"><circle class="rip fx" r="78"/><circle class="rip fx r2" r="78"/><circle class="b" r="9"/><path class="w" d="M-5 1a7 7 0 0 1 10 0M-2.5 3.6a3.4 3.4 0 0 1 5 0"/><circle class="f" cy="5.6" r="1.3"/></g></g>
+<g class="dv wf" style="--c:var(--c-purple);--d:1.34s" transform="translate(355 300)"><g class="pp"><circle class="rip fx" r="78"/><circle class="rip fx r2" r="78"/><circle class="b" r="9"/><path class="w" d="M-5 1a7 7 0 0 1 10 0M-2.5 3.6a3.4 3.4 0 0 1 5 0"/><circle class="f" cy="5.6" r="1.3"/></g></g>
+<g class="dv wf" style="--c:var(--c-purple);--d:1.37s" transform="translate(40 150)"><g class="pp"><rect class="b" x="-11" y="-17" width="22" height="34" rx="2"/><path class="w" d="M-6 -10h12M-6 -4h12M-6 2h12M-6 8h12"/></g></g>
+</g>
+<path class="wall" pathLength="100" d="M20 20H420V340H20Z M160 20V60M160 100V250M160 290V340 M20 170H70M110 170H160 M160 170H200M250 170H290 M290 20V90M290 130V270M290 310V340"/>
+<g class="tagl">
+<text class="lt" x="183" y="309" text-anchor="start">KP-1</text>
+<text class="lt" x="183" y="33" text-anchor="start">KP-2</text>
+<text class="lt" x="47" y="191" text-anchor="start">KP-3</text>
+<text class="lt" x="313" y="309" text-anchor="start">KP-4</text>
+<text class="cm" x="44" y="52" text-anchor="start">CAM-1</text>
+<text class="cm" x="396" y="52" text-anchor="end">CAM-2</text>
+<text class="cm" x="44" y="296" text-anchor="start">CAM-3</text>
+<text class="cm" x="106" y="323" text-anchor="start">DB-1</text>
+<text class="au" x="216" y="89" text-anchor="start">SPK-1</text>
+<text class="au" x="261" y="89" text-anchor="start">SPK-2</text>
+<text class="au" x="216" y="246" text-anchor="start">SPK-3</text>
+<text class="au" x="261" y="246" text-anchor="start">SPK-4</text>
+<text class="au" x="103" y="273" text-anchor="start">SPK-5</text>
+<text class="th" x="366" y="253" text-anchor="start">PJ-1</text>
+<text class="th" x="311" y="111" text-anchor="start">SR-1</text>
+<text class="th" x="398" y="109" text-anchor="end">SR-2</text>
+<text class="th" x="311" y="206" text-anchor="start">SR-3</text>
+<text class="th" x="398" y="204" text-anchor="end">SR-4</text>
+<text class="wf" x="239" y="141" text-anchor="start">AP-1</text>
+<text class="wf" x="103" y="177" text-anchor="start">AP-2</text>
+<text class="wf" x="366" y="291" text-anchor="start">AP-3</text>
+<text class="wf" x="51" y="141" text-anchor="start">SMP-1</text>
+</g>
+<g class="schd"><rect class="sp" x="432" y="20" width="116" height="320"/><text class="sh" x="440" y="38">SCHEDULE</text><line class="sl" x1="440" y1="45" x2="540" y2="45"/>
+<g class="sch" data-for="all">
+<g class="sr" style="--d:0.10s"><rect x="440" y="56" width="6" height="8" rx="1" style="fill:var(--c-yellow)"/><text class="sn" x="451" y="64">Lighting &amp; keypads</text><text class="sc" x="540" y="64" text-anchor="end">15</text></g>
+<g class="sr" style="--d:0.17s"><rect x="440" y="80" width="6" height="8" rx="1" style="fill:var(--c-orange)"/><text class="sn" x="451" y="88">Cameras &amp; doorbell</text><text class="sc" x="540" y="88" text-anchor="end">4</text></g>
+<g class="sr" style="--d:0.24s"><rect x="440" y="104" width="6" height="8" rx="1" style="fill:var(--c-green)"/><text class="sn" x="451" y="112">Whole-house audio</text><text class="sc" x="540" y="112" text-anchor="end">5</text></g>
+<g class="sr" style="--d:0.31s"><rect x="440" y="128" width="6" height="8" rx="1" style="fill:var(--c-blue)"/><text class="sn" x="451" y="136">Home theater</text><text class="sc" x="540" y="136" text-anchor="end">5</text></g>
+<g class="sr" style="--d:0.38s"><rect x="440" y="152" width="6" height="8" rx="1" style="fill:var(--c-purple)"/><text class="sn" x="451" y="160">Wi-Fi &amp; network</text><text class="sc" x="540" y="160" text-anchor="end">4</text></g>
+<g class="sr" style="--d:0.45s"><rect x="440" y="176" width="6" height="8" rx="1" style="fill:var(--ink)"/><text class="sn" x="451" y="184">Home runs</text><text class="sc" x="540" y="184" text-anchor="end">32</text></g>
+</g>
+<g class="sch" data-for="lt">
+<g class="sr" style="--d:0.10s"><text class="st" x="440" y="64" style="fill:var(--c-yellow)">KP-1</text><text class="sd" x="440" y="73">Scene keypad</text></g>
+<g class="sr" style="--d:0.16s"><text class="st" x="440" y="88" style="fill:var(--c-yellow)">KP-2</text><text class="sd" x="440" y="97">Scene keypad</text></g>
+<g class="sr" style="--d:0.22s"><text class="st" x="440" y="112" style="fill:var(--c-yellow)">KP-3</text><text class="sd" x="440" y="121">Scene keypad</text></g>
+<g class="sr" style="--d:0.28s"><text class="st" x="440" y="136" style="fill:var(--c-yellow)">KP-4</text><text class="sd" x="440" y="145">Scene keypad</text></g>
+<g class="sr" style="--d:0.34s"><text class="st" x="440" y="160" style="fill:var(--c-yellow)">LT-1</text><text class="sd" x="440" y="169">Dimmable downlight</text></g>
+<g class="sr" style="--d:0.40s"><text class="st" x="440" y="184" style="fill:var(--c-yellow)">LT-2</text><text class="sd" x="440" y="193">Dimmable downlight</text></g>
+<g class="sr" style="--d:0.46s"><text class="st" x="440" y="208" style="fill:var(--c-yellow)">LT-3</text><text class="sd" x="440" y="217">Dimmable downlight</text></g>
+<g class="sr" style="--d:0.52s"><text class="st" x="440" y="232" style="fill:var(--c-yellow)">LT-4</text><text class="sd" x="440" y="241">Dimmable downlight</text></g>
+<g class="sr" style="--d:0.58s"><text class="st" x="440" y="256" style="fill:var(--c-yellow)">LT-5</text><text class="sd" x="440" y="265">Dimmable downlight</text></g>
+<g class="sr" style="--d:0.64s"><text class="st" x="440" y="280" style="fill:var(--c-yellow)">LT-6</text><text class="sd" x="440" y="289">Dimmable downlight</text></g>
+<g class="sr" style="--d:0.70s"><text class="st" x="440" y="304" style="fill:var(--c-yellow)">LT-7</text><text class="sd" x="440" y="313">Dimmable downlight</text></g>
+<text class="sd sr" x="440" y="322" style="--d:0.80s">+ 4 more on the sheet</text>
+</g>
+<g class="sch" data-for="cm">
+<g class="sr" style="--d:0.10s"><text class="st" x="440" y="64" style="fill:var(--c-orange)">CAM-1</text><text class="sd" x="440" y="73">4K camera</text></g>
+<g class="sr" style="--d:0.16s"><text class="st" x="440" y="88" style="fill:var(--c-orange)">CAM-2</text><text class="sd" x="440" y="97">4K camera</text></g>
+<g class="sr" style="--d:0.22s"><text class="st" x="440" y="112" style="fill:var(--c-orange)">CAM-3</text><text class="sd" x="440" y="121">4K camera</text></g>
+<g class="sr" style="--d:0.28s"><text class="st" x="440" y="136" style="fill:var(--c-orange)">DB-1</text><text class="sd" x="440" y="145">Video doorbell</text></g>
+</g>
+<g class="sch" data-for="au">
+<g class="sr" style="--d:0.10s"><text class="st" x="440" y="64" style="fill:var(--c-green)">SPK-1</text><text class="sd" x="440" y="73">In-ceiling speaker</text></g>
+<g class="sr" style="--d:0.16s"><text class="st" x="440" y="88" style="fill:var(--c-green)">SPK-2</text><text class="sd" x="440" y="97">In-ceiling speaker</text></g>
+<g class="sr" style="--d:0.22s"><text class="st" x="440" y="112" style="fill:var(--c-green)">SPK-3</text><text class="sd" x="440" y="121">In-ceiling speaker</text></g>
+<g class="sr" style="--d:0.28s"><text class="st" x="440" y="136" style="fill:var(--c-green)">SPK-4</text><text class="sd" x="440" y="145">In-ceiling speaker</text></g>
+<g class="sr" style="--d:0.34s"><text class="st" x="440" y="160" style="fill:var(--c-green)">SPK-5</text><text class="sd" x="440" y="169">In-ceiling speaker</text></g>
+</g>
+<g class="sch" data-for="th">
+<g class="sr" style="--d:0.10s"><text class="st" x="440" y="64" style="fill:var(--c-blue)">PJ-1</text><text class="sd" x="440" y="73">4K projector</text></g>
+<g class="sr" style="--d:0.16s"><text class="st" x="440" y="88" style="fill:var(--c-blue)">SR-1</text><text class="sd" x="440" y="97">Surround speaker</text></g>
+<g class="sr" style="--d:0.22s"><text class="st" x="440" y="112" style="fill:var(--c-blue)">SR-2</text><text class="sd" x="440" y="121">Surround speaker</text></g>
+<g class="sr" style="--d:0.28s"><text class="st" x="440" y="136" style="fill:var(--c-blue)">SR-3</text><text class="sd" x="440" y="145">Surround speaker</text></g>
+<g class="sr" style="--d:0.34s"><text class="st" x="440" y="160" style="fill:var(--c-blue)">SR-4</text><text class="sd" x="440" y="169">Surround speaker</text></g>
+</g>
+<g class="sch" data-for="wf">
+<g class="sr" style="--d:0.10s"><text class="st" x="440" y="64" style="fill:var(--c-purple)">AP-1</text><text class="sd" x="440" y="73">Wi-Fi access point</text></g>
+<g class="sr" style="--d:0.16s"><text class="st" x="440" y="88" style="fill:var(--c-purple)">AP-2</text><text class="sd" x="440" y="97">Wi-Fi access point</text></g>
+<g class="sr" style="--d:0.22s"><text class="st" x="440" y="112" style="fill:var(--c-purple)">AP-3</text><text class="sd" x="440" y="121">Wi-Fi access point</text></g>
+<g class="sr" style="--d:0.28s"><text class="st" x="440" y="136" style="fill:var(--c-purple)">SMP-1</text><text class="sd" x="440" y="145">Media panel and switch</text></g>
+</g>
+<g class="sch" data-for="pw">
+<g class="sr" style="--d:0.10s"><text class="st" x="440" y="64" style="fill:var(--c-yellow)">KP-1 → SMP-1</text><text class="sd" x="440" y="73">14/2</text></g>
+<g class="sr" style="--d:0.16s"><text class="st" x="440" y="88" style="fill:var(--c-yellow)">KP-2 → SMP-1</text><text class="sd" x="440" y="97">14/2</text></g>
+<g class="sr" style="--d:0.22s"><text class="st" x="440" y="112" style="fill:var(--c-yellow)">KP-3 → SMP-1</text><text class="sd" x="440" y="121">14/2</text></g>
+<g class="sr" style="--d:0.28s"><text class="st" x="440" y="136" style="fill:var(--c-yellow)">KP-4 → SMP-1</text><text class="sd" x="440" y="145">14/2</text></g>
+<g class="sr" style="--d:0.34s"><text class="st" x="440" y="160" style="fill:var(--c-yellow)">LT-1 → SMP-1</text><text class="sd" x="440" y="169">14/2</text></g>
+<g class="sr" style="--d:0.40s"><text class="st" x="440" y="184" style="fill:var(--c-yellow)">LT-2 → SMP-1</text><text class="sd" x="440" y="193">14/2</text></g>
+<g class="sr" style="--d:0.46s"><text class="st" x="440" y="208" style="fill:var(--c-yellow)">LT-3 → SMP-1</text><text class="sd" x="440" y="217">14/2</text></g>
+<g class="sr" style="--d:0.52s"><text class="st" x="440" y="232" style="fill:var(--c-yellow)">LT-4 → SMP-1</text><text class="sd" x="440" y="241">14/2</text></g>
+<g class="sr" style="--d:0.58s"><text class="st" x="440" y="256" style="fill:var(--c-yellow)">LT-5 → SMP-1</text><text class="sd" x="440" y="265">14/2</text></g>
+<g class="sr" style="--d:0.64s"><text class="st" x="440" y="280" style="fill:var(--c-yellow)">LT-6 → SMP-1</text><text class="sd" x="440" y="289">14/2</text></g>
+<g class="sr" style="--d:0.70s"><text class="st" x="440" y="304" style="fill:var(--c-yellow)">LT-7 → SMP-1</text><text class="sd" x="440" y="313">14/2</text></g>
+<text class="sd sr" x="440" y="322" style="--d:0.80s">+ 21 more on the sheet</text>
+</g>
+</g>
+<g class="tb"><rect x="20" y="352" width="528" height="52"/><line x1="208" y1="352" x2="208" y2="404"/><line x1="300" y1="352" x2="300" y2="404"/><line x1="470" y1="352" x2="470" y2="404"/><use href="#jlogo" x="28" y="364" width="26" height="26"/><text class="o" x="60" y="375">JAMS DOCS AND DESIGNS</text><text class="k" x="60" y="390">SMART HOME DESIGN</text><text class="k" x="216" y="366">PROJECT</text><text class="v" x="216" y="388">Kona residence</text><text class="k" x="308" y="366">TITLE</text><text class="v" id="shpTitle" x="308" y="388">Ground floor · All systems</text><text class="k" x="478" y="366">SHEET</text><text class="t" id="shpNo" x="478" y="392">H-000</text></g>
+</svg>
+        <figcaption class="shcap" id="shpCap">Every device on one floor plan, with a tag that matches the schedule and the pre-wire plan.</figcaption>
+      </figure>
+    </div>
+    <div class="shaud">
         <article class="shcard rv">
           <h3>For builders and contractors</h3>
           <ul>
@@ -1392,36 +1648,6 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
           </ul>
         </article>
       </div>
-      <figure class="shfig rv" aria-label="A house floor plan with smart home devices placed in each room">
-        <svg viewBox="0 0 520 400" role="img" aria-labelledby="shfigt"><title id="shfigt">Ground floor plan with lighting keypads, cameras, a video doorbell, speakers, Wi-Fi and a theater laid out</title>
-          <defs><pattern id="shgrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern></defs>
-          <rect width="520" height="400" fill="var(--sheet)"/><rect width="520" height="400" fill="url(#shgrid)"/>
-          <g fill="none" stroke="var(--ink)" stroke-width="5" stroke-linejoin="miter">
-            <rect x="30" y="30" width="460" height="320"/><path d="M200 30V200M30 200H330M330 30V350M200 270V350"/>
-          </g>
-          <g fill="var(--sheet)"><rect x="96" y="346" width="44" height="9"/><rect x="250" y="196" width="40" height="9"/><rect x="196" y="110" width="9" height="40"/></g>
-          <g font-family="var(--f-mono)" font-size="11" fill="var(--muted)" letter-spacing=".08em"><text x="62" y="120">GARAGE</text><text x="232" y="120">KITCHEN</text><text x="372" y="190">THEATER</text><text x="62" y="250">ENTRY</text><text x="232" y="250">LIVING</text></g>
-          <g class="shsym">
-            <g transform="translate(118 368)"><rect x="-10" y="-10" width="20" height="20" rx="3" fill="var(--sheet)" stroke="var(--c-orange)" stroke-width="2.5"/><circle r="4" fill="var(--c-orange)"/></g>
-            <g transform="translate(46 46)"><rect x="-10" y="-8" width="20" height="12" rx="2" fill="var(--sheet)" stroke="var(--c-orange)" stroke-width="2.5"/><path d="M-5 4h10l-3 6h-4z" fill="var(--c-orange)"/></g>
-            <g transform="translate(474 46)"><rect x="-10" y="-8" width="20" height="12" rx="2" fill="var(--sheet)" stroke="var(--c-orange)" stroke-width="2.5"/><path d="M-5 4h10l-3 6h-4z" fill="var(--c-orange)"/></g>
-            <g transform="translate(214 222)"><rect x="-9" y="-12" width="18" height="24" rx="3" fill="var(--sheet)" stroke="var(--c-yellow)" stroke-width="2.5"/><g fill="var(--c-yellow)"><rect x="-5" y="-8" width="10" height="3"/><rect x="-5" y="-2" width="10" height="3"/><rect x="-5" y="4" width="10" height="3"/></g></g>
-            <g transform="translate(345 60)"><rect x="-9" y="-12" width="18" height="24" rx="3" fill="var(--sheet)" stroke="var(--c-yellow)" stroke-width="2.5"/><g fill="var(--c-yellow)"><rect x="-5" y="-8" width="10" height="3"/><rect x="-5" y="-2" width="10" height="3"/><rect x="-5" y="4" width="10" height="3"/></g></g>
-            <g fill="var(--sheet)" stroke="var(--c-green)" stroke-width="2.5"><circle cx="230" cy="300" r="10"/><circle cx="300" cy="300" r="10"/><circle cx="240" cy="70" r="10"/><circle cx="300" cy="70" r="10"/></g>
-            <g fill="var(--c-green)"><circle cx="230" cy="300" r="3.5"/><circle cx="300" cy="300" r="3.5"/><circle cx="240" cy="70" r="3.5"/><circle cx="300" cy="70" r="3.5"/></g>
-            <g transform="translate(265 160)"><circle r="13" fill="var(--sheet)" stroke="var(--c-blue)" stroke-width="2.5"/><path d="M-6 1a8.5 8.5 0 0 1 12 0M-3 4a4.2 4.2 0 0 1 6 0" fill="none" stroke="var(--c-blue)" stroke-width="2" stroke-linecap="round"/><circle cy="7" r="1.6" fill="var(--c-blue)"/></g>
-            <g transform="translate(410 300)"><rect x="-44" y="-4" width="88" height="8" rx="1" fill="var(--c-blue)"/></g>
-            <g transform="translate(410 120)"><rect x="-14" y="-9" width="28" height="18" rx="3" fill="var(--sheet)" stroke="var(--c-blue)" stroke-width="2.5"/><path d="M-4 9 0 16 4 9" fill="none" stroke="var(--c-blue)" stroke-width="2"/></g>
-            <g fill="var(--sheet)" stroke="var(--c-green)" stroke-width="2.5"><circle cx="370" cy="250" r="10"/><circle cx="450" cy="250" r="10"/></g>
-          </g>
-          <g font-family="var(--f-mono)" font-size="9.5" fill="var(--ink)" font-weight="600"><text x="132" y="372">DB-1</text><text x="60" y="64">CAM-1</text><text x="440" y="64">CAM-2</text><text x="226" y="226">LT-1</text><text x="282" y="164">AP-1</text><text x="372" y="140">PJ-1</text><text x="376" y="320">SCREEN</text></g>
-          <g transform="translate(330 368)" font-family="var(--f-mono)" font-size="9" fill="var(--muted)"><text>E-301 · GROUND FLOOR · REV A</text></g>
-        </svg>
-      </figure>
-    </div>
-    <ul class="shsys" aria-label="Systems we design">
-      <li style="--c:var(--c-yellow)">Smart lighting &amp; keypads</li><li style="--c:var(--c-orange)">Video doorbells</li><li style="--c:var(--c-orange)">CCTV cameras</li><li style="--c:var(--c-blue)">Home theaters</li><li style="--c:var(--c-green)">Whole-house audio</li><li style="--c:var(--c-blue)">Wi-Fi &amp; network</li><li style="--c:var(--c-yellow)">Motorized shades</li><li style="--c:var(--c-black)">Smart locks</li><li style="--c:var(--c-black)">Security systems</li><li style="--c:var(--c-white)">Climate control</li>
-    </ul>
     <ol class="shsteps">
       <li><b>Send the blueprints</b><span>A PDF from the architect or a photo of the plans, one per floor.</span></li>
       <li><b>Design each floor</b><span>Devices placed room by room, with what each one does.</span></li>
@@ -2219,5 +2445,16 @@ var t;inp.addEventListener('input',function(){clearTimeout(t);var v=norm(inp.val
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();show(norm(inp.value))}else if(e.key==='Escape'){inp.value='';show('')}});
 document.querySelectorAll('.lk-chips button').forEach(function(b){b.addEventListener('click',function(){inp.value=b.dataset.l;show(b.dataset.l)})});
 rows.forEach(function(r){r.addEventListener('click',stopTour)})})();</script>
+<script>(function(){var svg=document.querySelector('svg.shp');if(!svg)return;var rows=[].slice.call(document.querySelectorAll('.shidx tr[role=button]')),cap=document.getElementById('shpCap'),
+T={all:['All systems','Every device on one floor plan, with a tag that matches the schedule and the pre-wire plan.'],lt:['Lighting','Keypads where you walk in, scenes for each room, every fixture on a dimmer.'],
+cm:['Cameras','Each camera’s field of view drawn on the plan, so every door and the driveway is covered.'],au:['Audio','Speakers placed for each room’s size, all playing from one app.'],
+th:['Theater','Screen size, projector throw, seating rows and surround speakers, laid out to the inch.'],wf:['Wi-Fi','Access points placed for the walls and floors, wired back to the media panel.'],
+pw:['Pre-wire','Every device home-runs to the media panel, so the crew knows each cable before the drywall goes up.']};
+function pick(r){var k=r.getAttribute('data-sys');rows.forEach(function(x){x.classList.toggle('on',x===r);x.setAttribute('aria-pressed',x===r)});
+ svg.setAttribute('data-sys',k);svg.classList.remove('go');void svg.getBoundingClientRect();svg.classList.add('go');
+ document.getElementById('shpNo').textContent=r.querySelector('td.s').textContent;document.getElementById('shpTitle').textContent='Ground floor · '+T[k][0];cap.textContent=T[k][1]}
+rows.forEach(function(r,i){r.addEventListener('click',function(){pick(r)});r.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(r)}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();var n=rows[(i+(e.key==='ArrowDown'?1:-1)+rows.length)%rows.length];n.focus();pick(n)}})});
+var ws=svg.querySelector('.wall');ws.style.animationPlayState='paused';[].forEach.call(svg.querySelectorAll('.dv .pp'),function(){});
+if('IntersectionObserver'in window){var io=new IntersectionObserver(function(e){if(e[0].isIntersecting){ws.style.animationPlayState='';pick(rows[0]);io.disconnect()}},{threshold:.35});io.observe(svg)}else{ws.style.animationPlayState='';pick(rows[0])}})();</script>
 </body>
 </html>
