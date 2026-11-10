@@ -196,6 +196,35 @@ h3{font-size:24px;line-height:1.05;font-weight:600}
 @keyframes vzring{0%{transform:scale(.25);opacity:.7}100%{transform:scale(1);opacity:0}}
 @keyframes vzblink{50%{opacity:.45}}
 @media (prefers-reduced-motion: reduce){.vz *{animation:none!important}.vz .ring,.vz .flow{display:none}}
+/* hover to trace */
+.hf .hf-hit{fill:none;stroke:transparent;stroke-width:9;pointer-events:stroke;cursor:crosshair}
+.hf-c>:not(.hf-hit),.hf-lc>:not(.hf-hit){pointer-events:none}
+.hf:focus{outline:none}.hf:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:6px}
+.hf-c,.hf-call,.hf-lc,.hf-sleeve,.hf-stamp,.hf-foot,.hf-foot2{transition:opacity .25s ease}
+.hf.tracing .hf-c:not(.hot),.hf.tracing .hf-call:not(.hot),.hf.tracing .hf-sleeve{opacity:.14}
+.hf.tracing .hf-stamp{opacity:.08}.hf.tracing-l .hf-foot,.hf.tracing-l .hf-foot2{opacity:0}
+.hf-c.hot .hf-run{stroke-width:3.4;filter:drop-shadow(0 0 3px var(--c))}
+.hf-c.hot .hf-boot{stroke:#fff;stroke-width:1}
+.hf-c.hot .hf-flow{stroke:#fff;stroke-width:3;animation:hfflow 1s cubic-bezier(.45,0,.55,1) 0s infinite}
+.hf-call.hot rect{fill:color-mix(in srgb,var(--c) 18%,var(--sheet));stroke-width:1.6}
+.hf-call.hot path{stroke-width:1.4}
+.hf.tracing-l .hf-lc:not(.hot){opacity:.25}
+.hf-lc.hot .hf-cord{stroke-width:3.6;filter:drop-shadow(0 0 3px var(--c))}
+.hf-tag.hot{fill:var(--ink);font-weight:700}
+.trace-tip{position:absolute;z-index:3;pointer-events:none;min-width:150px;padding:9px 12px 10px;background:var(--sheet);border:1px solid var(--line2);border-left:4px solid var(--c,var(--accent));border-radius:6px;box-shadow:0 14px 30px -14px rgba(10,18,28,.45);display:grid;gap:2px;animation:tipin .18s cubic-bezier(.23,1,.32,1)}
+.trace-tip[hidden]{display:none}
+.trace-tip b{font:700 17px/1 var(--f-display);letter-spacing:.04em;color:var(--c,var(--ink))}
+.trace-tip .f{font:600 12.5px var(--f-body);color:var(--ink)}
+.trace-tip .y{font:500 10.5px var(--f-mono);color:var(--muted)}
+.trace-tip.bad{--c:var(--bad)}
+@keyframes tipin{from{opacity:0;transform:translateY(4px)}}
+.trace-hint{position:absolute;right:0;top:-30px;margin:0;display:flex;align-items:center;gap:8px;font:500 11px var(--f-mono);letter-spacing:.06em;color:var(--muted)}
+.trace-hint i{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:hintp 2s ease-out infinite}
+@keyframes hintp{70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.trace-hint .tp{display:none}
+@media (hover:none){.trace-hint .hv{display:none}.trace-hint .tp{display:inline}}
+@media (max-width:640px){.trace-hint{position:static;margin:0 0 8px}}
+@media (prefers-reduced-motion: reduce){.trace-tip,.trace-hint i{animation:none}.hf-c.hot .hf-flow{display:none}}
 /* hero drawing: as found vs as-built */
 .hero-copy{gap:18px}
 .hero-copy .lead+.lead{margin-top:-4px}
@@ -717,7 +746,7 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
     </div>
 
     <figure class="sheetfig" style="margin:0">
-      <svg viewBox="0 0 640 440" role="img" aria-labelledby="hfT" class="hf">
+      <svg viewBox="0 0 640 440" role="img" aria-labelledby="hfT" class="hf" tabindex="0">
 <title id="hfT">The same equipment rack shown twice: as found, with tangled unlabeled patch cords, and as-built, with every cable dressed port to port, labeled and numbered to match the drawing</title>
 <defs><pattern id="hg" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" class="hs-g1"/></pattern><clipPath id="hfL"><rect x="15" y="15" width="302" height="410"/></clipPath><linearGradient id="hfBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity="0"/><stop offset="1" stop-color="var(--accent)" stop-opacity=".22"/></linearGradient></defs>
 <rect class="hs-sheet" x="0" y="0" width="640" height="440"/><rect x="14" y="14" width="612" height="412" fill="url(#hg)"/><rect class="hs-edge" x="14" y="14" width="612" height="412"/>
@@ -811,19 +840,32 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 <rect class="hf-jack" x="202.5" y="265.0" width="9" height="8" rx="1.5"/>
 </g>
 <g clip-path="url(#hfL)">
-<path class="hf-cord sv" d="M172.5 167.0C227 277 63 247 172.5 201.0"><animate class="hf-sway" attributeName="d" dur="4.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M172.5 167.0C227 277 63 247 172.5 201.0;M172.5 167.0C219 277 55 247 172.5 201.0;M172.5 167.0C227 277 63 247 172.5 201.0"/></path>
-<path class="hf-cord sn" d="M126.5 201.0C25 260 153 297 103.5 235.0"><animate class="hf-sway" attributeName="d" dur="4.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 201.0C25 260 153 297 103.5 235.0;M126.5 201.0C18 260 147 297 103.5 235.0;M126.5 201.0C25 260 153 297 103.5 235.0"/></path>
-<path class="hf-cord sa" d="M115.0 201.0C27 284 157 228 103.5 167.0"><animate class="hf-sway" attributeName="d" dur="6.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M115.0 201.0C27 284 157 228 103.5 167.0;M115.0 201.0C34 284 164 228 103.5 167.0;M115.0 201.0C27 284 157 228 103.5 167.0"/></path>
-<path class="hf-cord su" d="M115.0 167.0C63 268 205 190 103.5 133.0"><animate class="hf-sway" attributeName="d" dur="6.3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M115.0 167.0C63 268 205 190 103.5 133.0;M115.0 167.0C54 268 196 190 103.5 133.0;M115.0 167.0C63 268 205 190 103.5 133.0"/></path>
-<path class="hf-cord sc" d="M161.0 201.0C105 294 278 183 172.5 77.0"><animate class="hf-sway" attributeName="d" dur="5.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 201.0C105 294 278 183 172.5 77.0;M161.0 201.0C96 294 269 183 172.5 77.0;M161.0 201.0C105 294 278 183 172.5 77.0"/></path>
-<path class="hf-cord sn" d="M103.5 201.0C43 253 179 155 92.0 77.0"><animate class="hf-sway" attributeName="d" dur="6.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M103.5 201.0C43 253 179 155 92.0 77.0;M103.5 201.0C50 253 186 155 92.0 77.0;M103.5 201.0C43 253 179 155 92.0 77.0"/></path>
-<path class="hf-cord sv" d="M126.5 77.0C224 141 169 161 195.5 105.0"><animate class="hf-sway" attributeName="d" dur="5.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 77.0C224 141 169 161 195.5 105.0;M126.5 77.0C218 141 163 161 195.5 105.0;M126.5 77.0C224 141 169 161 195.5 105.0"/></path>
-<path class="hf-cord sn" d="M161.0 167.0C88 261 226 182 184.0 133.0"><animate class="hf-sway" attributeName="d" dur="5.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 167.0C88 261 226 182 184.0 133.0;M161.0 167.0C93 261 232 182 184.0 133.0;M161.0 167.0C88 261 226 182 184.0 133.0"/></path>
-<path class="hf-cord sv" d="M149.5 77.0C73 128 176 187 126.5 133.0"><animate class="hf-sway" attributeName="d" dur="6.0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M149.5 77.0C73 128 176 187 126.5 133.0;M149.5 77.0C65 128 168 187 126.5 133.0;M149.5 77.0C73 128 176 187 126.5 133.0"/></path>
-<path class="hf-cord sn" d="M126.5 167.0C62 243 230 145 207.0 77.0"><animate class="hf-sway" attributeName="d" dur="5.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 167.0C62 243 230 145 207.0 77.0;M126.5 167.0C54 243 222 145 207.0 77.0;M126.5 167.0C62 243 230 145 207.0 77.0"/></path>
-<path class="hf-cord sa" d="M161.0 133.0C207 199 34 187 103.5 77.0"><animate class="hf-sway" attributeName="d" dur="6.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 133.0C207 199 34 187 103.5 77.0;M161.0 133.0C198 199 26 187 103.5 77.0;M161.0 133.0C207 199 34 187 103.5 77.0"/></path>
-<path class="hf-cord su" d="M218.5 105.0C331 173 -6 325 92.0 235.0"><animate class="hf-sway" attributeName="d" dur="6.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M218.5 105.0C331 173 -6 325 92.0 235.0;M218.5 105.0C323 173 -13 325 92.0 235.0;M218.5 105.0C331 173 -6 325 92.0 235.0"/></path>
-<path class="hf-cord sc" d="M92.0 167.0C5 253 213 175 138.0 105.0"><animate class="hf-sway" attributeName="d" dur="7.0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M92.0 167.0C5 253 213 175 138.0 105.0;M92.0 167.0C-0 253 207 175 138.0 105.0;M92.0 167.0C5 253 213 175 138.0 105.0"/></path>
+<g class="hf-lc sv"><path class="hf-hit" d="M172.5 167.0C227 277 63 247 172.5 201.0"/>
+<path class="hf-cord sv" d="M172.5 167.0C227 277 63 247 172.5 201.0"><animate class="hf-sway" attributeName="d" dur="4.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M172.5 167.0C227 277 63 247 172.5 201.0;M172.5 167.0C219 277 55 247 172.5 201.0;M172.5 167.0C227 277 63 247 172.5 201.0"/></path></g>
+<g class="hf-lc sn"><path class="hf-hit" d="M126.5 201.0C25 260 153 297 103.5 235.0"/>
+<path class="hf-cord sn" d="M126.5 201.0C25 260 153 297 103.5 235.0"><animate class="hf-sway" attributeName="d" dur="4.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 201.0C25 260 153 297 103.5 235.0;M126.5 201.0C18 260 147 297 103.5 235.0;M126.5 201.0C25 260 153 297 103.5 235.0"/></path></g>
+<g class="hf-lc sa"><path class="hf-hit" d="M115.0 201.0C27 284 157 228 103.5 167.0"/>
+<path class="hf-cord sa" d="M115.0 201.0C27 284 157 228 103.5 167.0"><animate class="hf-sway" attributeName="d" dur="6.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M115.0 201.0C27 284 157 228 103.5 167.0;M115.0 201.0C34 284 164 228 103.5 167.0;M115.0 201.0C27 284 157 228 103.5 167.0"/></path></g>
+<g class="hf-lc su"><path class="hf-hit" d="M115.0 167.0C63 268 205 190 103.5 133.0"/>
+<path class="hf-cord su" d="M115.0 167.0C63 268 205 190 103.5 133.0"><animate class="hf-sway" attributeName="d" dur="6.3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M115.0 167.0C63 268 205 190 103.5 133.0;M115.0 167.0C54 268 196 190 103.5 133.0;M115.0 167.0C63 268 205 190 103.5 133.0"/></path></g>
+<g class="hf-lc sc"><path class="hf-hit" d="M161.0 201.0C105 294 278 183 172.5 77.0"/>
+<path class="hf-cord sc" d="M161.0 201.0C105 294 278 183 172.5 77.0"><animate class="hf-sway" attributeName="d" dur="5.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 201.0C105 294 278 183 172.5 77.0;M161.0 201.0C96 294 269 183 172.5 77.0;M161.0 201.0C105 294 278 183 172.5 77.0"/></path></g>
+<g class="hf-lc sn"><path class="hf-hit" d="M103.5 201.0C43 253 179 155 92.0 77.0"/>
+<path class="hf-cord sn" d="M103.5 201.0C43 253 179 155 92.0 77.0"><animate class="hf-sway" attributeName="d" dur="6.6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M103.5 201.0C43 253 179 155 92.0 77.0;M103.5 201.0C50 253 186 155 92.0 77.0;M103.5 201.0C43 253 179 155 92.0 77.0"/></path></g>
+<g class="hf-lc sv"><path class="hf-hit" d="M126.5 77.0C224 141 169 161 195.5 105.0"/>
+<path class="hf-cord sv" d="M126.5 77.0C224 141 169 161 195.5 105.0"><animate class="hf-sway" attributeName="d" dur="5.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 77.0C224 141 169 161 195.5 105.0;M126.5 77.0C218 141 163 161 195.5 105.0;M126.5 77.0C224 141 169 161 195.5 105.0"/></path></g>
+<g class="hf-lc sn"><path class="hf-hit" d="M161.0 167.0C88 261 226 182 184.0 133.0"/>
+<path class="hf-cord sn" d="M161.0 167.0C88 261 226 182 184.0 133.0"><animate class="hf-sway" attributeName="d" dur="5.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 167.0C88 261 226 182 184.0 133.0;M161.0 167.0C93 261 232 182 184.0 133.0;M161.0 167.0C88 261 226 182 184.0 133.0"/></path></g>
+<g class="hf-lc sv"><path class="hf-hit" d="M149.5 77.0C73 128 176 187 126.5 133.0"/>
+<path class="hf-cord sv" d="M149.5 77.0C73 128 176 187 126.5 133.0"><animate class="hf-sway" attributeName="d" dur="6.0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M149.5 77.0C73 128 176 187 126.5 133.0;M149.5 77.0C65 128 168 187 126.5 133.0;M149.5 77.0C73 128 176 187 126.5 133.0"/></path></g>
+<g class="hf-lc sn"><path class="hf-hit" d="M126.5 167.0C62 243 230 145 207.0 77.0"/>
+<path class="hf-cord sn" d="M126.5 167.0C62 243 230 145 207.0 77.0"><animate class="hf-sway" attributeName="d" dur="5.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M126.5 167.0C62 243 230 145 207.0 77.0;M126.5 167.0C54 243 222 145 207.0 77.0;M126.5 167.0C62 243 230 145 207.0 77.0"/></path></g>
+<g class="hf-lc sa"><path class="hf-hit" d="M161.0 133.0C207 199 34 187 103.5 77.0"/>
+<path class="hf-cord sa" d="M161.0 133.0C207 199 34 187 103.5 77.0"><animate class="hf-sway" attributeName="d" dur="6.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M161.0 133.0C207 199 34 187 103.5 77.0;M161.0 133.0C198 199 26 187 103.5 77.0;M161.0 133.0C207 199 34 187 103.5 77.0"/></path></g>
+<g class="hf-lc su"><path class="hf-hit" d="M218.5 105.0C331 173 -6 325 92.0 235.0"/>
+<path class="hf-cord su" d="M218.5 105.0C331 173 -6 325 92.0 235.0"><animate class="hf-sway" attributeName="d" dur="6.7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M218.5 105.0C331 173 -6 325 92.0 235.0;M218.5 105.0C323 173 -13 325 92.0 235.0;M218.5 105.0C331 173 -6 325 92.0 235.0"/></path></g>
+<g class="hf-lc sc"><path class="hf-hit" d="M92.0 167.0C5 253 213 175 138.0 105.0"/>
+<path class="hf-cord sc" d="M92.0 167.0C5 253 213 175 138.0 105.0"><animate class="hf-sway" attributeName="d" dur="7.0s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" values="M92.0 167.0C5 253 213 175 138.0 105.0;M92.0 167.0C-0 253 207 175 138.0 105.0;M92.0 167.0C5 253 213 175 138.0 105.0"/></path></g>
 </g>
 <rect class="hf-boot sv" x="169.3" y="163.4" width="6.4" height="7.2" rx="1.2"/>
 <rect class="hf-boot sv" x="169.3" y="197.4" width="6.4" height="7.2" rx="1.2"/>
@@ -949,97 +991,166 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 <rect class="hf-jack" x="514.5" y="265.0" width="9" height="8" rx="1.5"/>
 </g>
 <text class="hf-tag" x="377" y="271.6" text-anchor="end">PDU-1</text>
+<g class="hf-c sn" data-t="N-201" data-f="PP-1 port 1 → SW-1 port 1" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M404.0 77.0V105.0"/>
 <path class="hf-run sn" pathLength="100" style="--d:0.50s" d="M404.0 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:0.57s" d="M415.5 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:0.64s" d="M427.0 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:0.71s" d="M438.5 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:0.78s" d="M450.0 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:0.85s" d="M461.5 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:0.92s" d="M473.0 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:0.99s" d="M484.5 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:1.06s" d="M496.0 77.0V105.0"/>
-<path class="hf-run sn" pathLength="100" style="--d:1.13s" d="M507.5 77.0V105.0"/>
-<path class="hf-run sv" pathLength="100" style="--d:1.20s" d="M404.0 133.0V167.0"/>
-<path class="hf-run sv" pathLength="100" style="--d:1.27s" d="M415.5 133.0V167.0"/>
-<path class="hf-run sv" pathLength="100" style="--d:1.34s" d="M427.0 133.0V167.0"/>
-<path class="hf-run sv" pathLength="100" style="--d:1.41s" d="M438.5 133.0V167.0"/>
-<path class="hf-run sa" pathLength="100" style="--d:1.48s" d="M450.0 167.0V201.0"/>
-<path class="hf-run sa" pathLength="100" style="--d:1.55s" d="M461.5 167.0V201.0"/>
-<path class="hf-run su" pathLength="100" style="--d:1.62s" d="M473.0 167.0V201.0"/>
-<path class="hf-run sa" pathLength="100" style="--d:1.69s" d="M404.0 201.0V235.0"/>
-<path class="hf-run sa" pathLength="100" style="--d:1.76s" d="M415.5 201.0V235.0"/>
-<path class="hf-run sa" pathLength="100" style="--d:1.83s" d="M427.0 201.0V235.0"/>
-<path class="hf-run sa" pathLength="100" style="--d:1.90s" d="M438.5 201.0V235.0"/>
-<path class="hf-run sc" pathLength="100" style="--d:1.97s" d="M530.5 105.0V110.0Q530.5 114.0 534.5 114.0H538Q542 114.0 542 118.0V154.0Q542 158.0 538 158.0H488.5Q484.5 158.0 484.5 162.0V167.0"/>
-<path class="hf-run sk" pathLength="100" style="--d:2.04s" d="M461.5 235.0V249.0Q461.5 252.0 458.5 252.0H453.0Q450.0 252.0 450.0 255.0V269.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:2.40s;--fd:0.00s" d="M404.0 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="400.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.50s"/>
 <rect class="hf-boot sn hf-pop" x="400.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:0.95s"/>
+</g>
+<g class="hf-c sn" data-t="N-202" data-f="PP-1 port 2 → SW-1 port 2" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M415.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.57s" d="M415.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:2.77s;--fd:0.53s" d="M415.5 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="412.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.57s"/>
 <rect class="hf-boot sn hf-pop" x="412.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.02s"/>
+</g>
+<g class="hf-c sn" data-t="N-203" data-f="PP-1 port 3 → SW-1 port 3" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M427.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.64s" d="M427.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.14s;--fd:1.06s" d="M427.0 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="423.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.64s"/>
 <rect class="hf-boot sn hf-pop" x="423.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.09s"/>
+</g>
+<g class="hf-c sn" data-t="N-204" data-f="PP-1 port 4 → SW-1 port 4" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M438.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.71s" d="M438.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.51s;--fd:1.59s" d="M438.5 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="435.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.71s"/>
 <rect class="hf-boot sn hf-pop" x="435.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.16s"/>
+</g>
+<g class="hf-c sn" data-t="N-205" data-f="PP-1 port 5 → SW-1 port 5" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M450.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.78s" d="M450.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.88s;--fd:2.12s" d="M450.0 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="446.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.78s"/>
 <rect class="hf-boot sn hf-pop" x="446.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.23s"/>
+</g>
+<g class="hf-c sn" data-t="N-206" data-f="PP-1 port 6 → SW-1 port 6" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M461.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.85s" d="M461.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:4.25s;--fd:2.65s" d="M461.5 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="458.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.85s"/>
 <rect class="hf-boot sn hf-pop" x="458.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.30s"/>
+</g>
+<g class="hf-c sn" data-t="N-207" data-f="PP-1 port 7 → SW-1 port 7" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M473.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.92s" d="M473.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:4.62s;--fd:0.18s" d="M473.0 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="469.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.92s"/>
 <rect class="hf-boot sn hf-pop" x="469.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.37s"/>
+</g>
+<g class="hf-c sn" data-t="N-208" data-f="PP-1 port 8 → SW-1 port 8" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M484.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:0.99s" d="M484.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:4.99s;--fd:0.71s" d="M484.5 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="481.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:0.99s"/>
 <rect class="hf-boot sn hf-pop" x="481.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.44s"/>
+</g>
+<g class="hf-c sn" data-t="N-209" data-f="PP-1 port 9 → SW-1 port 9" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M496.0 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:1.06s" d="M496.0 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:2.76s;--fd:1.24s" d="M496.0 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="492.8" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:1.06s"/>
 <rect class="hf-boot sn hf-pop" x="492.8" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.51s"/>
+</g>
+<g class="hf-c sn" data-t="N-210" data-f="PP-1 port 10 → SW-1 port 10" data-y="Network · Cat6 · 1 ft · Sheet E-201" data-g="0">
+<path class="hf-hit" d="M507.5 77.0V105.0"/>
+<path class="hf-run sn" pathLength="100" style="--d:1.13s" d="M507.5 77.0V105.0"/>
+<path class="hf-flow sn" pathLength="100" style="--f:3.13s;--fd:1.77s" d="M507.5 77.0V105.0"/>
 <rect class="hf-boot sn hf-pop" x="504.3" y="73.4" width="6.4" height="7.2" rx="1.2" style="--d:1.13s"/>
 <rect class="hf-boot sn hf-pop" x="504.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.58s"/>
+</g>
+<g class="hf-c sv" data-t="V-101" data-f="PP-2 port 1 → SWR-1 IN 1" data-y="Video · HDMI · 3 ft · Sheet E-101" data-g="1">
+<path class="hf-hit" d="M404.0 133.0V167.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.20s" d="M404.0 133.0V167.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:3.50s;--fd:2.30s" d="M404.0 133.0V167.0"/>
 <rect class="hf-boot sv hf-pop" x="400.8" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.20s"/>
 <rect class="hf-boot sv hf-pop" x="400.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.65s"/>
+</g>
+<g class="hf-c sv" data-t="V-102" data-f="PP-2 port 2 → SWR-1 IN 2" data-y="Video · HDMI · 3 ft · Sheet E-101" data-g="1">
+<path class="hf-hit" d="M415.5 133.0V167.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.27s" d="M415.5 133.0V167.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:3.87s;--fd:2.83s" d="M415.5 133.0V167.0"/>
 <rect class="hf-boot sv hf-pop" x="412.3" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.27s"/>
 <rect class="hf-boot sv hf-pop" x="412.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.72s"/>
+</g>
+<g class="hf-c sv" data-t="V-103" data-f="PP-2 port 3 → SWR-1 IN 3" data-y="Video · HDMI · 3 ft · Sheet E-101" data-g="1">
+<path class="hf-hit" d="M427.0 133.0V167.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.34s" d="M427.0 133.0V167.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:4.24s;--fd:0.36s" d="M427.0 133.0V167.0"/>
 <rect class="hf-boot sv hf-pop" x="423.8" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.34s"/>
 <rect class="hf-boot sv hf-pop" x="423.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.79s"/>
+</g>
+<g class="hf-c sv" data-t="V-104" data-f="PP-2 port 4 → SWR-1 IN 4" data-y="Video · HDMI · 3 ft · Sheet E-101" data-g="1">
+<path class="hf-hit" d="M438.5 133.0V167.0"/>
+<path class="hf-run sv" pathLength="100" style="--d:1.41s" d="M438.5 133.0V167.0"/>
+<path class="hf-flow sv" pathLength="100" style="--f:4.61s;--fd:0.89s" d="M438.5 133.0V167.0"/>
 <rect class="hf-boot sv hf-pop" x="435.3" y="129.4" width="6.4" height="7.2" rx="1.2" style="--d:1.41s"/>
 <rect class="hf-boot sv hf-pop" x="435.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.86s"/>
+</g>
+<g class="hf-c sa" data-t="A-101" data-f="SWR-1 audio 1 → DSP-1 IN 5" data-y="Audio · balanced · 2 ft · Sheet E-101" data-g="3">
+<path class="hf-hit" d="M450.0 167.0V201.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.48s" d="M450.0 167.0V201.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:4.98s;--fd:1.42s" d="M450.0 167.0V201.0"/>
 <rect class="hf-boot sa hf-pop" x="446.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.48s"/>
 <rect class="hf-boot sa hf-pop" x="446.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.93s"/>
+</g>
+<g class="hf-c sa" data-t="A-102" data-f="SWR-1 audio 2 → DSP-1 IN 6" data-y="Audio · balanced · 2 ft · Sheet E-101" data-g="3">
+<path class="hf-hit" d="M461.5 167.0V201.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.55s" d="M461.5 167.0V201.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:2.75s;--fd:1.95s" d="M461.5 167.0V201.0"/>
 <rect class="hf-boot sa hf-pop" x="458.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.55s"/>
 <rect class="hf-boot sa hf-pop" x="458.3" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:2.00s"/>
+</g>
+<g class="hf-c su" data-t="U-101" data-f="SWR-1 USB → DSP-1 USB" data-y="USB · 3 ft · Sheet E-101" data-g="4">
+<path class="hf-hit" d="M473.0 167.0V201.0"/>
+<path class="hf-run su" pathLength="100" style="--d:1.62s" d="M473.0 167.0V201.0"/>
+<path class="hf-flow su" pathLength="100" style="--f:3.12s;--fd:2.48s" d="M473.0 167.0V201.0"/>
 <rect class="hf-boot su hf-pop" x="469.8" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:1.62s"/>
 <rect class="hf-boot su hf-pop" x="469.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:2.07s"/>
+</g>
+<g class="hf-c sa" data-t="A-201" data-f="DSP-1 OUT 1 → AMP-1 IN 1" data-y="Audio · balanced · 2 ft · Sheet E-101" data-g="5">
+<path class="hf-hit" d="M404.0 201.0V235.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.69s" d="M404.0 201.0V235.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:3.49s;--fd:0.01s" d="M404.0 201.0V235.0"/>
 <rect class="hf-boot sa hf-pop" x="400.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.69s"/>
 <rect class="hf-boot sa hf-pop" x="400.8" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.14s"/>
+</g>
+<g class="hf-c sa" data-t="A-202" data-f="DSP-1 OUT 2 → AMP-1 IN 2" data-y="Audio · balanced · 2 ft · Sheet E-101" data-g="5">
+<path class="hf-hit" d="M415.5 201.0V235.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.76s" d="M415.5 201.0V235.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:3.86s;--fd:0.54s" d="M415.5 201.0V235.0"/>
 <rect class="hf-boot sa hf-pop" x="412.3" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.76s"/>
 <rect class="hf-boot sa hf-pop" x="412.3" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.21s"/>
+</g>
+<g class="hf-c sa" data-t="A-203" data-f="DSP-1 OUT 3 → AMP-1 IN 3" data-y="Audio · balanced · 2 ft · Sheet E-101" data-g="5">
+<path class="hf-hit" d="M427.0 201.0V235.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.83s" d="M427.0 201.0V235.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:4.23s;--fd:1.07s" d="M427.0 201.0V235.0"/>
 <rect class="hf-boot sa hf-pop" x="423.8" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.83s"/>
 <rect class="hf-boot sa hf-pop" x="423.8" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.28s"/>
+</g>
+<g class="hf-c sa" data-t="A-204" data-f="DSP-1 OUT 4 → AMP-1 IN 4" data-y="Audio · balanced · 2 ft · Sheet E-101" data-g="5">
+<path class="hf-hit" d="M438.5 201.0V235.0"/>
+<path class="hf-run sa" pathLength="100" style="--d:1.90s" d="M438.5 201.0V235.0"/>
+<path class="hf-flow sa" pathLength="100" style="--f:4.60s;--fd:1.60s" d="M438.5 201.0V235.0"/>
 <rect class="hf-boot sa hf-pop" x="435.3" y="197.4" width="6.4" height="7.2" rx="1.2" style="--d:1.90s"/>
 <rect class="hf-boot sa hf-pop" x="435.3" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.35s"/>
+</g>
+<g class="hf-c sc" data-t="C-101" data-f="SW-1 port 12 → SWR-1 RS-232" data-y="Control · Cat6 · 4 ft · Sheet E-101" data-g="2">
+<path class="hf-hit" d="M530.5 105.0V110.0Q530.5 114.0 534.5 114.0H538Q542 114.0 542 118.0V154.0Q542 158.0 538 158.0H488.5Q484.5 158.0 484.5 162.0V167.0"/>
+<path class="hf-run sc" pathLength="100" style="--d:1.97s" d="M530.5 105.0V110.0Q530.5 114.0 534.5 114.0H538Q542 114.0 542 118.0V154.0Q542 158.0 538 158.0H488.5Q484.5 158.0 484.5 162.0V167.0"/>
+<path class="hf-flow sc" pathLength="100" style="--f:4.97s;--fd:2.13s" d="M530.5 105.0V110.0Q530.5 114.0 534.5 114.0H538Q542 114.0 542 118.0V154.0Q542 158.0 538 158.0H488.5Q484.5 158.0 484.5 162.0V167.0"/>
 <rect class="hf-boot sc hf-pop" x="527.3" y="101.4" width="6.4" height="7.2" rx="1.2" style="--d:1.97s"/>
 <rect class="hf-boot sc hf-pop" x="481.3" y="163.4" width="6.4" height="7.2" rx="1.2" style="--d:2.42s"/>
+</g>
+<g class="hf-c sk" data-t="P-01" data-f="AMP-1 power → PDU-1 outlet 3" data-y="Power · IEC · 3 ft · Sheet E-201" data-g="6">
+<path class="hf-hit" d="M461.5 235.0V249.0Q461.5 252.0 458.5 252.0H453.0Q450.0 252.0 450.0 255.0V269.0"/>
+<path class="hf-run sk" pathLength="100" style="--d:2.04s" d="M461.5 235.0V249.0Q461.5 252.0 458.5 252.0H453.0Q450.0 252.0 450.0 255.0V269.0"/>
 <rect class="hf-boot sk hf-pop" x="458.3" y="231.4" width="6.4" height="7.2" rx="1.2" style="--d:2.04s"/>
 <rect class="hf-boot sk hf-pop" x="446.8" y="265.4" width="6.4" height="7.2" rx="1.2" style="--d:2.49s"/>
-<path class="hf-flow sn" pathLength="100" style="--f:2.40s;--fd:0.00s" d="M404.0 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:2.77s;--fd:0.53s" d="M415.5 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:3.14s;--fd:1.06s" d="M427.0 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:3.51s;--fd:1.59s" d="M438.5 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:3.88s;--fd:2.12s" d="M450.0 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:4.25s;--fd:2.65s" d="M461.5 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:4.62s;--fd:0.18s" d="M473.0 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:4.99s;--fd:0.71s" d="M484.5 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:2.76s;--fd:1.24s" d="M496.0 77.0V105.0"/>
-<path class="hf-flow sn" pathLength="100" style="--f:3.13s;--fd:1.77s" d="M507.5 77.0V105.0"/>
-<path class="hf-flow sv" pathLength="100" style="--f:3.50s;--fd:2.30s" d="M404.0 133.0V167.0"/>
-<path class="hf-flow sv" pathLength="100" style="--f:3.87s;--fd:2.83s" d="M415.5 133.0V167.0"/>
-<path class="hf-flow sv" pathLength="100" style="--f:4.24s;--fd:0.36s" d="M427.0 133.0V167.0"/>
-<path class="hf-flow sv" pathLength="100" style="--f:4.61s;--fd:0.89s" d="M438.5 133.0V167.0"/>
-<path class="hf-flow sa" pathLength="100" style="--f:4.98s;--fd:1.42s" d="M450.0 167.0V201.0"/>
-<path class="hf-flow sa" pathLength="100" style="--f:2.75s;--fd:1.95s" d="M461.5 167.0V201.0"/>
-<path class="hf-flow su" pathLength="100" style="--f:3.12s;--fd:2.48s" d="M473.0 167.0V201.0"/>
-<path class="hf-flow sa" pathLength="100" style="--f:3.49s;--fd:0.01s" d="M404.0 201.0V235.0"/>
-<path class="hf-flow sa" pathLength="100" style="--f:3.86s;--fd:0.54s" d="M415.5 201.0V235.0"/>
-<path class="hf-flow sa" pathLength="100" style="--f:4.23s;--fd:1.07s" d="M427.0 201.0V235.0"/>
-<path class="hf-flow sa" pathLength="100" style="--f:4.60s;--fd:1.60s" d="M438.5 201.0V235.0"/>
-<path class="hf-flow sc" pathLength="100" style="--f:4.97s;--fd:2.13s" d="M530.5 105.0V110.0Q530.5 114.0 534.5 114.0H538Q542 114.0 542 118.0V154.0Q542 158.0 538 158.0H488.5Q484.5 158.0 484.5 162.0V167.0"/>
+</g>
 <rect class="hf-sleeve hf-pop" style="--d:1.90s" x="401.4" y="88.5" width="5.2" height="5"/>
 <rect class="hf-sleeve hf-pop" style="--d:1.93s" x="412.9" y="88.5" width="5.2" height="5"/>
 <rect class="hf-sleeve hf-pop" style="--d:1.96s" x="424.4" y="88.5" width="5.2" height="5"/>
@@ -1050,16 +1161,18 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 <rect class="hf-sleeve hf-pop" style="--d:2.11s" x="481.9" y="88.5" width="5.2" height="5"/>
 <rect class="hf-sleeve hf-pop" style="--d:2.14s" x="493.4" y="88.5" width="5.2" height="5"/>
 <rect class="hf-sleeve hf-pop" style="--d:2.17s" x="504.9" y="88.5" width="5.2" height="5"/>
-<g class="hf-call sn" style="--d:2.10s"><path pathLength="100" d="M507.5 91L574 72H581"/><circle cx="507.5" cy="91" r="1.8"/><rect x="581" y="64.5" width="49" height="15" rx="2"/><text x="585" y="75">N-201…210</text></g>
-<g class="hf-call sv" style="--d:2.22s"><path pathLength="100" d="M438.5 150L574 134H581"/><circle cx="438.5" cy="150" r="1.8"/><rect x="581" y="126.5" width="49" height="15" rx="2"/><text x="585" y="137">V-101…104</text></g>
-<g class="hf-call sc" style="--d:2.34s"><path pathLength="100" d="M542.0 136L574 108H599"/><circle cx="542.0" cy="136" r="1.8"/><rect x="599" y="100.5" width="31" height="15" rx="2"/><text x="603" y="111">C-101</text></g>
-<g class="hf-call sa" style="--d:2.46s"><path pathLength="100" d="M461.5 186L574 162H581"/><circle cx="461.5" cy="186" r="1.8"/><rect x="581" y="154.5" width="49" height="15" rx="2"/><text x="585" y="165">A-101/102</text></g>
-<g class="hf-call su" style="--d:2.58s"><path pathLength="100" d="M473.0 186L574 186H599"/><circle cx="473.0" cy="186" r="1.8"/><rect x="599" y="178.5" width="31" height="15" rx="2"/><text x="603" y="189">U-101</text></g>
-<g class="hf-call sa" style="--d:2.70s"><path pathLength="100" d="M438.5 214L574 212H581"/><circle cx="438.5" cy="214" r="1.8"/><rect x="581" y="204.5" width="49" height="15" rx="2"/><text x="585" y="215">A-201…204</text></g>
-<g class="hf-call sk" style="--d:2.82s"><path pathLength="100" d="M463.5 247L574 246H604"/><circle cx="463.5" cy="247" r="1.8"/><rect x="604" y="238.5" width="26" height="15" rx="2"/><text x="608" y="249">P-01</text></g>
+<g class="hf-call sn" data-g="0" style="--d:2.10s"><path pathLength="100" d="M507.5 91L574 72H581"/><circle cx="507.5" cy="91" r="1.8"/><rect x="581" y="64.5" width="49" height="15" rx="2"/><text x="585" y="75">N-201…210</text></g>
+<g class="hf-call sv" data-g="1" style="--d:2.22s"><path pathLength="100" d="M438.5 150L574 134H581"/><circle cx="438.5" cy="150" r="1.8"/><rect x="581" y="126.5" width="49" height="15" rx="2"/><text x="585" y="137">V-101…104</text></g>
+<g class="hf-call sc" data-g="2" style="--d:2.34s"><path pathLength="100" d="M542.0 136L574 108H599"/><circle cx="542.0" cy="136" r="1.8"/><rect x="599" y="100.5" width="31" height="15" rx="2"/><text x="603" y="111">C-101</text></g>
+<g class="hf-call sa" data-g="3" style="--d:2.46s"><path pathLength="100" d="M461.5 186L574 162H581"/><circle cx="461.5" cy="186" r="1.8"/><rect x="581" y="154.5" width="49" height="15" rx="2"/><text x="585" y="165">A-101/102</text></g>
+<g class="hf-call su" data-g="4" style="--d:2.58s"><path pathLength="100" d="M473.0 186L574 186H599"/><circle cx="473.0" cy="186" r="1.8"/><rect x="599" y="178.5" width="31" height="15" rx="2"/><text x="603" y="189">U-101</text></g>
+<g class="hf-call sa" data-g="5" style="--d:2.70s"><path pathLength="100" d="M438.5 214L574 212H581"/><circle cx="438.5" cy="214" r="1.8"/><rect x="581" y="204.5" width="49" height="15" rx="2"/><text x="585" y="215">A-201…204</text></g>
+<g class="hf-call sk" data-g="6" style="--d:2.82s"><path pathLength="100" d="M463.5 247L574 246H604"/><circle cx="463.5" cy="247" r="1.8"/><rect x="604" y="238.5" width="26" height="15" rx="2"/><text x="608" y="249">P-01</text></g>
 <g class="hs-tb"><rect x="430" y="350" width="196" height="76"/><line x1="430" y1="372" x2="626" y2="372"/><line x1="430" y1="398" x2="626" y2="398"/><line x1="540" y1="372" x2="540" y2="426"/><use href="#jlogo" x="434" y="352.5" width="17" height="17"/><text class="o" x="456" y="366">JAMS DOCS AND DESIGNS</text><text class="k" x="438" y="381">PROJECT</text><text class="v" x="438" y="393">MDF · Rack 1</text><text class="k" x="548" y="381">SHEET</text><text class="t" x="548" y="395">E-201</text><text class="k" x="438" y="407">TITLE</text><text class="v" x="438" y="419">Rack elevation</text><text class="k" x="548" y="407">STATUS</text><text class="v ok" x="548" y="419">As-built · Rev 0</text></g>
 <g class="hf-stamp"><rect x="334" y="352" width="84" height="40" rx="3"/><text x="376" y="370" text-anchor="middle" class="s1">AS-BUILT</text><text x="376" y="384" text-anchor="middle" class="s2">VERIFIED ON SITE</text></g>
 </svg>
+      <div class="trace-tip" role="status" aria-live="polite" hidden><b></b><span class="f"></span><span class="y"></span></div>
+      <p class="trace-hint" aria-hidden="true"><i></i><span class="hv">Hover a cable to trace it</span><span class="tp">Tap a cable to trace it</span></p>
       <div class="floatcard" aria-hidden="true">
         <span class="l">As-built survey · MDF Rack 1</span>
         <b>42 cables</b><span class="ok">● traced and labeled</span>
@@ -1886,5 +1999,22 @@ var vz=[].slice.call(document.querySelectorAll('.vzstage .vz')),eye=document.get
 function pick(i){rows.forEach(function(r,j){r.classList.toggle('on',j===i);r.setAttribute('aria-pressed',j===i)});vz.forEach(function(v){v.classList.remove('on')});void document.body.offsetWidth;vz[i]&&vz[i].classList.add('on');eye.textContent='Sheet '+C[i][0];cap.textContent=C[i][1]}
 rows.forEach(function(r,i){r.addEventListener('click',function(){pick(i)});r.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(i)}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();var n=(i+(e.key==='ArrowDown'?1:-1)+rows.length)%rows.length;rows[n].focus();pick(n)}})});
 var st=document.querySelector('.vzstage');if('IntersectionObserver'in window){var once=new IntersectionObserver(function(e){if(e[0].isIntersecting){pick(rows.findIndex(function(r){return r.classList.contains('on')})||0);once.disconnect()}},{threshold:.4});once.observe(st)}else pick(0)})();</script>
+<script>(function(){var svg=document.querySelector('svg.hf');if(!svg)return;var fig=svg.closest('.sheetfig'),tip=fig.querySelector('.trace-tip'),
+cs=[].slice.call(svg.querySelectorAll('.hf-c')),ls=[].slice.call(svg.querySelectorAll('.hf-lc')),calls=[].slice.call(svg.querySelectorAll('.hf-call')),tags=[].slice.call(svg.querySelectorAll('.hf-tag')),
+cur=null,ki=-1,touched=false,rm=matchMedia('(prefers-reduced-motion: reduce)');
+function clear(){if(cur)cur.classList.remove('hot');calls.forEach(function(c){c.classList.remove('hot')});tags.forEach(function(t){t.classList.remove('hot')});svg.classList.remove('tracing','tracing-l');tip.hidden=true;cur=null}
+function place(el){var left=el.classList.contains('hf-lc'),m=svg.getScreenCTM(),f=fig.getBoundingClientRect(),pt=svg.createSVGPoint();pt.x=left?30:334;pt.y=298;var q=pt.matrixTransform(m);tip.hidden=false;tip.style.left=(q.x-f.left)+'px';tip.style.top=(q.y-f.top)+'px';tip.style.maxWidth=Math.max(180,m.a*(left?270:226))+'px'}
+function show(el,c,t,fr,y,bad){tip.className='trace-tip '+c+(bad?' bad':'');tip.querySelector('b').textContent=t;tip.querySelector('.f').textContent=fr;tip.querySelector('.y').textContent=y;tip.style.animation='none';void tip.offsetWidth;tip.style.animation='';place(el)}
+function color(el){return ['sv','sa','sn','su','sc','sk'].filter(function(k){return el.classList.contains(k)})[0]||''}
+function trace(el){if(cur===el)return;clear();cur=el;el.classList.add('hot');
+ if(el.classList.contains('hf-c')){svg.classList.add('tracing');var g=el.getAttribute('data-g');calls.forEach(function(c){if(c.getAttribute('data-g')===g)c.classList.add('hot')});
+  var f=el.getAttribute('data-f');tags.forEach(function(t){var n=t.textContent;if(f.indexOf(n+' ')===0||f.indexOf('\u2192 '+n+' ')>-1)t.classList.add('hot')});
+  show(el,color(el),el.getAttribute('data-t'),f,el.getAttribute('data-y'))}
+ else{svg.classList.add('tracing-l');show(el,color(el),'??','No label. No drawing.','Where does it go? Billed time to find out.',true)}}
+cs.concat(ls).forEach(function(el){var h=el.querySelector('.hf-hit');h.addEventListener('pointerenter',function(e){if(e.pointerType!=='touch'){touched=true;trace(el)}});h.addEventListener('pointerleave',function(e){if(e.pointerType!=='touch'&&cur===el)clear()});h.addEventListener('click',function(e){e.stopPropagation();touched=true;cur===el?clear():trace(el)})});
+document.addEventListener('click',function(e){if(cur&&!svg.contains(e.target))clear()});
+svg.addEventListener('keydown',function(e){var k=e.key;if(k==='ArrowRight'||k==='ArrowDown'||k==='ArrowLeft'||k==='ArrowUp'){e.preventDefault();touched=true;ki=(ki+(k==='ArrowRight'||k==='ArrowDown'?1:-1)+cs.length)%cs.length;trace(cs[ki])}else if(k==='Escape')clear()});
+svg.addEventListener('blur',clear);addEventListener('resize',function(){if(cur)place(cur)});
+if(!rm.matches)setTimeout(function(){if(touched)return;var d=cs[10];trace(d);setTimeout(function(){if(!touched&&cur===d)clear()},2200)},4300)})();</script>
 </body>
 </html>
