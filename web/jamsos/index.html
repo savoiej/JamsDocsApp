@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: app shell — left rail of modules, working surface on the right; the design view is a drawing set (signal flow + rack elevations) on a pannable sheet with zones and a title block */
 :root{
@@ -1099,6 +1099,78 @@ button,a,[role="button"],summary,label,select{touch-action:manipulation}
 button,[role="button"],[draggable="true"]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 button:not(:disabled):active{filter:brightness(.92)}
 @media (pointer:coarse){input,textarea,select{font-size:16px!important}}
+/* ===== theme: structured-cabling color code (Jams Operations design system) =====
+   Cable colors mean what they mean on the patch panel: orange backbone/uplink, black servers/equipment,
+   yellow Wi-Fi/PoE, blue network data, green CCTV/security, white telephony/voice.
+   Fills use --cable-*; text or icons on a card use the --cable-*-text variants. White always gets --cable-voice-edge. */
+:root{
+  --f-ui:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif; --f-body:var(--f-ui);
+  --f-head:"Barlow Condensed","Arial Narrow",system-ui,sans-serif; --f-display:var(--f-head);
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r-card:8px; --r-ctl:8px; --r-tag:4px;
+}
+:root:not([data-theme="dark"]){
+  --bg:#f4f6f9; --surface:#ffffff; --sunk:#e8ecf2; --line:#cbd3df; --line-ctl:#6f7b90; --fg:#0f1b2d; --muted:#4a5568;
+  --rack-navy:#13294b;
+  --cable-backbone:#f07a1a; --cable-backbone-text:#b4500a;
+  --cable-equipment:#1e1f24;
+  --cable-wifi-poe:#f5c400; --cable-wifi-poe-text:#806200;
+  --cable-data:#1d6fd1; --cable-data-text:#1a5fb4;
+  --cable-cctv:#23843a; --cable-cctv-text:#1e7a33;
+  --cable-voice:#ffffff; --cable-voice-edge:#9aa3b2;
+  --accent:#1d6fd1; --accent-ink:#ffffff; --accent-soft:#e3eefb;
+  --ok:#1e7a33; --warn:#806200; --bad:#c62828;
+  --ok-soft:#e0f2e5; --warn-soft:#fbf1cc; --bad-soft:#fbe3e3;
+  --shadow:0 1px 2px rgba(15,27,45,.08),0 2px 8px rgba(15,27,45,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1420; --surface:#161e2d; --sunk:#1f2a3d; --line:#2c3850; --line-ctl:#5f6d86; --fg:#eef2f8; --muted:#a3aec2;
+  --rack-navy:#13294b;
+  --cable-backbone:#ff8f3a; --cable-backbone-text:#ff9f55;
+  --cable-equipment:#6b7590;
+  --cable-wifi-poe:#ffd43b; --cable-wifi-poe-text:#ffd43b;
+  --cable-data:#4c9aff; --cable-data-text:#6aacff;
+  --cable-cctv:#4cc764; --cable-cctv-text:#5ed477;
+  --cable-voice:#f2f4f7; --cable-voice-edge:#f2f4f7;
+  --accent:#4c9aff; --accent-ink:#0f1b2d; --accent-soft:#18304f;
+  --ok:#5ed477; --warn:#ffd43b; --bad:#ff6b6b;
+  --ok-soft:#163222; --warn-soft:#3a3214; --bad-soft:#3d1d1d;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --surface:#161e2d; --sunk:#1f2a3d; --line:#2c3850; --line-ctl:#5f6d86; --fg:#eef2f8; --muted:#a3aec2;
+  --rack-navy:#13294b;
+  --cable-backbone:#ff8f3a; --cable-backbone-text:#ff9f55;
+  --cable-equipment:#6b7590;
+  --cable-wifi-poe:#ffd43b; --cable-wifi-poe-text:#ffd43b;
+  --cable-data:#4c9aff; --cable-data-text:#6aacff;
+  --cable-cctv:#4cc764; --cable-cctv-text:#5ed477;
+  --cable-voice:#f2f4f7; --cable-voice-edge:#f2f4f7;
+  --accent:#4c9aff; --accent-ink:#0f1b2d; --accent-soft:#18304f;
+  --ok:#5ed477; --warn:#ffd43b; --bad:#ff6b6b;
+  --ok-soft:#163222; --warn-soft:#3a3214; --bad-soft:#3d1d1d;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark }
+body{font-family:var(--f-ui)}
+/* the left rail is the rack face: navy, light text */
+.rail{background:var(--rack-navy);border-right-color:transparent;
+  --fg:#eef2f8; --muted:#b4c0d4; --line:rgba(255,255,255,.14); --surface:#1c3560; --sunk:#0e2140;
+  --accent:#6aacff; --accent-ink:#0f1b2d; --accent-soft:rgba(106,172,255,.18); color:var(--fg)}
+.brand .bn b{font:700 20px/1.02 var(--f-head);letter-spacing:.02em;text-transform:uppercase}
+.brand .bn small#brandName{font:500 12px/1.25 var(--f-ui);color:var(--muted)}
+.navgroup{font:700 11px var(--f-head);letter-spacing:.08em;text-transform:uppercase}
+.vh h1{font:700 34px/1.04 var(--f-head);letter-spacing:.01em}
+@media (max-width:760px){.vh h1{font-size:28px}}
+input,select,textarea{border-color:var(--line-ctl)}
+code,kbd,.mono{font-family:var(--f-mono)}
+/* cable-type helpers: class="cable-tag backbone" → orange tag reading BACKBONE */
+.backbone{--cbl:var(--cable-backbone);--cbl-ink:#0f1b2d}.equipment{--cbl:var(--cable-equipment);--cbl-ink:#ffffff}
+.wifi-poe{--cbl:var(--cable-wifi-poe);--cbl-ink:#0f1b2d}.data-run{--cbl:var(--cable-data);--cbl-ink:var(--accent-ink)}
+.cctv{--cbl:var(--cable-cctv);--cbl-ink:#ffffff}.voice{--cbl:var(--cable-voice);--cbl-ink:#0f1b2d}
+:root[data-theme="dark"] .cctv{--cbl-ink:#0f1b2d}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cctv{--cbl-ink:#0f1b2d}}
+.cable-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-tag);background:var(--cbl);color:var(--cbl-ink);font:700 11px/16px var(--f-head);letter-spacing:.06em;text-transform:uppercase}
+.cable-tag.voice{box-shadow:inset 0 0 0 1px var(--cable-voice-edge)}
+.cable-dot{display:inline-block;width:10px;height:10px;border-radius:999px;background:var(--cbl)}
+.cable-dot.voice{box-shadow:inset 0 0 0 1px var(--cable-voice-edge)}
 </style>
 
 <div class="app">
