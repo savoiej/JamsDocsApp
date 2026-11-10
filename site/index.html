@@ -196,6 +196,39 @@ h3{font-size:24px;line-height:1.05;font-weight:600}
 @keyframes vzring{0%{transform:scale(.25);opacity:.7}100%{transform:scale(1);opacity:0}}
 @keyframes vzblink{50%{opacity:.45}}
 @media (prefers-reduced-motion: reduce){.vz *{animation:none!important}.vz .ring,.vz .flow{display:none}}
+/* cost calculator */
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+.calc-in{display:grid;gap:26px}
+.cr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:baseline}
+.cr label{font-weight:600;font-size:15px}
+.cr output{font:700 24px/1 var(--f-display);letter-spacing:.03em;color:var(--accent);font-variant-numeric:tabular-nums}
+.cr input{grid-column:1/-1;-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0;touch-action:pan-y}
+.cr input::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent) var(--p,50%),var(--sunk) var(--p,50%))}
+.cr input::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent) var(--p,50%),var(--sunk) var(--p,50%))}
+.cr input::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-8px;border-radius:50%;background:var(--sheet);border:2px solid var(--accent);box-shadow:0 2px 6px rgba(10,20,30,.25);transition:transform .15s cubic-bezier(.23,1,.32,1)}
+.cr input::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--sheet);border:2px solid var(--accent)}
+.cr input:active::-webkit-slider-thumb{transform:scale(1.15)}
+.cr input:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+.calc-note{margin:0;font-size:13px;color:var(--muted);max-width:52ch}
+.calc-out{background:var(--sheet);border:1.5px solid var(--ink);border-radius:4px;padding:0 0 20px;display:grid;gap:18px;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:16px 16px}
+.co-hd{display:flex;justify-content:space-between;padding:11px 18px;background:var(--sheet);border-bottom:1.5px solid var(--ink);font:700 16px var(--f-display);letter-spacing:.05em;text-transform:uppercase}
+.co-hd span+span{font:500 10.5px var(--f-mono);color:var(--muted);letter-spacing:.08em;align-self:center}
+.co-meter,.co-save,.co-bars,.co-5,.calc-out .btn{margin:0 18px}
+.co-meter i,.co-save i{display:block;font:500 10.5px var(--f-mono);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.co-meter b{display:inline-block;margin-top:4px;padding:4px 12px 5px;background:var(--gear);color:#ff8a7a;border-radius:4px;font:600 34px/1 var(--f-mono);letter-spacing:.02em;font-variant-numeric:tabular-nums;box-shadow:inset 0 2px 6px rgba(0,0,0,.4)}
+.co-meter span,.co-save span{display:block;margin-top:6px;font-size:13px;color:var(--muted)}
+.co-bars{display:grid;gap:10px}
+.cb{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;align-items:center;font:500 11px var(--f-mono);color:var(--muted)}
+.cb .tr{height:14px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.cb .tr i{display:block;height:100%;width:0;border-radius:3px;transition:width .5s cubic-bezier(.23,1,.32,1)}
+.cb.bad i{background:var(--bad)}.cb.ok i{background:var(--node)}
+.co-save{padding-top:14px;border-top:1px dashed var(--line2)}
+.co-save b{display:block;margin-top:2px;font:800 clamp(44px,5vw,64px)/1 var(--f-display);color:var(--node);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.co-5{font-size:14px;color:var(--muted)}.co-5 b{color:var(--ink)}
+.calc-out .btn{justify-self:start}
+.calc-mini{display:none}
+@media (max-width:900px){.calc{grid-template-columns:minmax(0,1fr)}.calc-mini{display:flex;position:sticky;top:76px;z-index:5;justify-content:space-between;gap:10px;padding:10px 14px;background:var(--gear);color:var(--gear-ink);border-radius:8px;font-size:13px;box-shadow:0 10px 24px -14px rgba(0,0,0,.5)}.calc-mini b{font:700 17px var(--f-display);letter-spacing:.03em}.calc-mini span:first-child b{color:#ff8a7a}.calc-mini span:last-child b{color:#7fe08a}}
+@media (prefers-reduced-motion: reduce){.cb .tr i,.cr input::-webkit-slider-thumb{transition:none}}
 /* live title block beside the form */
 .tbp{position:relative;background:var(--sheet);border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:14px 14px}
 .tbp-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--sheet);border-bottom:1.5px solid var(--ink);font:700 16px var(--f-display);letter-spacing:.05em;text-transform:uppercase}
@@ -1208,6 +1241,36 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
     </figure>
   </div>
 </section>
+<section class="sec" id="cost">
+  <div class="wrap">
+    <div class="sechead">
+      <p class="eyebrow">What the search costs</p>
+      <h2>What is the search costing you?</h2>
+      <p class="lead">Without drawings, every service call starts with someone finding out what’s there, on your clock. Set your own numbers.</p>
+    </div>
+    <div class="calc">
+      <div class="calc-in">
+        <div class="calc-mini" aria-hidden="true"><span>Searching <b id="mm-w">$0</b></span><span>You get back <b id="mm-s">$0</b> a year</span></div>
+        <div class="cr"><label for="c-calls">Service calls a year</label><output id="o-calls" for="c-calls"></output><input type="range" id="c-calls" min="1" max="60" step="1" value="12"></div>
+        <div class="cr"><label for="c-hrs">Time spent finding things, per call</label><output id="o-hrs" for="c-hrs"></output><input type="range" id="c-hrs" min="0.5" max="4" step="0.25" value="1.5"></div>
+        <div class="cr"><label for="c-techs">Techs on each call</label><output id="o-techs" for="c-techs"></output><input type="range" id="c-techs" min="1" max="4" step="1" value="1"></div>
+        <div class="cr"><label for="c-rate">Tech rate per hour</label><output id="o-rate" for="c-rate"></output><input type="range" id="c-rate" min="75" max="250" step="5" value="125"></div>
+        <p class="calc-note">With a current drawing set and labels, we assume finding the right cable takes about 15 minutes. Your numbers will vary.</p>
+      </div>
+      <div class="calc-out" aria-live="polite">
+        <div class="co-hd"><span>C-101 · What it saves</span><span>Per year</span></div>
+        <div class="co-meter"><i>Paid for searching, without the set</i><b id="m-without">$0</b><span id="m-hrs-without"></span></div>
+        <div class="co-bars" aria-hidden="true">
+          <div class="cb bad"><span>Without the set</span><div class="tr"><i id="b-without"></i></div></div>
+          <div class="cb ok"><span>With the set</span><div class="tr"><i id="b-with"></i></div></div>
+        </div>
+        <div class="co-save"><i>You get back</i><b id="m-save">$0</b><span id="m-save-hrs"></span></div>
+        <p class="co-5">Over five years: <b id="m-5">$0</b></p>
+        <a class="btn primary" href="#contact" id="calc-go">Document my system</a>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="sec" id="who">
   <div class="wrap">
     <div class="sechead">
@@ -2076,6 +2139,26 @@ function reset(){bx.classList.remove('issued');$('tbp-ss').textContent='Draft';$
 f.addEventListener('input',upd);f.addEventListener('change',upd);
 document.querySelectorAll('[data-pick]').forEach(function(a){a.addEventListener('click',function(){setTimeout(upd,30)})});
 new MutationObserver(function(){if(f.querySelector('.done')){bx.classList.add('issued');$('tbp-ss').textContent='Issued';$('tbp-ss').className='issued';$('tbp-st').textContent='Rev 0 · Issued'}else if(bx.classList.contains('issued'))reset()}).observe(f,{childList:true});
+upd()})();</script>
+<script>(function(){var $=function(i){return document.getElementById(i)};if(!$('c-calls'))return;
+var rm=matchMedia('(prefers-reduced-motion: reduce)').matches,shown={},WITH=.25;
+var money=function(n){return '$'+Math.round(n).toLocaleString('en-US')},hr=function(n){return (Math.round(n*10)/10).toLocaleString('en-US')};
+function tween(id,to){var e=$(id),from=shown[id]||0;shown[id]=to;if(rm||from===to){e.textContent=money(to);return}var t0=performance.now(),d=420;cancelAnimationFrame(e._r);
+ (function f(t){var p=Math.min(1,(t-t0)/d),k=1-Math.pow(1-p,3);e.textContent=money(from+(to-from)*k);if(p<1)e._r=requestAnimationFrame(f)})(t0)}
+function fill(i){var p=(i.value-i.min)/(i.max-i.min)*100;i.style.setProperty('--p',p+'%')}
+var data={};
+function upd(){var c=+$('c-calls').value,h=+$('c-hrs').value,t=+$('c-techs').value,r=+$('c-rate').value;
+ ['c-calls','c-hrs','c-techs','c-rate'].forEach(function(i){fill($(i))});
+ $('o-calls').textContent=c;$('o-hrs').textContent=(h%1?h.toFixed(2).replace(/0$/,''):h)+' h';$('o-techs').textContent=t;$('o-rate').textContent='$'+r;
+ var hw=c*h*t,hs=c*WITH*t,cw=hw*r,cs=hs*r,sv=Math.max(0,cw-cs);
+ tween('m-without',cw);tween('m-save',sv);$('mm-w').textContent=money(cw);$('mm-s').textContent=money(sv);tween('m-5',sv*5);
+ $('m-hrs-without').textContent=hr(hw)+' tech hours a year spent finding things';
+ $('m-save-hrs').textContent=hr(hw-hs)+' tech hours a year, back on real work';
+ $('b-without').style.width='100%';$('b-with').style.width=Math.max(2,hs/hw*100)+'%';
+ data={c:c,h:h,t:t,r:r,hw:hw,sv:sv}}
+['c-calls','c-hrs','c-techs','c-rate'].forEach(function(i){$(i).addEventListener('input',upd)});
+$('calc-go').addEventListener('click',function(){var a=$('n-asb');if(a&&!a.checked){a.checked=true;a.dispatchEvent(new Event('change',{bubbles:true}))}
+ var m=$('f-msg');if(m&&!m.value.trim()){m.value='From the cost calculator: about '+data.c+' service calls a year, '+data.h+' h finding things per call, '+data.t+' tech(s) at $'+data.r+'/h. That is about '+hr(data.hw)+' tech hours ('+money(data.hw*data.r)+') a year spent searching.';m.dispatchEvent(new Event('input',{bubbles:true}))}});
 upd()})();</script>
 </body>
 </html>
