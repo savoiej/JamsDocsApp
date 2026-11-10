@@ -124,6 +124,44 @@ h3{font-size:24px;line-height:1.05;font-weight:600}
 @keyframes draw{from{stroke-dashoffset:100}}
 @keyframes pop{from{opacity:0;transform:translateY(6px)}}
 
+/* hero drawing: as found vs as-built */
+.hero-copy{gap:18px}
+.hero-copy .lead+.lead{margin-top:-4px}
+.hero h1.h1-nb{font-size:clamp(40px,3.7vw + 10px,72px);line-height:.92}
+.hero-copy .lead.sm{font-size:16px}
+.hero .wrap{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)}
+.hf-hd text{font:700 15px var(--f-display);letter-spacing:.08em}
+.hf-hd .bad{fill:var(--bad)} .hf-hd .ok{fill:var(--node)}
+.hf-hd .strike{stroke:var(--bad);stroke-width:1.6}
+.hf-hd .sub{font:500 8px var(--f-mono);fill:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.hf-match{stroke:var(--line2);stroke-width:1;stroke-dasharray:6 4}
+.hf-rack{fill:var(--gear);stroke:var(--gear2);stroke-width:1.5}
+.hf-rail{fill:var(--gear2)}
+.hf-u rect:first-child{fill:var(--gear2);stroke:#4d5865;stroke-width:.8}
+.hf-jack{fill:#1a1f25;stroke:#5a6572;stroke-width:.6}
+.hf-scr{fill:#2f6fb0;opacity:.7}
+.hf-knob{fill:#1a1f25;stroke:#6b7682;stroke-width:.8}
+.hf-tag{font:600 7.5px var(--f-mono);fill:var(--muted);letter-spacing:.06em}
+.hf-cord{fill:none;stroke:var(--c);stroke-width:2.6;stroke-linecap:round;opacity:.9}
+.hf-q text{font:700 17px var(--f-mono);fill:var(--warn)}
+.hf-tape{fill:#efe4c2;stroke:#cdbd8e;stroke-width:.6}
+.hf-tapet{font:600 7px var(--f-mono);fill:#5d4b2a;letter-spacing:.04em}
+.hf-foot{font:600 12px var(--f-body);fill:var(--ink)}
+.hf-foot2{font:500 9px var(--f-mono);fill:var(--muted)}
+.hf-neat{stroke-width:1.8;stroke-linecap:round}
+.hf-call path{fill:none;stroke:var(--c);stroke-width:.9}
+.hf-call circle{fill:var(--c)}
+.hf-call rect{fill:var(--sheet);stroke:var(--c);stroke-width:1}
+.hf-call text{font:600 7.5px var(--f-mono);fill:var(--ink)}
+.hs-tb .v.ok{fill:var(--node)}
+.hf-stamp rect{fill:none;stroke:var(--node);stroke-width:2}
+.hf-stamp .s1{font:800 15px var(--f-display);fill:var(--node);letter-spacing:.08em}
+.hf-stamp .s2{font:600 6.5px var(--f-mono);fill:var(--node);letter-spacing:.1em}
+.hf-stamp{transform-box:fill-box;transform-origin:center;transform:rotate(-6deg);animation:stamp .45s cubic-bezier(.23,1,.32,1) 1.8s backwards}
+@keyframes stamp{from{opacity:0;transform:rotate(-6deg) scale(1.6)}}
+@media (prefers-reduced-motion: reduce){.hf-stamp{animation:none}}
+@media (max-width:640px){.sheetfig .floatcard{position:static;margin-top:12px;width:max-content;max-width:100%}}
+
 /* section frame */
 .sec{padding-block:96px;position:relative}
 .sec + .sec{border-top:1px solid var(--line)}
@@ -569,73 +607,250 @@ html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
   <div class="wrap">
     <div class="hero-copy">
       <p class="eyebrow"><span class="tag">●</span> As-built documentation for existing AV &amp; network systems</p>
-      <h1><span>Every cable <span class="c1" style="display:inline">traced.</span></span><span>Every rack <span class="c2" style="display:inline">labeled.</span></span><span>Every port <span class="c3" style="display:inline">mapped.</span></span></h1>
-      <p class="lead"><b class="plainlead">Most AV and network systems get installed and never written down.</b> Then every service call starts with a tech billing you to figure out what’s there. We come on site to trace your existing system, document every connection and put proper labels on every cable, port and rack. Then we hand you a complete as-built drawing set that matches the labels, so repairs and changes go faster and cost less, no matter who does the work.</p>
+      <h1 class="h1-nb"><span>Nobody wrote it down.</span><span class="c1">So we trace it.</span></h1>
+      <p class="lead"><b class="plainlead">Most AV and network systems get installed and never documented.</b> Or the drawings stopped matching the day someone moved a cable.</p>
+      <p class="lead sm">Then every service call starts with a tech billing you to figure out what’s there: unlabeled patch cords, a switch nobody can name, a display input only one person remembers. You pay for that search every time, before the real work even starts.</p>
+      <p class="lead">We trace, document and properly label your AV and network systems on site, and hand you the drawing set.</p>
       <div class="hero-cta">
         <a class="btn primary" href="#contact" data-pick="asbuilt">Document my system</a>
         <a class="btn" href="#deliverables">See what's in the set</a>
       </div>
       <div class="hero-meta">
-        <span class="sv"><i></i>Video</span><span class="sa"><i></i>Audio</span><span class="sn"><i></i>Network</span><span class="su"><i></i>USB</span><span class="sc"><i></i>Control</span>
+        <span class="sv"><i></i>Every cable traced</span><span class="sn"><i></i>Every rack labeled</span><span class="sa"><i></i>Every port mapped</span>
       </div>
     </div>
 
-    <figure class="sheetfig" style="margin:0" aria-label="Example as-built signal flow sheet E-101 for a conference room">
-      <svg viewBox="0 0 640 440" role="img">
-        <defs>
-          <pattern id="hg" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" class="hs-g1"/></pattern>
-        </defs>
-        <rect class="hs-sheet" x="0" y="0" width="640" height="440"/>
-        <rect x="14" y="14" width="612" height="412" fill="url(#hg)"/>
-        <rect class="hs-edge" x="14" y="14" width="612" height="412"/>
-        <g class="hs-zone"><text x="86" y="10">A</text><text x="239" y="10">B</text><text x="392" y="10">C</text><text x="545" y="10">D</text><text x="4" y="92">1</text><text x="4" y="218">2</text><text x="4" y="344">3</text></g>
-
-        <g class="hs-dev" style="animation-delay:0s"><rect class="b" x="40" y="62" width="116" height="58" rx="4"/><rect class="h" x="40.5" y="62.5" width="115" height="16" rx="3.5"/><text class="tg" x="48" y="74">PC-1</text><text class="nm" x="48" y="98">Lectern PC</text></g>
-        <g class="hs-dev" style="animation-delay:.06s"><rect class="b" x="262" y="100" width="116" height="58" rx="4"/><rect class="h" x="262.5" y="100.5" width="115" height="16" rx="3.5"/><text class="tg" x="270" y="112">SW-1</text><text class="nm" x="270" y="136">4K Switcher</text></g>
-        <g class="hs-dev" style="animation-delay:.12s"><rect class="b" x="484" y="62" width="116" height="58" rx="4"/><rect class="h" x="484.5" y="62.5" width="115" height="16" rx="3.5"/><text class="tg" x="492" y="74">DS-1</text><text class="nm" x="492" y="98">75" Display</text></g>
-        <g class="hs-dev" style="animation-delay:.18s"><rect class="b" x="40" y="250" width="116" height="58" rx="4"/><rect class="h" x="40.5" y="250.5" width="115" height="16" rx="3.5"/><text class="tg" x="48" y="262">MIC-1</text><text class="nm" x="48" y="286">Ceiling Mic</text></g>
-        <g class="hs-dev" style="animation-delay:.24s"><rect class="b" x="262" y="250" width="116" height="58" rx="4"/><rect class="h" x="262.5" y="250.5" width="115" height="16" rx="3.5"/><text class="tg" x="270" y="262">DSP-1</text><text class="nm" x="270" y="286">DSP 8×8 AEC</text></g>
-        <g class="hs-dev" style="animation-delay:.30s"><rect class="b" x="484" y="250" width="116" height="58" rx="4"/><rect class="h" x="484.5" y="250.5" width="115" height="16" rx="3.5"/><text class="tg" x="492" y="262">SPK-1/2</text><text class="nm" x="492" y="286">Ceiling Speakers</text></g>
-        <g class="hs-dev" style="animation-delay:.36s"><rect class="b" x="262" y="350" width="116" height="40" rx="4"/><text class="tg" x="270" y="366">CP-1</text><text class="nm" x="270" y="381">Control Proc.</text></g>
-
-        <path id="hc1" class="hs-cable sv" pathLength="100" style="animation-delay:.45s" d="M156 100H209V138H262"/>
-        <path id="hc2" class="hs-cable sv" pathLength="100" style="animation-delay:.6s" d="M378 138H431V100H484"/>
-        <path id="hc3" class="hs-cable sa" pathLength="100" style="animation-delay:.75s" d="M156 288H262"/>
-        <path id="hc4" class="hs-cable sa" pathLength="100" style="animation-delay:.9s" d="M378 288H484"/>
-        <path id="hc5" class="hs-cable sn" pathLength="100" style="animation-delay:1.05s" d="M320 158V250"/>
-        <path id="hc6" class="hs-cable sc" pathLength="100" style="animation-delay:1.2s" d="M320 308V350"/>
-        <path id="hc7" class="hs-cable su" pathLength="100" style="animation-delay:1.35s" d="M98 120V200H300V250"/>
-
-        <g class="hs-port sv"><circle cx="156" cy="100" r="4"/><circle cx="262" cy="138" r="4"/><circle cx="378" cy="138" r="4"/><circle cx="484" cy="100" r="4"/></g>
-        <g class="hs-port sa"><circle cx="156" cy="288" r="4"/><circle cx="262" cy="288" r="4"/><circle cx="378" cy="288" r="4"/><circle cx="484" cy="288" r="4"/></g>
-        <g class="hs-port sn"><circle cx="320" cy="158" r="4"/><circle cx="320" cy="250" r="4"/></g>
-        <g class="hs-port sc"><circle cx="320" cy="308" r="4"/><circle cx="320" cy="350" r="4"/></g>
-        <g class="hs-port su"><circle cx="98" cy="120" r="4"/><circle cx="300" cy="250" r="4"/></g>
-
-        <g class="hs-lab sv"><rect x="190" y="111" width="38" height="14" rx="2"/><text x="195" y="121">V-101</text></g>
-        <g class="hs-lab sv"><rect x="412" y="111" width="38" height="14" rx="2"/><text x="417" y="121">V-102</text></g>
-        <g class="hs-lab sa"><rect x="190" y="281" width="38" height="14" rx="2"/><text x="195" y="291">A-101</text></g>
-        <g class="hs-lab sa"><rect x="412" y="281" width="38" height="14" rx="2"/><text x="417" y="291">A-102</text></g>
-        <g class="hs-lab sn"><rect x="326" y="197" width="38" height="14" rx="2"/><text x="331" y="207">N-101</text></g>
-        <g class="hs-lab su"><rect x="160" y="193" width="38" height="14" rx="2"/><text x="165" y="203">U-101</text></g>
-
-        <g class="sv"><circle class="hs-pulse" r="3.5"><animateMotion dur="2.4s" repeatCount="indefinite" begin="2s"><mpath href="#hc1"/></animateMotion></circle><circle class="hs-pulse" r="3.5"><animateMotion dur="2.4s" repeatCount="indefinite" begin="2.6s"><mpath href="#hc2"/></animateMotion></circle></g>
-        <g class="sa"><circle class="hs-pulse" r="3.5"><animateMotion dur="1.8s" repeatCount="indefinite" begin="2.2s"><mpath href="#hc3"/></animateMotion></circle><circle class="hs-pulse" r="3.5"><animateMotion dur="1.8s" repeatCount="indefinite" begin="2.8s"><mpath href="#hc4"/></animateMotion></circle></g>
-        <g class="sn"><circle class="hs-pulse" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite" begin="2.4s"><mpath href="#hc5"/></animateMotion></circle></g>
-        <g class="su"><circle class="hs-pulse" r="3.5"><animateMotion dur="3s" repeatCount="indefinite" begin="2.5s"><mpath href="#hc7"/></animateMotion></circle></g>
-
-        <g class="hs-tb">
-          <rect x="430" y="350" width="196" height="76"/>
-          <line x1="430" y1="372" x2="626" y2="372"/><line x1="430" y1="398" x2="626" y2="398"/><line x1="540" y1="372" x2="540" y2="426"/>
-          <use href="#jlogo" x="434" y="352.5" width="17" height="17"/><text class="o" x="456" y="366">JAMS DOCS AND DESIGNS</text>
-          <text class="k" x="438" y="381">PROJECT</text><text class="v" x="438" y="393">Conf Rm 3B</text>
-          <text class="k" x="548" y="381">SHEET</text><text class="t" x="548" y="395">E-101</text>
-          <text class="k" x="438" y="407">TITLE</text><text class="v" x="438" y="419">Signal flow</text>
-          <text class="k" x="548" y="407">REV</text><text class="v" x="548" y="419">AB · 10/28/26</text>
-        </g>
-      </svg>
+    <figure class="sheetfig" style="margin:0">
+      <svg viewBox="0 0 640 440" role="img" aria-labelledby="hfT">
+<title id="hfT">The same equipment rack shown twice: as found, with tangled unlabeled cables and question marks, and as-built, with every cable dressed, labeled and numbered to match the drawing</title>
+<defs><pattern id="hg" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" class="hs-g1"/></pattern><clipPath id="hfL"><rect x="14" y="14" width="306" height="412"/></clipPath></defs>
+<rect class="hs-sheet" x="0" y="0" width="640" height="440"/>
+<rect x="14" y="14" width="612" height="412" fill="url(#hg)"/>
+<rect class="hs-edge" x="14" y="14" width="612" height="412"/>
+<g class="hs-zone"><text x="86" y="10">A</text><text x="239" y="10">B</text><text x="392" y="10">C</text><text x="545" y="10">D</text><text x="4" y="92">1</text><text x="4" y="218">2</text><text x="4" y="344">3</text></g>
+<g class="hf-hd"><text x="30" y="38" class="bad">AS FOUND</text><text x="334" y="38" class="ok">AS-BUILT</text><text x="30" y="52" class="sub">No drawings · no labels</text><text x="334" y="52" class="sub">Traced · documented · labeled</text></g>
+<line x1="318" y1="22" x2="318" y2="420" class="hf-match"/>
+<rect class="hf-rack" x="56" y="58" width="180" height="270" rx="3"/>
+<rect class="hf-rail" x="60" y="60" width="6" height="266"/><rect class="hf-rail" x="226" y="60" width="6" height="266"/>
+<g class="hf-u"><rect x="68" y="66" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="74.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="86.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="97.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="109.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="120.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="132.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="143.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="155.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="166.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="178.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="189.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="201.0" y="74" width="7" height="6" rx="1"/>
+</g>
+<g class="hf-u"><rect x="68" y="94" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="74.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="86.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="97.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="109.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="120.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="132.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="143.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="155.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="166.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="178.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="189.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="201.0" y="102" width="7" height="6" rx="1"/>
+</g>
+<g class="hf-u"><rect x="68" y="122" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="74.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="86.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="97.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="109.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="120.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="132.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="143.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="155.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="166.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="178.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="189.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="201.0" y="130" width="7" height="6" rx="1"/>
+</g>
+<g class="hf-u"><rect x="68" y="156" width="156" height="36" rx="2"/>
+<rect class="hf-scr" x="76" y="169" width="26" height="10" rx="1.5"/>
+<circle class="hf-knob" cx="118" cy="174" r="3"/>
+<circle class="hf-knob" cx="130" cy="174" r="3"/>
+<circle class="hf-knob" cx="142" cy="174" r="3"/>
+<circle class="hf-knob" cx="154" cy="174" r="3"/>
+<circle class="hf-knob" cx="166" cy="174" r="3"/>
+<circle class="hf-knob" cx="178" cy="174" r="3"/>
+</g>
+<g class="hf-u"><rect x="68" y="204" width="156" height="22" rx="2"/>
+<rect class="hf-scr" x="76" y="210" width="26" height="10" rx="1.5"/>
+<circle class="hf-knob" cx="118" cy="215" r="3"/>
+<circle class="hf-knob" cx="130" cy="215" r="3"/>
+<circle class="hf-knob" cx="142" cy="215" r="3"/>
+<circle class="hf-knob" cx="154" cy="215" r="3"/>
+<circle class="hf-knob" cx="166" cy="215" r="3"/>
+<circle class="hf-knob" cx="178" cy="215" r="3"/>
+</g>
+<g class="hf-u"><rect x="68" y="238" width="156" height="36" rx="2"/>
+<rect class="hf-scr" x="76" y="251" width="26" height="10" rx="1.5"/>
+<circle class="hf-knob" cx="118" cy="256" r="3"/>
+<circle class="hf-knob" cx="130" cy="256" r="3"/>
+<circle class="hf-knob" cx="142" cy="256" r="3"/>
+<circle class="hf-knob" cx="154" cy="256" r="3"/>
+<circle class="hf-knob" cx="166" cy="256" r="3"/>
+<circle class="hf-knob" cx="178" cy="256" r="3"/>
+</g>
+<g class="hf-u"><rect x="68" y="292" width="156" height="26" rx="2"/>
+<rect class="hf-jack" x="78" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="95" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="112" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="129" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="146" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="163" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="180" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="197" y="301" width="9" height="8" rx="1.5"/>
+</g>
+<g clip-path="url(#hfL)" class="hf-mess">
+<path class="hf-cord sa" d="M101 108 C175 140 151 206 226 255"/>
+<path class="hf-cord sn" d="M90 136 C104 157 62 240 47 264"/>
+<path class="hf-cord sn" d="M78 136 C89 201 -7 193 64 253"/>
+<path class="hf-cord sn" d="M136 80 C141 151 46 155 52 239"/>
+<path class="hf-cord sa" d="M124 80 C123 121 113 141 122 204"/>
+<path class="hf-cord sv" d="M90 136 C173 158 291 151 281 226"/>
+<path class="hf-cord sa" d="M136 136 C216 186 74 277 44 301"/>
+<path class="hf-cord sa" d="M193 136 C165 219 260 247 286 310"/>
+<path class="hf-cord su" d="M78 80 C77 109 213 276 230 315"/>
+<path class="hf-cord sn" d="M147 136 C84 165 205 286 253 322"/>
+<path class="hf-cord su" d="M182 80 C149 106 285 173 220 260"/>
+<path class="hf-cord sv" d="M158 136 C141 166 149 186 62 237"/>
+<path class="hf-cord sv" d="M136 136 C156 158 -20 274 32 321"/>
+<path class="hf-cord sa" d="M136 136 C102 163 275 165 230 236"/>
+</g>
+<g class="hf-q"><text x="252" y="96">??</text><text x="28" y="176">??</text><text x="262" y="214">??</text><text x="40" y="300">??</text></g>
+<g transform="rotate(-6 126 250)"><rect class="hf-tape" x="96" y="242" width="64" height="16"/><text class="hf-tapet" x="128" y="253" text-anchor="middle">DO NOT UNPLUG</text></g>
+<g transform="rotate(5 210 318)"><rect class="hf-tape" x="184" y="310" width="52" height="16"/><text class="hf-tapet" x="210" y="321" text-anchor="middle">STEVE?</text></g>
+<text class="hf-foot" x="30" y="352">Every service call starts with a search.</text>
+<text class="hf-foot2" x="30" y="370">Billed tech time, every visit.</text>
+<rect class="hf-rack" x="380" y="58" width="180" height="270" rx="3"/>
+<rect class="hf-rail" x="384" y="60" width="6" height="266"/><rect class="hf-rail" x="550" y="60" width="6" height="266"/>
+<g class="hf-u hs-dev" style="animation-delay:0.00s"><rect x="392" y="66" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="398.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="410.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="421.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="433.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="444.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="456.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="467.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="479.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="490.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="502.0" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="513.5" y="74" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="525.0" y="74" width="7" height="6" rx="1"/>
+<text class="hf-tag" x="376" y="80" text-anchor="end">PP-1</text>
+</g>
+<g class="hf-u hs-dev" style="animation-delay:0.05s"><rect x="392" y="94" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="398.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="410.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="421.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="433.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="444.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="456.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="467.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="479.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="490.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="502.0" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="513.5" y="102" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="525.0" y="102" width="7" height="6" rx="1"/>
+<text class="hf-tag" x="376" y="108" text-anchor="end">SW-1</text>
+</g>
+<g class="hf-u hs-dev" style="animation-delay:0.10s"><rect x="392" y="122" width="156" height="22" rx="2"/>
+<rect class="hf-jack" x="398.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="410.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="421.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="433.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="444.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="456.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="467.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="479.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="490.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="502.0" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="513.5" y="130" width="7" height="6" rx="1"/>
+<rect class="hf-jack" x="525.0" y="130" width="7" height="6" rx="1"/>
+<text class="hf-tag" x="376" y="136" text-anchor="end">PP-2</text>
+</g>
+<g class="hf-u hs-dev" style="animation-delay:0.15s"><rect x="392" y="156" width="156" height="36" rx="2"/>
+<rect class="hf-scr" x="400" y="169" width="26" height="10" rx="1.5"/>
+<circle class="hf-knob" cx="442" cy="174" r="3"/>
+<circle class="hf-knob" cx="454" cy="174" r="3"/>
+<circle class="hf-knob" cx="466" cy="174" r="3"/>
+<circle class="hf-knob" cx="478" cy="174" r="3"/>
+<circle class="hf-knob" cx="490" cy="174" r="3"/>
+<circle class="hf-knob" cx="502" cy="174" r="3"/>
+<text class="hf-tag" x="376" y="177" text-anchor="end">SWR-1</text>
+</g>
+<g class="hf-u hs-dev" style="animation-delay:0.20s"><rect x="392" y="204" width="156" height="22" rx="2"/>
+<rect class="hf-scr" x="400" y="210" width="26" height="10" rx="1.5"/>
+<circle class="hf-knob" cx="442" cy="215" r="3"/>
+<circle class="hf-knob" cx="454" cy="215" r="3"/>
+<circle class="hf-knob" cx="466" cy="215" r="3"/>
+<circle class="hf-knob" cx="478" cy="215" r="3"/>
+<circle class="hf-knob" cx="490" cy="215" r="3"/>
+<circle class="hf-knob" cx="502" cy="215" r="3"/>
+<text class="hf-tag" x="376" y="218" text-anchor="end">DSP-1</text>
+</g>
+<g class="hf-u hs-dev" style="animation-delay:0.25s"><rect x="392" y="238" width="156" height="36" rx="2"/>
+<rect class="hf-scr" x="400" y="251" width="26" height="10" rx="1.5"/>
+<circle class="hf-knob" cx="442" cy="256" r="3"/>
+<circle class="hf-knob" cx="454" cy="256" r="3"/>
+<circle class="hf-knob" cx="466" cy="256" r="3"/>
+<circle class="hf-knob" cx="478" cy="256" r="3"/>
+<circle class="hf-knob" cx="490" cy="256" r="3"/>
+<circle class="hf-knob" cx="502" cy="256" r="3"/>
+<text class="hf-tag" x="376" y="259" text-anchor="end">AMP-1</text>
+</g>
+<g class="hf-u hs-dev" style="animation-delay:0.30s"><rect x="392" y="292" width="156" height="26" rx="2"/>
+<rect class="hf-jack" x="402" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="419" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="436" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="453" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="470" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="487" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="504" y="301" width="9" height="8" rx="1.5"/>
+<rect class="hf-jack" x="521" y="301" width="9" height="8" rx="1.5"/>
+<text class="hf-tag" x="376" y="308" text-anchor="end">PDU-1</text>
+</g>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.40s" d="M402.0 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.44s" d="M413.5 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.48s" d="M425.0 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.52s" d="M436.5 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.56s" d="M448.0 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.60s" d="M459.5 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.64s" d="M471.0 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.68s" d="M482.5 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.72s" d="M494.0 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.76s" d="M505.5 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.80s" d="M517.0 83V113"/>
+<path class="hs-cable hf-neat sn" pathLength="100" style="animation-delay:0.84s" d="M528.5 83V113"/>
+<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:0.88s" d="M402.0 139V150H442.0V164"/>
+<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:0.92s" d="M425.0 139V150H454.0V164"/>
+<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:0.96s" d="M448.0 139V150H466.0V164"/>
+<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:1.00s" d="M471.0 139V150H478.0V164"/>
+<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:1.04s" d="M494.0 139V150H490.0V164"/>
+<path class="hs-cable hf-neat sv" pathLength="100" style="animation-delay:1.08s" d="M517.0 139V150H502.0V164"/>
+<path class="hs-cable hf-neat sa" pathLength="100" style="animation-delay:1.0s" d="M478 228V246"/>
+<path class="hs-cable hf-neat su" pathLength="100" style="animation-delay:1.05s" d="M502 228V246"/>
+<g class="hs-dev hf-call sn" style="animation-delay:1.20s"><path d="M414 90L576 88H586"/><circle cx="414" cy="90" r="2.2"/><rect x="586" y="80" width="36" height="15" rx="2"/><text x="589" y="91">N-201</text></g>
+<g class="hs-dev hf-call sn" style="animation-delay:1.28s"><path d="M460 90L576 112H586"/><circle cx="460" cy="90" r="2.2"/><rect x="586" y="104" width="36" height="15" rx="2"/><text x="589" y="115">N-206</text></g>
+<g class="hs-dev hf-call sv" style="animation-delay:1.36s"><path d="M448 146L576 150H586"/><circle cx="448" cy="146" r="2.2"/><rect x="586" y="142" width="36" height="15" rx="2"/><text x="589" y="153">V-104</text></g>
+<g class="hs-dev hf-call sa" style="animation-delay:1.44s"><path d="M478 236L576 230H586"/><circle cx="478" cy="236" r="2.2"/><rect x="586" y="222" width="36" height="15" rx="2"/><text x="589" y="233">A-101</text></g>
+<g class="hs-dev hf-call su" style="animation-delay:1.52s"><path d="M502 236L576 254H586"/><circle cx="502" cy="236" r="2.2"/><rect x="586" y="246" width="36" height="15" rx="2"/><text x="589" y="257">U-101</text></g>
+<g class="hs-dev hf-call sc" style="animation-delay:1.60s"><path d="M540 305L576 300H586"/><circle cx="540" cy="305" r="2.2"/><rect x="586" y="292" width="36" height="15" rx="2"/><text x="589" y="303">PDU-1·A</text></g>
+<g class="hs-tb"><rect x="430" y="350" width="196" height="76"/><line x1="430" y1="372" x2="626" y2="372"/><line x1="430" y1="398" x2="626" y2="398"/><line x1="540" y1="372" x2="540" y2="426"/><use href="#jlogo" x="434" y="352.5" width="17" height="17"/><text class="o" x="456" y="366">JAMS DOCS AND DESIGNS</text><text class="k" x="438" y="381">PROJECT</text><text class="v" x="438" y="393">MDF · Rack 1</text><text class="k" x="548" y="381">SHEET</text><text class="t" x="548" y="395">E-201</text><text class="k" x="438" y="407">TITLE</text><text class="v" x="438" y="419">Rack elevation</text><text class="k" x="548" y="407">STATUS</text><text class="v ok" x="548" y="419">As-built · Rev 0</text></g>
+<g class="hf-stamp"><rect x="334" y="360" width="84" height="40" rx="3"/><text x="376" y="378" text-anchor="middle" class="s1">AS-BUILT</text><text x="376" y="392" text-anchor="middle" class="s2">VERIFIED ON SITE</text></g>
+</svg>
       <div class="floatcard" aria-hidden="true">
-        <span class="l">As-built survey · Conf Rm 3B</span>
+        <span class="l">As-built survey · MDF Rack 1</span>
         <b>42 cables</b><span class="ok">● traced and labeled</span>
       </div>
     </figure>
