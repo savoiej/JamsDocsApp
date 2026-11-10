@@ -2,7 +2,7 @@
 // Needs the RESEND_API_KEY environment variable in the Vercel project.
 const TO = 'info@jamsdocsanddesigns.com';
 const FROM = 'Jams Docs and Designs Website <info@jamsdocsanddesigns.com>';
-const NEEDS = ['AV system design', 'Rack elevations and cable schedules', 'Network documentation', 'Proposals and BOMs',
+const NEEDS = ['AV system design', 'Smart home design', 'Cable and rack labeling', 'Rack elevations and cable schedules', 'Network documentation', 'Proposals and BOMs',
   'Install support', 'On-site support, moves, adds and changes', 'Service contract', 'As-built documentation', 'Platform early access'];
 
 const clip = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
