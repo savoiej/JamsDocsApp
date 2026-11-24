@@ -2335,9 +2335,10 @@ function fsApply(){
   const v=$('#v-design'),on=!!S.ui.fs&&S.view==='design';document.body.classList.toggle('dfs',on);
   if(v){v.classList.toggle('fs-pal',on&&!!S.ui.fsPal);v.classList.toggle('fs-side',on&&!!S.ui.fsSide)}
 }
+function fsPref(v){try{if(v){localStorage.setItem('jdd-fs-panels',JSON.stringify(v));return v}return JSON.parse(localStorage.getItem('jdd-fs-panels')||'{}')||{}}catch(e){return {}}}
 async function fsSet(on){
   S.ui.fs=on;
-  if(on){if(S.ui.fsSide==null)S.ui.fsSide=innerWidth>=1100;if(S.ui.fsPal==null)S.ui.fsPal=false;
+  if(on){const fp=fsPref();if(S.ui.fsSide==null)S.ui.fsSide=fp.side!=null?fp.side:innerWidth>=1100;if(S.ui.fsPal==null)S.ui.fsPal=fp.pal!=null?fp.pal:innerWidth>760;
     const el=document.documentElement;S.fsNative=false;
     try{if(el.requestFullscreen&&!document.fullscreenElement){await el.requestFullscreen({navigationUI:'hide'});S.fsNative=true}}catch(e){}}
   else{try{if(S.fsNative&&document.fullscreenElement)await document.exitFullscreen()}catch(e){}S.fsNative=false}
@@ -8283,7 +8284,7 @@ function onMkProp(t){
 }
 Object.assign(A,{
   fsToggle(){fsSet(!S.ui.fs)},
-  fsPanel(el){const k=el.dataset.p==='pal'?'fsPal':'fsSide';S.ui[k]=!S.ui[k];fsApply();const b=document.querySelectorAll(`.fsbar [data-p="${el.dataset.p}"]`);b.forEach(x=>x.setAttribute('aria-pressed',String(!!S.ui[k])));requestAnimationFrame(()=>{if(designOn()){const r=$('#stage').getBoundingClientRect();cam.init=true;applyCam()}})},
+  fsPanel(el){const k=el.dataset.p==='pal'?'fsPal':'fsSide';S.ui[k]=!S.ui[k];if(innerWidth>760)fsPref({pal:!!S.ui.fsPal,side:!!S.ui.fsSide});fsApply();const b=document.querySelectorAll(`.fsbar [data-p="${el.dataset.p}"]`);b.forEach(x=>x.setAttribute('aria-pressed',String(!!S.ui[k])));requestAnimationFrame(()=>{if(designOn()){const r=$('#stage').getBoundingClientRect();cam.init=true;applyCam()}})},
   ptool(el){const t=el.dataset.t||'select';S.ui.ptool=t;if(t!=='select'&&S.ui.mkOff){S.ui.mkOff=false;toast('Markup layer turned back on so you can see what you draw.')}S.mdraw=null;S.planTool=null;if(t!=='select'&&S.sel&&S.sel.kind!=='mark')S.sel=null;if(t!=='select'&&S.sel&&S.sel.kind==='mark')S.sel=null;
     if(!onPlan())setSheet('plan');else{renderToolbar();renderCanvas();renderInspector()}},
   mkColor(el){const c=el.dataset.c;mkStyle().c=c;const m=S.sel&&S.sel.kind==='mark'&&mkById(S.sel.id);if(m)mut(()=>{m.c=c});renderCanvas();renderInspector()},
