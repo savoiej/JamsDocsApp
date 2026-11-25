@@ -1542,7 +1542,68 @@ button:not(:disabled):active{filter:brightness(.92)}
 </div>
 <div class="overlay" id="overlay" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
-
+<style id="mobileApp">/* ===== Phone: a bottom tab bar, a full-screen menu, a sticky header, finger-sized targets ===== */
+.tabbar{display:none}
+@media (max-width:760px){
+  .app{grid-template-rows:auto;align-content:start}
+  body:not(.navopen) .app>.rail{display:none}
+  body::before{display:none}
+  .topbar{position:sticky!important;top:0;z-index:30;margin:-22px -16px 14px!important;padding:8px 16px!important;min-height:52px;box-sizing:border-box}
+  .topbar .crumb b{font-size:16px}
+  main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
+  .toast{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  body.nlmode .topbar{margin:0 0 14px!important}
+  body.dfs .tabbar,body.dfs.navopen .app>.rail{display:none!important}
+  .tabbar{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);position:fixed;left:0;right:0;bottom:0;z-index:39;background:var(--basalt,#14252A);border-top:1px solid #22353A;padding:0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+  .tabbar button{all:unset;box-sizing:border-box;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:58px;font:600 11px/1.1 var(--f-body,inherit);color:#93A5A8;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:color .12s,transform .1s}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button:active{transform:scale(.94)}
+  .tabbar button[aria-current="page"]{color:#fff}
+  .tabbar button[aria-current="page"]::before{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 3px 3px;background:var(--amber,#F2B11B)}
+  .tabbar button:focus-visible{outline:2px solid var(--amber,#F2B11B);outline-offset:-4px}
+  .tabbar i{position:absolute;top:6px;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:var(--bad,#E5484D);color:#fff;font:700 10px/16px var(--f-body,inherit);font-style:normal;text-align:center}
+  /* the menu: the whole rail, full screen above the tab bar */
+  body.navopen{overflow:hidden}
+  body.navopen .app>.rail{display:flex!important;position:fixed!important;top:0!important;left:0;right:0;bottom:auto!important;z-index:38;height:calc(100dvh - 59px - env(safe-area-inset-bottom,0px))!important;max-height:none!important;flex-direction:column!important;align-items:stretch!important;gap:14px!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;border:0!important;padding:16px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px))!important;animation:navIn .18s cubic-bezier(.2,.8,.2,1)}
+  @keyframes navIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  body.navopen .rail .brand .bn{display:flex!important;flex-direction:column}
+  body.navopen .rail .brand img{width:36px;height:36px}
+  body.navopen .rail .pjsw{display:block!important}
+  body.navopen .rail .railfoot{display:flex!important}
+  body.navopen .rail .nav{display:flex!important;flex-direction:column!important;gap:2px}
+  body.navopen .rail .nav .nvi,body.navopen .rail .nav svg{display:inline-block!important}
+  body.navopen .rail .nav .navhd{display:flex!important;pointer-events:none;margin-top:12px;padding:6px 12px 2px!important;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#8FA6A8!important}
+  body.navopen .rail .nav .navhd .chev,body.navopen .rail .nav .navhd .nvdot{display:none}
+  body.navopen .rail .nav .navsec,body.navopen .rail .nav .navsub{display:block!important}
+  body.navopen .rail .nav .navsub[hidden]{display:block!important}
+  body.navopen .rail .nav button:not(.navhd){display:flex!important;align-items:center;justify-content:flex-start!important;gap:12px;width:100%;min-height:46px;padding:10px 12px!important;margin:0!important;font-size:16px!important;white-space:normal;text-align:left}
+  body.navopen .rail .nav button .nvl{flex:1;text-align:left}
+  body.navopen .rail .nav .navsub{border:0!important;margin:0!important;padding:0!important}
+  body.navopen .rail .nav svg{width:20px;height:20px;flex:none}
+  body.navopen .rail .nav .k{display:inline!important;margin-left:auto}
+  body.navopen .rail .nav .badge{margin-left:auto}
+  body.navopen .rail .nav button[aria-current="page"]::before{left:0!important;top:10px!important;bottom:10px!important;width:3px!important;height:auto!important;right:auto!important}
+  body.navopen .rail .nav .nlhd{flex-direction:column!important;align-items:stretch!important}
+  body.navopen .rail .nav .nlhd .navgroup{display:block!important}
+  body.navopen .rail .nav .nlhd select{width:100%!important;max-width:none!important}
+  /* dialogs: nearly full width, scroll inside */
+  .overlay{padding:max(10px,env(safe-area-inset-top,0px)) 8px max(10px,env(safe-area-inset-bottom,0px))!important}
+  .dlg{border-radius:14px}
+}
+@media (max-width:760px) and (prefers-reduced-motion:reduce){body.navopen .app>.rail{animation:none}.tabbar button{transition:none}}
+/* finger-sized targets wherever the main pointer is a finger */
+@media (pointer:coarse){
+  .btn{min-height:40px}
+  .btn.sm{min-height:34px;padding-inline:12px}
+  .seg button,.seg label.filebtn{min-height:34px}
+  input[type=checkbox],input[type=radio]{width:22px;height:22px;flex:none}
+  .layers button{min-height:32px}
+  .paltools button{padding-block:10px;margin-block:-10px}
+  button.lnk,a.lnk,.rowlnk{padding-block:8px;margin-block:-8px}
+  button,a,[role=button],[data-act],[data-go],label{touch-action:manipulation}
+  button,[role=button],.btn,.chip,.tab{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+}
+</style>
 <script>
 (function(){
 "use strict";
@@ -7904,7 +7965,7 @@ document.addEventListener('click',e=>{
   if(/SELECT|INPUT|OPTION|TEXTAREA|LABEL/.test(e.target.tagName)&&e.target.closest('tr[data-act]')&&!e.target.closest('[data-act]').matches('button,input,select'))return;
   const a=e.target.closest('[data-act]');
   if(a&&A[a.dataset.act]&&!a.disabled){A[a.dataset.act](a,e);if(a.dataset.go)go(a.dataset.go);return}
-  const g=e.target.closest('[data-go]');if(g){if(S.studio&&g.dataset.go==='design'&&g.closest('#nav'))dcExit(true);go(g.dataset.go);return}
+  const g=e.target.closest('[data-go]');if(g){if(S.studio&&g.dataset.go==='design'&&g.closest('#nav,#tabbar'))dcExit(true);go(g.dataset.go);return}
   const sh=e.target.closest('[data-sheet]');if(sh){if(sh.dataset.sheet!==S.ui.sheet)setSheet(sh.dataset.sheet);return}
   const tb=e.target.closest('[data-tab]');if(tb){S.ui.tab=tb.dataset.tab;renderInspector();return}
   const rt=e.target.closest('[data-route]');if(rt){S.ui.route=rt.dataset.route;save();renderToolbar();renderCanvas();return}
@@ -9983,6 +10044,27 @@ cam=cams[S.ui.sheet]||cams.flow;
 const h0=(location.hash||'').slice(1);if(/^scan-/.test(h0))NL_HASH0=h0;
 go(/^scan-/.test(h0)?'networks':VIEWS.includes(h0)?h0:'overview');setTimeout(()=>{nlEnsure();nlNavRender()},300);
 cloudBoot();
+/* ================= PHONE TAB BAR =================
+   Below 760px the rail becomes a menu that opens full screen; four everyday pages sit in a tab bar.
+   Technicians get projects, drawings, the field app and the service desk instead of money pages. */
+const TABIC={overview:'<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',inbox:'<path d="M4 13l2.5-7h11L20 13v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20"/>',projects:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3M8 17h6"/>',design:'<rect x="3" y="4" width="7" height="6" rx="1"/><rect x="14" y="14" width="7" height="6" rx="1"/><path d="M10 7h4a2 2 0 0 1 2 2v5"/>',field:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/>',service:'<path d="M14.5 6.5a4 4 0 0 0 5 5L13 18a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5L17 4l3 3-2.5 2.5M10 15l-5.5 5.5"/>'};
+const tabIcon=v=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TABIC[v]||''}</svg>`;
+const TAB_MENU='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+function tabsRender(){let el=document.getElementById('tabbar');
+  if(!el){el=document.createElement('nav');el.id='tabbar';el.className='tabbar';el.setAttribute('aria-label','Quick menu');document.body.appendChild(el)}
+  const list=S.tech?[['projects','Projects'],['design','Drawings'],['field','Field'],['service','Service']]:[['overview','Home'],['inbox','Inbox'],['projects','Projects'],['design','Drawings']];
+  const open=document.body.classList.contains('navopen'),cur=S.studio&&S.view==='design'?'dcenter':S.view,inTabs=list.some(([v])=>v===cur);
+  const nb=document.getElementById('bInbox'),n=nb&&!nb.hidden?+nb.textContent||0:0;
+  el.innerHTML=list.map(([v,l])=>`<button type="button" data-go="${v}"${!open&&cur===v?' aria-current="page"':''}>${tabIcon(v)}<span>${l}</span>${v==='inbox'&&n?`<i aria-label="${n} waiting">${n>99?'99+':n}</i>`:''}</button>`).join('')
+   +`<button type="button" data-act="navMenu" aria-expanded="${open}"${open||!inTabs?' aria-current="page"':''}>${TAB_MENU}<span>Menu</span></button>`}
+function navMenuSet(on){document.body.classList.toggle('navopen',!!on);if(on){const r=document.querySelector('.app>.rail');if(r){r.scrollTop=0;const c=r.querySelector('[aria-current="page"]');if(c)c.scrollIntoView({block:'center'})}}tabsRender()}
+A.navMenu=()=>navMenuSet(!document.body.classList.contains('navopen'));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('navopen'))navMenuSet(false)});
+matchMedia('(max-width:760px)').addEventListener?.('change',e=>{if(!e.matches)navMenuSet(false)});
+{const go0=go;go=function(v){document.body.classList.remove('navopen');const r=go0.apply(this,arguments);try{tabsRender()}catch(e){}return r}}
+{const b0=badges;badges=function(){const r=b0.apply(this,arguments);try{tabsRender()}catch(e){}return r}}
+try{tabsRender()}catch(e){}
+
 try{palApply(palGet());modeApply()}catch(e){}
 })();
 </script>
