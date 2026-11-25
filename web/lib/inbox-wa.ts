@@ -18,17 +18,26 @@ export const waConfigured = () => !!(process.env.WA_TOKEN && process.env.WA_PHON
 export const waMissing = () => ["WA_TOKEN", "WA_PHONE_NUMBER_ID", "WA_APP_SECRET", "WA_VERIFY_TOKEN", "SUPABASE_SERVICE_ROLE_KEY"].filter((k) => !process.env[k]);
 const VER = () => process.env.WA_GRAPH_VERSION || "v23.0";
 
+const waErr = (msg: string, code?: number) => Object.assign(new Error(msg), { code }) as Error & { code?: number };
+
 export async function waGraph(path: string, init?: RequestInit) {
-  const r = await fetch(`https://graph.facebook.com/${VER()}/${path}`, {
-    ...init,
-    headers: { authorization: `Bearer ${process.env.WA_TOKEN}`, "content-type": "application/json", ...(init?.headers || {}) },
-    cache: "no-store",
-  });
+  // Pasted values often carry a stray space or line break; never echo the token back in an error.
+  const token = (process.env.WA_TOKEN || "").replace(/\s+/g, "");
+  if (!token) throw waErr("WA_TOKEN is empty in Vercel.");
+  if (/^sb_|^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9/.test(token)) throw waErr("WA_TOKEN holds a Supabase key, not a WhatsApp token. Paste the token from Meta's \"Generate token\" into WA_TOKEN in Vercel and redeploy.");
+  let r: Response;
+  try {
+    r = await fetch(`https://graph.facebook.com/${VER()}/${path}`, {
+      ...init,
+      headers: { authorization: `Bearer ${token}`, "content-type": "application/json", ...(init?.headers || {}) },
+      cache: "no-store",
+    });
+  } catch {
+    throw waErr("Couldn't reach WhatsApp. Check that WA_TOKEN in Vercel is the token from Meta, with nothing else in it.");
+  }
   const j = (await r.json().catch(() => ({}))) as { error?: { message?: string; code?: number; error_data?: { details?: string } } } & Record<string, unknown>;
   if (!r.ok || j.error) {
-    const e = new Error(j.error?.error_data?.details || j.error?.message || `WhatsApp answered ${r.status}`) as Error & { code?: number };
-    e.code = j.error?.code;
-    throw e;
+    throw waErr((j.error?.error_data?.details || j.error?.message || `WhatsApp answered ${r.status}`).split(token).join("…"), j.error?.code);
   }
   return j;
 }

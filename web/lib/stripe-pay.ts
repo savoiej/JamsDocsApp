@@ -24,8 +24,9 @@ export function stripe() {
 
 let admin: SupabaseClient | null = null;
 export function adminDb() {
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").replace(/\s+/g, "");
   if (!key) throw new Error("not_configured");
+  if (!/^sb_secret_|^eyJ/.test(key)) throw new Error("SUPABASE_SERVICE_ROLE_KEY doesn't look like a Supabase secret key (it should start with sb_secret_).");
   if (!admin) admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, { auth: { persistSession: false, autoRefreshToken: false } });
   return admin;
 }
