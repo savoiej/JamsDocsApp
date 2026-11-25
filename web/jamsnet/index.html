@@ -5244,7 +5244,7 @@ function ibThreadHTML(v){const c=clientById(v.clientId),u=S.ui,f=ibFirstIn(v),ne
    <div class="ibreply">
     <div class="ibrt"><label for="ibRch">Reply with</label><select class="inp sm" id="ibRch" data-id="${v.id}">${chs.map(([k,l])=>`<option value="${k}" ${k===rch?'selected':''}>${esc(l)}</option>`).join('')}</select>${SAMPLE?`<button class="btn sm" data-act="ibSum" data-id="${v.id}">Summarize</button><button class="btn sm" data-act="ibDraft" data-id="${v.id}">Draft a reply</button>`:''}</div>
     <textarea class="inp" id="ibTxt" rows="3" placeholder="Write a reply…">${esc(u.ibDraft&&u.ibDraft.id===v.id?u.ibDraft.t:'')}</textarea>
-    <div class="ibrb"><span class="muted" style="font-size:12px">${{email:m365Ok()?'Sends from your Microsoft 365 mailbox, in the same email thread.':'Opens your email app with the reply filled in.',wa:'Opens WhatsApp with the reply filled in.',teams:'Opens a Teams chat with the reply filled in.',slack:'Copies the reply; paste it in the Slack thread.',note:'Saved on the conversation only.'}[rch]||''}</span><button class="btn primary" data-act="ibSend" data-id="${v.id}">${rch==='note'?'Save note':'Send'}</button></div></div>
+    <div class="ibrb"><span class="muted" style="font-size:12px">${{email:m365Ok()?'Sends from your Microsoft 365 mailbox, in the same email thread.':'Opens your email app with the reply filled in.',wa:waOk()?'Sends from your WhatsApp Business number'+(WA.number?' ('+WA.number+')':'')+'.':'Opens WhatsApp with the reply filled in.',teams:'Opens a Teams chat with the reply filled in.',slack:'Copies the reply; paste it in the Slack thread.',note:'Saved on the conversation only.'}[rch]||''}</span><button class="btn primary" data-act="ibSend" data-id="${v.id}">${rch==='note'?'Save note':'Send'}</button></div></div>
   </div>
   <aside class="ibside">${ibSideHTML(v,c)}</aside>`}
 function ibReplyChans(v,c){const f=ibFirstIn(v),out=[],em=/@/.test(f.addr||'')?f.addr:(c&&(primaryOf(c)||{}).email)||'',ph=(!/@/.test(f.addr||'')&&ibDigits(f.addr).length>=7)?f.addr:(c&&(primaryOf(c)||{}).phone)||'';
@@ -5337,16 +5337,29 @@ function ibM365Card(){
     <label class="chk" style="font-size:13px"><input type="checkbox" id="ibAllMail" ${SETTINGS.ibAllMail?'checked':''}> Bring in all email, not only from clients</label>
     <div class="actions"><a class="btn sm primary" href="/api/inbox/m365/connect">${M365.accounts.length?'+ Connect another mailbox':'Connect a mailbox'}</a>${M365.accounts.length?'<button class="btn sm" data-act="ibSyncNow">Sync now</button>':''}</div>
     <p class="muted" style="margin:0;font-size:12px">Signs in with Microsoft. SITREP reads the inbox and Sent Items and sends your replies; it never deletes or moves mail.</p></div>`}
-async function ibConnInfo(){if(!M365.checked)await m365Status();const ov=$('#overlay');const C=[['email','Email','Google Workspace (Gmail) or Microsoft 365 (Outlook), signed in once per mailbox.','Your email provider, and which mailboxes to bring in.'],['wa','WhatsApp','The WhatsApp Business Platform from Meta, with your business number registered to it.','A Meta business account and the number to use. You can reply freely for 24 hours after a client writes; after that, Meta requires an approved template and charges for it.'],['teams','Teams','Microsoft Graph, approved once by your Microsoft 365 admin.','Admin approval. Some live chat features need Microsoft approval or carry usage fees.'],['slack','Slack','A Slack app in your workspace that reads the Slack Connect channels you share with clients.','Which shared channels belong to which client.']];
+function ibWaCard(){const url=location.origin.replace(/^http:/,'https:')+'/api/inbox/wa/webhook';
+  if(!WA.configured)return `<div class="ibconn"><div class="t">${ibCh('wa')}<b>WhatsApp Business</b><span class="ibflag wait">Waiting on setup</span></div>
+    <p>Uses Meta's WhatsApp Business Platform with your business number. In Meta's developer site, create a Business app with WhatsApp, register your number, and make a permanent system-user token. Then add four values to the site's settings in Vercel: <span class="mono">WA_TOKEN</span>, <span class="mono">WA_PHONE_NUMBER_ID</span>, <span class="mono">WA_APP_SECRET</span>, <span class="mono">WA_VERIFY_TOKEN</span>${WA.missing.includes('SUPABASE_SERVICE_ROLE_KEY')?' (and <span class="mono">SUPABASE_SERVICE_ROLE_KEY</span>)':''}.</p>
+    <p>In the app's WhatsApp configuration, set the callback URL to <span class="mono">${esc(url)}</span>, use the same verify token, and subscribe to <b>messages</b>.</p>
+    <p class="muted">You can reply freely for 24 hours after a client writes; after that, Meta requires an approved template and charges for it. A number moved to the Cloud API can't stay on the WhatsApp Business phone app.</p></div>`;
+  return `<div class="ibconn"><div class="t">${ibCh('wa')}<b>WhatsApp Business</b>${WA.error?'<span class="ibflag late">Check setup</span>':'<span class="ibflag ok">Connected</span>'}</div>
+    ${WA.error?`<p style="color:#C8341F;margin:0">Meta answered: ${esc(WA.error)}</p><p class="muted" style="margin:0">Usually an expired or wrong <span class="mono">WA_TOKEN</span>, or the wrong <span class="mono">WA_PHONE_NUMBER_ID</span>.</p>`:`<p style="margin:0"><b>${esc(WA.number||'Business number')}</b>${WA.name?' · '+esc(WA.name):''}</p><p class="muted" style="margin:0">Client WhatsApp messages arrive here as they're sent and match to clients by phone number. Replies go out from this number.</p>`}
+    <p class="muted" style="margin:0;font-size:12px">Webhook: <span class="mono">${esc(url)}</span></p></div>`}
+async function ibConnInfo(){if(!M365.checked)await m365Status();if(!WA.checked)await waStatus();const ov=$('#overlay');const C=[['email','Email','Google Workspace (Gmail) or Microsoft 365 (Outlook), signed in once per mailbox.','Your email provider, and which mailboxes to bring in.'],['wa','WhatsApp','The WhatsApp Business Platform from Meta, with your business number registered to it.','A Meta business account and the number to use. You can reply freely for 24 hours after a client writes; after that, Meta requires an approved template and charges for it.'],['teams','Teams','Microsoft Graph, approved once by your Microsoft 365 admin.','Admin approval. Some live chat features need Microsoft approval or carry usage fees.'],['slack','Slack','A Slack app in your workspace that reads the Slack Connect channels you share with clients.','Which shared channels belong to which client.']];
   ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="ibCH"><div class="dlgtop"><span>CLIENT INBOX</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
    <div style="padding:18px;display:flex;flex-direction:column;gap:12px"><h2 id="ibCH" style="margin:0;font-family:var(--f-display);font-size:26px">Connect accounts</h2>
     <p class="note" style="margin:0">Each channel needs an account and keys you create, added to the app's server settings. Until one is connected, log calls and paste emails with <b>+ Log a message</b>; replies open in the matching app with the text filled in.</p>
     ${ibM365Card()}
-    ${C.filter(x=>x[0]!=='email').map(([k,l,how,need])=>`<div class="ibconn"><div class="t">${ibCh(k)}<b>${l}</b><span class="ibflag wait">Not connected</span></div><p>${how}</p><p class="muted">Needs: ${need}</p></div>`).join('')}</div>
+    ${ibWaCard()}
+    ${C.filter(x=>x[0]!=='email'&&x[0]!=='wa').map(([k,l,how,need])=>`<div class="ibconn"><div class="t">${ibCh(k)}<b>${l}</b><span class="ibflag wait">Not connected</span></div><p>${how}</p><p class="muted">Needs: ${need}</p></div>`).join('')}</div>
    <div class="dlgfoot"><button class="btn primary" data-act="closeOverlay">Got it</button></div></div>`;ov.hidden=false}
 
 /* ---------- Microsoft 365 email: synced by the server into inboxmsg/<id>, matched to clients here ---------- */
 const M365={configured:false,accounts:[],checked:false,last:0,busy:false};let M365_UNSUB=null,M365_TIMER=null;
+/* WhatsApp Business (Cloud API): Meta posts messages to the server, which stores them in inboxmsg/<id> like email */
+const WA={configured:false,checked:false,number:'',name:'',error:'',missing:[]};const waOk=()=>WA.configured&&!WA.error;
+async function waStatus(){if(S.tech)return;try{const r=await fetch('/api/inbox/wa',{credentials:'same-origin'});if(!r.ok)return;const j=await r.json();Object.assign(WA,{configured:!!j.configured,number:j.number||'',name:j.name||'',error:j.error||'',missing:j.missing||[],checked:true})}catch(e){}}
+function ibSubscribe(){if(DBX&&!M365_UNSUB&&(m365Ok()||waOk())){try{M365_UNSUB=DBX.collection('inboxmsg').onSnapshot(snap=>ibApplySynced(snap.docs.map(d=>d.data())),()=>{})}catch(e){}}}
 const m365Ok=()=>M365.configured&&M365.accounts.length>0;
 async function m365Status(){if(S.tech)return;try{const r=await fetch('/api/inbox/m365',{credentials:'same-origin'});if(!r.ok)return;const j=await r.json();M365.configured=!!j.configured;M365.accounts=j.accounts||[];M365.checked=true}catch(e){}}
 async function m365Sync(manual){if(S.tech||M365.busy||!m365Ok())return;M365.busy=true;if(manual&&S.view==='inbox')R.inbox();
@@ -5354,14 +5367,18 @@ async function m365Sync(manual){if(S.tech||M365.busy||!m365Ok())return;M365.busy
     if(manual){const bad=(j.results||[]).filter(x=>x.error);toast(bad.length?`${bad[0].email}: ${bad[0].error}`:'Email is up to date.')}await m365Status()}
   catch(e){if(manual)toast('Couldn’t reach Microsoft 365. Try again in a minute.')}
   finally{M365.busy=false;if(S.view==='inbox')R.inbox()}}
-function m365Boot(){if(S.tech)return;m365Status().then(()=>{
+function m365Boot(){if(S.tech)return;Promise.all([m365Status(),waStatus()]).then(()=>{
     try{let L=location;try{if(parent!==window&&parent.location.search)L=parent.location}catch(x){}const q=new URLSearchParams(L.search).get('inbox');if(q){const msg={connected:'Mailbox connected. Bringing in your client email now.',declined:'Microsoft sign-in was cancelled.',expired:'That sign-in took too long. Try connecting again.',failed:'Microsoft sign-in didn’t finish. Try again, or check the app registration.',not_configured:'Microsoft 365 isn’t set up on this site yet.',not_allowed:'Only office staff can connect a mailbox.',no_offline:'Microsoft didn’t allow staying signed in. Check that offline_access is granted.',no_mailbox:'That account has no mailbox.'}[q];if(msg)toast(msg);try{(L===location?history:parent.history).replaceState(null,'',L.pathname+L.hash)}catch(x){}if(q==='connected')go('inbox')}}catch(e){}
-    if(!m365Ok())return;
-    if(DBX&&!M365_UNSUB){try{M365_UNSUB=DBX.collection('inboxmsg').onSnapshot(snap=>ibApplySynced(snap.docs.map(d=>d.data())),()=>{})}catch(e){}}
+    ibSubscribe();if(!m365Ok())return;
     m365Sync(false);clearInterval(M365_TIMER);M365_TIMER=setInterval(()=>{if(!document.hidden)m365Sync(false)},3*60e3)})}
 /* turn synced mail into conversations: only senders matched to a client, or replies in a thread already here (unless "all mail" is on) */
 function ibApplySynced(docs){const seen=new Set(INBOX.seen||[]);let n=0;
   docs.filter(d=>d&&d.id&&!seen.has(d.id)).sort((a,b)=>a.at-b.at).forEach(d=>{
+    if(d.ch==='wa'){const dg=ibDigits(d.addr),ckey='wa:'+dg;let has=INBOX.convs.find(x=>(x.ckeys||[]).includes(ckey));
+      if(has&&has.msgs.some(m=>m.mid&&m.mid===d.msgId)){seen.add(d.id);return}
+      if(has&&d.dir==='out'&&has.msgs.some(m=>m.dir==='out'&&m.ch==='wa'&&Math.abs(m.at-d.at)<30*6e4&&String(m.text||'').slice(0,60)===String(d.text||'').slice(0,60))){seen.add(d.id);return}
+      if(has&&has.done&&d.dir==='in'){has.ckeys=(has.ckeys||[]).filter(k=>k!==ckey)}
+      ibAddMsg({ch:'wa',dir:d.dir,name:d.name,addr:d.addr,subject:'',text:(d.text||''),clientId:ibMatch(d.addr),at:d.at,ckey,mid:d.msgId});seen.add(d.id);n++;return}
     const ckey='m365:'+(d.conv||d.msgId),has=INBOX.convs.find(x=>(x.ckeys||[]).includes(ckey));
     const who=d.dir==='in'?d.addr:(d.to||[])[0]||d.addr,cid=ibMatch(who);
     if(!has&&!cid&&!SETTINGS.ibAllMail)return;
@@ -7069,6 +7086,12 @@ const A={
       fetch('/api/inbox/m365/send',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(last?{account:last.acct,mailbox:last.mbox,replyTo:last.mid,text:txt}:{to,subject:'Re: '+(v.subject||''),text:txt})})
         .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(({ok,j})=>{if(!ok)throw new Error(j.message||'Not sent');
           v.msgs.push({id:'m'+Date.now().toString(36),ch:'email',dir:'out',name:'',addr:to,at:Date.now(),text:txt,via:'m365'});S.ui.ibDraft=null;saveInbox();R.inbox();badges();toast('Sent from '+(j.from||'Outlook')+'.')})
+        .catch(e=>{btn.disabled=false;btn.textContent='Send';toast('Not sent: '+e.message)});return}
+    if(ch==='wa'&&waOk()){const last=[...v.msgs].reverse().find(m=>m.dir==='in'&&m.ch==='wa'&&m.mid);const btn=el;btn.disabled=true;btn.textContent='Sending…';
+      fetch('/api/inbox/wa/send',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({to,text:txt,replyTo:last?last.mid:''})})
+        .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(({ok,j})=>{if(!ok)throw new Error(j.message||'Not sent');
+          INBOX.seen=[...(INBOX.seen||[]),j.id].slice(-4000);const dg='wa:'+ibDigits(to);if(!(v.ckeys||[]).includes(dg))v.ckeys=[...(v.ckeys||[]),dg];
+          v.msgs.push({id:'m'+Date.now().toString(36),ch:'wa',dir:'out',name:'',addr:to,at:Date.now(),text:txt,via:'wa',mid:j.wamid||''});S.ui.ibDraft=null;saveInbox();R.inbox();badges();toast('Sent on WhatsApp.')})
         .catch(e=>{btn.disabled=false;btn.textContent='Send';toast('Not sent: '+e.message)});return}
     if(ch==='email')open(`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent('Re: '+(v.subject||''))}&body=${encodeURIComponent(txt)}`);
     else if(ch==='wa')open(`https://wa.me/${ibDigits(to).length===10?'1'+ibDigits(to):String(to).replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`);
