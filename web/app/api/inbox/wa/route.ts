@@ -20,7 +20,13 @@ export async function GET() {
         try {
           const s = (await waGraph(`${waba}/subscribed_apps`)) as { data?: unknown[] };
           subscribed = !!s.data?.length;
-          if (!subscribed) subscribed = !!((await waGraph(`${waba}/subscribed_apps`, { method: "POST" })) as { success?: boolean }).success;
+          if (!subscribed) {
+            try {
+              subscribed = !!((await waGraph(`${waba}/subscribed_apps`, { method: "POST", body: "{}" })) as { success?: boolean }).success;
+            } catch (e) {
+              throw new Error("Subscribing the app: " + (e as Error).message);
+            }
+          }
         } catch (e) {
           subscribed = undefined;
           subscribeError = (e as Error).message;
