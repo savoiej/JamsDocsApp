@@ -1749,7 +1749,6 @@ function loadSaved(){try{const raw=localStorage.getItem(KEY);if(!raw)return fals
   (o.libDel||[]).forEach(id=>{lib=lib.filter(p=>p.id!==id)});
   const d=normDesign(o.d);if(!d)return false;
   S.design=d;uidc=o.u||100;if(o.ui)Object.assign(S.ui,o.ui);
-  if(!S.design.racks.length){S.design.racks.push(newRack('Equipment rack',12));autoArrange(S.design.racks[0])}
   cleanRacks();return true}catch(e){return false}}
 
 /* ---------- projects ----------
@@ -1802,7 +1801,6 @@ function switchProject(id){
   const d=normDesign(to.design);S.design=d||S.design;uidc=Math.max(uidc,to.u||0);
   to.design=null;PJ.cur=id;
   if(!d){S.design.racks=S.design.racks||[];}
-  if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
   cleanRacks();tkNormAll();
   H.past=[];H.future=[];S.sel=null;S.wire=null;S.planTool=null;S.pe=null;S.ui.padd=false;S.ui.pform=null;
   Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});
@@ -2100,8 +2098,9 @@ function loadTemplate(kind){
     for(let r=0;r<3;r++)for(let c=0;c<4;c++)pl.room.furn.push({x:.9+c*1.85,y:2.5+r*1.35,w:1.4,d:.6,label:''});
     at(d2,4.5,.12);at(d1,4.5,6.88,180);at(rx,4.5,6.62);at(wp,7.4,1.3);at(tx,8.35,1.2);at(s1,3,3.6);at(s2,6,3.6);
     S.design.racks[0].fp={x:RO.x+850,y:RO.y+45};
-  } else S.design.racks.push(newRack('Equipment rack',12));
-  if(kind!=='blank'){const r=S.design.racks[0],pp=newPanel(24,'cat6');r.items.push({id:nid(),kind:'panel',ref:pp.id,u:12});
+  } else if(kind!=='blank')S.design.racks.push(newRack('Equipment rack',12));
+  else S.design.plan.hideRoom=true;
+  if(kind!=='blank'&&S.design.racks[0]){const r=S.design.racks[0],pp=newPanel(24,'cat6');r.items.push({id:nid(),kind:'panel',ref:pp.id,u:12});
     autoArrange(r);autoPatch(r.id)}
 }
 
@@ -3130,6 +3129,7 @@ async function peOutput(raw){const d=PE.d,c=document.createElement('canvas');c.w
 function peScaleMm(outW){/* real width of the output in millimetres, from the drawing scale */
   const k=PE.scaleK;if(!k||!PE.d.scale)return null;const paperIn=outW/PE.d.scale/72;return k[0]==='m'?paperIn*25.4*+k.slice(1):paperIn*25.4*+k}
 
+document.addEventListener('change',e=>{if(e.target&&e.target.id==='npT'){const f=document.getElementById('npRf'),v=e.target.value;if(f)f.hidden=v==='blank'||v==='copy'||v.startsWith('dc:')}});
 document.addEventListener('change',e=>{const t=e.target;if(!t||!PE.d||!$('.pe'))return;
   if(t.dataset.pekind){peDo(()=>{t.checked?PE.offKinds.delete(t.dataset.pekind):PE.offKinds.add(t.dataset.pekind)})}
   else if(t.dataset.pelay){peDo(()=>{t.checked?PE.offLayers.delete(t.dataset.pelay):PE.offLayers.add(t.dataset.pelay)})}
@@ -5403,7 +5403,6 @@ function dcBuild(start,name){
   if(!d){S.design=dcClone(keep);loadTemplate(['huddle','classroom'].includes(start)?start:'blank');d=S.design;S.design=keep;S.sel=keepSel}
   d=normDesign(d);if(!d)return null;
   (d.cables||[]).forEach(c=>{delete c.status;delete c.note});
-  if(!d.racks.length)d.racks.push(newRack('Equipment rack',12));
   if(d.plan&&d.plan.room)d.plan.room.name=name;d.meta.rev='A';return d}
 function dcNew(f){const name=String(f.name||'').trim().slice(0,80)||'Untitled design';const d=dcBuild(f.start||'blank',name);if(!d){toast('That starting point could not be copied.');return null}
   const t={id:'dt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,kind:DC_KINDS.includes(f.kind)?f.kind:'Other',notes:String(f.notes||'').slice(0,400),created:Date.now(),updated:Date.now(),u:uidc,design:d};
@@ -5411,7 +5410,6 @@ function dcNew(f){const name=String(f.name||'').trim().slice(0,80)||'Untitled de
 function dcEnter(id){const t=dcById(id);if(!t){toast('That template is gone.');return}
   if(S.studio){if(S.studio.id===id){go('design');return}dcExit(true)}
   const d=normDesign(dcClone(t.design));if(!d){toast('This template could not be opened.');return}
-  if(!d.racks.length)d.racks.push(newRack('Equipment rack',12));
   S.studio={id,back:S.design,sheet:S.ui.sheet};S.design=d;uidc=Math.max(uidc,+t.u||0,maxUid());
   dcReset();S.ui.sheet='flow';go('design');requestAnimationFrame(()=>{try{fit(true)}catch(e){}})}
 function dcExit(quiet){if(!S.studio)return;dcCapture();dcStore();S.design=S.studio.back;const sh=S.studio.sheet;S.studio=null;dcReset();S.ui.sheet=sh||'flow';save();
@@ -5420,7 +5418,6 @@ function dcExit(quiet){if(!S.studio)return;dcCapture();dcStore();S.design=S.stud
 function dcLoadInto(id){const t=dcById(id);if(!t){toast('That template is gone.');return}
   const d=normDesign(dcClone(t.design));if(!d)return;
   if(!S.studio)['meta','meta2','meta3','meta4','meta5','meta6','meta7'].forEach(k=>{if(S.design[k])d[k]=S.design[k]});
-  if(!d.racks.length)d.racks.push(newRack('Equipment rack',12));
   S.design=d;uidc=Math.max(uidc,+t.u||0,maxUid());S.sel=null;S.wire=null;S.planTool=null;try{cleanRacks()}catch(e){}}
 function dcOptions(skip){const L=DC.filter(t=>t.id!==skip);if(!L.length)return '';
   return `<optgroup label="My templates">${L.map(t=>`<option value="dc:${t.id}">${esc(t.name)}</option>`).join('')}</optgroup>`}
@@ -6814,7 +6811,7 @@ function openNewProject(client,edit){
     <div class="row3"><label class="field" for="npD1">Start<input id="npD1" type="date" value="${esc(edit?P.startDate||'':isoDay(0))}"></label><label class="field" for="npD2">Target finish<input id="npD2" type="date" value="${esc(edit?P.dueDate||'':'')}"></label><label class="field" for="npPO">Client PO<input id="npPO" value="${esc(edit?P.po||'':'')}" placeholder="Optional" autocomplete="off"></label></div>
     <div id="npDraw"${edit?' hidden':''}><div class="plh">Drawings</div>
      <div class="row2"><label class="field" for="npT">Start from<select id="npT"><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="blank">Blank drawing set</option><option value="copy">Copy of ${esc(S.prop.project)}</option>${dcOptions()}</select></label>
-      <label class="field" for="npR">Rack size<select id="npR">${RACK_SIZES.map(z=>`<option value="${z}">${z}U</option>`).join('')}</select></label></div></div>
+      <label class="field" for="npR" id="npRf">Rack size<select id="npR">${RACK_SIZES.map(z=>`<option value="${z}">${z}U</option>`).join('')}</select></label></div></div>
     <div class="plh">Billing</div>
     <div class="row2"><label class="field" for="npB">How you’ll bill<select id="npB">${PJ_BILL.map(([k,l])=>`<option value="${k}"${k===(B.method||ty.bill)?' selected':''}>${esc(l)}</option>`).join('')}</select></label>
      <label class="field" for="npCt" data-npb="contract">Service contract<select id="npCt"></select></label>
@@ -8490,7 +8487,7 @@ function applyCloud(meta,pjs){
     list.sort((a,b)=>{const ia=ord.indexOf(a.id),ib=ord.indexOf(b.id);return (ia<0?1e9:ia)-(ib<0?1e9:ib)});
     PJ.list=list;PJ.cur=idx&&list.some(e=>e.id===idx.cur)?idx.cur:list[0].id;
     const e=curPj();if(e.prop)S.prop=e.prop;S.tasks=Array.isArray(e.tasks)?e.tasks:[];S.time=Array.isArray(e.time)?e.time:[];S.photos=Array.isArray(e.photos)?e.photos:[];tkNormAll();
-    const d=normDesign(e.design);if(d)S.design=d;e.design=null;if(!S.design.racks.length)S.design.racks.push(newRack('Equipment rack',12));
+    const d=normDesign(e.design);if(d)S.design=d;e.design=null;
     uidc=Math.max(uidc,+e.u||0,maxUid());cleanRacks();H.past=[];H.future=[];S.sel=null;S.wire=null;S.liveSet=null;
     Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false})}
   purgeSamples();
