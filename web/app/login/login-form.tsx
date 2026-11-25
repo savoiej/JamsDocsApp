@@ -15,6 +15,7 @@ export default function LoginForm({ next, notice }: { next: string; notice?: str
       <input type="hidden" name="next" value={next} />
       <label className="field">Email<input name="email" type="email" autoComplete="email" required /></label>
       <label className="field">Password<input name="password" type="password" autoComplete="current-password" required /></label>
+      <p className="forgot"><Link href="/login/forgot">Forgot your password?</Link></p>
       <button className="btn primary" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</button>
       <p>New to the team? <Link href="/signup">Create an account</Link></p>
     </form>
