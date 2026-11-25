@@ -15,11 +15,13 @@ export async function GET() {
       let subscribed: boolean | undefined;
       const waba = (process.env.WA_WABA_ID || "").trim();
       if (waba) {
-        const s = (await waGraph(`${waba}/subscribed_apps`)) as { data?: unknown[] };
-        subscribed = !!s.data?.length;
-        if (!subscribed) {
-          const r = (await waGraph(`${waba}/subscribed_apps`, { method: "POST" })) as { success?: boolean };
-          subscribed = !!r.success;
+        // Best effort: the token may not be allowed to read the account's subscriptions.
+        try {
+          const s = (await waGraph(`${waba}/subscribed_apps`)) as { data?: unknown[] };
+          subscribed = !!s.data?.length;
+          if (!subscribed) subscribed = !!((await waGraph(`${waba}/subscribed_apps`, { method: "POST" })) as { success?: boolean }).success;
+        } catch {
+          subscribed = undefined;
         }
       }
       cached = { at: Date.now(), number: j.display_phone_number || "", name: j.verified_name || "", quality: j.quality_rating || "", subscribed };
