@@ -10,7 +10,7 @@ export async function GET() {
   if (!(await staff())) return NextResponse.json({ message: "Not allowed." }, { status: 403 });
   if (!waConfigured()) return NextResponse.json({ configured: false, missing: waMissing() });
   try {
-    if (!cached || Date.now() - cached.at > 10 * 60e3 || cached.subscribed === false) {
+    if (!cached || Date.now() - cached.at > 10 * 60e3 || (!!process.env.WA_WABA_ID && cached.subscribed !== true)) {
       const j = (await waGraph(`${process.env.WA_PHONE_NUMBER_ID}?fields=display_phone_number,verified_name,quality_rating`)) as { display_phone_number?: string; verified_name?: string; quality_rating?: string };
       let subscribed: boolean | undefined;
       const waba = (process.env.WA_WABA_ID || "").trim();
