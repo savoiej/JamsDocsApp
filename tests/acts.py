@@ -1,5 +1,5 @@
 import os
-APP=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','apps','jamsnet','index.html')
+APP=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','web','jamsnet','index.html')
 import asyncio,re,json
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'harness.py')).read().split('async def main')[0])
 h=open(APP).read();i=h.index('<script type="text/plain" id="nlsrc">');av=h[:i]
