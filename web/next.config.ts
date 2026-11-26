@@ -2,9 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Stored files (photos, floor plans, spec sheets) are addressed as /_blob/<id> inside SITREP.
-  // JamsOS was renamed Jams Operations; the old address still works
+  // Jams Operations (ver1) was merged into SITREP; its old addresses open SITREP
   async redirects() {
-    return [{ source: "/jamsos", destination: "/operations", permanent: true }];
+    return [
+      { source: "/operations", destination: "/app", permanent: true },
+      { source: "/jamsos", destination: "/app", permanent: true },
+    ];
   },
   async rewrites() {
     return [{ source: "/_blob/:id", destination: "/api/blob/:id" }];

@@ -39,7 +39,7 @@ New accounts can't see any data until an admin approves them. The database enfor
 
 ## Updating the app page
 
-After changing `apps/jamsnet/index.html` at the repo root, copy it into `web/jamsnet/index.html`.
+SITREP's page is `web/jamsnet/index.html`; edit it there. The Client App (`/client`) is built from the network module embedded in that same file.
 
 ## Checks
 

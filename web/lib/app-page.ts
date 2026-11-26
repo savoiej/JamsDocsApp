@@ -16,8 +16,19 @@ export function storageShim(prefix: string) {
 /* claude.ai artifact links baked into the pages, and where they live on this site */
 export function siteLinks(html: string, origin: string) {
   return html
-    .replaceAll("https://claude.ai/artifact/Rp5GENCYKRYw6nnA2LJdE8", `${origin}/operations`)
-    .replaceAll("https://claude.ai/artifact/XqWiKrqY6AnbRVYwFpFqmw", `${origin}/operations`)
+    .replaceAll("https://claude.ai/artifact/Rp5GENCYKRYw6nnA2LJdE8", `${origin}/app`)
+    .replaceAll("https://claude.ai/artifact/XqWiKrqY6AnbRVYwFpFqmw", `${origin}/app`)
     .replaceAll("https://claude.ai/artifact/HTnSSukvAoNNfVikhxhhqs", `${origin}/client`)
     .replaceAll("https://claude.ai/artifact/1du4BSTFvnCX4tamvmsKuG", `${origin}/app`);
+}
+
+/* SITREP is the one app file. Its network module (also the Client App) is embedded in it as
+   <script type="text/plain" id="nlsrc">, with "<script" and "<!--" escaped; this unpacks it the
+   same way SITREP's nlEnsure() does, so there is no second copy to keep in step. */
+export function networkModule(sitrepHtml: string) {
+  const open = sitrepHtml.indexOf('<script type="text/plain" id="nlsrc">');
+  if (open < 0) throw new Error("SITREP page has no embedded network module");
+  const start = sitrepHtml.indexOf(">", open) + 1;
+  const end = sitrepHtml.indexOf("</script>", start);
+  return sitrepHtml.slice(start, end).replace(/<\\(\/?script|!--)/gi, "<$1");
 }

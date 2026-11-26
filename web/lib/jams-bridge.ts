@@ -72,7 +72,7 @@ function compare(a: unknown, op: string, b: unknown): boolean {
 }
 
 export function createBridge(profile: Profile, opts: { ns?: string } = {}) {
-  /* A namespace keeps one app's documents apart from another's in the shared table (JamsOS lives under "jamsos/"). */
+  /* A namespace keeps one app's documents apart from another's in the shared table (the Client App lives under "client/"; the retired Jams Operations ver1 left its rows under "jamsos/"). */
   const ns = clean(opts.ns || "");
   const P = (p: string) => (!ns || p === ns || p.startsWith(ns + "/") ? p : `${ns}/${p}`);
   const supabase = createClient();

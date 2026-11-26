@@ -8638,6 +8638,23 @@ async function backupAll(){
   const r=await saveFile(new Blob([JSON.stringify(all,null,1)],{type:'application/json'}),`${firm()} backup ${isoDay(0)}.json`.replace(/[\\/:*?"<>|]+/g,' '));
   toast(r==='saved'?'Backup ready.':r==='declined'?'Download cancelled.':'Another download is waiting for you to confirm.')}
 
+/* ---------- restore a full backup (moves work between copies of the app; ported from Jams Operations ver1) ---------- */
+let RS_PENDING=null;
+async function restorePick(file){const box=$('#rsConfirm');RS_PENDING=null;if(!file||!box)return;
+  let b=null;try{b=JSON.parse(await file.text())}catch(e){}
+  if(!b||b.format!=='jdd-backup/1'||!Array.isArray(b.projects)){box.innerHTML='<p class="note bad" style="margin:8px 0 0">That file isn’t a SITREP backup. Use the file from “Download a full backup”.</p>';return}
+  RS_PENDING=b;const n=b.projects.filter(e=>e&&e.id).length,when=b.exportedAt?new Date(b.exportedAt).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}):'an unknown date';
+  const parts=[plural(n,'project'),plural((b.clients||[]).length,'client'),plural((b.invoices||[]).length,'invoice')];if(Array.isArray(b.contracts))parts.push(plural(b.contracts.length,'contract'));
+  box.innerHTML=`<div class="banner" style="margin-top:10px"><span>Load the backup from <b>${esc(when)}</b>: ${parts.join(', ')} and your settings? This replaces the clients, invoices, contracts, service, library and settings in the app now. Projects in the backup replace ones with the same ID; other projects stay.</span><span class="actions"><button class="btn" data-act="restoreCancel">Cancel</button><button class="btn primary" data-act="restoreGo">Replace with backup</button></span></div>`}
+function restoreApply(b){const J=x=>JSON.stringify(x),meta={};
+  if(b.settings)meta.settings=J(b.settings);if(Array.isArray(b.clients))meta.clients=J(b.clients);if(Array.isArray(b.invoices))meta.invoices=J(b.invoices);if(Array.isArray(b.contracts))meta.contracts=J(b.contracts);
+  if(b.service)meta.service=J(b.service);if(Array.isArray(b.registers))meta['registers-0']=J(b.registers);if(Array.isArray(b.inventory))meta['inventory-0']=J(b.inventory);if(b.library)meta.library=J(b.library);
+  const list=b.projects.filter(e=>e&&e.id),ids=list.map(e=>e.id);meta.index=J({order:ids,cur:ids[0]});
+  applyCloud(meta,list.map(e=>[e.id,J(e)]));
+  saveProjects();saveRegisters();saveInventory();saveSettings();saveContracts();renderBrand();
+  CLOUD.last={};if(CLOUD.ready)cloudFlush();
+  return ids.length}
+
 /* ---------- business settings ---------- */
 /* ---------- color theme: SITREP (default) or Hands Free Help (lime, gray, black) ---------- */
 const PALETTES=[{id:'sitrep',name:'SITREP',sw:['#14252A','#0B7A83','#F2B11B']},{id:'hfh',name:'Hands Free Help',sw:['#9CCB19','#111210','#A9ACA6']},{id:'cable',name:'Cabling',sw:['#0D2B52','#F07A1A','#F5C400','#1D6FD6','#2E9B45']}];
@@ -8689,7 +8706,7 @@ R.settings=function(){
    <div class="panel"><div class="ph"><h2>Saving and backup</h2></div><div class="fields">
     <div class="kv"><span>Status</span><b id="syncTxt">${esc(CLOUD.state||'Saved in this browser')}</b><span>Projects</span><b>${PJ.list.length}</b><span>Clients</span><b>${S.clients.length}</b><span>Invoices</span><b>${S.invoices.length}</b><span>Registers</span><b>${S.registers.length}</b><span>Inventory items</span><b>${S.inventory.length}</b></div>
     <p class="note">${DBX?'Everything saves to this app automatically, so it opens the same on your phone, tablet or another computer. Floor plan images stay in the browser that uploaded them.':'Saving to the app needs you to be signed in to claude.ai. Until then, work stays in this browser.'}</p>
-    <div class="actions"><button class="btn" data-act="backupAll">Download a full backup (JSON)</button></div>
+    <div class="actions"><button class="btn" data-act="backupAll">Download a full backup (JSON)</button><label class="btn filebtn">Restore from a backup<input type="file" id="restoreFile" accept="application/json,.json" aria-label="Restore from a backup file"></label></div><div id="rsConfirm" aria-live="polite"></div>
    </div></div>
    <div class="panel"><div class="ph"><h2>AI assistant</h2>${SAMPLE?'<span class="aibadge">ON</span>':''}</div><div class="fields">
     <p class="note" style="margin:0">${SAMPLE?'The assistant reads and edits your open project: it can draft a room from a description, wire it, arrange the rack, check the design and write the scope of work. The first time, you’ll be asked to allow it.':'The AI assistant isn’t available in this view. Open the app signed in to claude.ai to use it. Until then the assistant gives scripted answers.'}</p>
@@ -8921,11 +8938,15 @@ Object.assign(A,{
     S.photos=S.photos.filter(x=>x!==p);saveProjects();R.field();try{if(ASSETS)await ASSETS.delete(p.asset)}catch(e){}toast('Photo deleted.')},
   sowAI(el){sowAI(el)},
   backupAll(){backupAll()},
+  restoreCancel(){RS_PENDING=null;const b=$('#rsConfirm');if(b)b.innerHTML='';const f=$('#restoreFile');if(f)f.value=''},
+  restoreGo(){const b=RS_PENDING;if(!b)return;RS_PENDING=null;let n=0;try{n=restoreApply(b)}catch(e){toast('Couldn’t restore that backup. Nothing was changed on the server.');return}
+    go('settings');toast(`Restored ${plural(n,'project')}, ${plural(S.clients.length,'client')} and ${plural(S.invoices.length,'invoice')} from the backup.`)},
   logoReset(){SETTINGS.logo='';saveSettings();renderBrand();S.liveSet=null;R.settings();toast('Back to the original logo.')}
 });
 document.addEventListener('change',e=>{const t=e.target;
   if(t.dataset&&t.dataset.set){onSettingChange(t);return}
   if(t.id==='logoFile'){setLogo(t.files&&t.files[0]);return}
+  if(t.id==='restoreFile'){restorePick(t.files&&t.files[0]);return}
   if(t.id==='photoFile'){addPhoto(t.files&&t.files[0]);t.value='';return}
   if(t.id==='fWho'){S.ui.fwho=t.value;return}});
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.set==='name'&&!t.value.trim())return;if(t.dataset&&t.dataset.set&&t.tagName==='INPUT'&&t.type!=='number'&&t.type!=='email')onSettingChange(t)});
