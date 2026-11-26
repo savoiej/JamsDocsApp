@@ -1087,6 +1087,12 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .svgo{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}.svgo .btn{min-height:44px}
 .svrooms{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--line)}.svrooms .chip{cursor:pointer;border:0}
 .svnext{display:flex;flex-direction:column;gap:8px;padding-top:0}
+/* library check + port templates */
+.libcheck{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 0 12px}
+.libcheck .l{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:4px}
+.libcheck .chip{cursor:pointer;border:0;font:inherit;font-size:13px}
+.libcheck .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pttab td{vertical-align:middle}.pttab .ptprev{font-size:13px;max-width:360px}
 .attnbtn{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%}
 @media (hover:hover){.attnbtn:hover b{text-decoration:underline}}
 .attnbtn:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
@@ -4499,10 +4505,46 @@ const matOnly=p=>!placeable(p)&&!isMod(p)&&!p.ctype&&!['Cable','Rack','Patch pan
 /* imported price lists, read back from the products themselves */
 function priceLists(){const m=new Map();lib.forEach(p=>{if(!p.list)return;const k=p.mfr+'|'+p.list.name;const o=m.get(k)||{brand:p.mfr,name:p.list.name,at:p.list.at,n:0,photos:0};o.n++;if(pImg(p))o.photos++;if(srNeeds(p))o.need=(o.need||0)+1;if(p.list.at>o.at)o.at=p.list.at;m.set(k,o)});
   return [...m.values()].sort((a,b)=>b.at.localeCompare(a.at)||a.brand.localeCompare(b.brand))}
+/* ---------- port templates: give every port-less product in a category the same ports in one go ----------
+   A category's template is either a suggested set (below, in the same style as the built-in products)
+   or a copy of the ports of a product in that category that already has them. */
+const PORT_TPL={Display:['hdmi:HDMI 1|hdmi:HDMI 2|ctrl:RS-232|net:LAN',''],Projector:['hdmi:HDMI|ctrl:RS-232|net:LAN',''],Speaker:['audio:Speaker in',''],
+ Amplifier:['audio:Input 1|audio:Input 2|net:LAN','audio:Out 1|audio:Out 2'],DSP:['audio:In 1|audio:In 2|audio:In 3|audio:In 4|net:LAN','audio:Out 1|audio:Out 2|audio:Out 3|audio:Out 4'],
+ Microphone:['net:PoE+','audio:Dante out'],Camera:['net:PoE',''],Switcher:['hdmi:HDMI 1|hdmi:HDMI 2|hdmi:HDMI 3|hdmi:HDMI 4|ctrl:RS-232|net:LAN','hdmi:HDMI Out'],
+ Extender:['hdmi:HDMI In','net:HDBT Out'],Source:['net:LAN','hdmi:HDMI'],Control:['net:LAN','ctrl:COM 1|ctrl:IR 1|ctrl:Relay 1'],
+ Network:['net:Uplink','net:Port 1|net:Port 2|net:Port 3|net:Port 4|net:Port 5|net:Port 6|net:Port 7|net:Port 8'],'Wall plate':['','hdmi:HDMI'],Soundbar:['hdmi:HDMI|usb:USB|net:LAN',''],
+ Lighting:['ctrl:Lighting bus',''],Shade:['ctrl:Shade bus',''],Climate:['net:Wi-Fi',''],Doorbell:['net:PoE',''],Lock:['ctrl:Wireless',''],Sensor:['ctrl:Wireless',''],
+ Security:['net:LAN|ctrl:Wireless',''],Telephony:['net:LAN','']};
+function ptDonors(cat){return lib.filter(p=>p.cat===cat&&placeable(p)&&!isMod(p)&&!p.ctype&&!slotsOf(p).length).sort((a,b)=>(a.mfr+' '+a.model).localeCompare(b.mfr+' '+b.model))}
+function ptChoice(cat){const m=SETTINGS.portTpl||{},v=m[cat];if(v==='none'||v==='preset'&&PORT_TPL[cat])return v;if(v&&v.startsWith('p:')&&byId(v.slice(2))&&placeable(byId(v.slice(2))))return v;
+  if(PORT_TPL[cat])return 'preset';const d=ptDonors(cat);return d.length?'p:'+d[0].id:'none'}
+function ptPorts(cat,ch){ch=ch||ptChoice(cat);if(ch==='preset'&&PORT_TPL[cat])return {ins:ports(PORT_TPL[cat][0]),outs:ports(PORT_TPL[cat][1])};
+  if(ch&&ch.startsWith('p:')){const p=byId(ch.slice(2));if(p)return {ins:p.ins.map(x=>({...x})),outs:p.outs.map(x=>({...x}))}}return null}
+function ptSummary(t){if(!t)return '';const c=(arr,side)=>{const m=new Map();arr.forEach(x=>m.set(x.t,(m.get(x.t)||0)+1));return [...m].map(([k,n])=>`${n}× ${(SIG[k]||{}).short||k} ${side}`)};return [...c(t.ins,'in'),...c(t.outs,'out')].join(', ')}
+function ptRows(){const m=new Map();lib.filter(matOnly).forEach(p=>m.set(p.cat,(m.get(p.cat)||0)+1));return [...m].sort((a,b)=>b[1]-a[1])}
+function ptApply(cats){const undo=[];let n=0;
+  cats.forEach(cat=>{const t=ptPorts(cat);if(!t||!(t.ins.length+t.outs.length))return;
+    lib.filter(p=>p.cat===cat&&matOnly(p)).forEach(p=>{undo.push({id:p.id,ins:p.ins,outs:p.outs});p.ins=t.ins.map(x=>({...x}));p.outs=t.outs.map(x=>({...x}));n++})});
+  if(n){S.ptUndo=undo;save();badges()}return n}
+function ptPanelHTML(){const rows=ptRows();
+  return `<div class="panel" id="ptPanel"><div class="ph" style="flex-wrap:wrap"><h2>Port templates</h2><span class="muted" style="font-size:12px">Give every product without ports in a category the same ports, then fine-tune any one from Edit</span><span class="tgrow"></span>
+    ${S.ptUndo&&S.ptUndo.length?`<button class="btn" data-act="ptUndo">Undo last (${S.ptUndo.length})</button>`:''}${rows.length?`<button class="btn primary" data-act="ptAll">Apply to all ${plural(rows.reduce((a,[,n])=>a+n,0),'product')}</button>`:''}<button class="btn" data-act="ptClose">Close</button></div>
+   ${rows.length?`<div class="scroll"><table class="t pttab"><thead><tr><th>Category</th><th class="n">Without ports</th><th>Template</th><th>Ports it gives</th><th></th></tr></thead><tbody>
+    ${rows.map(([cat,n])=>{const ch=ptChoice(cat),donors=ptDonors(cat),t=ptPorts(cat,ch);
+      return `<tr><td><span class="catchip">${esc(cat)}</span></td><td class="n">${n}</td>
+       <td><select class="inp" data-ptcat="${esc(cat)}" aria-label="Port template for ${esc(cat)}" style="max-width:300px">${PORT_TPL[cat]?`<option value="preset"${ch==='preset'?' selected':''}>Suggested ${esc(cat.toLowerCase())} ports</option>`:''}${donors.length?`<optgroup label="Copy the ports of">${donors.slice(0,40).map(p=>`<option value="p:${esc(p.id)}"${ch==='p:'+p.id?' selected':''}>${esc(p.mfr)} ${esc(p.model)}</option>`).join('')}</optgroup>`:''}<option value="none"${ch==='none'?' selected':''}>Leave without ports</option></select></td>
+       <td class="ptprev">${t&&(t.ins.length+t.outs.length)?esc(ptSummary(t)):'<span class="muted">No template for this category. Build one product’s ports, then copy them.</span>'}</td>
+       <td>${t&&(t.ins.length+t.outs.length)?`<button class="btn sm" data-act="ptOne" data-cat="${esc(cat)}">Apply to ${n}</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`
+    :'<div class="pb"><p class="muted" style="margin:0">Every device in your library has ports.</p></div>'}</div>`}
+/* ---------- library check: what needs fixing, each count filters the table ---------- */
+const LIBFIX={ports:['without ports',p=>matOnly(p)],cost:['without a dealer cost',p=>!(+p.cost>0)&&!['Rack','Accessory'].includes(p.cat)&&!p.ctype],twins:['with the same name as another',p=>nameTwins(p).length>0],cat:['in “Other”',p=>!p.cat||p.cat==='Other']};
+function libCheckHTML(){const c=Object.entries(LIBFIX).map(([k,[l,fn]])=>[k,l,lib.filter(fn).length]).filter(x=>x[2]>0);if(!c.length&&!S.ui.libFix)return '';
+  return `<div class="libcheck" role="group" aria-label="Library check"><span class="l">Library check</span>${c.map(([k,l,n])=>`<button class="chip${S.ui.libFix===k?' Active':' Medium'}" data-act="libFix" data-k="${k}" aria-pressed="${S.ui.libFix===k}">${n} ${esc(l)}</button>`).join('')}${S.ui.libFix?'<button class="lnk" data-act="libFix" data-k="">Show all</button>':''}</div>`}
 R.library=function(){
   const brands=[...new Set(lib.map(p=>p.mfr))].sort((a,b)=>a.localeCompare(b));if(libBrand!=='All'&&!brands.includes(libBrand))libBrand='All';
   const inBrand=lib.filter(p=>libBrand==='All'||p.mfr===libBrand),cats=['All',...new Set(inBrand.map(p=>p.cat))];if(!cats.includes(libCat))libCat='All';
-  const ql=libQ.toLowerCase(),items=inBrand.filter(p=>(libCat==='All'||p.cat===libCat)&&(!ql||(p.mfr+' '+p.model+' '+p.desc+' '+p.cat).toLowerCase().includes(ql)));
+  const fx=LIBFIX[S.ui.libFix]&&LIBFIX[S.ui.libFix][1];
+  const ql=libQ.toLowerCase(),items=inBrand.filter(p=>(!fx||fx(p))&&(libCat==='All'||p.cat===libCat)&&(!ql||(p.mfr+' '+p.model+' '+p.desc+' '+p.cat).toLowerCase().includes(ql)));
   const shown=items.slice(0,libLim),cards=S.ui.libView==='cards',pls=priceLists();
   const portsCell=p=>isMod(p)?`${[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')}<span class="muted mono" style="font-size:11px">${portCount(p)} ports · fits ${esc(p.fits)}</span>`
     :placeable(p)?(slotsOf(p).length?`<span class="chip Sent" title="${esc(slotsOf(p).map(x=>x.n).join(', '))}">${plural(slotsOf(p).length,'slot')}</span> `:'')+[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')+`<span class="muted mono" style="font-size:11px">${p.ins.length} in · ${p.outs.length} out</span>`
@@ -4522,9 +4564,11 @@ R.library=function(){
   $('#v-library').innerHTML=`
   <header class="vh"><div><p class="eyebrow">My library · ${lib.length} products · ${brands.length} brands</p><h1>Equipment library</h1>
    <p class="sub">Every device carries its photos, ports, rack space, power, dealer cost and install labor, so drawings, the bill of materials and proposals stay in sync.</p></div>
-   <div class="actions"><button class="btn primary money" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="srOpenA">Ports from spec sheets</button><button class="btn" data-act="newBlockLib">Build a custom device</button></div></header>
+   <div class="actions"><button class="btn primary money" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="ptOpen">Port templates</button><button class="btn" data-act="srOpenA">Ports from spec sheets</button><button class="btn" data-act="newBlockLib">Build a custom device</button></div></header>
   <input type="file" id="srOne" hidden accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Spec sheet for this product">
   ${canPrice()&&(S.pl||S.plOpen)?plPanelHTML():''}
+  ${libCheckHTML()}
+  ${S.ui.ptOpen?ptPanelHTML():''}
   ${S.sr&&S.sr.open?srPanelHTML():''}
   ${pls.length&&canPrice()?`<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Price lists</h2><span class="muted" style="font-size:12px">Import a newer list from the same brand to update its prices</span><span class="tgrow"></span><label class="field inl" for="pDays">Flag lists older than<select class="inp" id="pDays" style="width:auto">${[30,60,90,180,365].map(d=>`<option value="${d}" ${priceDays()===d?'selected':''}>${d} days</option>`).join('')}</select></label></div>
    ${(()=>{const st=pls.filter(l=>ageDays(l.at)>priceDays());return st.length?`<div class="pb" style="padding-bottom:0"><div class="banner" style="margin:0"><span><b>${esc(st.length===1?st[0].brand:`${st[0].brand} and ${plural(st.length-1,'other brand')}`)}: prices over ${priceDays()} days old.</b> Ask for current lists and import them; open proposals using them show a warning.</span></div></div>`:''})()}<div class="scroll"><table class="t"><thead><tr><th>Brand</th><th>List</th><th>Imported</th><th class="n">Products</th><th class="n">With photos</th><th class="n">Need ports</th><th></th></tr></thead><tbody>
@@ -7015,6 +7059,7 @@ function npSync(first){const ty=pjTypeOf($('#npY').value),sv=npSvcs(),b=$('#npB'
     const L=(S.contracts||[]).filter(ctLive),mine=L.filter(c=>String(c.client).toLowerCase()===cl),rest=L.filter(c=>!mine.includes(c));
     cs.innerHTML=(mine.length||rest.length?'':'<option value="">No active contracts yet</option>')+[...mine,...rest].map(c=>`<option value="${c.id}"${c.id===cur?' selected':''}>${esc(c.client)} · ${esc(c.title||c.no)}</option>`).join('')}}
 document.addEventListener('change',e=>{const t=e.target;if(!t)return;
+  if(t.dataset&&t.dataset.ptcat!=null){SETTINGS.portTpl={...(SETTINGS.portTpl||{}),[t.dataset.ptcat]:t.value};saveSettings();R.library();return}
   if(t.id==='npY'){const ty=pjTypeOf(t.value);document.querySelectorAll('[data-npsvc]').forEach(x=>{x.checked=ty.svc.includes(x.dataset.npsvc)});$('#npB').value=ty.bill;npSync('type');return}
   if(t.dataset&&t.dataset.npsvc!=null||t.id==='npB'){npSync();return}});
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='npC'&&$('#npCt'))npSync()});
@@ -7187,6 +7232,12 @@ const A={
   wireFrom(el){startWire(parseEp(el.dataset.ep))},
   cancelWire(){S.wire=null;renderCanvas();renderInspector()},
   rmExtra(el){mut(()=>S.design.extras=S.design.extras.filter(e=>e.pid!==el.dataset.pid));refreshDesign()},
+  ptOpen(){S.ui.ptOpen=true;R.library();requestAnimationFrame(()=>{const el=$('#ptPanel');if(el)el.scrollIntoView({block:'start',behavior:'smooth'})})},
+  ptClose(){S.ui.ptOpen=false;R.library()},
+  ptOne(el){const cat=el.dataset.cat,n=ptApply([cat]);R.library();toast(n?`${plural(n,cat.toLowerCase()+' product')} now ${n===1?'has':'have'} ports and can go on the signal flow.`:'Nothing to change.')},
+  ptAll(){const cats=ptRows().map(([c])=>c),n=ptApply(cats);R.library();toast(n?`${plural(n,'product')} now ${n===1?'has':'have'} ports. Categories set to “Leave without ports” were skipped.`:'No templates to apply. Pick one per category first.')},
+  ptUndo(){const u=S.ptUndo||[];u.forEach(x=>{const p=byId(x.id);if(p){p.ins=x.ins;p.outs=x.outs}});S.ptUndo=null;save();badges();R.library();toast(`Undone: ${plural(u.length,'product')} back to no ports.`)},
+  libFix(el){S.ui.libFix=el.dataset.k||'';libLim=200;R.library()},
   srOpenA(){srOpen();R.library();requestAnimationFrame(()=>{const el=$('#srPanel');if(el)el.scrollIntoView({block:'start',behavior:'smooth'})})},
   srClose(){if(!S.sr||S.sr.busy)return;S.sr.open=false;S.sr.items=[];R.library()},
   srStart(){srRun()},
