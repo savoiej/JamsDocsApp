@@ -16,9 +16,7 @@ AV design, proposals, projects, service contracts, time & invoicing and network 
 
 | Path | What it is | Published at |
 |---|---|---|
-| `apps/jamsnet/index.html` | **SITREP**, the combined app. Network docs run inside it (the SITREP code is embedded in a `<script type="text/plain" id="nlsrc">` block and loaded in a frame). | https://claude.ai/artifact/1du4BSTFvnCX4tamvmsKuG |
-| `apps/netline/index.html` | **SITREP**, the standalone network-documentation app (hosted product, plans and modules per customer). Also the source of the network docs embedded in SITREP. | https://claude.ai/artifact/HTnSSukvAoNNfVikhxhhqs |
-| `apps/jams-docs-and-designs/index.html` | The original AV design app (before SITREP). | https://claude.ai/artifact/XqWiKrqY6AnbRVYwFpFqmw |
+| `web/jamsnet/index.html` | **SITREP**, the one app file: AV design, proposals, projects, service, billing and network docs. Served at `/app`. The network module is embedded in it (`<script type="text/plain" id="nlsrc">`) and is also served on its own as the **Client App** at `/client`. | https://app.jamsdocsanddesigns.com/app |
 | `site/index.html` | Marketing website for Jams Docs and Designs. | — |
 | `assets/logo.png` | Company logo. | — |
 | `tests/` | Browser checks (Playwright) for SITREP. | — |
@@ -43,9 +41,13 @@ python3 tests/crawl2.py   # same for every network docs page
 
 The checks open the page offline and stand in for the claude.ai database with an in-memory one (`tests/harness.py`).
 
-## Updating network docs inside SITREP
+## One app file
 
-Edit `apps/netline/index.html`, then copy it into SITREP's `nlsrc` block with `SITREP` renamed to `SITREP` and `<script`, `</script` and `<!--` escaped as `<\script`, `<\/script`, `<\!--`.
+Everything lives in `web/jamsnet/index.html`; there are no other copies to keep in step.
+
+- **Network docs / Client App:** edit them inside SITREP's `nlsrc` block. In that block `<script`, `</script` and `<!--` are written `<\script`, `<\/script`, `<\!--`. `/client` unpacks the same block on each request (`networkModule()` in `web/lib/app-page.ts`), so a change there shows up in both SITREP and the Client App.
+- **Jams Operations ver1** was merged into SITREP on Nov 25, 2026. `/operations` and `/jamsos` now open `/app`. Its few saved rows stay in Supabase under `jamsos/`, untouched. To move work between copies, use Business settings → Download a full backup, then Restore from a backup.
+- The older claude.ai artifact copies (`apps/jamsnet`, `apps/netline`, `apps/jams-docs-and-designs`) were removed from the repo; git history still has them.
 
 Contact: Jamie@jamsdocsanddesigns.com · 808-636-8720
 
@@ -59,4 +61,3 @@ Every kind of record the app saves also lands in its own table with one column p
 - If a record can't be copied, the save still succeeds and the problem is logged in `private.sync_errors`.
 - Same access rules as the app: approved team members can read them; plan and customer-account tables are admin-only.
 - To add a field, edit `supabase/tools/gen_typed_tables.py`, regenerate with `python3 supabase/tools/gen_typed_tables.py <store.json> > supabase/migrations/<new>.sql`, and apply.
-
