@@ -798,11 +798,39 @@ tr.freerow td{color:var(--muted)}
 @media (max-width:760px){.ftask{grid-template-columns:minmax(0,1fr)}.ftask .actions{justify-content:flex-start!important}.clock .big{font-size:40px}}
 /* ===== client workspace ===== */
 .crm.one{grid-template-columns:minmax(0,1fr);grid-template-areas:"list"}
-.cwtabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin}
-.cwtabs button{all:unset;cursor:pointer;padding:9px 12px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
-.cwtabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
-.cwtabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-.cwtabs .badge{font:500 11px var(--f-mono);background:var(--sunk);color:var(--fg);border-radius:10px;padding:0 7px}
+/* client page: header, KPI cards that open their section, grouped tab menu */
+.cwcrumb{margin:0 0 6px}.cwcrumb .lnk{font-size:13px;font-weight:500}
+.cwhead{display:grid;grid-template-columns:auto 1fr auto;gap:6px 16px;align-items:center}
+.cwav{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font:700 20px/1 var(--f-head,var(--f-display));letter-spacing:.02em}
+.cwid{min-width:0}
+.cwtitle{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cwtitle h1{margin:0;font-family:var(--f-head,var(--f-display));font-weight:700;font-size:clamp(26px,2.4vw,34px);line-height:1.05;letter-spacing:-.02em;overflow-wrap:anywhere}
+.cwmeta{margin:4px 0 0;color:var(--muted);font-size:13px}
+.cwcontact{margin:2px 0 0;font-size:13px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.cwcontact i{font-style:normal;color:var(--muted)}.cwcontact a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+@media (hover:hover){.cwcontact a:hover{border-bottom-color:var(--accent)}}
+.cwact{align-self:start;justify-content:flex-end}.cwact a.btn{color:inherit;text-decoration:none}
+.cwkpis{margin-top:4px}
+.cwk{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:2px;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card,8px);padding:14px 16px;transition:border-color .15s,box-shadow .15s}
+.cwk .v{font-size:30px!important;margin-top:4px}
+@media (hover:hover){.cwk:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(0,0,0,.05)}}
+.cwk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cwtabs{display:flex;align-items:center;gap:2px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;box-shadow:inset 0 -1px var(--line);margin-top:6px}
+.cwtabs::-webkit-scrollbar{display:none}
+.cwgrp{display:flex;gap:2px;flex:none}
+.cwsep{flex:none;width:1px;height:18px;background:var(--line);margin:0 8px}
+.cwtabs button{all:unset;cursor:pointer;padding:11px 12px 10px;font-weight:500;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;display:inline-flex;gap:6px;align-items:center;transition:color .15s}
+@media (hover:hover){.cwtabs button:hover{color:var(--fg)}}
+.cwtabs button[aria-selected="true"]{color:var(--fg);font-weight:600;border-bottom-color:var(--accent)}
+.cwtabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:4px}
+.cwtabs .badge{font:600 11px/18px var(--f-ui,var(--f-mono));min-width:18px;text-align:center;background:var(--sunk);color:var(--fg);border-radius:9px;padding:0 6px;box-sizing:border-box}
+.cwtabs .badge.bad{background:var(--bad-soft);color:var(--bad)}
+.cwtabs button[aria-selected="true"] .badge{background:var(--accent-soft);color:var(--accent-ink,var(--accent))}
+@media (max-width:760px){
+ .cwhead{grid-template-columns:auto 1fr;align-items:start}.cwav{width:44px;height:44px;border-radius:12px;font-size:16px}
+ .cwact{grid-column:1/-1;justify-content:flex-start}
+ .cwkpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}.cwk .v{font-size:24px!important}.cwk:last-child:nth-child(odd){grid-column:1/-1}
+ .cwsep{margin:0 4px}}
 .cwlist{list-style:none;margin:0;padding:0}
 .cwlist li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;flex-wrap:wrap}
 .cwlist li:last-child{border-bottom:0}
@@ -6421,7 +6449,9 @@ Object.assign(A,{
 });
 
 /* ================= CLIENT WORKSPACE: one page per client with everything about them, plus a client portal ================= */
-const CW_TABS=[['overview','Overview'],['projects','Projects'],['invoices','Invoices'],['assets','Equipment'],['docs','Drawings & photos'],['service','Service'],['history','Notes & history'],['details','Contacts & details'],['portal','Client portal']];
+const CW_TABS=[['overview','Overview'],['projects','Projects'],['docs','Drawings'],['assets','Equipment'],['service','Service'],['invoices','Invoices'],['details','Contacts'],['history','Notes'],['portal','Portal']];
+/* tab groups for the client menu: overview · the work · money · people and records */
+const CW_GROUPS=[['overview'],['projects','docs','assets','service'],['invoices'],['details','history','portal']];
 function tagsFor(d){const m={};(d.nodes||[]).forEach(n=>{m[n.uid]=n.tag||(byId(n.pid)?autoTag(n,(d.nodes||[]).filter(x=>byId(x.pid))):'?')});return m}
 /* every project for a client, with its design, tasks, time, photos and price, whether open or parked */
 function cwProjects(c){
@@ -6448,22 +6478,36 @@ function cwTimeline(c,list){const yr=new Date().getFullYear(),now=Date.now(),ite
 const CW_KIND={note:'Note',invoice:'Invoice',payment:'Payment',project:'Project',time:'Time',photo:'Photo'};
 function cwThumb(sh,pj,i){return `<button class="dthumb" data-act="cwSheet" data-pj="${esc(pj)}" data-i="${i}" aria-label="Open sheet ${esc(sh.dwg)} ${esc(sh.title)}">${sh.svg!=null?`<svg viewBox="0 0 ${SW} ${SH}" aria-hidden="true">${snapDefs()}${sh.svg}</svg>`:`<span class="dtdoc" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>`}<span class="dtl"><span class="mono">${esc(sh.dwg)}</span><b>${esc(sh.title)}</b>${sh.sum?`<small>${esc(sh.sum)}</small>`:''}</span></button>`}
 
+/* client tab menu: left/right arrows, Home and End move between tabs */
+document.addEventListener('keydown',e=>{const t=e.target;if(!t.closest||!t.closest('.cwtabs')||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  const tabs=[...document.querySelectorAll('.cwtabs [role=tab]')],i=tabs.indexOf(t);if(i<0)return;e.preventDefault();
+  const n=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;A.cwTab(tabs[n])});
 function renderCW(c){
   const tab=S.ui.cwTab||'overview',list=cwProjects(c),inv=clientInvoices(c),pc=primaryOf(c),tickets=S.tickets.filter(t=>String(t.site).toLowerCase().startsWith(c.name.toLowerCase())),ags=S.agreements.filter(a=>sameName(a.client,c.name));
   const signed=list.filter(P=>P.prop.status==='Signed').reduce((s,P)=>s+(P.q?P.q.total:0),0)+S.pipeline.filter(r=>sameName(r.client,c.name)&&r.status==='Signed').reduce((s,r)=>s+r.value,0);
   const open=list.filter(P=>['Draft','Sent','Viewed','Change order'].includes(P.prop.status)).reduce((s,P)=>s+(P.q?P.q.total:0),0);
   const owed=clientBalance(c),over=inv.filter(v=>invStatus(v)==='Overdue'),assets=cwAssets(c,list),openT=tickets.filter(t=>t.col!=='Completed');
   const paid=r2(inv.reduce((s,v)=>s+(v.payments||[]).reduce((a,p)=>a+(+p.amount||0),0),0));
-  const head=`<header class="vh"><div><p class="eyebrow"><button class="lnk" data-act="cwBack" style="font:inherit;letter-spacing:inherit;text-transform:inherit">← All clients</button> · ${esc(c.type)} · client since ${esc(c.created)}</p><h1>${esc(c.name)} ${chip(c.status)}</h1>
-     <p class="sub">${[pc?`${pc.name}${pc.title?', '+pc.title:''}`:'',c.address,pc&&pc.phone||c.phone].filter(Boolean).map(esc).join(' · ')||'No contact details yet'}</p></div>
-    <div class="actions">${pc&&pc.email?`<a class="btn" href="mailto:${esc(pc.email)}">Email ${esc(pc.name.split(' ')[0])}</a>`:''}<button class="btn" data-act="newInvoice" data-client="${c.id}">+ Invoice</button><button class="btn primary" data-act="clientProject" data-id="${c.id}">+ New project</button></div></header>
-   <div class="kpis">
-    <div class="panel kpi"><div class="l">Signed work</div><div class="v">${money(signed)}</div><div class="s">${plural(list.length,'project')} in the app</div></div>
-    <div class="panel kpi"><div class="l">Open proposals</div><div class="v">${money(open)}</div><div class="s">Not yet signed</div></div>
-    <div class="panel kpi"><div class="l">Owed to you</div><div class="v ${over.length?'bad':''}">${money(owed)}</div><div class="s">${over.length?plural(over.length,'invoice')+' overdue':`${money(paid)} paid to date`}</div></div>
-    <div class="panel kpi"><div class="l">Equipment</div><div class="v">${assets.length}</div><div class="s">${assets.filter(a=>a.serial).length} with serials</div></div>
-    <div class="panel kpi"><div class="l">Service</div><div class="v">${openT.length}</div><div class="s">${ags.length?esc(ags[0].plan.split('·')[0].trim())+' plan':'open tickets'}</div></div></div>
-   <div class="cwtabs" role="tablist" aria-label="Client sections">${CW_TABS.map(([k,l])=>`<button role="tab" data-act="cwTab" data-t="${k}" aria-selected="${tab===k}">${l}${k==='invoices'&&inv.length?` <span class="badge">${inv.length}</span>`:k==='projects'&&list.length?` <span class="badge">${list.length}</span>`:k==='service'&&openT.length?` <span class="badge">${openT.length}</span>`:''}</button>`).join('')}</div>`;
+  const ini=String(c.name||'?').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
+  const contact=[pc?`<span><b>${esc(pc.name)}</b>${pc.title?`, ${esc(pc.title)}`:''}</span>`:'',pc&&pc.email?`<a href="mailto:${esc(pc.email)}">${esc(pc.email)}</a>`:'',(pc&&pc.phone||c.phone)?`<a href="tel:${esc(pc&&pc.phone||c.phone)}">${esc(pc&&pc.phone||c.phone)}</a>`:'',c.address?`<span>${esc(c.address)}</span>`:''].filter(Boolean);
+  const msgN=0,cnt={projects:list.length,invoices:inv.length,assets:assets.length,service:openT.length,messages:msgN},lbl=Object.fromEntries(CW_TABS);
+  const tabBtn=k=>`<button role="tab" data-act="cwTab" data-t="${k}" aria-selected="${tab===k}"${tab===k?' tabindex="0"':' tabindex="-1"'}>${lbl[k]}${cnt[k]?` <span class="badge${k==='messages'||(k==='service'&&openT.some(t=>t.pri==='High'))?' bad':''}">${cnt[k]}</span>`:''}</button>`;
+  const kpi=(t,l,v,sub,cls='')=>`<button class="panel kpi cwk" data-act="cwTab" data-t="${t}" aria-label="${esc(l)}: ${esc(String(v))}. Open ${esc(lbl[t]||t)}"><span class="l">${l}</span><span class="v ${cls}">${v}</span><span class="s">${sub}</span></button>`;
+  const head=`<nav class="cwcrumb" aria-label="Breadcrumb"><button class="lnk" data-act="cwBack">← All clients</button></nav>
+   <header class="cwhead">
+    <span class="cwav" aria-hidden="true">${esc(ini)}</span>
+    <div class="cwid"><div class="cwtitle"><h1>${esc(c.name)}</h1>${chip(c.status)}</div>
+     <p class="cwmeta">${esc(c.type)} client · since ${esc(c.created)}${list.length?` · ${plural(list.length,'project')}`:''}</p>
+     <p class="cwcontact">${contact.length?contact.join('<i aria-hidden="true">·</i>'):`<span class="muted">No contact on file.</span> <button class="lnk" data-act="cwTab" data-t="details">Add a contact</button>`}</p></div>
+    <div class="actions cwact">${pc&&pc.email?`<a class="btn" href="mailto:${esc(pc.email)}" target="_blank" rel="noopener">Email ${esc(pc.name.split(' ')[0])}</a>`:''}<button class="btn" data-act="newInvoice" data-client="${c.id}">+ Invoice</button><button class="btn primary" data-act="clientProject" data-id="${c.id}">+ New project</button></div>
+   </header>
+   <div class="kpis cwkpis">
+    ${kpi('projects','Signed work',money(signed),`${plural(list.length,'project')} in the app`)}
+    ${kpi('projects','Open proposals',money(open),'Not yet signed')}
+    ${kpi('invoices','Owed to you',money(owed),over.length?plural(over.length,'invoice')+' overdue':`${money(paid)} paid to date`,over.length?'bad':'')}
+    ${kpi('assets','Equipment',assets.length,`${assets.filter(a=>a.serial).length} with serials`)}
+    ${kpi('service','Service',openT.length,ags.length?esc(ags[0].plan.split('·')[0].trim())+' plan':'open tickets')}</div>
+   <div class="cwtabs" role="tablist" aria-label="Client sections">${CW_GROUPS.map(g=>`<div class="cwgrp">${g.map(tabBtn).join('')}</div>`).join('<span class="cwsep" aria-hidden="true"></span>')}</div>`;
   let body='';
   if(tab==='overview'){
     const todo=[];
@@ -6566,7 +6610,7 @@ async function cwPortalDownload(c){
 async function cwAssetsCsv(c){const a=cwAssets(c);const csv=[['Project','Status','Tag','Label','Manufacturer','Model','Category','Location','Rack position','Asset tag','Serial number'],...a.map(x=>[x.project,x.status,x.tag,x.label,x.mfr,x.model,x.cat,x.loc,x.pos,x.asset,x.serial])].map(r=>r.map(csvCell).join(',')).join('\n');
   const r=await saveFile(new Blob([csv],{type:'text/csv'}),`${c.name} equipment ${isoDay(0)}.csv`.replace(/[\\/:*?"<>|]+/g,' '));toast(r==='saved'?'Equipment list ready.':r==='declined'?'Download cancelled.':'Another download is waiting for you to confirm.')}
 Object.assign(A,{
-  cwTab(el){S.ui.cwTab=el.dataset.t;R.clients()},
+  cwTab(el){S.ui.cwTab=el.dataset.t;R.clients();const t=document.querySelector(`.cwtabs [data-t="${el.dataset.t}"]`);if(t){t.scrollIntoView({block:'nearest',inline:'nearest'});if(el.closest&&el.closest('.cwtabs'))t.focus()}},
   cwBack(){S.ui.cpage=null;R.clients();window.scrollTo(0,0)},
   cwSheet(el){const c=clientById(S.ui.cpage);if(!c)return;const P=cwProjects(c).find(x=>x.e.id===el.dataset.pj);if(!P||!P.drawings)return;S.sv={set:P.drawings,i:+el.dataset.i};renderSheetViewer()},
   cwTicket(){const c=clientById(S.ui.cpage);if(!c)return;const issue=($('#cwIssue').value||'').trim(),room=($('#cwRoom').value||'').trim();if(!issue){toast('Describe the issue.');$('#cwIssue').focus();return}
