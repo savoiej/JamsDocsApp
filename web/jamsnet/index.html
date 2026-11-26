@@ -1074,6 +1074,19 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .pjnext{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:12px 16px 14px}
 .pjnext .l{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .pjnext .t{flex:1;min-width:200px;font-size:14px}
+/* as-built survey */
+.svpanel .fields{gap:12px}
+.svpick{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:10px 12px;border:1px solid var(--accent);border-radius:10px;background:var(--accent-soft)}
+.svpick .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}.svpick .muted{flex:1}
+.svhits{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.svhits button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:space-between;gap:10px;padding:11px 12px;border-bottom:1px solid var(--sunk);font-size:14px}
+.svhits button:last-child{border-bottom:0}
+@media (hover:hover){.svhits button:hover{background:var(--sunk)}}
+.svhits button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.svnew{display:flex;flex-direction:column;gap:10px}
+.svgo{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}.svgo .btn{min-height:44px}
+.svrooms{display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--line)}.svrooms .chip{cursor:pointer;border:0}
+.svnext{display:flex;flex-direction:column;gap:8px;padding-top:0}
 .attnbtn{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%}
 @media (hover:hover){.attnbtn:hover b{text-decoration:underline}}
 .attnbtn:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
@@ -5837,6 +5850,7 @@ function openClient(){
     :`<p class="note">Signed by <b>${esc(P.signer||'')}</b>. This proposal is locked.</p>`}
     ${P.closeout?`<div class="dsec"><div class="dsec-h"><b>As-built documentation · ${esc(dayFmtIso(P.closeout.at))}</b><span class="muted">Your installed system, as built</span></div>${sheetThumbs(P.closeout.set).replace(/data-act="viewSheet"/g,'data-act="viewAsBuilt"')}
      <details class="sowd"><summary>Equipment register · ${plural(P.closeout.reg.length,'device')}</summary><div class="scroll"><table class="t"><thead><tr><th>Tag</th><th>Equipment</th><th>Location</th><th>Serial</th><th>MAC</th><th>IP</th></tr></thead><tbody>${P.closeout.reg.map(r=>`<tr><td class="mono">${esc(r.tag)}</td><td>${esc(r.mfr)} ${esc(r.model)}</td><td>${esc(r.loc)}</td><td class="mono">${esc(r.serial)}</td><td class="mono">${esc(r.mac)}</td><td class="mono">${esc(r.ip)}</td></tr>`).join('')}</tbody></table></div></details>
+     ${Array.isArray(P.revs)&&P.revs.length?`<details class="sowd"><summary>Revision history · ${plural(P.revs.length,'revision')} · current rev ${esc(P.revs[P.revs.length-1].rev)}</summary>${revTableHTML(P.revs,true)}</details>`:''}
      <div class="actions"><button class="btn sm" data-act="coPdf">Download the closeout package</button></div></div>`:''}
    </div></div>`;
   ov.hidden=false;
@@ -6107,18 +6121,36 @@ async function svgToPng(markup,w,h,scale){
    At the end of a job: an as-built PDF (cover and readiness summary, equipment register with
    serials, MACs and IPs, cable test results, warranty and support, every drawing sheet marked
    AS-BUILT, and the install photos), and an as-built snapshot published to the client view. */
-function coSet(){const at=S.prop.attach,m6=S.design.meta6,pr=m6.price;S.prop.attach={};m6.price='none';try{const x=drawingSet();x.rev='AS-BUILT';return x}finally{S.prop.attach=at;m6.price=pr}}
+function coSet(){const at=S.prop.attach,m6=S.design.meta6,pr=m6.price;S.prop.attach={};m6.price='none';try{const x=drawingSet();x.rev='AS-BUILT · REV '+(S.design.meta.rev||'A');return x}finally{S.prop.attach=at;m6.price=pr}}
 function coRegister(){const tg=tags(),m=S.design.ipam||{},hosts=m.hosts||{},vl=new Map((m.vlans||[]).map(v=>[String(v.id),v]));
   return S.design.nodes.map(n=>{const p=prod(n),h=hosts[n.uid]||{},v=vl.get(String(h.vlan||''));return {uid:n.uid,tag:tg[n.uid]||'',mfr:p.mfr,model:p.model,desc:p.desc,loc:endLoc(n.uid)||'',serial:n.serial||'',mac:h.mac||'',ip:h.ip||'',vlan:v?`${v.id} ${v.name}`:'',host:h.host||'',inst:n.inst||null,net:netPortsOf(p).length>0}})
     .sort((a,b)=>String(a.tag).localeCompare(String(b.tag),undefined,{numeric:true}))}
 function coStats(){const r=coRegister(),cs=S.design.cables,ph=(S.photos||[]).filter(p=>p.asset);
   return {devs:r.length,inst:r.filter(x=>x.inst).length,serial:r.filter(x=>x.serial).length,net:r.filter(x=>x.net).length,mac:r.filter(x=>x.net&&x.mac).length,ip:r.filter(x=>x.net&&x.ip).length,
     cables:cs.length,tested:cs.filter(c=>c.status==='Tested').length,photos:ph.length,devPhotos:new Set(ph.filter(p=>p.uid).map(p=>p.uid)).size}}
+/* ---------- drawing-set revisions ---------- */
+function revList(){const P=S.prop;if(!Array.isArray(P.revs))P.revs=[];return P.revs}
+function revNext(){const R=revList(),last=R.length?String(R[R.length-1].rev):'';if(!last)return String(S.design.meta.rev||'A').toUpperCase()||'A';
+  const m=/^([A-Y])$/.exec(last);return m?String.fromCharCode(m[1].charCodeAt(0)+1):last+'1'}
+function revChanges(){const R=revList(),prev=R[R.length-1],d=S.design.nodes.map(n=>n.uid),c=S.design.cables.map(x=>x.id);
+  if(!prev||!prev.ids)return {first:true,d,c};const pd=new Set(prev.ids.d||[]),pc=new Set(prev.ids.c||[]),nd=new Set(d),nc=new Set(c);
+  return {d,c,dA:d.filter(x=>!pd.has(x)).length,dR:[...pd].filter(x=>!nd.has(x)).length,cA:c.filter(x=>!pc.has(x)).length,cR:[...pc].filter(x=>!nc.has(x)).length}}
+function revChgText(x){if(!x||x.first)return 'First issue';const t=[];if(x.dA)t.push(`${plural(x.dA,'device')} added`);if(x.dR)t.push(`${plural(x.dR,'device')} removed`);if(x.cA)t.push(`${plural(x.cA,'cable')} added`);if(x.cR)t.push(`${plural(x.cR,'cable')} removed`);return t.join(', ')||'No device or cable changes'}
+function revDialog(){const ov=$('#overlay'),R=revList(),nx=revNext(),ch=revChanges();
+  ov.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="rvH"><div class="dlgtop"><span>ISSUE DRAWING SET</span><button class="btn sm" data-act="closeOverlay">Close</button></div>
+   <div class="bform" style="padding:18px">
+    <h2 id="rvH" style="margin:0;font-family:var(--f-display);font-size:24px">Issue rev ${esc(nx)}${R.length?` (replaces rev ${esc(R[R.length-1].rev)})`:''}</h2>
+    <p class="muted" style="margin:0">Changes since ${R.length?'rev '+esc(R[R.length-1].rev):'the start'}: ${esc(revChgText(ch))}. Issuing updates the REV on every sheet and the client’s as-built view.</p>
+    <label class="field" for="rvSum">What changed<textarea id="rvSum" rows="3">${esc(R.length?'':'Initial as-built issue')}</textarea></label>
+    <div class="row2"><label class="field" for="rvBy">Issued by<input id="rvBy" value="${esc(S.design.meta.drawn||'')}" autocomplete="off"></label><label class="field" for="rvAp">Approved by (optional)<input id="rvAp" placeholder="Client contact who signed off" autocomplete="off"></label></div>
+    <div class="dlgfoot"><button class="btn" data-act="closeOverlay">Cancel</button><button class="btn primary" data-act="revIssue">Issue rev ${esc(nx)} and publish</button></div></div></div>`;
+  ov.hidden=false;setTimeout(()=>{const t=$('#rvSum');if(t)t.focus()},0)}
+function revTableHTML(R,client){if(!R||!R.length)return '';return `<div class="scroll"><table class="t"><thead><tr><th>Rev</th><th>Issued</th><th>What changed</th>${client?'':'<th>Changes</th><th>By</th>'}<th>Approved by</th></tr></thead><tbody>${R.slice().reverse().map(r=>`<tr><td class="mono"><b>${esc(r.rev)}</b></td><td>${esc(dayFmtIso(r.at))}</td><td>${esc(r.summary||'')}</td>${client?'':`<td class="muted">${esc(revChgText(r.chg))}</td><td>${esc(r.by||'')}</td>`}<td>${esc(r.approver||'')}</td></tr>`).join('')}</tbody></table></div>`}
 function closeoutHTML(){const P=S.prop,st=coStats(),pub=P.closeout;if(!st.devs)return '';
   const row=(ok,txt,go)=>`<li class="${ok?'ok':''}"><span class="cok" aria-hidden="true">${ok?'✓':'•'}</span><span>${txt}</span>${!ok&&go?`<button class="lnk" data-go="${go}">${go==='field'?'Field app':'Open'}</button>`:''}</li>`;
   const ready=st.inst===st.devs&&st.tested===st.cables;
   return `<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Closeout</h2>${pub?`<span class="chip Signed">Published ${esc(dayFmtIso(pub.at))}</span>`:''}<span class="tgrow"></span>
-    <button class="btn" data-act="coPdf">Download closeout PDF</button><button class="btn ${ready?'primary':''}" data-act="coPublish">${pub?'Update the client’s as-built':'Publish as-built to the client'}</button></div>
+    <button class="btn" data-act="coPdf">Download closeout PDF</button><button class="btn ${ready?'primary':''}" data-act="coPublish">Issue rev ${esc(revNext())}${pub?' and update the client':' and publish'}</button></div>
    <div class="pb"><ul class="colist">
     ${row(st.inst===st.devs,`${st.inst} of ${st.devs} devices marked installed`,'field')}
     ${row(st.tested===st.cables,`${st.tested} of ${st.cables} cables tested`,'field')}
@@ -6126,7 +6158,8 @@ function closeoutHTML(){const P=S.prop,st=coStats(),pub=P.closeout;if(!st.devs)r
     ${st.net?row(st.mac===st.net,`${st.mac} of ${st.net} MAC addresses captured`,'field'):''}
     ${st.net?row(st.ip===st.net,`${st.ip} of ${st.net} network devices have an IP on the E-601 sheet`,'design'):''}
     ${row(st.devPhotos>0,`${plural(st.photos,'photo')}${st.devPhotos?`, ${st.devPhotos} devices with install photos`:''}`,'field')}
-   </ul><p class="note" style="margin:8px 0 0">The package can go out with gaps: missing items show blank in the register. ${pub?'Publishing again replaces what the client sees.':'Publishing adds the as-built drawings and equipment register to the client view; it never shows prices.'}</p></div></div>`}
+   </ul><p class="note" style="margin:8px 0 0">The package can go out with gaps: missing items show blank in the register. ${pub?'Publishing again replaces what the client sees.':'Publishing adds the as-built drawings and equipment register to the client view; it never shows prices.'}</p></div>
+   ${revList().length?`<div class="ph" style="border-top:1px solid var(--line)"><h2>Revisions</h2><span class="muted mono" style="font-size:12px">Current: rev ${esc(revList()[revList().length-1].rev)}</span></div>${revTableHTML(revList(),false)}`:''}</div>`}
 async function coPages(doc,o){const {INK,MUTED,LINE,M,PW,set}=o,P=S.prop,st=coStats(),reg=coRegister(),done=(P.closeout&&P.closeout.at)||isoDay(0);
   const LX=logoSrc()?M+50:M;if(logoSrc()){try{doc.addImage(logoSrc(),'PNG',M,42,40,40)}catch(_){}}
   doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text(pt(firm().toUpperCase()),LX,64);
@@ -6909,10 +6942,11 @@ function reply(t){
 
 /* ================= ACTIONS ================= */
 /* ---------- new project dialog: any kind of job, not just AV drawings ---------- */
-const PJ_SVCS=[['design','AV design drawings'],['proposal','Equipment & proposal'],['install','Installation'],['programming','Programming & commissioning'],['cabling','Cabling & pre-wire'],['network','Network setup'],['netdoc','Network documentation'],['onsite','Onsite support'],['maint','Preventive maintenance'],['consult','Consulting'],['training','Training'],['pm','Project management']];
+const PJ_SVCS=[['asbuilt','As-built survey & drawings'],['design','AV design drawings'],['proposal','Equipment & proposal'],['install','Installation'],['programming','Programming & commissioning'],['cabling','Cabling & pre-wire'],['network','Network setup'],['netdoc','Network documentation'],['onsite','Onsite support'],['maint','Preventive maintenance'],['consult','Consulting'],['training','Training'],['pm','Project management']];
 const PJ_TYPES=[
  {k:'av',l:'AV design & install',svc:['design','proposal','install','programming','training','pm'],bill:'fixed',tasks:'av'},
  {k:'network',l:'Network & cabling install',svc:['proposal','cabling','network','install','netdoc','pm'],bill:'fixed',tasks:'network'},
+ {k:'asbuilt',l:'As-built documentation (existing system)',svc:['asbuilt','design'],bill:'hourly',tasks:'asbuilt'},
  {k:'netdoc',l:'Network documentation',svc:['netdoc'],bill:'hourly',tasks:'netdoc'},
  {k:'support',l:'Onsite support / service call',svc:['onsite'],bill:'hourly',tasks:'support'},
  {k:'install',l:'Equipment install',svc:['proposal','install'],bill:'fixed',tasks:'install'},
@@ -6926,6 +6960,7 @@ const PJ_TASKSETS={
  network:[['Site survey and pathway plan','KM',0,1,'Site walk, 9:00 AM'],['Order cable, racks and network gear','JS',1,1],['Pull and terminate cabling','DL',5,3,'Cabling crew, 7:30 AM'],['Rack, patch panels and labeling','DL',8,1],['Install switches, firewall and access points','KM',9,1],['Configure, test and certify runs','KM',10,2],['Document the network','JS',12,1],['Walkthrough and handover','JS',13,1]],
  netdoc:[['Kickoff and access to sites','JS',0,1],['Walk sites and equipment rooms','KM',1,2,'Site walk, 9:00 AM'],['Import switch configs and neighbors','KM',3,1],['Label, photograph and map jacks','DL',4,2],['Audit gaps and fix records','KM',6,1],['Issue the document set','JS',7,1]],
  support:[['Triage and schedule the visit','JS',0,1],['Onsite visit','KM',1,1,'Service visit'],['Resolve and document the fix','KM',1,1],['Follow up with the client','JS',3,1]],
+ asbuilt:[['Kickoff, site access and any old drawings','JS',0,1],['Survey the site room by room','KM',1,2,'Site survey, 9:00 AM'],['Draw the signal flow, racks and cable schedule','JS',3,2],['Review the drawings with the client','JS',5,1,'Drawing review, 10:00 AM'],['Issue the as-built drawing set','JS',6,1]],
  install:[['Receive and stage equipment','DL',0,1],['Install and mount','DL',2,1,'Install day, 8:00 AM'],['Connect and test','KM',3,1],['Show the client how it works','KM',3,1],['Closeout and handover','JS',4,1]],
  maint:[['Schedule the visit','JS',0,1],['Inspect and test systems','KM',2,1,'Maintenance visit'],['Firmware and updates','KM',2,1],['Send findings and recommendations','JS',3,1]],
  smarthome:[['Get the blueprints and walk them with the client','JS',0,1,'Plan review, 10:00 AM'],['Design lighting, shades and climate','KM',2,2],['Design cameras, doorbell, locks and security','KM',4,1],['Design audio, video and theater','KM',5,2],['Design Wi-Fi and the network','KM',7,1],['Proposal and client review','JS',8,1],['Pre-wire walkthrough with the contractor','DL',14,1,'Pre-wire walk, 8:00 AM'],['Low-voltage pre-wire','DL',15,3,'Pre-wire crew, 7:30 AM'],['Trim-out and install devices','DL',45,3,'Trim-out, 8:00 AM'],['Program scenes and the app','KM',48,2],['Show the homeowner how it works','KM',50,1,'Homeowner walkthrough'],['Closeout and as-built handoff','JS',51,1]],
@@ -6990,10 +7025,12 @@ function npRead(){const v=id=>(($('#'+id)||{}).value||'').trim(),n=id=>v(id)==='
    Only the stages that fit the project's services show (a documentation job has no design or purchasing). */
 function pjStages(e){if(!e)return {list:[],cur:null,complete:false};const open=e.id===PJ.cur,P=pjProp(e),ty=pjTypeOf(P.ptype||'av'),sv=P.services||ty.svc,B=P.billing||{};
   const tasks=open?S.tasks:(Array.isArray(e.tasks)?e.tasks:[]),des=open?S.design:e.design,nodes=des&&Array.isArray(des.nodes)?des.nodes.length:0;
-  const st=P.status||'Draft',signed=st==='Signed'||st==='Change order',sold=sv.includes('proposal')||sv.includes('design');
+  const st=P.status||'Draft',signed=st==='Signed'||st==='Change order',ab=sv.includes('asbuilt'),sold=sv.includes('proposal')||(sv.includes('design')&&!ab),revs=Array.isArray(P.revs)?P.revs:[];
   const pos=(P.purch&&Array.isArray(P.purch.pos)?P.purch.pos:[]).filter(poLive),inv=(S.invoices||[]).filter(v=>v.pj===e.id&&!v.void);
   const L=[];
-  if(sv.includes('design'))L.push({k:'design',l:'Design',go:'design',done:nodes>0,sub:nodes?plural(nodes,'device'):'Not started',next:'Place the devices on the drawings',btn:'Open drawings'});
+  if(ab){L.push({k:'survey',l:'Survey',go:'field',done:nodes>0,sub:nodes?plural(nodes,'device'):'Not started',next:'Walk the site and record what’s installed, room by room',btn:'Open the survey'});
+    L.push({k:'drawings',l:'Drawings',go:'design',done:revs.length>0,sub:revs.length?'Rev '+revs[revs.length-1].rev:'Not issued',next:'Wire the signal flow and check the racks, then issue the drawing set from Closeout',btn:'Open drawings'})}
+  else if(sv.includes('design'))L.push({k:'design',l:'Design',go:'design',done:nodes>0,sub:nodes?plural(nodes,'device'):'Not started',next:'Place the devices on the drawings',btn:'Open drawings'});
   if(sold)L.push({k:'proposal',l:'Proposal',go:'proposal',done:signed,lost:st==='Lost',wait:st==='Sent',sub:st,
     next:st==='Lost'?'The proposal is marked lost':st==='Viewed'?'The client viewed the proposal. Follow up for a signature.':st==='Sent'?'Proposal sent. Waiting for the client to open it.':'Send the proposal to the client',btn:st==='Draft'?'Open proposal':'View proposal'});
   if(sv.includes('proposal')){let need=0,left=0,rec=false;
@@ -7186,7 +7223,14 @@ const A={
   coPdf(el){if(pdfBusy)return;pdfBusy=true;const lab=el&&el.textContent;if(el){el.disabled=true;el.textContent='Building PDF…'}toast('Building the closeout package…');
     (async()=>{try{const {blob,pages}=await buildProposalPdf({closeout:true}),P=S.prop,name=pt(`Closeout ${P.no} ${P.client} - ${P.project}.pdf`).replace(/[\\/:*?"<>|?]+/g,' ').replace(/\s+/g,' ').trim();const r=await saveFile(blob,name);toast(r==='saved'?`Closeout package ready (${pages} pages).`:r==='declined'?'Download cancelled.':'Another download is waiting for you.')}
       catch(e){toast('Couldn’t build the PDF. Check your connection and try again.')}finally{pdfBusy=false;if(el&&el.isConnected){el.disabled=false;el.textContent=lab}}})()},
-  coPublish(){const P=S.prop;P.closeout={at:isoDay(0),set:coSet(),reg:coRegister().map(({uid,inst,net,...r})=>r)};plog(`As-built documentation published to the client (${plural(P.closeout.set.sheets.length,'sheet')}, ${plural(P.closeout.reg.length,'device')})`);saveProjects();R.projects();toast('Published. The client view now has the as-built drawings and equipment register.')},
+  coPublish(){revDialog()},
+  revIssue(){const P=S.prop,sum=(($('#rvSum')||{}).value||'').trim(),by=(($('#rvBy')||{}).value||'').trim(),ap=(($('#rvAp')||{}).value||'').trim();
+    if(!sum){toast('Say what changed in this revision.');$('#rvSum').focus();return}
+    const rv=revNext(),ch=revChanges();mut(()=>{S.design.meta.rev=rv});
+    P.closeout={at:isoDay(0),rev:rv,set:coSet(),reg:coRegister().map(({uid,inst,net,...r})=>r)};
+    revList().push({rev:rv,at:isoDay(0),by,approver:ap,summary:sum,devs:ch.d.length,cables:ch.c.length,sheets:P.closeout.set.sheets.length,ids:{d:ch.d,c:ch.c},chg:ch.first?{first:true}:{dA:ch.dA,dR:ch.dR,cA:ch.cA,cR:ch.cR}});
+    plog(`Drawing set rev ${rv} issued and published to the client (${plural(P.closeout.set.sheets.length,'sheet')}, ${plural(P.closeout.reg.length,'device')})${ap?' · approved by '+ap:''}`);
+    saveProjects();closeOverlay();R.projects();toast(`Rev ${rv} issued. The client view now has rev ${rv} of the as-built.`)},
   viewAsBuilt(el){const P=S.prop;if(!P.closeout)return;S.sv={set:P.closeout.set,i:+el.dataset.i};renderSheetViewer()},
   propRepriced(){const P=S.prop,q=quote(),was=P.sentTotal;P.sentTotal=q.total;P.sentPrices=Object.fromEntries(q.lines.map(l=>[l.p.id,+l.p.cost||0]));plog(`Repriced from the current price lists: ${money2(was||0)} → ${money2(q.total)}`);saveProjects();propParts();toast('Prices accepted. The client view shows the new total; let the client know it changed.')},
   estUse(){S.prop.laborMethod='detail';saveProjects();R.estimate();toast('The proposal now uses this estimate for labor and consumables.')},
@@ -8891,6 +8935,8 @@ function photoStrip(uid){const ps=(S.photos||[]).filter(p=>p.uid===uid);if(!ps.l
   return `<div class="plh">Photos · ${ps.length}</div><div class="pstripm">${ps.slice(-8).reverse().map(p=>`<a href="${esc(photoUrl(p))}" target="_blank" rel="noopener" title="${esc(p.caption||'Site photo')}"><img src="${esc(photoUrl(p))}" alt="${esc(p.caption||'Site photo')}" loading="lazy"></a>`).join('')}</div>`}
 let fieldTimer=null;
 R.field=function(){
+  /* survey mode by default on as-built jobs and on projects with nothing designed yet */
+  const svm=(S.ui.fmode||((S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).includes('asbuilt')||!S.design.nodes.length?'survey':'install'))==='survey';
   const tg=tags(),pj=curPj(),ck=clockGet(),cs=S.design.cables.slice().sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
   const tested=cs.filter(c=>c.status==='Tested').length,tasks=S.tasks.slice().sort((a,b)=>a.start-b.start),done=tasks.filter(t=>t.col==='done').length;
   const on=ck&&ck.pj===PJ.cur,elsewhere=ck&&!on;
@@ -8903,7 +8949,7 @@ R.field=function(){
    :`<div class="clock"><p class="eyebrow">Time clock${today?` · ${today} h logged today`:''}</p>
      <div class="row3"><label class="field" for="fWho">Tech<select id="fWho">${['DL','KM','AP','JS'].map(w=>`<option ${w===S.ui.fwho?'selected':''}>${w}</option>`).join('')}</select></label>
       <label class="field" for="fTask">Task<select id="fTask"><option value="">General</option>${tasks.filter(t=>t.col!=='done').map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join('')}</select></label>
-      <label class="field" for="fType">Type<select id="fType">${['Install','Programming','Site visit','Commute','Service'].map(x=>`<option>${x}</option>`).join('')}</select></label></div>
+      <label class="field" for="fType">Type<select id="fType">${['Install','Programming','Site visit','Commute','Service'].map(x=>`<option${svm&&x==='Site visit'?' selected':''}>${x}</option>`).join('')}</select></label></div>
      <button class="btn primary big-btn" data-act="fieldIn">Clock in</button></div>`;
   const nextBtns=t=>t.col==='todo'?`<button class="btn sm" data-act="fieldTask" data-id="${t.id}" data-to="doing">Start</button>`
     :t.col==='doing'?`<button class="btn sm primary" data-act="fieldTask" data-id="${t.id}" data-to="done">Done</button><button class="btn sm" data-act="fieldTask" data-id="${t.id}" data-to="blocked">Blocked</button>`
@@ -8912,18 +8958,19 @@ R.field=function(){
   const ph=(S.photos||[]).slice().reverse();
   $('#v-field').innerHTML=`
   <header class="vh"><div><p class="eyebrow">Field · ${esc(new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}))}</p><h1>${esc(S.prop.project)}</h1><p class="sub">${esc(S.prop.client)}${pj&&pj.site?' · '+esc(sameName(pj.site.split('·')[0],S.prop.client)?pj.site.split('·').slice(1).join('·').trim():pj.site):''}</p></div>
-   <div class="actions"><select class="inp" id="pjSel3" aria-label="Open project" style="width:auto;max-width:100%">${projOptions()}</select></div></header>
+   <div class="actions"><div class="seg" role="group" aria-label="Field mode"><button data-act="fieldMode" data-m="install" aria-pressed="${!svm}">Install</button><button data-act="fieldMode" data-m="survey" aria-pressed="${svm}">Survey</button></div><select class="inp" id="pjSel3" aria-label="Open project" style="width:auto;max-width:100%">${projOptions()}</select></div></header>
   <div class="field-wrap">
    <div class="panel">${clock}</div>
+   ${svm?svHTML():''}
    <div class="panel"><div class="ph"><h2>Tasks</h2><span class="muted mono" style="font-size:12px">${done} of ${tasks.length} done</span></div>
     ${tasks.length?tasks.map(t=>`<div class="ftask"><div><b>${esc(t.title)}</b><div class="muted" style="font-size:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:3px"><span class="av">${esc(t.who)}</span>Due ${dayFmt(t.start+t.dur-1)} ${chip(COLS.find(c=>c[0]===t.col)[1])}${t.note?` · ${esc(t.note)}`:''}</div></div><div class="actions" style="gap:6px;justify-content:flex-end">${nextBtns(t)}</div></div>`).join('')
-     :`<div class="pb"><p class="muted" style="margin:0 0 10px">No tasks on this project yet.</p><button class="btn" data-act="addStdTasks">Add the standard install tasks</button></div>`}</div>
+     :`<div class="pb"><p class="muted" style="margin:0 0 10px">No tasks on this project yet.</p><button class="btn" data-act="addStdTasks">Add the standard tasks</button></div>`}</div>
    ${fieldDevHTML()}
-   <div class="panel"><div class="ph"><h2>Cable sign-off</h2><span class="muted mono" style="font-size:12px">${tested} of ${cs.length} tested</span></div>
+   ${svm?'':`<div class="panel"><div class="ph"><h2>Cable sign-off</h2><span class="muted mono" style="font-size:12px">${tested} of ${cs.length} tested</span></div>
     <div class="pb" style="padding-bottom:4px">${meterBar(tested,cs.length||1)}</div>
     ${cs.length?cs.map(c=>{const st=c.status||PULL[0];return `<div class="fcab"><div class="fcab-h ${SIG[c.type].cls}"><span class="dot"></span><b class="mono">${esc(c.id)}</b><span class="muted" style="font-size:12px">${esc(tg[c.a.uid])} ${esc((pDef(c.a)||{}).n||'')} → ${esc(tg[c.b.uid])} ${esc((pDef(c.b)||{}).n||'')} · ${lenOf(c)} m</span></div>
       <div class="seg" role="group" aria-label="Status of ${esc(c.id)}">${PULL.map(p=>`<button data-act="fieldCable" data-id="${esc(c.id)}" data-st="${p}" aria-pressed="${p===st}">${p==='Not pulled'?'Not pulled':p}</button>`).join('')}</div></div>`}).join('')
-     :'<p class="pb muted" style="margin:0">No cables in this design yet.</p>'}</div>
+     :'<p class="pb muted" style="margin:0">No cables in this design yet.</p>'}</div>`}
    <div class="panel"><div class="ph"><h2>Site photos</h2><span class="muted mono" style="font-size:12px">${ph.length}</span></div><div class="fields">
     ${ASSETS?`<div class="row2"><label class="field" for="fDev">Device<select id="fDev"><option value="">General · site</option>${devs.map(n=>`<option value="${n.uid}">${esc(tg[n.uid])} · ${esc(prod(n).model)}</option>`).join('')}</select></label>
       <label class="field" for="fCap">Caption<input id="fCap" placeholder="e.g. Backing behind display" maxlength="80"></label></div>
@@ -8938,6 +8985,44 @@ R.field=function(){
 const fdMacNorm=v=>{const h=String(v||'').replace(/[^0-9a-f]/gi,'');return h.length===12?h.toUpperCase().match(/../g).join(':'):String(v||'').trim().toUpperCase()};
 const fdIsMac=v=>/^([0-9a-f]{2}[:\-.]?){5}[0-9a-f]{2}$/i.test(String(v||'').replace(/^(mac|eth\d?|lan)[:\s]*/i,'').trim())||/^[0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4}$/i.test(String(v||'').trim());
 const fdMac=uid=>{const h=S.design.ipam&&S.design.ipam.hosts&&S.design.ipam.hosts[uid];return h&&h.mac||''};
+/* ---------- as-built survey: walk an existing site room by room and record what's there.
+   Each device lands on the device list, its rack elevation and a draft signal flow grouped by room. ---------- */
+function svRooms(){const out=[];S.design.nodes.forEach(n=>{const l=(n.loc||'').trim();if(l&&!out.includes(l))out.push(l)});return out}
+function svKeep(){const f=S.svf||(S.svf={});const v=id=>{const el=$('#'+id);return el?el.value:undefined};
+  [['room','svRoom'],['ser','svSer'],['rack','svRack'],['u','svU'],['n','svN'],['mk','svMk'],['md','svMd'],['cat','svCat'],['rn','svRn'],['rs','svRs']].forEach(([k,id])=>{const x=v(id);if(x!==undefined)f[k]=x});return f}
+function svPos(room,p){const rooms=svRooms();let ri=rooms.indexOf(room);if(ri<0)ri=rooms.length;
+  const here=S.design.nodes.filter(n=>(n.loc||'').trim()===room),col=ri%7,band=Math.floor(ri/7);
+  let x=40+col*(W+44),y=40+band*360+here.reduce((a,n)=>a+nodeH(prod(n))+18,0);
+  if(y>SH-nodeH(p)-30){x+=24;y=SH-nodeH(p)-30}
+  while(S.design.nodes.some(n=>Math.abs(n.x-x)<20&&Math.abs(n.y-y)<20)){x+=24;y+=24}
+  return {x:Math.round(x),y:Math.round(y)}}
+function svHTML(){const f=S.svf||(S.svf={}),rooms=svRooms(),q=(S.ui.svq||'').trim().toLowerCase(),pick=f.pid&&byId(f.pid);
+  if(f.room==null)f.room=rooms[rooms.length-1]||'';
+  const hits=q.length>=2&&!pick?lib.filter(p=>!['Cable','Accessory','Patch panel','Module'].includes(p.cat)&&!p.fits&&(p.mfr+' '+p.model+' '+p.cat+' '+(p.desc||'')).toLowerCase().includes(q)).slice(0,6):[];
+  const byRoom=rooms.map(r=>[r,S.design.nodes.filter(n=>(n.loc||'').trim()===r).length]);
+  return `<div class="panel svpanel"><div class="ph"><h2>As-built survey</h2><span class="muted mono" style="font-size:12px">${plural(S.design.nodes.length,'device')} · ${plural(rooms.length,'room')}</span></div>
+   <div class="fields">
+    <label class="field" for="svRoom">Room or area<input id="svRoom" list="svRoomL" value="${esc(f.room||'')}" placeholder="e.g. Board room, MDF, Lobby" autocomplete="off"></label>
+    <datalist id="svRoomL">${rooms.map(r=>`<option value="${esc(r)}">`).join('')}</datalist>
+    ${pick?`<div class="svpick"><span class="l">Equipment</span><b>${esc(pick.mfr)} ${esc(pick.model)}</b><span class="muted">${esc(pick.cat)}</span><button class="btn sm" data-act="svClear">Change</button></div>`
+     :f.newOn?`<div class="svnew"><p class="note" style="margin:0">Not in the library: it’s added with no ports, so wire it later from Equipment library → Edit.</p><div class="row3">
+       <label class="field" for="svMk">Make<input id="svMk" value="${esc(f.mk||'')}" autocomplete="off"></label>
+       <label class="field" for="svMd">Model<input id="svMd" value="${esc(f.md||'')}" autocomplete="off"></label>
+       <label class="field" for="svCat">Type<select id="svCat">${CAT_ORDER.filter(c=>!['Cable','Accessory','Patch panel','Module','Rack'].includes(c)).map(c=>`<option${c===(f.cat||'Other')?' selected':''}>${esc(c)}</option>`).join('')}</select></label></div>
+       <button class="lnk" data-act="svLib" style="align-self:flex-start">Search the library instead</button></div>`
+     :`<label class="field" for="svQ">Equipment<input id="svQ" value="${esc(S.ui.svq||'')}" placeholder="Search the library: brand, model or type" autocomplete="off"></label>
+       ${hits.length?`<div class="svhits" role="list">${hits.map(p=>`<button role="listitem" data-act="svPick" data-pid="${esc(p.id)}"><b>${esc(p.mfr)} ${esc(p.model)}</b><span class="muted">${esc(p.cat)}</span></button>`).join('')}</div>`:q.length>=2?'<p class="muted" style="margin:0;font-size:13px">No match in the library.</p>':''}
+       <button class="lnk" data-act="svNew" style="align-self:flex-start">Not in the library? Add it by hand</button>`}
+    <div class="row3">
+     <label class="field" for="svSer">Serial number<span class="fdin"><input class="inp mono" id="svSer" value="${esc(f.ser||'')}" autocomplete="off" autocapitalize="characters" spellcheck="false"><label class="btn sm filebtn" title="Photograph the serial number barcode">Scan<input type="file" accept="image/*" capture="environment" data-svscan="1" aria-label="Scan the serial number"></label></span></label>
+     <label class="field" for="svRack">Rack<select id="svRack"><option value="">Not in a rack</option>${S.design.racks.map(r=>`<option value="${r.id}"${r.id===f.rack?' selected':''}>${esc(r.name)} · ${r.size}U</option>`).join('')}<option value="__new"${f.rack==='__new'?' selected':''}>New rack…</option></select></label>
+     <label class="field" for="svU">Bottom U<input id="svU" type="number" min="1" max="60" value="${esc(f.u||'')}" placeholder="Next free"></label></div>
+    ${f.rack==='__new'?`<div class="row2"><label class="field" for="svRn">New rack name<input id="svRn" value="${esc(f.rn||'')}" placeholder="${esc((f.room||'Equipment')+' rack')}"></label><label class="field" for="svRs">Size (U)<input id="svRs" type="number" min="4" max="60" value="${esc(f.rs||'42')}"></label></div>`:''}
+    <div class="svgo"><label class="field" for="svN" style="flex:0 0 96px">How many<input id="svN" type="number" min="1" max="50" value="${esc(f.n||'1')}"></label><button class="btn primary" data-act="svAdd">Add to the as-built</button></div>
+   </div>
+   ${byRoom.length?`<div class="pb svrooms">${byRoom.map(([r,c])=>`<button class="chip${r===f.room?' Active':''}" data-act="svRoomSet" data-room="${esc(r)}">${esc(r)} · ${c}</button>`).join('')}</div>
+    <div class="pb svnext"><p class="note" style="margin:0">Each device is on the device list, its rack and a draft signal flow, grouped by room. Next: wire the connections, then issue rev ${esc(revNext())} from Projects → Closeout.</p><div class="actions"><button class="btn sm" data-go="design">Open the signal flow</button><button class="btn sm" data-go="projects">Closeout</button></div></div>`:''}
+  </div>`}
 function fieldDevHTML(){const tg=tags(),devs=S.design.nodes.slice().sort((a,b)=>String(tg[a.uid]).localeCompare(String(tg[b.uid]),undefined,{numeric:true}));
   if(!devs.length)return '';const inst=devs.filter(n=>n.inst).length,ph=new Map();(S.photos||[]).forEach(p=>{if(p.uid)ph.set(p.uid,(ph.get(p.uid)||0)+1)});
   const q=(S.ui.fdq||'').toLowerCase(),show=devs.filter(n=>!q||[tg[n.uid],prod(n).model,prod(n).mfr,n.serial,fdMac(n.uid),endLoc(n.uid)].join(' ').toLowerCase().includes(q));
@@ -8965,9 +9050,14 @@ function fdSet(uid,k,v){const n=node(uid);if(!n)return;
     else if(k==='serial'){if(v)n.serial=v.trim();else delete n.serial}
     else if(k==='inst'){if(v)n.inst={at:isoDay(0),who:S.ui.fwho||($('#fWho')||{}).value||''};else delete n.inst}})}
 function bindField(){const el=$('#v-field');if(!el||el.dataset.fdb)return;el.dataset.fdb=1;
-  el.addEventListener('input',e=>{if(e.target.id==='fdQ'){S.ui.fdq=e.target.value;const pos=e.target.selectionStart;R.field();const q=$('#fdQ');if(q){q.focus();q.setSelectionRange(pos,pos)}}});
+  el.addEventListener('input',e=>{if(e.target.id==='svQ'){svKeep();S.ui.svq=e.target.value;const pos=e.target.selectionStart;R.field();const q=$('#svQ');if(q){q.focus();q.setSelectionRange(pos,pos)}return}
+    if(e.target.id==='fdQ'){S.ui.fdq=e.target.value;const pos=e.target.selectionStart;R.field();const q=$('#fdQ');if(q){q.focus();q.setSelectionRange(pos,pos)}}});
   el.addEventListener('change',async e=>{const t=e.target;
     if(t.dataset.fd){const k=t.dataset.fd;fdSet(t.dataset.uid,k,k==='inst'?t.checked:t.value);if(k==='inst'){R.field();toast(t.checked?`${tags()[t.dataset.uid]} marked installed.`:'Unmarked.')}else if(k==='mac')t.value=fdMac(t.dataset.uid);return}
+    if(t.id==='svRack'){svKeep();R.field();return}
+    if(t.dataset.svscan){const fl=t.files&&t.files[0];t.value='';if(!fl)return;toast('Reading the barcode…');
+      try{const v=await scanBarcode(fl,'serial');if(!v){toast('No barcode found. Get closer to the label, or type it in.');return}svKeep().ser=v;const s2=$('#svSer');if(s2)s2.value=v;toast('Serial: '+v)}
+      catch(err){toast(err&&err.message==='load'?'Couldn’t load the barcode reader. Check your connection, or type it in.':'Couldn’t read that photo. Try again, or type it in.')}return}
     if(t.dataset.scan){const f=t.files&&t.files[0],uid=t.dataset.uid,want=t.dataset.scan;t.value='';if(!f)return;toast('Reading the barcode…');
       try{const v=await scanBarcode(f,want);if(!v){toast(want==='mac'?'No MAC address barcode found. Get closer to the label, or type it in.':'No barcode found. Get closer to the label, or type it in.');return}
         fdSet(uid,want,v);R.field();toast(`${tags()[uid]} ${want==='mac'?'MAC':'serial'}: ${want==='mac'?fdMacNorm(v):v}`)}
@@ -8984,6 +9074,31 @@ async function addPhoto(file){
     saveProjects();R.field();toast('Photo saved'+(uid?` to ${tags()[uid]}`:'')+'.')}
   catch(e){toast(e&&e.code==='quota_exceeded'?'Photo storage is full. Delete some photos first.':e&&e.code==='not_granted'?'Uploads weren’t allowed.':'Couldn’t upload that photo. Try again.')}}
 Object.assign(A,{
+  fieldMode(el){S.ui.fmode=el.dataset.m;R.field()},
+  svPick(el){const f=svKeep();f.pid=el.dataset.pid;f.newOn=false;S.ui.svq='';R.field();const s=$('#svSer');if(s)s.focus()},
+  svClear(){const f=svKeep();f.pid=null;R.field();const q=$('#svQ');if(q)q.focus()},
+  svNew(){const f=svKeep();f.newOn=true;f.pid=null;const q=(S.ui.svq||'').trim();if(q&&!f.md)f.md=q;R.field();const m=$('#svMk');if(m)m.focus()},
+  svLib(){const f=svKeep();f.newOn=false;R.field();const q=$('#svQ');if(q)q.focus()},
+  svRoomSet(el){const f=svKeep();f.room=el.dataset.room;R.field()},
+  svAdd(){const f=svKeep(),room=(f.room||'').trim();
+    if(!room){toast('Name the room or area first.');const r=$('#svRoom');if(r)r.focus();return}
+    let pid=f.pid;
+    if(!pid&&f.newOn){const mk=(f.mk||'').trim(),md=(f.md||'').trim();if(!mk||!md){toast('Enter the make and model.');const e=$(mk?'#svMd':'#svMk');if(e)e.focus();return}
+      const ex=lib.find(p=>sameTxt(p.mfr,mk)&&sameTxt(p.model,md));
+      if(ex)pid=ex.id;else{const p={id:'SV-'+Date.now().toString(36).toUpperCase(),mfr:mk,model:md,cat:f.cat||'Other',desc:`${mk} ${md} (recorded on site)`,cost:0,msrp:0,labor:0,ins:[],outs:[],ru:0,watts:0,mount:'rack',imgs:[]};lib.push(p);pid=p.id}}
+    const p=pid&&byId(pid);if(!p){toast('Pick the equipment from the library, or add it by hand.');const q=$('#svQ');if(q)q.focus();return}
+    const n=Math.max(1,Math.min(50,Math.round(+f.n||1))),who=S.ui.fwho||(clockGet()||{}).who||'';
+    let rack=null;if(f.rack==='__new'){const sz=Math.max(4,Math.min(60,Math.round(+f.rs||42)));rack=newRack((f.rn||'').trim()||room+' rack',sz)}else if(f.rack)rack=S.design.racks.find(r=>r.id===f.rack)||null;
+    let off=0;const added=mut(()=>{if(rack&&f.rack==='__new')S.design.racks.push(rack);const out=[];
+      for(let i=0;i<n;i++){const pos=svPos(room,p),nd={uid:nid(),pid,x:pos.x,y:pos.y,loc:room,inst:{at:isoDay(0),who}};if(i===0&&(f.ser||'').trim())nd.serial=f.ser.trim();S.design.nodes.push(nd);out.push(nd);
+        if(rack){const h=p.ru||1;let u=i===0&&+f.u?Math.round(+f.u):0;if(!u||!fits(rack,u,h)){u=0;for(let k=rack.size-h+1;k>=1;k--)if(fits(rack,k,h)){u=k;break}}
+          if(u)rack.items.push({id:nid(),kind:'dev',ref:nd.uid,u});else off++}}
+      return out});
+    if(rack&&f.rack==='__new')f.rack=rack.id;
+    Object.assign(f,{pid:null,ser:'',u:'',n:'1',newOn:false,mk:'',md:'',rn:'',rs:''});S.ui.svq='';
+    const tg=tags();R.field();badges();
+    toast(`${n>1?n+' × ':''}${p.model} added in ${room}${added.length===1?' as '+tg[added[0].uid]:''}${rack?` · ${rack.name}`:''}.${off?` ${plural(off,'unit')} didn’t fit in the rack.`:''}${!p.ru&&rack?' It has no rack size yet, so it takes 1U.':''}`);
+    const q=$('#svQ');if(q)q.focus()},
   fieldIn(){const who=$('#fWho').value,task=$('#fTask').value,type=$('#fType').value;S.ui.fwho=who;clockSet({pj:PJ.cur,who,task,type,start:Date.now()});R.field();toast(`${who} clocked in.`)},
   fieldOut(){const c=clockGet();if(!c)return;const hrs=Math.max(.25,Math.round((Date.now()-c.start)/36e5*4)/4);
     S.time.push({task:c.task||'',hrs,type:c.type,who:c.who,day:isoDay(0)});clockSet(null);saveProjects();R.field();toast(`Logged ${hrs} h for ${c.who}.`)},
