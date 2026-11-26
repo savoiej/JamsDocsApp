@@ -1262,6 +1262,8 @@ const assetUsed=id=>lib.some(p=>(p.imgs||[]).some(im=>im.asset===id))||(S.bld&&(
 function dropAssets(list){if(!ASSETS)return;(list||[]).forEach(im=>{if(im&&im.asset&&!assetUsed(im.asset))ASSETS.delete(im.asset).catch(()=>{})})}
 const isMod=p=>!!(p&&p.fits);
 const slotsOf=p=>p&&Array.isArray(p.slots)?p.slots:[];
+/* cables, racks, patch panels and accessories never carry ports; every other product gets the same editor as a new device block */
+const BARE_CATS=['Cable','Rack','Patch panel','Accessory'];
 const placeable=p=>!!p&&!isMod(p)&&(p.ins.length+p.outs.length>0||slotsOf(p).length>0);
 const sameTxt=(a,b)=>String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
 const fitsSlot=(s,m)=>isMod(m)&&(s.acc||[]).some(a=>sameTxt(a,m.fits));
@@ -1935,6 +1937,10 @@ function renderPal(){
   const row=p=>{const types=[...new Set([...p.ins,...p.outs].map(x=>x.t))];return `<div class="palItem${pImg(p)?' hasimg':''}" draggable="true" data-drop="node:${esc(p.id)}" title="${esc(p.desc)} — drag onto the sheet, or press +">${thumb(p,'palthumb')}<b>${esc(p.model)}</b><button class="plus" data-act="addNode" data-pid="${esc(p.id)}" aria-label="Add ${esc(p.model)} to sheet">+</button><small><span class="pdots">${types.map(t=>`<i class="${SIG[t]?.cls||''}"></i>`).join('')}</span>${esc(p.mfr)} · ${p.ins.length} in / ${p.outs.length} out${p.ru?` · ${p.ru}U`:''}</small></div>`};
   let h=groups.size>1?`<div class="paltools"><span>${plural(items.length,'device')} · ${plural(groups.size,'type')}</span><button data-act="palAll" data-v="1">Expand all</button><button data-act="palAll" data-v="0">Collapse all</button></div>`:'';
   groups.forEach((ps,cat)=>{const on=!!q||!!open[cat];h+=`<div class="palgrp${on?' open':''}"><button class="palhd" data-act="palToggle" data-cat="${esc(cat)}" aria-expanded="${on}"><span class="chev" aria-hidden="true"></span><span class="palhd-t">${esc(cat)}</span><span class="palcnt">${ps.length}</span></button>${on?`<div class="palgrp-b">${ps.map(row).join('')}</div>`:''}</div>`});
+  /* products saved with no ports (CSV imports without inputs/outputs, quick adds) can't be wired yet; list them so they don't just vanish */
+  const np=lib.filter(p=>!placeable(p)&&!isMod(p)&&!p.ctype&&!BARE_CATS.includes(p.cat)).filter(p=>!q||(p.mfr+' '+p.model+' '+p.cat+' '+p.desc).toLowerCase().includes(q)).sort((a,b)=>ci(a.cat)-ci(b.cat)||a.model.localeCompare(b.model));
+  if(np.length){const NK='__noports__',on=!!q||!!open[NK];
+    h+=`<div class="palgrp${on?' open':''}"><button class="palhd" data-act="palToggle" data-cat="${NK}" aria-expanded="${on}" title="These products have no ports yet, so they can't go on the signal flow"><span class="chev" aria-hidden="true"></span><span class="palhd-t">No ports yet</span><span class="palcnt">${np.length}</span></button>${on?`<div class="palgrp-b"><p class="palEmpty" style="margin:0 0 4px">Add inputs and outputs to put these on the signal flow. Until then they go on the bill of materials only.</p>${np.slice(0,200).map(p=>`<div class="palItem${pImg(p)?' hasimg':''}" title="${esc(p.desc)} — no ports yet">${thumb(p,'palthumb')}<b>${esc(p.model)} <span class="muted" style="font-weight:400">${esc(p.cat)}</span></b><button class="btn sm" data-act="palPorts" data-id="${esc(p.id)}" aria-label="Add ports to ${esc(p.model)}" style="float:right">Add ports</button><small>${esc(p.mfr)} · no ports</small></div>`).join('')}${np.length>200?`<p class="palEmpty">and ${np.length-200} more. Search to narrow the list.</p>`:''}</div>`:''}</div>`}
   box.innerHTML=h||'<p class="palEmpty">No matches. Build a custom device or import products in Library.</p>';
 }
 
@@ -3172,7 +3178,7 @@ function openBuilder(){S.bld={imgs:[],up:[],mfr:'',model:'',cat:'Source',desc:''
 const bldProd=b=>({mfr:b.mfr||'Custom',model:b.model||'New device',cat:b.cat,ins:b.ports.filter(p=>p.side==='in').map(p=>({t:p.t,n:p.n||'Port'})),outs:b.ports.filter(p=>p.side==='out').map(p=>({t:p.t,n:p.n||'Port'}))});
 /* open a library product in the editor; ports keep a note of where they started so drawings can follow edits */
 function openEditor(pid){const p=byId(pid);if(!p)return;
-  S.bld={editId:pid,imgs:(p.imgs||[]).map(x=>({...x})),up:[],simple:!placeable(p)&&!isMod(p),fits:p.fits||'',slots:slotsOf(p).map(x=>({n:x.n,acc:(x.acc||[]).join(', ')})),mfr:p.mfr,model:p.model,cat:p.cat,desc:p.desc,cost:p.cost,msrp:p.msrp,labor:p.labor,ru:String(p.ru||0),mount:p.mount||'rack',watts:p.watts||'',
+  S.bld={editId:pid,imgs:(p.imgs||[]).map(x=>({...x})),up:[],simple:!placeable(p)&&!isMod(p)&&(!!p.ctype||BARE_CATS.includes(p.cat)),bare:!placeable(p)&&!isMod(p),fits:p.fits||'',slots:slotsOf(p).map(x=>({n:x.n,acc:(x.acc||[]).join(', ')})),mfr:p.mfr,model:p.model,cat:p.cat,desc:p.desc,cost:p.cost,msrp:p.msrp,labor:p.labor,ru:String(p.ru||0),mount:p.mount||'rack',watts:p.watts||'',
     ports:[...p.ins.map((x,i)=>({side:'in',t:x.t,n:x.n,o:'in:'+i})),...p.outs.map((x,i)=>({side:'out',t:x.t,n:x.n,o:'out:'+i}))]};renderBuilder()}
 /* where a product is used: the open project and every parked one */
 function productUse(pid){const ds=[[S.prop.project,S.design],...PJ.list.filter(e=>e.id!==PJ.cur&&e.design).map(e=>[(e.prop||{}).project||'Project',e.design])];
@@ -3203,7 +3209,7 @@ function renderBuilder(){
      <label class="field" for="bMt">Mounting<select id="bMt" data-bf="mount"><option value="rack" ${b.mount==='rack'?'selected':''}>Rack ears</option><option value="shelf" ${b.mount==='shelf'?'selected':''}>Sits on a shelf</option></select></label>
      <label class="field" for="bW">Power (W)<input id="bW" type="number" min="0" data-bf="watts" value="${esc(b.watts)}"></label></div>
     ${b.cat==='Module'?`<label class="field" for="bFt">Fits slot type<input id="bFt" data-bf="fits" list="slotTypesL2" value="${esc(b.fits||'')}" placeholder="Required · e.g. Avaya G4x0 media module"><datalist id="slotTypesL2">${slotTypes().map(t=>`<option value="${esc(t)}">`).join('')}</datalist></label><p class="note" style="margin:0">Modules go in a slot of a chassis instead of on the drawing. Their ports appear on the chassis once you install them.</p>`:''}
-    ${b.simple?`<p class="note" style="margin:0">${b.cat==='Cable'?'Cables have no ports. Their type is set by the signal they carry.':'This product has no ports, so it isn’t placed on the signal flow.'}</p>`:`<div class="plh">Ports · ${b.ports.length}</div>`}
+    ${b.simple?`<p class="note" style="margin:0">${b.cat==='Cable'?'Cables have no ports. Their type is set by the signal they carry.':'This product has no ports, so it isn’t placed on the signal flow.'}</p>`:`<div class="plh">Ports · ${b.ports.length}</div>${b.bare&&!b.ports.length?'<p class="note" style="margin:0">No ports yet, so this goes on the bill of materials but not the signal flow. Add inputs and outputs to place it on the drawings.</p>':''}`}
     ${b.simple?'':`<div class="bports">`+b.ports.map((p,i)=>`<div class="bport"><select data-bp="side" data-i="${i}" aria-label="Port side">${['in','out'].map(s=>`<option value="${s}" ${p.side===s?'selected':''}>${s==='in'?'Input':'Output'}</option>`).join('')}</select>
       <select data-bp="t" data-i="${i}" aria-label="Signal type">${Object.entries(SIG).map(([k,s])=>`<option value="${k}" ${p.t===k?'selected':''}>${s.short}</option>`).join('')}</select>
       <input data-bp="n" data-i="${i}" value="${esc(p.n)}" aria-label="Port name" placeholder="Port name"><button class="btn sm" data-act="bpDel" data-i="${i}" aria-label="Remove port">×</button></div>`).join('')+'</div>'}
@@ -3281,7 +3287,7 @@ function saveProductEdit(){
   const b=S.bld,p=byId(b.editId);if(!p){closeOverlay();return}
   const mfr=String(b.mfr).trim()||'Custom',model=String(b.model).trim();
   if(lib.some(x=>x!==p&&x.mfr===mfr&&x.model===model)){toast(`${mfr} ${model} is already in the library.`);return}
-  if(!b.simple&&!b.ports.length&&!(b.cat!=='Module'&&(b.slots||[]).length)){toast('Keep at least one port.');return}
+  if(!b.simple&&!b.bare&&!b.ports.length&&!(b.cat!=='Module'&&(b.slots||[]).length)){toast('Keep at least one port.');return}
   if(b.cat==='Module'&&!String(b.fits||'').trim()){toast('Name the slot type this module fits.');$('#bFt')&&$('#bFt').focus();return}
   const nb=bldProd(b),map={},cnt={in:0,out:0};let typeOrSide=0;
   if(!b.simple)b.ports.forEach(pt=>{const i=cnt[pt.side]++;if(!pt.o)return;const [od,oi]=pt.o.split(':'),old=(od==='in'?p.ins:p.outs)[+oi];
@@ -4577,6 +4583,7 @@ const A={
   modYes(){const a=S.ui.modAsk;if(a)setModule(a.uid,a.k,a.pid)},
   modNo(){S.ui.modAsk=null;renderInspector()},
   libEdit(el){openEditor(el.dataset.id)},
+  palPorts(el){openEditor(el.dataset.id);const h=document.querySelector('#overlay .plh');if(h)h.scrollIntoView({block:'start'})},
   rcChip(el){const k=el.dataset.k,a=S.ui.rcArm;
     if(!a||a===k){S.ui.rcArm=a===k?null:k;renderRackConn();return}
     const A=rcParse(a),B=rcParse(k);
@@ -4597,7 +4604,7 @@ const A={
     const r=await saveFile(new Blob([csv],{type:'text/csv'}),name);
     toast(r==='saved'?`${name} is ready (${plural(rows.length,'device')}${rows.filter(x=>x[9]).length<rows.length?`, ${rows.length-rows.filter(x=>x[9]).length} still without a serial number`:''}).`:r==='declined'?'Download cancelled.':'Another download is waiting for you to confirm.')},
   palToggle(el){const o=S.ui.palOpen||(S.ui.palOpen={}),c=el.dataset.cat;if(($('#palQ')||{}).value)return;o[c]=!o[c];save();renderPal();const b=document.querySelector(`.palhd[data-cat="${CSS.escape(c)}"]`);if(b)b.focus()},
-  palAll(el){const o=S.ui.palOpen||(S.ui.palOpen={}),on=el.dataset.v==='1';lib.filter(placeable).forEach(p=>{o[p.cat]=on});save();renderPal()},
+  palAll(el){const o=S.ui.palOpen||(S.ui.palOpen={}),on=el.dataset.v==='1';lib.filter(placeable).forEach(p=>{o[p.cat]=on});o.__noports__=on;save();renderPal()},
   libMerge(el){const into=S.bld.editId,from=el.dataset.id,f=byId(from),t=byId(into);if(!f||!t)return;
     const r=mergeProduct(from,into);openEditor(into);badges();if(S.view==='library')R.library();
     toast(`Merged. ${r.moved?`${plural(r.moved,'placed device')} now ${r.moved===1?'uses':'use'} this ${t.model} (${plural(portCount(t),'port')}).`:'Nothing was placed with the other one.'}${r.dropped?` ${plural(r.dropped,'cable')} on ports this one doesn’t have ${r.dropped>1?'were':'was'} removed.`:''}`)},
