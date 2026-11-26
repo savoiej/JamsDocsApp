@@ -1,5 +1,5 @@
 import os
-APP=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','apps','jamsnet','index.html')
+APP=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','web','jamsnet','index.html')
 import asyncio,json,re
 exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'harness.py')).read().split('async def main')[0])
 SKIP=re.compile(r'del|remove|void|discard|reset|clear|purge|wipe|logout|print|pdf|csv|download|backup|export|save|send|sign|dictat|mic|record|camera|photo|upload|import|fullscreen|fs|ask|chat|sample|ai|find|search',re.I)
