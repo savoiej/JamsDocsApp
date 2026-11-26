@@ -1056,6 +1056,28 @@ main{padding-block:32px 56px;padding-left:max(clamp(16px,3vw,40px),env(safe-area
 .attn li{padding:12px 20px;border-bottom:1px solid var(--sunk);font-size:14px}
 .attn li:last-child{border-bottom:0}
 .attn li small{display:block;color:var(--muted);font-size:13px}
+/* job stage bar on the Projects page */
+.pjstages{padding:0;overflow:hidden}
+.pjstages ol{list-style:none;margin:0;padding:12px 12px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.pjstages ol::-webkit-scrollbar{display:none}
+.pjstages li{flex:1 1 0;min-width:128px;position:relative}
+.pjstages li button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:10px;align-items:center;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+@media (hover:hover){.pjstages li button:hover{border-color:var(--accent)}}
+.pjstages li button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pjstages .pjn{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:600 12px/1 var(--f-ui,var(--f-body));background:var(--sunk);color:var(--muted)}
+.pjstages .pjl{display:flex;flex-direction:column;min-width:0}.pjstages .pjl b{font-size:14px}.pjstages .pjl small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pjstages li.done .pjn{background:var(--ok-soft);color:var(--ok)}
+.pjstages li.cur button{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.pjstages li.cur .pjn{background:var(--accent);color:var(--accent-ink)}
+.pjstages li.lost .pjn{background:var(--bad-soft);color:var(--bad)}
+.pjstages li.todo .pjl b{color:var(--muted);font-weight:500}
+.pjnext{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:12px 16px 14px}
+.pjnext .l{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pjnext .t{flex:1;min-width:200px;font-size:14px}
+.attnbtn{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%}
+@media (hover:hover){.attnbtn:hover b{text-decoration:underline}}
+.attnbtn:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+@media (max-width:760px){.pjstages li{min-width:112px}.pjnext .t{min-width:0;flex-basis:100%}}
 /* draggable items: "all:unset" also clears the browser's drag setting, so turn it back on */
 [draggable="true"]{-webkit-user-drag:element;user-select:none;-webkit-user-select:none}@media (hover:hover) and (pointer:fine){[draggable="true"]:hover{-webkit-user-drag:element;user-select:none;-webkit-user-select:none}}
 .pldrop{border:1.5px dashed var(--line);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;background:var(--sunk)}
@@ -2275,8 +2297,10 @@ R.overview=function(){
   const card=r=>`<button class="pcard${r.open?' on':''}" ${r.live?`data-act="openProject" data-id="${r.id}" data-to="proposal" title="Open this project"`:'tabindex="-1"'}><b>${esc(cliName(r))}</b><small>${esc(r.project)}${r.open?' · open now':''}</small><div class="pv">${money(r.value)}</div></button>`;
   const lostRows=rows.filter(r=>r.status==='Lost');
   const attn=[...hot.map(t=>`<li><b>${esc(t.id)}</b> · ${esc(t.issue||'Service ticket')}<small>${esc(t.site||'')} · high priority${t.tech?' · '+esc(t.tech):''}</small></li>`),
-    ...rows.filter(r=>r.status==='Viewed').map(r=>`<li><b>${esc(cliName(r))}</b> viewed the proposal<small>${money(r.value)} · follow up for a signature</small></li>`),
-    ...(S.invoices||[]).filter(v=>invStatus(v)==='Overdue').map(v=>`<li><b>${esc(v.no||'Invoice')}</b> is overdue<small>${esc((clientById(v.clientId)||{}).name||'')}${v.project?' · '+esc(v.project):''}</small></li>`)].slice(0,5);
+    ...(S.invoices||[]).filter(v=>invStatus(v)==='Overdue').map(v=>`<li><b>${esc(v.no||'Invoice')}</b> is overdue<small>${esc((clientById(v.clientId)||{}).name||'')}${v.project?' · '+esc(v.project):''}</small></li>`),
+    /* each live job's next step, unless it's waiting on someone else (overdue invoices are already listed above) */
+    ...PJ.list.map(e=>({e,r:pjStages(e)})).filter(({r})=>r.cur&&!r.cur.wait&&!r.lost&&!(r.cur.k==='invoice'&&/overdue/.test(r.cur.next))).map(({e,r})=>{const p=pjProp(e);
+      return `<li><button class="attnbtn" data-act="openProject" data-id="${e.id}" data-to="${r.cur.go}"><b>${esc(cliName(p))}</b> · ${esc(p.project||'Untitled')}<small>${esc(r.cur.l)}: ${esc(r.cur.next)}</small></button></li>`})].slice(0,6);
   $('#v-overview').innerHTML=`
   <header class="ovhero"><div><p class="eyebrow">${hi} · ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</p>
     <h1>${plural(open.length,'proposal')} out, ${week?plural(week,'visit')+' on the calendar':'nothing on the calendar'} this week.</h1></div>
@@ -6264,6 +6288,7 @@ R.projects=function(){
    <div class="actions"><select class="inp" id="pjSel2" aria-label="Open project" style="width:auto">${projOptions()}</select><button class="btn" data-act="newProject">+ New project</button>
    ${S.tasks.length||!pjTaskList(S.prop.ptype||'av').length?'':'<button class="btn" data-act="addStdTasks">Add standard tasks</button>'}
    <div class="seg" role="group" aria-label="Task view"><button data-pm="kanban" aria-pressed="${S.projMode==='kanban'}">Board</button><button data-pm="list" aria-pressed="${S.projMode==='list'}">List</button><button data-pm="gantt" aria-pressed="${S.projMode==='gantt'}">Timeline</button><button data-pm="week" aria-pressed="${S.projMode==='week'}">Team week</button></div></div></header>
+  ${pjStagesHTML()}
   ${pjDetailsHTML()}
   ${(S.prop.services||pjTypeOf(S.prop.ptype||'av').svc).some(k=>k==='proposal'||k==='design')&&canPrice()?`  <div class="panel cost">
    <div><div class="l">Contract value</div><div class="v">${money(contract)}</div><div class="muted" style="font-size:12px">From proposal, before tax</div></div>
@@ -6284,6 +6309,8 @@ R.projects=function(){
     ${S.time.slice().reverse().slice(0,6).map(t=>`<tr><td><span class="av">${esc(t.who)}</span></td><td>${esc(S.tasks.find(x=>x.id===t.task)?.title)}</td><td class="muted">${esc(t.type)}</td><td class="n">${t.hrs}</td></tr>`).join('')}</tbody></table></div>
   </div></div>`;
   tkRenderBody();
+  /* on narrow screens the stage row scrolls sideways: bring the current stage into view */
+  {const ol=document.querySelector('.pjstages ol'),c=ol&&ol.querySelector('li.cur');if(c&&ol.scrollWidth>ol.clientWidth)ol.scrollLeft=c.offsetLeft-(ol.clientWidth-c.clientWidth)/2}
 };
 
 /* ---------- task manager views ---------- */
@@ -6622,17 +6649,18 @@ const NLNAVK='jdd-nlnav-v1';let NLST=null;try{NLST=JSON.parse(localStorage.getIt
 function nlNav(st){NLST=st;try{localStorage.setItem(NLNAVK,JSON.stringify(st))}catch(e){}nlNavRender()}
 /* ================= SIDEBAR: AV design and network docs in one organized menu ================= */
 const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-/* the sidebar, in the order the work happens: find the client, sell, design and build, bill, then support */
+/* the sidebar, in the order a job runs: sell, design, build, bill, then support */
 const NAV_IC={"av:overview": "<path d=\"M3 11l9-7 9 7\"/><path d=\"M5 10v10h14V10\"/>", "av:dcenter": "<path d=\"M3 21l4-1 11-11-3-3L4 17z\"/><path d=\"M14 6l3 3\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/>", "av:inbox": "<path d=\"M3 13h5l1 3h6l1-3h5\"/><path d=\"M5.5 5h13L21 13v6H3v-6z\"/>", "av:assistant": "<path d=\"M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z\"/><path d=\"M19 16v4M17 18h4\"/>", "av:clients": "<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20a6.5 6.5 0 0 1 13 0\"/><path d=\"M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8\"/>", "av:proposal": "<path d=\"M6 3h9l4 4v14H6z\"/><path d=\"M14 3v5h5\"/><path d=\"M9 14l2 2 4-4\"/>", "av:projects": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4M7 14h4M7 17h7\"/>", "av:design": "<rect x=\"3\" y=\"4\" width=\"7\" height=\"6\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"6\" rx=\"1\"/><path d=\"M10 7h4a2 2 0 0 1 2 2v5\"/>", "av:library": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"5\" rx=\"1\"/><rect x=\"3\" y=\"11\" width=\"18\" height=\"5\" rx=\"1\"/><path d=\"M7 6.5h.01M7 13.5h.01M3 20h18\"/>", "av:estimate": "<path d=\"M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z\"/>", "av:purchasing": "<circle cx=\"9\" cy=\"20\" r=\"1.5\"/><circle cx=\"18\" cy=\"20\" r=\"1.5\"/><path d=\"M2 3h3l2.7 12.5h11.6L22 7H6.2\"/>", "av:field": "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/>", "av:billing": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "nl:billing": "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 7h6M9 11h6M9 15h4\"/>", "av:contracts": "<path d=\"M6 3h9l4 4v14H6z\"/><path d=\"M14 3v5h5M9 17c1.5-2 2.5-2 3 0s1.5 1 3-1\"/>", "av:service": "<path d=\"M4 13a8 8 0 0 1 16 0\"/><rect x=\"3\" y=\"13\" width=\"4\" height=\"6\" rx=\"1\"/><rect x=\"17\" y=\"13\" width=\"4\" height=\"6\" rx=\"1\"/>", "nl:tickets": "<path d=\"M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v8a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2z\"/><path d=\"M14 7v2M14 11v2M14 15v2\"/>", "nl:board": "<rect x=\"3\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\"/><rect x=\"10\" y=\"3\" width=\"5\" height=\"12\" rx=\"1\"/><rect x=\"17\" y=\"3\" width=\"4\" height=\"8\" rx=\"1\"/>", "nl:maint": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4\"/>", "nl:field": "<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><path d=\"M14 14h3v3h-3zM21 14v.01M14 21h.01M17 21h4v-4\"/>", "nl:contacts": "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M8 17a4 4 0 0 1 8 0\"/>", "nl:runbooks": "<path d=\"M4 4h6a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4z\"/><path d=\"M20 4h-5a2 2 0 0 0-2 2M20 4v15h-7\"/>", "nl:sites": "<path d=\"M4 21V5l8-2v18M12 7l8 3v11M2 21h20M8 8v.01M8 12v.01M8 16v.01M16 13v.01M16 17v.01\"/>", "nl:plans": "<path d=\"M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z\"/><path d=\"M9 4v14M15 6v14\"/>", "nl:devices": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"/><path d=\"M8 20h8M12 16v4\"/>", "nl:racks": "<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"1\"/><path d=\"M5 8h14M5 14h14M9 5h.01M9 11h.01M9 17h.01\"/>", "nl:power": "<path d=\"M13 2L4 14h7l-1 8 9-12h-7z\"/>", "nl:cabling": "<path d=\"M4 19v-4a4 4 0 0 1 4-4h8a4 4 0 0 0 4-4V5\"/><rect x=\"2\" y=\"19\" width=\"4\" height=\"3\" rx=\"1\"/><rect x=\"18\" y=\"2\" width=\"4\" height=\"3\" rx=\"1\"/>", "nl:jacks": "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"/><rect x=\"9\" y=\"7\" width=\"6\" height=\"4\" rx=\"1\"/><rect x=\"9\" y=\"13\" width=\"6\" height=\"4\" rx=\"1\"/>", "nl:lifecycle": "<path d=\"M20 11a8 8 0 0 0-14.9-3M4 13a8 8 0 0 0 14.9 3\"/><path d=\"M5 3v5h5M19 21v-5h-5\"/>", "nl:discover": "<path d=\"M12 3v12M7 10l5 5 5-5\"/><path d=\"M4 19h16\"/>", "nl:inventory": "<path d=\"M3 7l9-4 9 4-9 4z\"/><path d=\"M3 7v10l9 4 9-4V7M12 11v10\"/>", "nl:topology": "<rect x=\"9\" y=\"3\" width=\"6\" height=\"5\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"/><rect x=\"15\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"/><path d=\"M12 8v4M6 16v-2h12v2\"/>", "nl:ipam": "<path d=\"M5 9h15M4 15h15M10 3L8 21M16 3l-2 18\"/>", "nl:circuits": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18\"/>", "nl:wireless": "<path d=\"M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0\"/><path d=\"M12 19.5h.01\"/>", "nl:security": "<path d=\"M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z\"/>", "nl:dnscloud": "<path d=\"M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z\"/>", "nl:audit": "<rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M9 2h6v4H9zM9 14l2 2 4-4\"/>", "nl:revisions": "<path d=\"M3 12a9 9 0 1 0 3-6.7L3 8\"/><path d=\"M3 3v5h5M12 7v5l3 2\"/>", "nl:labels": "<path d=\"M3 12V3h9l9 9-9 9z\"/><path d=\"M7.5 7.5h.01\"/>", "nl:docset": "<path d=\"M8 3h8l4 4v12H8z\"/><path d=\"M16 3v4h4M4 7v14h12\"/>", "nl:portal": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 9h18M7 6.5h.01M10 6.5h.01\"/>", "av:registers": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"10\" rx=\"1\"/><path d=\"M6 11V5h8v6M16 8h3v3M8 15h.01M12 15h.01M16 15h.01\"/>", "nl:help": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14M12 17.5h.01\"/>", "av:settings": "<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2\"/>", "nl:admin": "<circle cx=\"11\" cy=\"8\" r=\"4\"/><path d=\"M3 21a8 8 0 0 1 11-7.4M18 15v6M15 18h6\"/>", "av:inventory": "<path d=\"M3 7l9-4 9 4-9 4z\"/><path d=\"M3 7v10l9 4 9-4V7M12 11v10\"/>"};
 const NAVL=[
  {top:'av:overview|Dashboard'},
- {top:'av:dcenter|Design Center'},
  {top:'av:inbox|Client inbox|#bInbox'},
  {top:'av:assistant|Assistant|AI'},
- {sec:'clients',title:'Sales',items:['av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals']},
- {sec:'projects',title:'Design & build',items:['av:projects|Projects & schedule', 'av:design|Design drawings|#bDesign', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
- {sec:'billing',title:'Billing',items:['av:billing|Time & invoicing|#bTime', 'nl:billing|Network time & billing']},
- {sec:'support',title:'Service',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
+ {sec:'clients',title:'Sell',items:['av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals']},
+ {sec:'design',title:'Design',items:['av:design|Design drawings|#bDesign', 'av:dcenter|Design Center', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables']},
+ {sec:'projects',title:'Build',items:['av:projects|Projects & schedule', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
+ /* one place for billing: network support time opens from a switch on the Time & invoicing page */
+ {sec:'billing',title:'Bill',items:['av:billing|Time & invoicing|#bTime']},
+ {sec:'support',title:'Support',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
  {net:true},
  {sec:'physical',title:'Physical',items:['nl:sites', 'nl:plans', 'nl:devices', 'nl:racks', 'nl:power', 'nl:cabling', 'nl:jacks', 'nl:lifecycle', 'nl:discover', 'nl:inventory|Site inventory']},
  {sec:'logical',title:'Logical',items:['nl:topology', 'nl:ipam', 'nl:circuits', 'nl:wireless', 'nl:security', 'nl:dnscloud']},
@@ -6642,7 +6670,7 @@ const NAVL=[
 const NL_DEF={sites:'Sites & rooms',plans:'Floor plans',devices:'Devices',racks:'Racks',power:'Power',cabling:'Cabling',jacks:'Wall jacks',lifecycle:'Lifecycle & budget',discover:'Import from switches',inventory:'Site inventory',topology:'Topology',ipam:'IP & VLANs',circuits:'WAN circuits',wireless:'Wireless',security:'Firewall & VPN',dnscloud:'DNS & cloud',tickets:'Tickets',board:'Board',billing:'Time & billing',maint:'Maintenance',field:'Field view',contacts:'Contacts',runbooks:'Runbooks',audit:'Audit',revisions:'Revisions',labels:'Labels',docset:'Document set',portal:'Client portal',help:'Help & guide',overview:'Network overview'};
 function nlItem(go){if(!NLST)return go==='admin'||go==='portal'?null:{go,label:NL_DEF[go]||go};const all=[...NLST.top,...NLST.secs.flatMap(x=>x.items)];return all.find(x=>x.go===go)||null}
 function navItem(spec,top,icon){const [k,lab,extra]=spec.split('|'),[kind,go]=k.split(':');if(S.tech&&((kind==='av'&&TECH_HIDE.includes(go))||(kind==='nl'&&go==='billing')))return '';
-  if(kind==='av'){const cur=S.view===go&&S.view!=='networks';
+  if(kind==='av'){const cur=(S.view===go&&S.view!=='networks')||(go==='billing'&&S.view==='networks'&&NLST&&NLST.view==='billing');
     return `<button data-go="${go}"${top?' class="navtop"':''}${cur?' aria-current="page"':''}${top?'':` title="${esc(lab)}"`}>${NVI(NAV_IC[k]||icon||'')}<span class="nvl">${esc(lab)}</span>${extra?(extra[0]==='#'?`<span class="badge" id="${extra.slice(1)}">0</span>`:`<span class="k">${esc(extra)}</span>`):''}</button>`}
   const it=nlItem(go);if(!it)return '';const cur=S.view==='networks'&&NLST&&NLST.view===go;
   return `<button data-nlgo="${go}"${it.locked?' class="locked"':''}${cur?' aria-current="page"':''}>${NVI(NAV_IC[k]||'<circle cx="12" cy="12" r="2"/>')}<span class="nvl">${esc(lab||it.label)}</span>${it.badge&&it.badge!=='0'?`<span class="badge${it.bad?' bad':''}">${esc(it.badge)}</span>`:''}</button>`}
@@ -6958,6 +6986,36 @@ document.addEventListener('input',e=>{if(e.target&&e.target.id==='npC'&&$('#npCt
 function npRead(){const v=id=>(($('#'+id)||{}).value||'').trim(),n=id=>v(id)===''?'':r2(+v(id)),b=v('npB');
   return {ptype:v('npY'),services:npSvcs(),startDate:v('npD1'),dueDate:v('npD2'),po:v('npPO'),scope:v('npNo'),billRate:['hourly','nte'].includes(b)?n('npRt'):'',
     billing:{method:b,contract:b==='contract'?v('npCt'):'',estHours:['hourly','nte'].includes(b)?n('npEh'):'',cap:b==='nte'?n('npCap'):''}}}
+/* ---------- job stages: where a project stands and the one next step ----------
+   Only the stages that fit the project's services show (a documentation job has no design or purchasing). */
+function pjStages(e){if(!e)return {list:[],cur:null,complete:false};const open=e.id===PJ.cur,P=pjProp(e),ty=pjTypeOf(P.ptype||'av'),sv=P.services||ty.svc,B=P.billing||{};
+  const tasks=open?S.tasks:(Array.isArray(e.tasks)?e.tasks:[]),des=open?S.design:e.design,nodes=des&&Array.isArray(des.nodes)?des.nodes.length:0;
+  const st=P.status||'Draft',signed=st==='Signed'||st==='Change order',sold=sv.includes('proposal')||sv.includes('design');
+  const pos=(P.purch&&Array.isArray(P.purch.pos)?P.purch.pos:[]).filter(poLive),inv=(S.invoices||[]).filter(v=>v.pj===e.id&&!v.void);
+  const L=[];
+  if(sv.includes('design'))L.push({k:'design',l:'Design',go:'design',done:nodes>0,sub:nodes?plural(nodes,'device'):'Not started',next:'Place the devices on the drawings',btn:'Open drawings'});
+  if(sold)L.push({k:'proposal',l:'Proposal',go:'proposal',done:signed,lost:st==='Lost',wait:st==='Sent',sub:st,
+    next:st==='Lost'?'The proposal is marked lost':st==='Viewed'?'The client viewed the proposal. Follow up for a signature.':st==='Sent'?'Proposal sent. Waiting for the client to open it.':'Send the proposal to the client',btn:st==='Draft'?'Open proposal':'View proposal'});
+  if(sv.includes('proposal')){let need=0,left=0,rec=false;
+    if(open){try{const nd=poNeeds();need=nd.reduce((a,n)=>a+n.need,0);left=nd.reduce((a,n)=>a+n.left,0);rec=need>0&&nd.every(n=>n.rec>=n.need)}catch(_){}}
+    else{need=pos.length;left=pos.length?0:1;rec=pos.length>0&&pos.every(p=>poStatus(p)==='Received')}
+    L.push({k:'purchase',l:'Purchase',go:'purchasing',done:need>0&&left===0&&rec,wait:need>0&&left===0&&!rec,
+      sub:open?(need?(left?`${left} to order`:rec?'All received':'On order'):'Nothing yet'):(pos.length?plural(pos.length,'PO'):'Nothing yet'),
+      next:open&&left?`Order ${plural(left,'item')} from the bill of materials`:need&&!left&&!rec?'Waiting on deliveries. Check items in as they arrive.':'Order the equipment',btn:'Open purchasing'})}
+  {const openT=tasks.filter(t=>t.col!=='done'),over=openT.filter(t=>t.dd<tkIso(0));
+    L.push({k:'work',l:'Work',go:'projects',done:tasks.length>0&&!openT.length,sub:tasks.length?`${tasks.length-openT.length} of ${tasks.length} tasks`:'No tasks',
+      next:!tasks.length?'Add tasks or schedule the work':over.length?`${plural(over.length,'task')} overdue, ${openT.length} open`:`${plural(openT.length,'task')} to finish`,btn:'Open tasks'})}
+  if(B.method!=='contract'&&B.method!=='internal'){const od=inv.find(v=>invStatus(v)==='Overdue'),dr=inv.find(v=>invStatus(v)==='Draft'),un=inv.find(v=>invStatus(v)!=='Paid');
+    L.push({k:'invoice',l:'Invoice',go:'billing',done:inv.length>0&&!un,wait:!!un&&!od&&!dr,sub:inv.length?plural(inv.length,'invoice'):'Not billed',
+      next:!inv.length?'Bill the client for this job':od?`Invoice ${od.no||''} is overdue`:dr?`Send invoice ${dr.no||''}`:`Waiting on payment for ${un.no||'the invoice'}`,btn:'Time & invoicing'})}
+  const list=S.tech?L.filter(x=>x.k!=='proposal'&&x.k!=='invoice'):L,cur=list.find(x=>!x.done)||null;
+  return {list,cur,complete:list.length>0&&!cur,lost:L.some(x=>x.lost)}}
+function pjStagesHTML(){const e=curPj(),r=pjStages(e);if(!r.list.length)return '';
+  const items=r.list.map((x,i)=>{const cls=x.done?'done':x===r.cur?'cur':'todo';
+    return `<li class="${cls}${x.lost?' lost':''}"><button data-go="${x.go}"${x===r.cur?' aria-current="step"':''}><span class="pjn" aria-hidden="true">${x.done?'✓':i+1}</span><span class="pjl"><b>${esc(x.l)}</b><small>${esc(x.sub)}</small></span></button></li>`}).join('');
+  const nx=r.cur?`<div class="pjnext"><span class="l">Next step</span><span class="t">${esc(r.cur.next)}</span><button class="btn sm${r.cur.wait?'':' primary'}" data-go="${r.cur.go}">${esc(r.cur.btn)}</button></div>`
+    :`<div class="pjnext"><span class="l">Next step</span><span class="t">Every stage is done. Close the job out with the client.</span></div>`;
+  return `<nav class="panel pjstages" aria-label="Job stages"><ol>${items}</ol>${nx}</nav>`}
 /* the details strip on the Projects page */
 function pjDetailsHTML(){const P=S.prop,B=P.billing||{},ty=pjTypeOf(P.ptype||'av'),svc=(P.services||ty.svc).map(k=>(PJ_SVCS.find(s=>s[0]===k)||[k,k])[1]),e=curPj();
   const tb=typeof tbAll==='function'?tbAll().filter(x=>x.e.id===e.id):[],hrs=tb.reduce((s,{t})=>s+(+t.hrs||0),0),amt=tb.reduce((s,{t,e})=>s+tbAmt(t,e),0);
@@ -7553,8 +7611,8 @@ R.billing=function(){const el=$('#v-billing');const f=S.ui.tbf||(S.ui.tbf={pj:''
   const tm=tbTimer(),tmE=tm&&pjById(tm.pj);
   const sel=S.ui.tbPj&&pjById(S.ui.tbPj)?S.ui.tbPj:PJ.cur,selE=pjById(sel);
   const tot=rows.reduce((s,{t})=>s+(+t.hrs||0),0),totA=rows.reduce((s,{t,e})=>s+tbAmt(t,e),0);
-  el.innerHTML=`<header class="vh"><div><p class="eyebrow">Sales &amp; clients</p><h1>Time &amp; invoicing</h1><p class="sub">Track hours on every project, then turn unbilled time into an invoice.</p></div>
-   <div class="actions"><button class="btn" data-act="tbSettings">Rates &amp; rounding</button><button class="btn" data-act="tbCsv">Export CSV</button><button class="btn" data-act="tbEdit">+ Log time</button><button class="btn primary" data-act="tbInvoice"${unb.length?'':' disabled'}>Invoice unbilled time</button></div></header>
+  el.innerHTML=`<header class="vh"><div><p class="eyebrow">Bill</p><h1>Time &amp; invoicing</h1><p class="sub">Track hours on every project, then turn unbilled time into an invoice.</p></div>
+   <div class="actions"><div class="seg" role="group" aria-label="Whose time"><button aria-pressed="true">Projects</button><button data-nlgo="billing" aria-pressed="false" title="Support time logged against client networks">Network support</button></div><button class="btn" data-act="tbSettings">Rates &amp; rounding</button><button class="btn" data-act="tbCsv">Export CSV</button><button class="btn" data-act="tbEdit">+ Log time</button><button class="btn primary" data-act="tbInvoice"${unb.length?'':' disabled'}>Invoice unbilled time</button></div></header>
   <div class="panel tbtimer${tm?' tbon':''}"><div class="pb">${tm?`<div class="tbrun"><span class="tbdot" aria-hidden="true"></span><div class="tbwhat"><b>${esc([pjProp(tmE).project,tm.task?tbTaskName({task:tm.task},tmE):tm.type].filter(Boolean).join(' · '))}</b><span class="muted">${esc(pjProp(tmE).client||'')}${tm.note?' · '+esc(tm.note):''} · ${esc(tm.who||'')}</span></div><span class="tbclock mono" id="tbClock" aria-live="off">${tbClock(Date.now()-tm.start)}</span><button class="btn" data-act="tbDiscard">Discard</button><button class="btn primary" data-act="tbStop">Stop and log</button></div>`
    :`<div class="tbstart"><label class="field" for="tbPj">Project<select id="tbPj">${tbPjOptions(sel)}</select></label>
      <label class="field" for="tbTask">Task<select id="tbTask"><option value="">No task</option>${pjTasks(selE).map(k=>`<option value="${k.id}">${esc(k.title)}</option>`).join('')}</select></label>
@@ -7957,7 +8015,7 @@ const NEW_ITEMS=[
  ['Invoice','Bill a client',()=>{if(S.view!=='clients')go('clients');A.newInvoice()}],
  ['Service ticket','AV service desk',()=>newTicket(null)],
  ['Network','Client Networks',()=>{nlOpen('overview');setTimeout(()=>{const api=NLF&&NLF.contentWindow&&NLF.contentWindow.NL_API;if(api)api.net('__new')},400)}]];
-function navLabelFor(){if(S.view==='networks'){const g=NLST&&NLST.view,f=[...NAVL].find(x=>x.items&&x.items.some(i=>i.startsWith('nl:'+g+'|')||i==='nl:'+g));if(!g||g==='overview')return ['Client Networks','Network overview'];const it=nlItem(g);const lab=f&&f.items.find(i=>i.split('|')[0]==='nl:'+g);return [f?f.title:'Client Networks',(lab&&lab.split('|')[1])||(it&&it.label)||'Network overview']}
+function navLabelFor(){if(S.view==='networks'&&NLST&&NLST.view==='billing')return ['Bill','Time & invoicing · Network support'];if(S.view==='networks'){const g=NLST&&NLST.view,f=[...NAVL].find(x=>x.items&&x.items.some(i=>i.startsWith('nl:'+g+'|')||i==='nl:'+g));if(!g||g==='overview')return ['Client Networks','Network overview'];const it=nlItem(g);const lab=f&&f.items.find(i=>i.split('|')[0]==='nl:'+g);return [f?f.title:'Client Networks',(lab&&lab.split('|')[1])||(it&&it.label)||'Network overview']}
   if(S.studio&&S.view==='design')return ['Design Center',(dcById(S.studio.id)||{}).name||'Template'];
   for(const g of NAVL){if(g.top&&g.top.split('|')[0]==='av:'+S.view)return ['',g.top.split('|')[1]];if(g.items){const x=g.items.find(i=>i.split('|')[0]==='av:'+S.view);if(x)return [g.title,x.split('|')[1]]}}return ['','']}
 function renderTopbar(){const el=$('#topbar');if(!el)return;const [sec,page]=navLabelFor(),tm=typeof tbTimer==='function'?tbTimer():null;
