@@ -1745,6 +1745,34 @@ button:not(:disabled):active{filter:brightness(.92)}
   :root[data-glass] .tabbar button{color:var(--muted)}
   :root[data-glass] .tabbar button[aria-current="page"]{color:var(--accent)}
   :root[data-glass] .tabbar button[aria-current="page"]::before{background:var(--hl)}}
+/* ===== Design Center ===== */
+.dckpis .kbtn.on{box-shadow:0 0 0 2px var(--accent)!important}
+.dckpis .kbtn:last-child .v{font-size:clamp(18px,1.6vw,22px)!important;line-height:1.2;overflow-wrap:anywhere}
+.dcfr .apseg{flex-wrap:nowrap}
+.dcfilt .dcfr{display:flex;gap:8px;align-items:center;margin-left:auto}.dcfilt .dcfr .inp{width:auto}
+.dcseg{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}.dcseg button{white-space:nowrap;flex:none}
+.dctags{display:flex;flex-wrap:wrap;gap:4px}.dctags button,.dctags span{all:unset;cursor:pointer;font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px}
+.dctags span{cursor:default}.dctags.sm{margin-top:4px}.dctags button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.dctags button:focus-visible{outline:2px solid var(--accent)}
+.dctagbar{align-items:center;margin:-4px 0 14px;gap:6px}.dctagbar .muted{font-size:12.5px;margin-right:4px}.dctagbar .dcclr{background:none;color:var(--muted);text-decoration:underline}
+.dcthw{position:relative}.dclive{display:block;width:100%;height:100%}.dclive svg{display:block;width:100%;height:100%}
+.dcstar{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;flex:none;color:var(--muted)}
+.dcthw .dcstar{position:absolute;top:8px;right:8px;background:color-mix(in srgb,var(--surface) 90%,transparent);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.dcstar svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}.dcstar[aria-pressed="true"]{color:#E0A100}.dcstar[aria-pressed="true"] svg{fill:currentColor}
+.dcstar:focus-visible{outline:2px solid var(--accent)}
+.dccard.fav{box-shadow:0 0 0 1.5px color-mix(in srgb,#E0A100 55%,transparent),var(--shadow)}
+.dcuse b{color:var(--fg);font-weight:600}
+.dcmore{position:relative;margin-left:auto}.dcmore summary{list-style:none;cursor:pointer}.dcmore summary::-webkit-details-marker{display:none}
+.dcmenu{position:absolute;right:0;bottom:calc(100% + 6px);z-index:5;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;box-shadow:0 18px 40px -16px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.dcmenu button{all:unset;cursor:pointer;padding:9px 12px;border-radius:10px;font-size:14px}.dcmenu button.bad{color:var(--bad)}
+@media (hover:hover) and (pointer:fine){.dcmenu button:hover{background:var(--sunk)}}.dcmenu button:focus-visible{outline:2px solid var(--accent)}
+.dclist td{vertical-align:middle}.dclist .dcstar{width:32px;height:32px}.dcrowact{white-space:nowrap;text-align:right}.dcrowact .btn{margin-left:4px}
+.dcnote2{margin-top:14px}
+.dcest{width:100%;border-collapse:collapse;font-size:13.5px}.dcest td{padding:5px 0;border-bottom:1px solid var(--line)}.dcest .n{text-align:right;font-variant-numeric:tabular-nums}.dcest .tot td{font-weight:700;border-bottom:0}
+.dceq{display:flex;flex-direction:column;gap:4px}.dceq details{border:1px solid var(--line);border-radius:12px;padding:6px 10px}.dceq summary{cursor:pointer;font-size:13px;font-weight:600;display:flex;justify-content:space-between}
+.dceq ul{list-style:none;margin:6px 0 2px;padding:0;display:flex;flex-direction:column;gap:4px}.dceq li{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}.dceq li b{font-variant-numeric:tabular-nums}
+.dcpvmore{display:flex;gap:8px;flex-wrap:wrap}
+.dwpv-h .dcstar{background:var(--sunk)}
 /* ===== Design drawings dashboard + preview ===== */
 .dwkpis .kbtn.on{box-shadow:0 0 0 2px var(--accent)!important}
 .dwgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
@@ -2461,7 +2489,7 @@ function go(v){
   S.view=v;document.body.classList.toggle('nlmode',v==='networks');if(typeof nlNavRender==='function')nlNavRender();if(typeof renderTopbar==='function')renderTopbar();
   VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v);
   const nv=S.studio&&v==='design'?'dcenter':v==='design'?'drawings':v;
-  if(v!=='drawings'&&S.dwp)dwClose();
+  if(S.dwp&&!((S.dwp.kind==='dc'&&v==='dcenter')||(S.dwp.kind!=='dc'&&v==='drawings')))dwClose();
   document.querySelectorAll('#nav [data-go]').forEach(b=>{if(b.dataset.go===nv)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});navSync(nv);
   R[v]();badges();window.scrollTo(0,0);
 }
@@ -5788,7 +5816,7 @@ function dcBuild(start,name){
   (d.cables||[]).forEach(c=>{delete c.status;delete c.note});
   if(d.plan&&d.plan.room)d.plan.room.name=name;d.meta.rev='A';return d}
 function dcNew(f){const name=String(f.name||'').trim().slice(0,80)||'Untitled design';const d=dcBuild(f.start||'blank',name);if(!d){toast('That starting point could not be copied.');return null}
-  const t={id:'dt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,kind:DC_KINDS.includes(f.kind)?f.kind:'Other',notes:String(f.notes||'').slice(0,400),created:Date.now(),updated:Date.now(),u:uidc,design:d};
+  const t={id:'dt'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,kind:DC_KINDS.includes(f.kind)?f.kind:'Other',notes:String(f.notes||'').slice(0,400),tags:dcTagParse(f.tags||''),created:Date.now(),updated:Date.now(),u:uidc,design:d};
   DC.unshift(t);dcStore();return t}
 function dcEnter(id){const t=dcById(id);if(!t){toast('That template is gone.');return}
   if(S.studio){if(S.studio.id===id){go('design');return}dcExit(true)}
@@ -5799,6 +5827,7 @@ function dcExit(quiet){if(!S.studio)return;dcCapture();dcStore();S.design=S.stud
   if(!quiet)toast('Template saved.')}
 /* a saved template replacing a project's drawings: the project keeps its own title blocks */
 function dcLoadInto(id){const t=dcById(id);if(!t){toast('That template is gone.');return}
+  if(!S.studio){t.uses=(+t.uses||0)+1;t.lastUsed=Date.now();dcStore()}
   const d=normDesign(dcClone(t.design));if(!d)return;
   if(!S.studio)['meta','meta2','meta3','meta4','meta5','meta6','meta7'].forEach(k=>{if(S.design[k])d[k]=S.design[k]});
   S.design=d;uidc=Math.max(uidc,+t.u||0,maxUid());S.sel=null;S.wire=null;S.planTool=null;try{cleanRacks()}catch(e){}}
@@ -5823,37 +5852,105 @@ function dcStudioBar(){const t=dcById(S.studio.id)||{name:'Template'};
   return `<div class="dcbar" role="region" aria-label="Template editing">
    <div class="dcbar-l"><span class="dcbadge">Template</span><label class="sr" for="dcName">Template name</label><input class="inp" id="dcName" value="${esc(t.name)}" maxlength="80" data-dcname="${t.id}"><span class="muted dcsaved">Saves as you work · no client project is changed</span></div>
    <div class="dcbar-r"><button class="btn" data-act="dcDup" data-id="${t.id}">Save as a copy</button><button class="btn" data-act="dcUse" data-id="${t.id}">Use in ${esc(S.prop.project||'project')}</button><button class="btn primary" data-act="dcClose">Done</button></div></div>`}
+function dcTagParse(v){return [...new Set(String(v||'').split(',').map(x=>x.trim().replace(/\s+/g,' ').slice(0,24)).filter(Boolean))].slice(0,8)}
+const dcTags=t=>Array.isArray(t.tags)?t.tags:[];
+const DC_SORTS=[['recent','Recently edited'],['name','Name A–Z'],['used','Most used'],['devices','Most devices'],['est','Lowest estimate']];
+/* render or price a template with the editor's own code, then put the open project back */
+function dcWith(t,fn,asTpl){const keep={d:S.design,p:S.prop,l:S.liveSet,sh:S.ui.sheet};let out=null;
+  try{const dd=normDesign(dcClone(t.design));if(!dd)return null;S.design=dd;if(asTpl)S.prop={...keep.p,project:t.name,client:'Template · '+t.kind,drawings:null,revs:[],attach:{}};out=fn()}catch(e){out=null}
+  finally{S.design=keep.d;S.prop=keep.p;S.liveSet=keep.l;S.ui.sheet=keep.sh}return out}
+const DCC={};
+function dcCache(t,k,fn){const sg=(t.updated||0)+'|'+k+'|'+(k==='est'?[S.prop.markup,S.prop.laborRate,S.prop.laborMethod,S.prop.laborPct,S.prop.tax].join(','):'');const c=DCC[t.id+k];if(c&&c.s===sg)return c.v;const v=fn();DCC[t.id+k]={s:sg,v};return v}
+function dcEst(t){return dcCache(t,'est',()=>dcWith(t,()=>{const q=quote(),g={};q.lines.forEach(l=>{const c=l.p.cat||'Other';(g[c]=g[c]||[]).push({mfr:l.p.mfr||'',model:l.p.model||l.p.id,qty:l.qty})});return {equip:q.equip,hrs:q.hrs,labor:q.labor,total:q.total,groups:g,items:q.lines.reduce((a,l)=>a+l.qty,0)}}))}
+function dcSet(t){return dcCache(t,'set',()=>dcWith(t,()=>drawingSet(),true))}
+function dcLive(t){return dcCache(t,'th',()=>(t.design&&(t.design.nodes||[]).length)?dcWith(t,()=>snapCanvas('flow'),true)||'':'')}
+function dcSorted(L,how){const n=t=>(t.design&&t.design.nodes||[]).length,e=t=>{const x=canPrice()?dcEst(t):null;return x?x.total:0};
+  return L.sort(how==='name'?(a,b)=>a.name.localeCompare(b.name):how==='used'?(a,b)=>(+b.uses||0)-(+a.uses||0)||(b.updated||0)-(a.updated||0):how==='devices'?(a,b)=>n(b)-n(a):how==='est'?(a,b)=>e(a)-e(b):(a,b)=>(b.updated||0)-(a.updated||0))
+    .sort((a,b)=>(!!b.fav)-(!!a.fav))}
+function dcStar(t){return `<button type="button" class="dcstar" data-act="dcFav" data-id="${t.id}" aria-pressed="${!!t.fav}" aria-label="${t.fav?'Remove from':'Add to'} favorites: ${esc(t.name)}" title="${t.fav?'Favorite':'Add to favorites'}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg></button>`}
+function dcUsed(t){return +t.uses?`Used ${plural(+t.uses,'time')}`:'Not used yet'}
+function dcCardHTML(t){const ask=S.ui.dcDelAsk===t.id,est=canPrice()?dcEst(t):null,tg=dcTags(t);
+  return `<article class="panel dccard${t.fav?' fav':''}">
+    <div class="dcthw"><button class="dcth" data-act="dcPreview" data-id="${t.id}" aria-label="Preview ${esc(t.name)}"><span class="dclive" data-dclive="${t.id}">${dcThumb(t.design)}</span></button>${dcStar(t)}</div>
+    <div class="dcbody"><label class="sr" for="dcn-${t.id}">Name</label><input class="dcnm" id="dcn-${t.id}" value="${esc(t.name)}" maxlength="80" data-dcname="${t.id}">
+     <div class="dcmeta"><label class="sr" for="dck-${t.id}">Kind</label><select class="dckind" id="dck-${t.id}" data-dckind="${t.id}">${DC_KINDS.map(x=>`<option${x===t.kind?' selected':''}>${x}</option>`).join('')}</select><span>${esc(dcWhen(t.updated))}</span></div>
+     ${t.notes?`<p class="dcnote">${esc(t.notes)}</p>`:''}
+     ${tg.length?`<div class="dctags">${tg.map(x=>`<button type="button" data-act="dcTag" data-tag="${esc(x)}">#${esc(x)}</button>`).join('')}</div>`:''}
+     <p class="dcst">${dcStats(t.design).map(esc).join(' · ')}</p>
+     <p class="dcst dcuse">${esc(dcUsed(t))}${est&&est.total?` · <b>Est. ${money(est.total)}</b>`:''}</p></div>
+    <div class="dcact">${ask?`<span class="dcask">Delete this template?</span><button class="btn sm" data-act="dcDelNo">Keep</button><button class="btn sm danger" data-act="dcDel" data-id="${t.id}">Delete</button>`:
+      `<button class="btn sm" data-act="dcPreview" data-id="${t.id}">Preview</button><button class="btn sm primary" data-act="dcOpen" data-id="${t.id}">Edit</button><button class="btn sm" data-act="dcNewPj" data-id="${t.id}">New project</button>
+       <details class="dcmore"><summary class="btn sm ghost" aria-label="More for ${esc(t.name)}">More</summary><div class="dcmenu"><button data-act="dcUse" data-id="${t.id}">Use in ${esc(clip(S.prop.project||'project',26))}</button><button data-act="dcDup" data-id="${t.id}">Duplicate</button><button data-act="dcExport" data-id="${t.id}">Export file</button><button class="bad" data-act="dcDel" data-id="${t.id}">Delete</button></div></details>`}</div></article>`}
+function dcRowHTML(t){const est=canPrice()?dcEst(t):null,d=t.design||{};
+  return `<tr><td>${dcStar(t)}</td><td><button type="button" class="lnk" data-act="dcPreview" data-id="${t.id}">${esc(t.name)}</button>${dcTags(t).length?`<div class="dctags sm">${dcTags(t).map(x=>`<span>#${esc(x)}</span>`).join('')}</div>`:''}</td><td>${esc(t.kind)}</td><td class="n">${(d.nodes||[]).length}</td><td class="n">${(d.cables||[]).length}</td><td class="n">${+t.uses||0}</td>${canPrice()?`<td class="n">${est&&est.total?money(est.total):'—'}</td>`:''}<td>${esc(dcWhen(t.updated))}</td>
+   <td class="dcrowact"><button class="btn sm primary" data-act="dcOpen" data-id="${t.id}">Edit</button><button class="btn sm" data-act="dcNewPj" data-id="${t.id}">New project</button></td></tr>`}
 R.dcenter=function(){
-  const q=(S.ui.dcq||'').trim().toLowerCase(),k=S.ui.dck||'';
-  const L=DC.slice().sort((a,b)=>(b.updated||0)-(a.updated||0)).filter(t=>(!k||t.kind===k)&&(!q||(t.name+' '+(t.notes||'')+' '+t.kind).toLowerCase().includes(q)));
-  const nf=S.ui.dcNew;
+  const q=(S.ui.dcq||'').trim().toLowerCase(),k=S.ui.dck||'',tag=S.ui.dctag||'',fav=!!S.ui.dcfav,sort=S.ui.dcs||'recent',view=S.ui.dcv==='list'?'list':'grid';
+  const L=dcSorted(DC.filter(t=>(!k||t.kind===k)&&(!tag||dcTags(t).includes(tag))&&(!fav||t.fav)&&(!q||(t.name+' '+(t.notes||'')+' '+t.kind+' '+dcTags(t).join(' ')).toLowerCase().includes(q))),sort);
+  const nf=S.ui.dcNew,uses=DC.reduce((a,t)=>a+(+t.uses||0),0),top=DC.slice().sort((a,b)=>(+b.uses||0)-(+a.uses||0))[0],favs=DC.filter(t=>t.fav).length,allTags=[...new Set(DC.flatMap(dcTags))].sort();
   const form=nf?`<form class="panel dcnew" id="dcNewF" autocomplete="off"><h2>New design</h2>
     <div class="dcnewg"><label class="field" for="dcnN">Name<input class="inp" id="dcnN" maxlength="80" placeholder="Executive boardroom, 12 seats" required></label>
      <label class="field" for="dcnK">Kind<select class="inp" id="dcnK">${DC_KINDS.map(x=>`<option${x===(k||'Conference room')?' selected':''}>${x}</option>`).join('')}</select></label>
      <label class="field" for="dcnS">Start from<select class="inp" id="dcnS"><option value="blank">Blank drawing set</option><option value="huddle">Huddle room template</option><option value="classroom">Classroom template</option><option value="copy">Copy of ${esc(S.prop.project||'this project')}’s drawings</option>${dcOptions()}</select></label>
-     <label class="field dcwide" for="dcnD">Notes<input class="inp" id="dcnD" maxlength="400" placeholder="What this design is for"></label></div>
+     <label class="field dcwide" for="dcnD">Notes<input class="inp" id="dcnD" maxlength="400" placeholder="What this design is for"></label>
+     <label class="field dcwide" for="dcnT">Tags<input class="inp" id="dcnT" maxlength="200" placeholder="Comma-separated · e.g. Crestron, Teams Rooms, 85-inch"></label></div>
     <div class="actions"><button type="button" class="btn" data-act="dcNewCancel">Cancel</button><button class="btn primary" type="submit">Create and open</button></div></form>`:'';
-  const cards=L.map(t=>{const ask=S.ui.dcDelAsk===t.id;return `<article class="panel dccard">
-    <button class="dcth" data-act="dcOpen" data-id="${t.id}" aria-label="Open ${esc(t.name)}">${dcThumb(t.design)}</button>
-    <div class="dcbody"><label class="sr" for="dcn-${t.id}">Name</label><input class="dcnm" id="dcn-${t.id}" value="${esc(t.name)}" maxlength="80" data-dcname="${t.id}">
-     <div class="dcmeta"><label class="sr" for="dck-${t.id}">Kind</label><select class="dckind" id="dck-${t.id}" data-dckind="${t.id}">${DC_KINDS.map(x=>`<option${x===t.kind?' selected':''}>${x}</option>`).join('')}</select><span>${esc(dcWhen(t.updated))}</span></div>
-     ${t.notes?`<p class="dcnote">${esc(t.notes)}</p>`:''}
-     <p class="dcst">${dcStats(t.design).map(esc).join(' · ')}</p></div>
-    <div class="dcact">${ask?`<span class="dcask">Delete this template?</span><button class="btn sm" data-act="dcDelNo">Keep</button><button class="btn sm danger" data-act="dcDel" data-id="${t.id}">Delete</button>`:
-      `<button class="btn sm primary" data-act="dcOpen" data-id="${t.id}">Open</button><button class="btn sm" data-act="dcUse" data-id="${t.id}" title="Replace ${esc(S.prop.project||'the project')}’s drawings with this design">Use in project</button><button class="btn sm" data-act="dcDup" data-id="${t.id}">Duplicate</button><button class="btn sm ghost" data-act="dcDel" data-id="${t.id}" aria-label="Delete ${esc(t.name)}">Delete</button>`}</div></article>`}).join('');
   const kinds=[...new Set(DC.map(t=>t.kind))];
-  $('#v-dcenter').innerHTML=`<header class="vh"><div><p class="eyebrow">${esc(firm())} · Design Center</p><h1>Design templates</h1></div>
-   <div class="actions"><button class="btn" data-act="dcFromProject">Save ${esc(S.prop.project||'project')} as a template</button><button class="btn primary" data-act="dcNewOpen">+ New design</button></div></header>
-   <p class="muted dclede">Build designs that aren’t tied to a client. Each one saves as a template you can start any project from, or load into a project’s drawings.</p>
+  const kp=(l,v,s2,act,on)=>`<${act?`button type="button" class="kbtn kpi${on?' on':''}" ${act} aria-pressed="${!!on}"`:'div class="kbtn kpi"'}><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s2}</div></${act?'button':'div'}>`;
+  $('#v-dcenter').innerHTML=`<header class="vh"><div><p class="eyebrow">${esc(firm())} · Design</p><h1>Design Center</h1><p class="sub">Reusable designs that aren’t tied to a client. Start projects from them, load them into a project’s drawings, or share them as files.</p></div>
+   <div class="actions"><label class="btn filebtn">Import<input type="file" id="dcImp" accept="application/json,.json" aria-label="Import templates from a file"></label>${DC.length?'<button class="btn" data-act="dcExportAll">Export all</button>':''}<button class="btn" data-act="dcFromProject">Save ${esc(clip(S.prop.project||'project',24))} as a template</button><button class="btn primary" data-act="dcNewOpen">+ New design</button></div></header>
+   ${DC.length?`<div class="kpis dckpis">${kp('Templates',DC.length,`${kinds.length} ${kinds.length===1?'kind':'kinds'} of room`,`data-act="dcFilt" data-f="all"`,!fav&&!k&&!tag)}${kp('Favorites',favs,favs?'Pinned to the top':'Star a template to pin it',`data-act="dcFilt" data-f="fav"`,fav)}${kp('Used in projects',uses,uses?'Times a template started or loaded a design':'Start a project from one to count it')}${kp('Most used',top&&+top.uses?esc(clip(top.name,22)):'—',top&&+top.uses?dcUsed(top):'Nothing used yet',top&&+top.uses?`data-act="dcPreview" data-id="${top.id}"`:'')}</div>`:''}
    ${form}
-   ${DC.length?`<div class="dcfilt"><label class="sr" for="dcQ">Search templates</label><input class="inp" id="dcQ" type="search" placeholder="Search templates" value="${esc(S.ui.dcq||'')}">
-     <div class="seg" role="group" aria-label="Kind"><button data-act="dcKind" data-k="" aria-pressed="${!k}">All ${DC.length}</button>${kinds.map(x=>`<button data-act="dcKind" data-k="${esc(x)}" aria-pressed="${k===x}">${esc(x)} ${DC.filter(t=>t.kind===x).length}</button>`).join('')}</div></div>`:''}
-   ${L.length?`<div class="dcgrid">${cards}</div>`:DC.length?`<div class="panel empty"><b>No templates match</b><span>Clear the search or pick another kind.</span></div>`:
-     nf?'':`<div class="panel empty dcfirst"><h2>No templates yet</h2><p class="muted">Start a design from a blank set or one of the room templates, or save the drawings of ${esc(S.prop.project||'your current project')} as your first template.</p><button class="btn primary" data-act="dcNewOpen">+ New design</button></div>`}`;
-  const F=$('#dcNewF');if(F){F.addEventListener('submit',e=>{e.preventDefault();const t=dcNew({name:$('#dcnN').value,kind:$('#dcnK').value,start:$('#dcnS').value,notes:$('#dcnD').value});if(!t)return;S.ui.dcNew=false;dcEnter(t.id);toast(`“${t.name}” created. It saves as you work.`)});setTimeout(()=>{const n=$('#dcnN');if(n)n.focus()},0)}
+   ${DC.length?`<div class="dcfilt"><label class="sr" for="dcQ">Search templates</label><input class="inp" id="dcQ" type="search" placeholder="Search name, notes or tags" value="${esc(S.ui.dcq||'')}">
+     <div class="apseg dcseg" role="group" aria-label="Kind"><button data-act="dcKind" data-k="" aria-pressed="${!k}">All ${DC.length}</button>${kinds.map(x=>`<button data-act="dcKind" data-k="${esc(x)}" aria-pressed="${k===x}">${esc(x)} ${DC.filter(t=>t.kind===x).length}</button>`).join('')}</div>
+     <span class="dcfr"><label class="sr" for="dcSort">Sort</label><select class="inp" id="dcSort">${DC_SORTS.filter(([v])=>v!=='est'||canPrice()).map(([v,l])=>`<option value="${v}"${v===sort?' selected':''}>${l}</option>`).join('')}</select>
+     <span class="apseg" role="group" aria-label="View"><button data-act="dcView" data-v="grid" aria-pressed="${view==='grid'}" aria-label="Grid view">▦</button><button data-act="dcView" data-v="list" aria-pressed="${view==='list'}" aria-label="List view">☰</button></span></span></div>
+     ${allTags.length?`<div class="dctags dctagbar" role="group" aria-label="Tags"><span class="muted">Tags</span>${allTags.map(x=>`<button type="button" data-act="dcTag" data-tag="${esc(x)}" aria-pressed="${tag===x}">#${esc(x)}</button>`).join('')}${tag||fav?'<button type="button" class="dcclr" data-act="dcFilt" data-f="all">Clear filters</button>':''}</div>`:''}`:''}
+   ${L.length?(view==='list'?`<div class="panel"><div class="scroll"><table class="t dclist"><thead><tr><th><span class="sr">Favorite</span></th><th>Template</th><th>Kind</th><th class="n">Devices</th><th class="n">Cables</th><th class="n">Used</th>${canPrice()?'<th class="n">Estimate</th>':''}<th>Edited</th><th><span class="sr">Actions</span></th></tr></thead><tbody>${L.map(dcRowHTML).join('')}</tbody></table></div></div>`:`<div class="dcgrid">${L.map(dcCardHTML).join('')}</div>`)
+     :DC.length?`<div class="panel empty"><b>No templates match</b><span>Clear the search or filters.</span><button class="btn sm" data-act="dcFilt" data-f="all">Clear filters</button></div>`:
+     nf?'':`<div class="panel empty dcfirst"><h2>No templates yet</h2><p class="muted">Start a design from a blank set or one of the room templates, save the drawings of ${esc(S.prop.project||'your current project')} as your first template, or import a template file.</p><button class="btn primary" data-act="dcNewOpen">+ New design</button></div>`}
+   ${canPrice()&&DC.length?`<p class="note dcnote2">Estimates use ${esc(S.prop.project||'the open project')}’s markup, labor rate and tax, so they match what a proposal would show.</p>`:''}`;
+  const F=$('#dcNewF');if(F){F.addEventListener('submit',e=>{e.preventDefault();const t=dcNew({name:$('#dcnN').value,kind:$('#dcnK').value,start:$('#dcnS').value,notes:$('#dcnD').value,tags:$('#dcnT').value});if(!t)return;S.ui.dcNew=false;dcEnter(t.id);toast(`“${t.name}” created. It saves as you work.`)});setTimeout(()=>{const n=$('#dcnN');if(n)n.focus()},0)}
   const Q=$('#dcQ');if(Q)Q.addEventListener('input',e=>{S.ui.dcq=e.target.value;const p=e.target.selectionStart;R.dcenter();const q2=$('#dcQ');if(q2){q2.focus();try{q2.setSelectionRange(p,p)}catch(x){}}});
+  const So=$('#dcSort');if(So)So.addEventListener('change',()=>{S.ui.dcs=So.value;save();R.dcenter()});
+  const Im=$('#dcImp');if(Im)Im.addEventListener('change',()=>{const f=Im.files&&Im.files[0];Im.value='';if(f)dcImport(f)});
   $('#v-dcenter').querySelectorAll('[data-dckind]').forEach(el=>el.addEventListener('change',()=>{const t=dcById(el.dataset.dckind);if(t){t.kind=el.value;t.updated=Date.now();dcStore();R.dcenter()}}));
-};
+  dcFillLive()};
+function dcFillLive(){const q=[...document.querySelectorAll('#v-dcenter [data-dclive]')];let i=0;
+  const step=()=>{if(S.view!=='dcenter'||i>=q.length)return;const el=q[i++];const t=el.isConnected&&dcById(el.dataset.dclive);if(t){const v=dcLive(t);if(v)el.innerHTML=`<svg viewBox="0 0 ${SW} ${SH}" aria-hidden="true">${snapDefs()}${v}</svg>`}setTimeout(step,0)};setTimeout(step,30)}
+/* ---------- export / import as a file ---------- */
+function dcFileName(n){return String(n).replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,60)||'template'}
+async function dcExportList(list,name){if(!list.length)return;const data=JSON.stringify({type:'sitrep-design-templates',v:1,from:firm(),at:new Date().toISOString(),templates:list.map(t=>({...t,fav:false}))},null,1);
+  const r=await saveFile(new Blob([data],{type:'application/json'}),name+'.json');if(r==='saved')toast(`${plural(list.length,'template')} exported.`)}
+function dcImport(file){if(file.size>25e6){toast('That file is too large to be a template file.');return}const rd=new FileReader();
+  rd.onload=()=>{let o;try{o=JSON.parse(rd.result)}catch(e){toast('That file isn’t a SITREP template file.');return}
+    const arr=Array.isArray(o)?o:(o&&Array.isArray(o.templates)?o.templates:(o&&o.design?[o]:[]));let n=0;
+    arr.forEach(t=>{if(!t||!t.design||!Array.isArray(t.design.nodes))return;const d=normDesign(dcClone(t.design));if(!d)return;
+      const id=(!t.id||dcById(t.id))?'dt'+Date.now().toString(36)+Math.random().toString(36).slice(2,6):String(t.id);
+      DC.unshift({id,name:String(t.name||'Imported design').slice(0,80)+(dcById(t.id)?' (imported)':''),kind:DC_KINDS.includes(t.kind)?t.kind:'Other',notes:String(t.notes||'').slice(0,400),tags:dcTagParse((t.tags||[]).join(',')),created:Date.now(),updated:Date.now(),u:+t.u||0,uses:0,design:d});n++});
+    if(!n){toast('No templates were found in that file.');return}dcStore();R.dcenter();toast(`Imported ${plural(n,'template')}.`)};
+  rd.readAsText(file)}
+/* ---------- centered preview (shares the drawings preview window) ---------- */
+function dcPreviewOpen(id){const t=dcById(id);if(!t)return;if(!(t.design&&(t.design.nodes||[]).length)){toast(`“${t.name}” is blank. Open it to start drawing.`);return}
+  const set=dcSet(t);if(!set||!set.sheets.length){toast('This template can’t be previewed. Open it to edit.');return}S.dwp={kind:'dc',id,i:0,set,from:null};dwRender()}
+function dcPvHTML(){const t=dcById(S.dwp.id);if(!t)return '';const {set,i}=S.dwp,sh=set.sheets[i],n=set.sheets.length,est=canPrice()?dcEst(t):dcWith(t,()=>{const g={};bom().forEach(l=>{const c=l.p.cat||'Other';(g[c]=g[c]||[]).push({mfr:l.p.mfr||'',model:l.p.model||l.p.id,qty:l.qty})});return {groups:g}}),d=t.design||{};
+  const G=est&&est.groups?Object.entries(est.groups).sort((a,b)=>a[0].localeCompare(b[0])):[];
+  return `<div class="dwpv-card" role="dialog" aria-modal="true" aria-labelledby="dwpvH">
+   <header class="dwpv-h"><div class="dwpv-t"><p class="eyebrow">Design Center · ${esc(t.kind)}</p><h2 id="dwpvH">${esc(t.name)}</h2></div>${dcStar(t)}<button type="button" class="apx" data-act="dwClose" aria-label="Close preview">×</button></header>
+   <div class="dwpv-tabs" role="tablist" aria-label="Sheets">${set.sheets.map((s2,j)=>`<button type="button" role="tab" data-act="dwSheet" data-i="${j}" aria-selected="${j===i}"><span class="mono">${esc(s2.dwg)}</span>${esc(s2.title)}</button>`).join('')}</div>
+   <div class="dwpv-main"><div class="dwpv-sheet">${dwSheetBody(set,sh)}</div>
+    <aside class="dwpv-side">
+     <div class="dwpv-acts"><button type="button" class="btn primary" data-act="dcNewPj" data-id="${t.id}">Start a new project from this</button><button type="button" class="btn" data-act="dcOpen" data-id="${t.id}">Edit the template</button><button type="button" class="btn" data-act="dcUse" data-id="${t.id}">Use in ${esc(clip(S.prop.project||'project',24))}</button></div>
+     <dl class="dwfacts"><div><dt>Devices</dt><dd>${(d.nodes||[]).length}</dd></div><div><dt>Cables</dt><dd>${(d.cables||[]).length}</dd></div><div><dt>Racks</dt><dd>${(d.racks||[]).filter(r=>(r.items||[]).length).length}</dd></div><div><dt>Used</dt><dd>${+t.uses||0}</dd></div></dl>
+     ${canPrice()&&est?`<div class="dwpv-sec"><b>Estimate</b><table class="dcest"><tr><td>Equipment</td><td class="n">${money(est.equip)}</td></tr><tr><td>Labor · ${est.hrs} h</td><td class="n">${money(est.labor)}</td></tr><tr class="tot"><td>Total with tax</td><td class="n">${money(est.total)}</td></tr></table><small class="muted">At ${esc(S.prop.project||'the open project')}’s markup and labor rate.</small></div>`:''}
+     <div class="dwpv-sec"><b>Equipment</b>${G.length?`<div class="dceq">${G.map(([c,L2])=>`<details${G.length<=4?' open':''}><summary>${esc(c)} <span class="muted">${L2.reduce((a,x)=>a+x.qty,0)}</span></summary><ul>${L2.map(x=>`<li><span>${esc(x.mfr)} ${esc(x.model)}</span><b>×${x.qty}</b></li>`).join('')}</ul></details>`).join('')}</div>`:'<p class="muted" style="margin:0">No equipment yet.</p>'}</div>
+     <div class="dwpv-sec"><label class="field" for="dcpN">Notes<textarea class="inp" id="dcpN" rows="3" maxlength="400" data-dcnotes="${t.id}" placeholder="What this design is for">${esc(t.notes||'')}</textarea></label>
+      <label class="field" for="dcpT">Tags<input class="inp" id="dcpT" maxlength="200" data-dctags="${t.id}" value="${esc(dcTags(t).join(', '))}" placeholder="Comma-separated"></label></div>
+     <div class="dcpvmore"><button type="button" class="btn sm" data-act="dcDup" data-id="${t.id}">Duplicate</button><button type="button" class="btn sm" data-act="dcExport" data-id="${t.id}">Export file</button></div>
+    </aside></div>
+   <footer class="dwpv-f"><span class="muted">Sheet ${i+1} of ${n} · edited ${esc(dcWhen(t.updated))}</span><span class="actions"><button type="button" class="btn sm" data-act="dwStep" data-d="-1" ${i?'':'disabled'}>← Previous</button><button type="button" class="btn sm" data-act="dwStep" data-d="1" ${i<n-1?'':'disabled'}>Next →</button></span></footer></div>`}
+document.addEventListener('change',e=>{const el=e.target;if(!el||!el.dataset)return;const id=el.dataset.dcnotes||el.dataset.dctags;if(!id)return;const t=dcById(id);if(!t)return;
+  if(el.dataset.dcnotes!=null&&el.dataset.dcnotes){t.notes=el.value.slice(0,400)}else{t.tags=dcTagParse(el.value);el.value=t.tags.join(', ')}t.updated=Date.now();dcStore();if(S.view==='dcenter')R.dcenter();toast('Template updated.')});
 /* renaming a template from a card or the editing bar */
 document.addEventListener('change',e=>{const el=e.target;if(!el||!el.dataset||!el.dataset.dcname)return;const t=dcById(el.dataset.dcname);if(!t)return;
   const v=el.value.trim().slice(0,80);if(!v){el.value=t.name;return}if(v===t.name)return;t.name=v;t.updated=Date.now();dcStore();
@@ -7630,16 +7727,16 @@ const A={
   bgCenter(){const b=PB();if(!b)return;const A=BG_AREA;mut(()=>{bgTransform(1,b.x,b.y,Math.round(A.x+(A.w-b.w)/2-b.x),Math.round(A.y+(A.h-b.h)/2-b.y))});refreshDesign();toast('Plan centered on the sheet.')},
   dcNewOpen(){S.ui.dcNew=true;S.ui.dcDelAsk=null;if(S.view!=='dcenter')go('dcenter');else R.dcenter()},
   dcNewCancel(){S.ui.dcNew=false;R.dcenter()},
-  dcOpen(el){S.ui.dcDelAsk=null;dcEnter(el.dataset.id)},
+  dcOpen(el){S.ui.dcDelAsk=null;if(S.dwp){S.dwp=null;dwRender()}dcEnter(el.dataset.id)},
   dcKind(el){S.ui.dck=el.dataset.k||'';R.dcenter()},
   dcDelNo(){S.ui.dcDelAsk=null;R.dcenter()},
   dcDel(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.ui.dcDelAsk!==id){S.ui.dcDelAsk=id;R.dcenter();return}
     S.ui.dcDelAsk=null;DC=DC.filter(x=>x.id!==id);dcStore();delete CLOUD.last['designs/'+id];
     if(DBX&&CLOUD.ready)DBX.doc('designs/'+id).delete().catch(()=>{});R.dcenter();toast(`“${t.name}” deleted.`)},
-  dcDup(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.studio&&S.studio.id===id)dcCapture();
+  dcDup(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.dwp){S.dwp=null;dwRender()}if(S.studio&&S.studio.id===id)dcCapture();
     const n=dcNew({name:(t.name+' copy').slice(0,80),kind:t.kind,notes:t.notes,start:'dc:'+id});if(!n)return;
     if(S.studio){dcEnter(n.id);toast(`Now editing “${n.name}”. The original is unchanged.`)}else{R.dcenter();toast(`“${n.name}” added.`)}},
-  dcUse(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.studio)dcExit(true);if(S.view!=='design')go('design');
+  dcUse(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.dwp){S.dwp=null;dwRender()}if(S.studio)dcExit(true);if(S.view!=='design')go('design');
     mut(()=>loadTemplate('dc:'+id));Object.values(cams).forEach(c=>{if(c!==cams.sched&&c!==cams.patch&&c!==cams.bom&&c!==cams.ip)c.init=false});R.design();requestAnimationFrame(()=>{try{fit(true)}catch(e){}});
     toast(`“${t.name}” loaded into ${S.prop.project||'this project'}. The previous drawings are one undo away.`)},
   dcClose(){go('dcenter');toast('Template saved.')},
@@ -10670,6 +10767,9 @@ function dwPreviewOpen(id,k,from){const e=pjById(id);if(!e)return;const x=dwInfo
 function dwSheetBody(set,sh){return sh.svg!=null?`<svg class="dsheet dwpvsvg" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="${esc(sh.dwg+' '+sh.title)}">${snapDefs()}${sh.svg}</svg>`
   :`<div class="dhtml"><div class="dhtml-h"><span class="mono">${esc(sh.dwg)} · rev ${esc(set.rev)}</span><b>${esc(sh.title)}</b></div>${sh.html}</div>`}
 function dwRender(){let el=$('#dwPrev');if(!S.dwp){if(el)el.remove();return}
+  if(S.dwp.kind==='dc'){if(!dcById(S.dwp.id)){S.dwp=null;if(el)el.remove();return}if(!el){el=document.createElement('div');el.id='dwPrev';el.className='dwpv';document.body.appendChild(el)}
+    const ae=document.activeElement&&document.activeElement.id;el.innerHTML=dcPvHTML();const t2=el.querySelector('[role="tab"][aria-selected="true"]');if(t2&&t2.scrollIntoView)t2.scrollIntoView({block:'nearest',inline:'nearest'});
+    if(ae&&document.getElementById(ae))document.getElementById(ae).focus();else if(!el.contains(document.activeElement))el.querySelector('[data-act="dwClose"]').focus();return}
   const e=pjById(S.dwp.id);if(!e){S.dwp=null;if(el)el.remove();return}
   const x=dwInfo(e),{set,i}=S.dwp,sh=set.sheets[i],n=set.sheets.length,RV=x.revs.slice().reverse().slice(0,4);
   if(!el){el=document.createElement('div');el.id='dwPrev';el.className='dwpv';document.body.appendChild(el)}
@@ -10706,6 +10806,18 @@ Object.assign(A,{
     if(S.studio)dcExit(true);if(id&&id!==PJ.cur&&switchProject(id))toast(`Opened ${S.prop.project} for ${cliName(S.prop)}.`);setSheet(k)},
   dwProject(el){const id=el.dataset.pj;S.dwp=null;dwRender();if(id!==PJ.cur&&switchProject(id))toast(`Opened ${S.prop.project} for ${cliName(S.prop)}.`);go('projects')},
   dwIssue(el){const id=el.dataset.pj;S.dwp=null;dwRender();if(id!==PJ.cur)switchProject(id);go('projects');setTimeout(()=>revDialog(),0)}
+});
+Object.assign(A,{
+  dcPreview(el){dcPreviewOpen(el.dataset.id)},
+  dcFav(el){const t=dcById(el.dataset.id);if(!t)return;t.fav=!t.fav;dcStore();if(S.dwp&&S.dwp.kind==='dc')dwRender();if(S.view==='dcenter')R.dcenter()},
+  dcTag(el){const g=el.dataset.tag;S.ui.dctag=S.ui.dctag===g?'':g;save();R.dcenter()},
+  dcFilt(el){const f=el.dataset.f;if(f==='fav'){S.ui.dcfav=!S.ui.dcfav}else{S.ui.dcfav=false;S.ui.dctag='';S.ui.dck='';S.ui.dcq=''}save();R.dcenter()},
+  dcView(el){S.ui.dcv=el.dataset.v;save();R.dcenter()},
+  dcExport(el){const t=dcById(el.dataset.id);if(t)dcExportList([t],'SITREP template - '+dcFileName(t.name))},
+  dcExportAll(){dcExportList(DC.slice(),'SITREP templates - '+dcFileName(firm())+' '+isoDay(0))},
+  dcNewPj(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.dwp)dwClose();if(S.studio)dcExit(true);openNewProject();
+    setTimeout(()=>{const sel=$('#npT');if(sel){sel.value='dc:'+id;const pn=$('#npP')||$('#npN');if(pn&&!pn.value)pn.value=t.name}const sv=document.querySelector('[data-npsvc="design"]');if(sv&&!sv.checked){sv.checked=true;sv.dispatchEvent(new Event('change',{bubbles:true}))}const dr=$('#npDraw');if(dr)dr.hidden=false},0);
+    toast(`New project starting from “${t.name}”.`)}
 });
 purgeSamples();
 window.addEventListener('pagehide',saveProjects);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveProjects()});
