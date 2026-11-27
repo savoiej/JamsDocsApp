@@ -1745,6 +1745,64 @@ button:not(:disabled):active{filter:brightness(.92)}
   :root[data-glass] .tabbar button{color:var(--muted)}
   :root[data-glass] .tabbar button[aria-current="page"]{color:var(--accent)}
   :root[data-glass] .tabbar button[aria-current="page"]::before{background:var(--hl)}}
+/* ===== Equipment library ===== */
+.lkpis .kbtn.on{box-shadow:0 0 0 2px var(--accent)!important}
+.ltools .dcmenu.down{top:calc(100% + 6px);bottom:auto}.ltools summary{list-style:none}.ltools summary::-webkit-details-marker{display:none}
+.dcmenu.down{top:calc(100% + 6px);bottom:auto}
+.libwrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1000px){.libwrap{grid-template-columns:minmax(0,1fr)}}
+.libfacets{padding:14px;display:flex;flex-direction:column;gap:16px;position:sticky;top:76px;max-height:calc(100vh - 100px);overflow:auto}
+@media (max-width:1000px){.libfacets{position:static;max-height:none}}
+.lfh{display:flex;justify-content:space-between;align-items:center}.lfh b{font-size:15px}
+.lfs{display:flex;flex-direction:column;gap:6px}.lfl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.lfs .check{font-size:13.5px}
+.lfcats{display:flex;flex-direction:column;gap:2px;max-height:260px;overflow:auto}
+.lfcats button,.lfsig button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:34px;padding:4px 10px;border-radius:10px;font-size:13.5px}
+.lfcats button span,.lfsig button>span:last-child{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lfcats button[aria-pressed="true"],.lfsig button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+@media (hover:hover) and (pointer:fine){.lfcats button:hover,.lfsig button:hover{background:var(--sunk)}}
+.lfcats button:focus-visible,.lfsig button:focus-visible{outline:2px solid var(--accent)}
+.lfsig{display:flex;flex-direction:column;gap:2px}
+.libres{min-width:0}
+.libbar{flex-wrap:wrap;gap:10px}.libsrch{display:flex;align-items:center;gap:8px;flex:1 1 260px;min-height:42px;padding:0 14px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.libsrch input{all:unset;flex:1;min-width:0;color:var(--fg);font-size:14px}
+.lcount{font-size:12.5px}
+.libt td{vertical-align:middle}.libt tr.sel td{background:var(--accent-soft)}
+.lsel{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+.lstar{width:32px;height:32px}
+.lused{display:inline-block;min-width:22px;text-align:center;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:1px 8px}
+.lmg{font-weight:600}.lmg.lo{color:var(--warn)}.lmg.hi{color:var(--ok)}
+.libcard{position:relative;cursor:default}.libcard.sel{box-shadow:0 0 0 2px var(--accent)}
+.libcard .lcimg{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;aspect-ratio:4/3;background:#fff;border-bottom:1px solid var(--line);overflow:hidden;width:100%}
+.libcard .lcimg:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.lcov{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}.lcov>*{pointer-events:auto}
+.lcov .lsel{background:#fff}.lcov .dcstar{background:color-mix(in srgb,var(--surface) 90%,transparent);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.lbulk{position:sticky;bottom:16px;z-index:20;margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-radius:18px;background:var(--fg);color:var(--surface);box-shadow:0 20px 50px -16px rgba(0,0,0,.45)}
+.lbulk b{margin-right:6px}.lbulk .btn{background:color-mix(in srgb,var(--surface) 12%,transparent);color:var(--surface);border-color:transparent}
+.lbulk .btn.primary{background:var(--surface)!important;color:var(--fg)!important;border-color:var(--surface)!important}.lbulk .btn:disabled{opacity:.45}
+.lbulk .inp{width:auto;min-width:120px;background:var(--surface);color:var(--fg)}.lbf{display:inline-flex;align-items:center;gap:6px;font-size:13px}.lbf .inp{width:90px;min-width:0}
+.lpv .dwpv-main{grid-template-columns:minmax(0,1fr) 320px}
+.lpv-l{overflow:auto;padding:18px;display:flex;flex-direction:column;gap:16px;background:var(--sunk)}
+.lpv-img{background:#fff;border-radius:16px;display:grid;place-items:center;aspect-ratio:16/9;overflow:hidden}.lpv-img img{max-width:100%;max-height:100%;object-fit:contain}
+.lpv-img .lcnone{font-size:44px;color:var(--muted)}.lpv-img.none{aspect-ratio:auto;height:140px}
+.libt td:nth-child(4){min-width:240px}
+.lpv-thumbs{display:flex;gap:8px;flex-wrap:wrap}.lpv-thumbs img{width:64px;height:48px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid var(--line)}
+.lpv-desc{margin:0;font-size:14px}
+.lpv-ports{display:grid;grid-template-columns:1fr 1fr;gap:12px}.lpv-ports>div{background:var(--surface);border-radius:14px;padding:12px}
+.lports{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px;max-height:220px;overflow:auto}.lports li{display:flex;align-items:center;gap:8px;font-size:13px}.lports small{margin-left:auto;color:var(--muted)}
+.lsim{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.lsim button,.lcmph{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:8px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:13px}
+.lsim small,.lcmph small{color:var(--muted);font-size:12px}.lsim button:focus-visible,.lcmph:focus-visible{outline:2px solid var(--accent)}
+.lsimg{display:grid;place-items:center;height:64px;background:#fff;border-radius:8px;overflow:hidden}.lsimg img{max-width:100%;max-height:64px;object-fit:contain}.lsimg .lcnone{font-size:22px;color:var(--muted)}
+.lspecs{display:flex;flex-direction:column;gap:0;margin:0}.lspecs div{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}.lspecs dt{color:var(--muted)}.lspecs dd{margin:0;font-weight:600;text-align:right}
+.lpv-links{display:flex;flex-wrap:wrap;gap:6px}
+.lwhere{padding:0}
+.lcmp{height:auto;max-height:calc(100dvh - 32px)}
+.lcmpw{overflow:auto;flex:1;min-height:0;padding:0 18px 12px}.lcmpt{width:100%;min-width:560px}.lcmpt th[scope=row]{font-weight:500;color:var(--muted);white-space:nowrap;text-align:left}
+.lcmpt td,.lcmpt thead th{min-width:150px}.lcmpt thead th{vertical-align:top;padding-bottom:12px}.lcmph{width:100%}
+.lbest{color:var(--ok);font-weight:700}.lcmpa{display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:760px){.lbulk{bottom:calc(74px + env(safe-area-inset-bottom,0px))}.lkpis .kbtn .s{display:none}}
+@media (max-width:860px){.lpv .dwpv-main{grid-template-columns:minmax(0,1fr)}.lpv-l{overflow:visible}.lpv-ports{grid-template-columns:1fr}}
 /* ===== Design Center ===== */
 .dckpis .kbtn.on{box-shadow:0 0 0 2px var(--accent)!important}
 .dckpis .kbtn:last-child .v{font-size:clamp(18px,1.6vw,22px)!important;line-height:1.2;overflow-wrap:anywhere}
@@ -2489,7 +2547,7 @@ function go(v){
   S.view=v;document.body.classList.toggle('nlmode',v==='networks');if(typeof nlNavRender==='function')nlNavRender();if(typeof renderTopbar==='function')renderTopbar();
   VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v);
   const nv=S.studio&&v==='design'?'dcenter':v==='design'?'drawings':v;
-  if(S.dwp&&!((S.dwp.kind==='dc'&&v==='dcenter')||(S.dwp.kind!=='dc'&&v==='drawings')))dwClose();
+  if(S.dwp&&v!==({dc:'dcenter',lib:'library',cmp:'library'}[S.dwp.kind]||'drawings'))dwClose();
   document.querySelectorAll('#nav [data-go]').forEach(b=>{if(b.dataset.go===nv)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});navSync(nv);
   R[v]();badges();window.scrollTo(0,0);
 }
@@ -4711,7 +4769,7 @@ Kestrel Vision,KV-Bar,Soundbar,USB video bar with camera and mics,,1499,1,usb:US
 Marrow Pro,MP-4x150,Amplifier,4 × 150 W 70 V amplifier,1190,1690,1,audio:Line In 1|audio:Line In 2,audio:Spk A|audio:Spk B|audio:Spk C|audio:Spk D,2,640`;
 let libQ='',libCat='All',libBrand='All',libLim=200;
 /* remember where you were in this browser: list filters, view modes and tabs survive a reload */
-const UIKEEP_KEY='sitrep:view:v1',UIKEEP=['cwTab','crmTab','libFix','libView','fmode','iq','ist','tq','tf','tp','ta','tbf','tkWho','cq','cst'];
+const UIKEEP_KEY='sitrep:view:v1',UIKEEP=['cwTab','crmTab','libFix','libView','lsort','lsig','lrack','lshow','dwf','dcs','dcv','fmode','iq','ist','tq','tf','tp','ta','tbf','tkWho','cq','cst'];
 function uiKeepSave(){try{const o={ui:{},lib:{q:libQ,cat:libCat,brand:libBrand},pm:S.projMode};UIKEEP.forEach(k=>{if(S.ui[k]!==undefined)o.ui[k]=S.ui[k]});localStorage.setItem(UIKEEP_KEY,JSON.stringify(o))}catch(e){}}
 function uiKeepLoad(){try{const o=JSON.parse(localStorage.getItem(UIKEEP_KEY)||'null');if(!o||typeof o!=='object')return;UIKEEP.forEach(k=>{if(o.ui&&o.ui[k]!==undefined)S.ui[k]=o.ui[k]});
   if(o.lib){libQ=String(o.lib.q||'');libCat=o.lib.cat||'All';libBrand=o.lib.brand||'All'}if(['kanban','list','gantt','week'].includes(o.pm))S.projMode=o.pm}catch(e){}}
@@ -4762,27 +4820,35 @@ R.library=function(){
   const brands=[...new Set(lib.map(p=>p.mfr))].sort((a,b)=>a.localeCompare(b));if(libBrand!=='All'&&!brands.includes(libBrand))libBrand='All';
   const inBrand=lib.filter(p=>libBrand==='All'||p.mfr===libBrand),cats=['All',...new Set(inBrand.map(p=>p.cat))];if(!cats.includes(libCat))libCat='All';
   const fx=LIBFIX[S.ui.libFix]&&LIBFIX[S.ui.libFix][1];
-  const ql=libQ.toLowerCase(),items=inBrand.filter(p=>(!fx||fx(p))&&(libCat==='All'||p.cat===libCat)&&(!ql||(p.mfr+' '+p.model+' '+p.desc+' '+p.cat).toLowerCase().includes(ql)));
-  const shown=items.slice(0,libLim),cards=S.ui.libView==='cards',pls=priceLists();
+  const ql=libQ.toLowerCase(),U=libUsage(),ls=S.ui.lshow||{},sg=Array.isArray(S.ui.lsig)?S.ui.lsig:[],rk=S.ui.lrack||'';
+  const base=p=>(!fx||fx(p))&&(!ql||(p.mfr+' '+p.model+' '+p.desc+' '+p.cat+' '+(p.tags||[]).join(' ')).toLowerCase().includes(ql))&&(!sg.length||sg.some(t=>libSigs(p).includes(t)))&&(!rk||(rk==='rack'?+p.ru>0:!(+p.ru>0)))&&(!ls.fav||p.fav)&&(!ls.used||U.has(p.id))&&(!ls.photo||!!pImg(p));
+  const pool=inBrand.filter(base),items=libSort(pool.filter(p=>libCat==='All'||p.cat===libCat),U);S.libList=items.map(p=>p.id);
+  const shown=items.slice(0,libLim),cards=S.ui.libView==='cards',pls=priceLists(),SEL=libSelSet();
   const portsCell=p=>isMod(p)?`${[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')}<span class="muted mono" style="font-size:11px">${portCount(p)} ports · fits ${esc(p.fits)}</span>`
     :placeable(p)?(slotsOf(p).length?`<span class="chip Sent" title="${esc(slotsOf(p).map(x=>x.n).join(', '))}">${plural(slotsOf(p).length,'slot')}</span> `:'')+[...new Set([...p.ins,...p.outs].map(x=>x.t))].map(t=>`<span class="dot ${SIG[t]?.cls||''}" title="${SIG[t]?.label||t}"></span> `).join('')+`<span class="muted mono" style="font-size:11px">${p.ins.length} in · ${p.outs.length} out</span>`
     :p.ctype?`<span class="dot ${SIG[p.ctype].cls}"></span> <span class="muted mono" style="font-size:11px">${SIG[p.ctype].short} cable</span>`
     :matOnly(p)?`<span class="chip" title="No ports yet, so it goes on the bill of materials but not the drawings.">Materials only</span> <button class="lnk" data-act="srFor" data-id="${esc(p.id)}" style="font-size:12px">${p.specUrl?'read its spec sheet':'add ports from a spec sheet'}</button>`:'<span class="muted">—</span>';
   const links=p=>`${p.spec?` <a class="lnk" data-act="openSpec" href="/_blob/${esc(p.spec)}" target="_blank" rel="noopener" style="font-size:11px">spec sheet</a>`:''}${p.src&&/^https?:\/\//.test(p.src)?` <a class="lnk" href="${esc(p.src)}" target="_blank" rel="noopener noreferrer" style="font-size:11px">source</a>`:''}${nameTwins(p).length?' <span class="chip Medium" title="Another product has the same model name. Open it to merge them.">same name</span>':''}`;
-  const table=`<div class="scroll"><table class="t"><thead><tr><th><span class="sr">Photo</span></th><th>Category</th><th>Product</th><th>Ports</th><th class="n">Rack</th><th class="n money">Dealer</th><th class="n money">MSRP</th><th class="n">Labor h</th><th></th></tr></thead><tbody>
-   ${shown.map(p=>`<tr class="click" data-act="libEdit" data-id="${esc(p.id)}" title="Edit ${esc(p.model)}"><td class="thumbcell">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><span class="catchip">${esc(p.cat)}</span></td><td><b>${esc(p.model)}</b> <span class="muted">${esc(p.mfr)}</span>${links(p)}<br><span class="muted">${esc(p.desc)}</span></td>
+  const cp=canPrice(),star=p=>`<button type="button" class="dcstar lstar" data-act="libFav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${p.fav?'Remove from':'Add to'} favorites: ${esc(p.model)}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg></button>`;
+  const ck=p=>`<input type="checkbox" class="lsel" data-act="libSel" data-id="${esc(p.id)}" ${SEL.has(p.id)?'checked':''} aria-label="Select ${esc(p.mfr+' '+p.model)}">`;
+  const usedTxt=p=>{const u=U.get(p.id);return u?`<span class="lused" title="In ${plural(u.pj.size,'project')}">${u.units}</span>`:'<span class="muted">—</span>'};
+  const allSel=shown.length&&shown.every(p=>SEL.has(p.id));
+  const table=`<div class="scroll"><table class="t libt"><thead><tr><th><input type="checkbox" class="lsel" data-act="libSelAll" ${allSel?'checked':''} aria-label="Select all shown"></th><th><span class="sr">Favorite</span></th><th><span class="sr">Photo</span></th><th>Product</th><th>Ports</th><th class="n">Rack</th>${cp?'<th class="n money">Dealer</th><th class="n money">MSRP</th><th class="n money">Margin</th>':''}<th class="n">Labor h</th><th class="n">Used</th><th><span class="sr">Edit</span></th></tr></thead><tbody>
+   ${shown.map(p=>`<tr class="click${SEL.has(p.id)?' sel':''}" data-act="libPv" data-id="${esc(p.id)}" title="View ${esc(p.model)}"><td>${ck(p)}</td><td>${star(p)}</td><td class="thumbcell">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><b>${esc(p.model)}</b> <span class="muted">${esc(p.mfr)}</span>${links(p)}<br><span class="catchip">${esc(p.cat)}</span> <span class="muted">${esc(clip(p.desc,90))}</span></td>
     <td>${portsCell(p)}</td>
     <td class="n">${placeable(p)&&!['Cable','Rack','Patch panel'].includes(p.cat)?`<select class="cellin libru" data-libru="${esc(p.id)}" aria-label="Rack space for ${esc(p.model)}"><option value="0" ${p.ru>0?'':'selected'}>Not racked</option>${[1,2,3,4,5,6,7,8].map(u=>`<option value="${u}" ${p.ru===u&&p.mount!=='shelf'?'selected':''}>${u}U</option><option value="${u}s" ${p.ru===u&&p.mount==='shelf'?'selected':''}>${u}U shelf</option>`).join('')}</select>`:(p.ru?p.ru+'U':'<span class="muted">—</span>')}</td>
-    <td class="n money">${money2(p.cost)}</td><td class="n money">${money2(p.msrp)}</td><td class="n">${p.labor}</td><td><button class="btn sm" data-act="libEdit" data-id="${esc(p.id)}">Edit</button></td></tr>`).join('')||'<tr><td colspan="9" class="muted">No products match.</td></tr>'}
+    ${cp?`<td class="n money">${money2(+p.cost||0)}</td><td class="n money">${money2(+p.msrp||0)}</td><td class="n money">${libMargin(p)==null?'<span class="muted">—</span>':`<span class="lmg ${libMargin(p)<.15?'lo':libMargin(p)>=.3?'hi':''}">${Math.round(libMargin(p)*100)}%</span>`}</td>`:''}<td class="n">${p.labor}</td><td class="n">${usedTxt(p)}</td><td><button class="btn sm" data-act="libEdit" data-id="${esc(p.id)}">Edit</button></td></tr>`).join('')||`<tr><td colspan="12" class="muted">No products match. <button class="lnk" data-act="libClearF">Clear filters</button></td></tr>`}
    </tbody></table></div>`;
-  const grid=`<div class="libcards">${shown.map(p=>{const u=pImg(p);return `<button class="libcard" data-act="libEdit" data-id="${esc(p.id)}" aria-label="Edit ${esc(p.mfr+' '+p.model)}">
-     <span class="lcimg">${u?`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:`<span class="lcnone" aria-hidden="true">${esc(p.cat.slice(0,1))}</span>`}</span>
-     <span class="lcb"><span class="lcm"><span class="catchip">${esc(p.cat)}</span>${matOnly(p)?'<span class="chip">Materials only</span>':''}</span><b>${esc(p.model)}</b><span class="muted">${esc(p.mfr)}</span><span class="lcd">${esc(clip(p.desc,80))}</span>
-     <span class="lcp money"><span><small>Dealer</small>${money2(p.cost)}</span><span><small>MSRP</small>${money2(p.msrp)}</span></span></span></button>`}).join('')||'<p class="muted">No products match.</p>'}</div>`;
+  const grid=`<div class="libcards">${shown.map(p=>{const u=pImg(p),us=U.get(p.id);return `<article class="libcard${SEL.has(p.id)?' sel':''}">
+     <button type="button" class="lcimg" data-act="libPv" data-id="${esc(p.id)}" aria-label="View ${esc(p.mfr+' '+p.model)}">${u?`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:`<span class="lcnone" aria-hidden="true">${esc(p.cat.slice(0,1))}</span>`}</button>
+     <span class="lcov">${ck(p)}${star(p)}</span>
+     <span class="lcb"><span class="lcm"><span class="catchip">${esc(p.cat)}</span>${matOnly(p)?'<span class="chip">Materials only</span>':''}${us?`<span class="lused" title="In ${plural(us.pj.size,'project')}">Used ${us.units}</span>`:''}</span><b>${esc(p.model)}</b><span class="muted">${esc(p.mfr)}</span><span class="lcd">${esc(clip(p.desc,80))}</span>
+     ${cp?`<span class="lcp money"><span><small>Dealer</small>${money2(+p.cost||0)}</span><span><small>MSRP</small>${money2(+p.msrp||0)}</span>${libMargin(p)!=null?`<span><small>Margin</small>${Math.round(libMargin(p)*100)}%</span>`:''}</span>`:''}</span></article>`}).join('')||`<p class="muted" style="padding:14px">No products match. <button class="lnk" data-act="libClearF">Clear filters</button></p>`}</div>`;
   $('#v-library').innerHTML=`
   <header class="vh"><div><p class="eyebrow">My library · ${lib.length} products · ${brands.length} brands</p><h1>Equipment library</h1>
    <p class="sub">Every device carries its photos, ports, rack space, power, dealer cost and install labor, so drawings, the bill of materials and proposals stay in sync.</p></div>
-   <div class="actions"><button class="btn primary money" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="ptOpen">Port templates</button><button class="btn" data-act="srOpenA">Ports from spec sheets</button><button class="btn" data-act="newBlockLib">Build a custom device</button></div></header>
+   <div class="actions"><button class="btn primary money" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="newBlockLib">Build a custom device</button><details class="dcmore ltools"><summary class="btn">Tools</summary><div class="dcmenu down"><button data-act="ptOpen">Port templates</button><button data-act="srOpenA">Ports from spec sheets</button><button data-act="libCsv">Export the library as CSV</button></div></details></div></header>
+  ${libKpisHTML(U,brands)}
   <input type="file" id="srOne" hidden accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Spec sheet for this product">
   ${canPrice()&&(S.pl||S.plOpen)?plPanelHTML():''}
   ${libCheckHTML()}
@@ -4793,17 +4859,19 @@ R.library=function(){
    ${pls.map((l,i)=>`<tr><td><b>${esc(l.brand)}</b></td><td class="mono" style="font-size:12px">${esc(clip(l.name,44))}</td><td>${esc(dayFmtIso(l.at))}${ageDays(l.at)>priceDays()?` <span class="chip Overdue">${esc(ageTxt(ageDays(l.at)))} old</span>`:''}</td><td class="n">${l.n}</td><td class="n">${l.photos}</td><td class="n">${l.need?`<button class="lnk" data-act="srList" data-i="${i}">${l.need}</button>`:'0'}</td><td style="white-space:nowrap"><button class="btn sm" data-act="libBrandShow" data-v="${esc(l.brand)}">Show</button> ${S.ui.plDel===i?`<span class="muted sm">Remove the ones no project uses?</span> <button class="btn sm danger" data-act="plDelGo" data-i="${i}">Remove</button> <button class="btn sm" data-act="plDelAsk" data-i="-1">Keep</button>`:`<button class="btn sm" data-act="plDelAsk" data-i="${i}">Remove…</button>`}</td></tr>`).join('')}
   </tbody></table></div></div>`:''}
   ${findHTML()}
-  <div class="panel"><div class="ph" style="flex-wrap:wrap"><div class="libtools" style="flex:1"><input class="inp" id="libQ" placeholder="Search products" value="${esc(libQ)}" aria-label="Search products">
-    <select class="inp" id="libBrand" aria-label="Brand" style="width:auto"><option value="All">All brands</option>${brands.map(b=>`<option ${b===libBrand?'selected':''}>${esc(b)}</option>`).join('')}</select>
-    <select class="inp" id="libCat" aria-label="Category" style="width:auto">${cats.map(c=>`<option value="${esc(c)}" ${c===libCat?'selected':''}>${c==='All'?'All categories':esc(c)}</option>`).join('')}</select></div>
-    <span class="muted" style="font-size:12px">${items.length===lib.length?plural(items.length,'product'):`${items.length} of ${lib.length}`}</span>
-    <div class="seg" role="group" aria-label="View"><button data-act="libView" data-v="table" aria-pressed="${!cards}">List</button><button data-act="libView" data-v="cards" aria-pressed="${cards}">Photos</button></div></div>
+  <div class="libwrap">${libFacetsHTML(lib.filter(base),pool,brands,U)}
+  <div class="panel libres"><div class="ph libbar"><label class="libsrch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="libQ" type="search" placeholder="Search model, brand, description or category" value="${esc(libQ)}" aria-label="Search products" autocomplete="off"></label>
+    <span class="muted lcount">${items.length===lib.length?plural(items.length,'product'):`${items.length} of ${lib.length}`}</span>
+    <label class="sr" for="lsort">Sort</label><select class="inp" id="lsort" style="width:auto">${LIB_SORTS.filter(([v])=>cp||!/cost|margin/.test(v)).map(([v,l])=>`<option value="${v}"${(S.ui.lsort||'cat')===v?' selected':''}>${l}</option>`).join('')}</select>
+    <div class="apseg" role="group" aria-label="View"><button data-act="libView" data-v="table" aria-pressed="${!cards}">List</button><button data-act="libView" data-v="cards" aria-pressed="${cards}">Photos</button></div></div>
    ${cards?grid:table}
-   ${items.length>shown.length?`<div class="pb" style="padding-top:0"><button class="btn" data-act="libMore">Show ${Math.min(200,items.length-shown.length)} more of ${items.length-shown.length}</button></div>`:''}</div>`;
+   ${items.length>shown.length?`<div class="pb" style="padding-top:0"><button class="btn" data-act="libMore">Show ${Math.min(200,items.length-shown.length)} more of ${items.length-shown.length}</button></div>`:''}</div></div>
+  ${SEL.size?libBulkHTML(SEL):''}`;
   bindFind();bindPL();bindSR();{const d=$('#pDays');if(d)d.addEventListener('change',e=>{SETTINGS.priceDays=+e.target.value;saveSettings();R.library()})}
   $('#libQ').addEventListener('input',e=>{libQ=e.target.value;libLim=200;const pos=e.target.selectionStart;R.library();const q=$('#libQ');q.focus();q.setSelectionRange(pos,pos)});
-  $('#libCat').addEventListener('change',e=>{libCat=e.target.value;libLim=200;R.library()});
-  $('#libBrand').addEventListener('change',e=>{libBrand=e.target.value;libCat='All';libLim=200;R.library()});
+  {const so=$('#lsort');if(so)so.addEventListener('change',()=>{S.ui.lsort=so.value;R.library()})}
+  {const bb=$('#libBrand');if(bb)bb.addEventListener('change',e=>{libBrand=e.target.value;libCat='All';libLim=200;R.library()})}
+  {const bc=$('#lbCat');if(bc)bc.addEventListener('change',()=>{S.ui.lbCatV=bc.value})}
 };
 const dayFmtIso=d=>{if(!d)return '—';const t=new Date(d+'T12:00:00');return isNaN(t)?d:t.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};
 function splitCSV(line){
@@ -7888,7 +7956,7 @@ const A={
   closeOverlay(){closeOverlay()},
   modYes(){const a=S.ui.modAsk;if(a)setModule(a.uid,a.k,a.pid)},
   modNo(){S.ui.modAsk=null;renderInspector()},
-  libEdit(el){openEditor(el.dataset.id)},
+  libEdit(el){if(S.dwp){S.dwp=null;dwRender()}openEditor(el.dataset.id)},
   rcChip(el){const k=el.dataset.k,a=S.ui.rcArm;
     if(!a||a===k){S.ui.rcArm=a===k?null:k;renderRackConn();return}
     const A=rcParse(a),B=rcParse(k);
@@ -10767,6 +10835,9 @@ function dwPreviewOpen(id,k,from){const e=pjById(id);if(!e)return;const x=dwInfo
 function dwSheetBody(set,sh){return sh.svg!=null?`<svg class="dsheet dwpvsvg" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="${esc(sh.dwg+' '+sh.title)}">${snapDefs()}${sh.svg}</svg>`
   :`<div class="dhtml"><div class="dhtml-h"><span class="mono">${esc(sh.dwg)} · rev ${esc(set.rev)}</span><b>${esc(sh.title)}</b></div>${sh.html}</div>`}
 function dwRender(){let el=$('#dwPrev');if(!S.dwp){if(el)el.remove();return}
+  if(S.dwp.kind==='lib'||S.dwp.kind==='cmp'){const h=S.dwp.kind==='lib'?libPvHTML():libCmpHTML();if(!h){S.dwp=null;if(el)el.remove();return}
+    if(!el){el=document.createElement('div');el.id='dwPrev';el.className='dwpv';document.body.appendChild(el)}const ae=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.act;
+    el.innerHTML=h;const back=ae&&el.querySelector(`[data-act="${ae}"]`);(back||el.querySelector('[data-act="dwClose"]')).focus();return}
   if(S.dwp.kind==='dc'){if(!dcById(S.dwp.id)){S.dwp=null;if(el)el.remove();return}if(!el){el=document.createElement('div');el.id='dwPrev';el.className='dwpv';document.body.appendChild(el)}
     const ae=document.activeElement&&document.activeElement.id;el.innerHTML=dcPvHTML();const t2=el.querySelector('[role="tab"][aria-selected="true"]');if(t2&&t2.scrollIntoView)t2.scrollIntoView({block:'nearest',inline:'nearest'});
     if(ae&&document.getElementById(ae))document.getElementById(ae).focus();else if(!el.contains(document.activeElement))el.querySelector('[data-act="dwClose"]').focus();return}
@@ -10800,7 +10871,7 @@ Object.assign(A,{
   dwClear(){S.ui.dwf='all';S.ui.dwq='';save();R.drawings()},
   dwPreview(el){dwPreviewOpen(el.dataset.pj,el.dataset.k,el.dataset.pj)},
   dwSheet(el){if(!S.dwp)return;S.dwp.i=+el.dataset.i;dwRender()},
-  dwStep(el){if(!S.dwp)return;const n=S.dwp.set.sheets.length,j=S.dwp.i+(+el.dataset.d);if(j<0||j>=n)return;S.dwp.i=j;dwRender()},
+  dwStep(el){if(!S.dwp)return;if(S.dwp.kind==='cmp')return;if(S.dwp.kind==='lib'){const L=S.dwp.list||[],j=L.indexOf(S.dwp.id)+(+el.dataset.d);if(j<0||j>=L.length)return;S.dwp.id=L[j];dwRender();return}const n=S.dwp.set.sheets.length,j=S.dwp.i+(+el.dataset.d);if(j<0||j>=n)return;S.dwp.i=j;dwRender()},
   dwClose(){dwClose()},
   dwOpen(el){const id=el.dataset.pj,k=['flow','rack','patch','plan','sched','bom','ip'].includes(el.dataset.sheet)?el.dataset.sheet:'flow';S.dwp=null;dwRender();
     if(S.studio)dcExit(true);if(id&&id!==PJ.cur&&switchProject(id))toast(`Opened ${S.prop.project} for ${cliName(S.prop)}.`);setSheet(k)},
@@ -10818,6 +10889,114 @@ Object.assign(A,{
   dcNewPj(el){const id=el.dataset.id,t=dcById(id);if(!t)return;if(S.dwp)dwClose();if(S.studio)dcExit(true);openNewProject();
     setTimeout(()=>{const sel=$('#npT');if(sel){sel.value='dc:'+id;const pn=$('#npP')||$('#npN');if(pn&&!pn.value)pn.value=t.name}const sv=document.querySelector('[data-npsvc="design"]');if(sv&&!sv.checked){sv.checked=true;sv.dispatchEvent(new Event('change',{bubbles:true}))}const dr=$('#npDraw');if(dr)dr.hidden=false},0);
     toast(`New project starting from “${t.name}”.`)}
+});
+/* ================= EQUIPMENT LIBRARY: browse, compare, bulk edit ================= */
+const LIB_SORTS=[['cat','Category'],['name','Model A–Z'],['brand','Brand A–Z'],['cost-asc','Dealer cost, low to high'],['cost-desc','Dealer cost, high to low'],['margin','Best margin'],['used','Most used']];
+function libUsage(){const m=new Map(),cur=S.studio?S.studio.back:S.design,ds=[[PJ.cur,cur],...PJ.list.filter(e=>e.id!==PJ.cur&&e.design).map(e=>[e.id,e.design])];
+  ds.forEach(([id,d])=>{if(!d)return;const add=(pid,q)=>{if(!pid)return;let o=m.get(pid);if(!o){o={units:0,pj:new Set()};m.set(pid,o)}o.units+=q;o.pj.add(id)};
+    (d.nodes||[]).forEach(n=>{add(n.pid,1);Object.values(n.mods||{}).forEach(x=>add(x&&x.pid,1))});(d.extras||[]).forEach(x=>add(x.pid,+x.qty||1));(d.cables||[]).forEach(c=>add(c.sku,1))});return m}
+const libSigs=p=>[...new Set([...(p.ins||[]),...(p.outs||[])].map(x=>x.t).concat(p.ctype?[p.ctype]:[]))];
+const libMargin=p=>+p.msrp>0&&+p.cost>0?(+p.msrp-+p.cost)/+p.msrp:null;
+function libSort(L,U){const k=S.ui.lsort||'cat',n=p=>(p.mfr+' '+p.model).toLowerCase(),f=L.slice().sort((a,b)=>(!!b.fav)-(!!a.fav));
+  const by={name:(a,b)=>a.model.localeCompare(b.model),brand:(a,b)=>a.mfr.localeCompare(b.mfr)||a.model.localeCompare(b.model),'cost-asc':(a,b)=>(+a.cost||0)-(+b.cost||0),'cost-desc':(a,b)=>(+b.cost||0)-(+a.cost||0),
+    margin:(a,b)=>(libMargin(b)??-1)-(libMargin(a)??-1),used:(a,b)=>((U.get(b.id)||{}).units||0)-((U.get(a.id)||{}).units||0)||n(a).localeCompare(n(b))}[k];
+  return by?L.slice().sort(by):f}
+function libSelSet(){if(!(S.lsel instanceof Set))S.lsel=new Set();[...S.lsel].forEach(id=>{if(!byId(id))S.lsel.delete(id)});return S.lsel}
+function libKpisHTML(U,brands){const used=lib.filter(p=>U.has(p.id)),units=used.reduce((a,p)=>a+U.get(p.id).units,0),fav=lib.filter(p=>p.fav).length,ls=S.ui.lshow||{};
+  const np=lib.filter(p=>matOnly(p)).length,nc=lib.filter(p=>LIBFIX.cost[1](p)).length,fx=S.ui.libFix;
+  const k=(l,v,sub,act,on)=>`<button type="button" class="kbtn kpi${on?' on':''}" ${act} aria-pressed="${!!on}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${sub}</div></button>`;
+  return `<div class="kpis lkpis">${k('Products',lib.length.toLocaleString(),plural(brands.length,'brand'),'data-act="libClearF"',!ls.fav&&!ls.used&&!fx&&libCat==='All'&&libBrand==='All'&&!libQ)}${k('Favorites',fav,fav?'Pinned to the top of every list':'Star products you use most','data-act="libShow" data-k="fav"',ls.fav)}${k('In your projects',used.length,`${units.toLocaleString()} units across your drawings`,'data-act="libShow" data-k="used"',ls.used)}${k('Need ports',np,np?'Bill of materials only until ports are added':'Every product can go on drawings','data-act="libFixSet" data-k="ports"',fx==='ports')}${canPrice()?k('Missing a dealer cost',nc,nc?'Proposals can’t price these':'Every product is priced','data-act="libFixSet" data-k="cost"',fx==='cost'):''}</div>`}
+function libFacetsHTML(all,pool,brands,U){const ls=S.ui.lshow||{},sg=Array.isArray(S.ui.lsig)?S.ui.lsig:[],rk=S.ui.lrack||'';
+  const cc={};pool.forEach(p=>cc[p.cat]=(cc[p.cat]||0)+1);const cats=Object.keys(cc).sort((a,b)=>cc[b]-cc[a]||a.localeCompare(b));
+  const sc={};all.forEach(p=>libSigs(p).forEach(t=>sc[t]=(sc[t]||0)+1));
+  const any=libCat!=='All'||libBrand!=='All'||sg.length||rk||ls.fav||ls.used||ls.photo||S.ui.libFix;
+  return `<aside class="panel libfacets" aria-label="Filters"><div class="lfh"><b>Filters</b>${any?'<button class="lnk" data-act="libClearF">Clear all</button>':''}</div>
+   <div class="lfs"><span class="lfl">Show</span>${[['fav','Favorites'],['used','Used in my projects'],['photo','Has a photo']].map(([k,l])=>`<label class="check"><input type="checkbox" data-act="libShow" data-k="${k}" ${ls[k]?'checked':''}> ${l}</label>`).join('')}</div>
+   <div class="lfs"><label class="lfl" for="libBrand">Brand</label><select class="inp" id="libBrand"><option value="All">All ${brands.length} brands</option>${brands.map(b=>`<option ${b===libBrand?'selected':''}>${esc(b)}</option>`).join('')}</select></div>
+   <div class="lfs"><span class="lfl">Category</span><div class="lfcats"><button type="button" data-act="libCatSet" data-v="All" aria-pressed="${libCat==='All'}">All <span>${pool.length}</span></button>${cats.map(c=>`<button type="button" data-act="libCatSet" data-v="${esc(c)}" aria-pressed="${libCat===c}">${esc(c)} <span>${cc[c]}</span></button>`).join('')}</div></div>
+   <div class="lfs"><span class="lfl">Signals</span><div class="lfsig">${Object.keys(SIG).filter(t=>sc[t]).map(t=>`<button type="button" data-act="libSig" data-k="${t}" aria-pressed="${sg.includes(t)}"><span class="dot ${SIG[t].cls}" aria-hidden="true"></span>${esc(SIG[t].short)} <span>${sc[t]}</span></button>`).join('')}</div></div>
+   <div class="lfs"><span class="lfl">Mounting</span><div class="apseg"><button data-act="libRack" data-k="" aria-pressed="${!rk}">Any</button><button data-act="libRack" data-k="rack" aria-pressed="${rk==='rack'}">Rack</button><button data-act="libRack" data-k="free" aria-pressed="${rk==='free'}">Not racked</button></div></div>
+  </aside>`}
+function libBulkHTML(SEL){const n=SEL.size,b=S.ui.lbulk||'',cats=[...new Set(lib.map(p=>p.cat))].sort();
+  return `<div class="lbulk" role="region" aria-label="Selected products"><b>${plural(n,'product')} selected</b>
+   ${b==='cat'?`<label class="sr" for="lbCat">New category</label><select class="inp" id="lbCat">${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select><button class="btn sm primary" data-act="libBulkCatGo">Apply</button><button class="btn sm" data-act="libBulk" data-k="">Cancel</button>`
+   :b==='price'?`<label class="lbf" for="lbC">Dealer cost<input class="inp" id="lbC" type="number" step="0.5" placeholder="+0" inputmode="decimal">%</label><label class="lbf" for="lbM">MSRP<input class="inp" id="lbM" type="number" step="0.5" placeholder="+0" inputmode="decimal">%</label><button class="btn sm primary" data-act="libBulkPriceGo">Apply</button><button class="btn sm" data-act="libBulk" data-k="">Cancel</button>`
+   :b==='labor'?`<label class="lbf" for="lbL">Labor hours each<input class="inp" id="lbL" type="number" min="0" step="0.25" inputmode="decimal"></label><button class="btn sm primary" data-act="libBulkLaborGo">Apply</button><button class="btn sm" data-act="libBulk" data-k="">Cancel</button>`
+   :`<button class="btn sm primary" data-act="libCmp" ${n<2||n>4?'disabled':''} title="${n<2?'Select 2 to 4 products to compare':n>4?'Compare up to 4 at a time':''}">Compare${n>=2&&n<=4?` ${n}`:''}</button><button class="btn sm" data-act="libBulkFav">Favorite</button><button class="btn sm" data-act="libBulk" data-k="cat">Change category</button>${canPrice()?'<button class="btn sm" data-act="libBulk" data-k="price">Adjust prices</button>':''}<button class="btn sm" data-act="libBulk" data-k="labor">Set labor</button><button class="btn sm" data-act="libCsv" data-sel="1">Export CSV</button>`}
+   <button class="btn sm ghost" data-act="libSelClear">Clear selection</button></div>`}
+/* CSV that the price-list importer reads back */
+function libCSV(list){const q=v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},pp=a=>(a||[]).map(x=>x.t+':'+x.n).join('|');
+  return ['manufacturer,model,category,description,dealer_cost,msrp,labor_hrs,inputs,outputs,rack_units,watts',...list.map(p=>[p.mfr,p.model,p.cat,p.desc,+p.cost||0,+p.msrp||0,+p.labor||0,pp(p.ins),pp(p.outs),+p.ru||0,+p.watts||0].map(q).join(','))].join('\n')}
+function libSimilar(p){const sg=libSigs(p);return lib.filter(x=>x.id!==p.id&&x.cat===p.cat).map(x=>({x,s:libSigs(x).filter(t=>sg.includes(t)).length*3-Math.abs(Math.log(((+x.cost||1)/(+p.cost||1))))+(x.mfr===p.mfr?1:0)})).sort((a,b)=>b.s-a.s).slice(0,4).map(o=>o.x)}
+function libPortsHTML(list,dir){if(!list.length)return `<p class="muted" style="margin:0">No ${dir}.</p>`;return `<ul class="lports">${list.map(x=>`<li><span class="dot ${(SIG[x.t]||{}).cls||''}" aria-hidden="true"></span>${esc(x.n)}<small>${esc((SIG[x.t]||{}).short||x.t)}</small></li>`).join('')}</ul>`}
+function libPvHTML(){const p=byId(S.dwp.id);if(!p)return '';const L=S.dwp.list||[],i=L.indexOf(p.id),U=libUsage(),u=U.get(p.id),cp=canPrice(),mk=+S.prop.markup||0,img=pImg(p),mg=libMargin(p),sim=libSimilar(p);
+  const where=u?[...u.pj].map(id=>{const e=pjById(id);if(!e)return '';const P=pjProp(e),d=id===PJ.cur?(S.studio?S.studio.back:S.design):e.design,c=((d&&d.nodes)||[]).filter(n=>n.pid===p.id).length+((d&&d.extras)||[]).filter(x=>x.pid===p.id).reduce((a,x)=>a+(+x.qty||1),0);
+    return `<li><button type="button" data-act="dwOpen" data-pj="${id}" data-sheet="flow"><b>${esc(P.project||'Project')}</b><small>${esc(cliName(P))}${c?` · ${c} ${c===1?'unit':'units'}`:''}</small></button></li>`}).join(''):'';
+  const cmpOn=libSelSet().has(p.id);
+  return `<div class="dwpv-card lpv" role="dialog" aria-modal="true" aria-labelledby="dwpvH">
+   <header class="dwpv-h"><div class="dwpv-t"><p class="eyebrow">${esc(p.mfr)} · ${esc(p.cat)}</p><h2 id="dwpvH">${esc(p.model)}</h2></div>
+    <button type="button" class="dcstar" data-act="libFav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${p.fav?'Remove from':'Add to'} favorites"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg></button>
+    <button type="button" class="apx" data-act="dwClose" aria-label="Close">×</button></header>
+   <div class="dwpv-main"><div class="lpv-l">
+     <div class="lpv-img${img?'':' none'}">${img?`<img src="${esc(img)}" alt="${esc(p.mfr+' '+p.model)}" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'lcnone',textContent:'No photo'}))">`:`<span class="lcnone">${esc(p.cat.slice(0,1))}</span>`}</div>
+     ${(p.imgs||[]).length>1?`<div class="lpv-thumbs">${p.imgs.slice(0,6).map(x=>`<img src="${esc(imgSrc(x))}" alt="" loading="lazy" referrerpolicy="no-referrer">`).join('')}</div>`:''}
+     <p class="lpv-desc">${esc(p.desc||'')}</p>
+     ${matOnly(p)?`<div class="banner" style="margin:0"><span>This product has no ports yet, so it goes on the bill of materials but not on drawings.</span><button class="btn sm" data-act="srFor" data-id="${esc(p.id)}">${p.specUrl?'Read its spec sheet':'Add ports from a spec sheet'}</button></div>`:p.ctype?`<div class="lpv-ports"><div><b>Cable</b><ul class="lports"><li><span class="dot ${(SIG[p.ctype]||{}).cls||''}" aria-hidden="true"></span>${esc((SIG[p.ctype]||{}).label||p.ctype)} cable</li></ul></div></div>`:`<div class="lpv-ports"><div><b>Inputs · ${(p.ins||[]).length}</b>${libPortsHTML(p.ins||[],'inputs')}</div><div><b>Outputs · ${(p.outs||[]).length}</b>${libPortsHTML(p.outs||[],'outputs')}</div></div>`}
+     ${sim.length?`<div class="dwpv-sec"><b>Similar ${esc(p.cat.toLowerCase())} products</b><div class="lsim">${sim.map(x=>`<button type="button" data-act="libPv" data-id="${esc(x.id)}"><span class="lsimg">${thumb(x,'')||`<span class="lcnone">${esc(x.cat.slice(0,1))}</span>`}</span><b>${esc(x.model)}</b><small>${esc(x.mfr)}${cp?` · ${money(+x.cost||0)}`:''}</small></button>`).join('')}</div></div>`:''}
+    </div>
+    <aside class="dwpv-side">
+     <div class="dwpv-acts">${placeable(p)?`<button type="button" class="btn primary" data-act="libPlace" data-id="${esc(p.id)}">Place on ${esc(clip(S.prop.project||'the drawing',22))}</button>`:''}<button type="button" class="btn${placeable(p)?'':' primary'}" data-act="libBom" data-id="${esc(p.id)}">Add to the bill of materials</button><button type="button" class="btn" data-act="libEdit" data-id="${esc(p.id)}">Edit product</button></div>
+     ${cp?`<dl class="dwfacts"><div><dt>Dealer</dt><dd>${money2(+p.cost||0)}</dd></div><div><dt>MSRP</dt><dd>${money2(+p.msrp||0)}</dd></div><div><dt>Margin</dt><dd>${mg==null?'—':Math.round(mg*100)+'%'}</dd></div><div><dt>Sell at ${mk}%</dt><dd>${money2((+p.cost||0)*(1+mk/100))}</dd></div></dl>`:''}
+     <dl class="lspecs"><div><dt>Rack space</dt><dd>${+p.ru?`${p.ru}U${p.mount==='shelf'?' on a shelf':''}`:'Not racked'}</dd></div><div><dt>Power</dt><dd>${+p.watts?`${p.watts} W · ${Math.round(p.watts*3.412).toLocaleString()} BTU/h`:'—'}</dd></div><div><dt>Install labor</dt><dd>${+p.labor||0} h</dd></div>${slotsOf(p).length?`<div><dt>Card slots</dt><dd>${slotsOf(p).length}</dd></div>`:''}${p.fits?`<div><dt>Fits</dt><dd>${esc(p.fits)}</dd></div>`:''}</dl>
+     <div class="lpv-links">${p.spec?`<a class="btn sm" data-act="openSpec" href="/_blob/${esc(p.spec)}" target="_blank" rel="noopener">Spec sheet</a>`:''}${p.src&&/^https?:\/\//.test(p.src)?`<a class="btn sm" href="${esc(p.src)}" target="_blank" rel="noopener noreferrer">Product page</a>`:''}<button type="button" class="btn sm" data-act="libSel" data-id="${esc(p.id)}" aria-pressed="${cmpOn}">${cmpOn?'✓ In compare':'Add to compare'}</button><button type="button" class="btn sm" data-act="libDup" data-id="${esc(p.id)}">Duplicate</button></div>
+     <div class="dwpv-sec"><b>Used in</b>${where?`<ul class="dwtodo lwhere">${where}</ul>`:'<p class="muted" style="margin:0">Not in any project yet.</p>'}</div>
+    </aside></div>
+   <footer class="dwpv-f"><span class="muted">${i>=0?`${i+1} of ${L.length} in this list`:''}</span><span class="actions"><button type="button" class="btn sm" data-act="dwStep" data-d="-1" ${i>0?'':'disabled'}>← Previous</button><button type="button" class="btn sm" data-act="dwStep" data-d="1" ${i>=0&&i<L.length-1?'':'disabled'}>Next →</button></span></footer></div>`}
+function libCmpHTML(){const P=S.dwp.ids.map(byId).filter(Boolean),cp=canPrice();if(P.length<2)return '';
+  const lo=Math.min(...P.map(p=>+p.cost||Infinity)),hm=Math.max(...P.map(p=>libMargin(p)??-1)),U=libUsage(),sigs=[...new Set(P.flatMap(libSigs))];
+  const cnt=(p,t,d)=>(p[d]||[]).filter(x=>x.t===t).length;
+  const row=(l,f)=>`<tr><th scope="row">${l}</th>${P.map(p=>`<td>${f(p)}</td>`).join('')}</tr>`;
+  return `<div class="dwpv-card lcmp" role="dialog" aria-modal="true" aria-labelledby="dwpvH">
+   <header class="dwpv-h"><div class="dwpv-t"><p class="eyebrow">Equipment library</p><h2 id="dwpvH">Compare ${P.length} products</h2></div><button type="button" class="apx" data-act="dwClose" aria-label="Close">×</button></header>
+   <div class="lcmpw"><table class="t lcmpt"><thead><tr><th><span class="sr">Spec</span></th>${P.map(p=>`<th scope="col"><button type="button" class="lcmph" data-act="libPv" data-id="${esc(p.id)}"><span class="lsimg">${thumb(p,'')||`<span class="lcnone">${esc(p.cat.slice(0,1))}</span>`}</span><b>${esc(p.model)}</b><small>${esc(p.mfr)}</small></button></th>`).join('')}</tr></thead><tbody>
+    ${row('Category',p=>esc(p.cat))}
+    ${cp?row('Dealer cost',p=>`<span class="${+p.cost===lo?'lbest':''}">${money2(+p.cost||0)}</span>`)+row('MSRP',p=>money2(+p.msrp||0))+row('Margin',p=>{const m=libMargin(p);return m==null?'—':`<span class="${m===hm?'lbest':''}">${Math.round(m*100)}%</span>`})+row(`Sell at ${+S.prop.markup||0}%`,p=>money2((+p.cost||0)*(1+(+S.prop.markup||0)/100))):''}
+    ${row('Install labor',p=>`${+p.labor||0} h`)}${row('Rack space',p=>+p.ru?p.ru+'U':'—')}${row('Power',p=>+p.watts?p.watts+' W':'—')}
+    ${row('Inputs',p=>(p.ins||[]).length)}${row('Outputs',p=>(p.outs||[]).length)}
+    ${sigs.map(t=>row(`<span class="dot ${SIG[t]?SIG[t].cls:''}" aria-hidden="true"></span> ${esc(SIG[t]?SIG[t].short:t)} in / out`,p=>p.ctype===t?'Cable':`${cnt(p,t,'ins')} / ${cnt(p,t,'outs')}`)).join('')}
+    ${row('Used in your projects',p=>{const u=U.get(p.id);return u?`${u.units} in ${plural(u.pj.size,'project')}`:'—'})}
+    <tr><th scope="row"><span class="sr">Actions</span></th>${P.map(p=>`<td><div class="lcmpa">${placeable(p)?`<button class="btn sm primary" data-act="libPlace" data-id="${esc(p.id)}">Place</button>`:''}<button class="btn sm" data-act="libCmpDrop" data-id="${esc(p.id)}">Remove</button></div></td>`).join('')}</tr>
+   </tbody></table></div>
+   <footer class="dwpv-f"><span class="muted">${cp?'Green marks the lowest dealer cost and the best margin.':''}</span><span></span></footer></div>`}
+function libAfterEdit(msg){save();badges();R.library();if(msg)toast(msg)}
+Object.assign(A,{
+  libPv(el){const id=el.dataset.id;if(!byId(id))return;S.dwp={kind:'lib',id,list:(S.libList||[]).includes(id)?S.libList:[id]};dwRender()},
+  libFav(el){const p=byId(el.dataset.id);if(!p)return;p.fav=!p.fav;save();if(S.dwp)dwRender();if(S.view==='library')R.library()},
+  libSel(el){const id=el.dataset.id,Sx=libSelSet();if(Sx.has(id))Sx.delete(id);else Sx.add(id);if(S.dwp)dwRender();R.library()},
+  libSelAll(){const Sx=libSelSet(),ids=(S.libList||[]).slice(0,libLim),all=ids.every(id=>Sx.has(id));ids.forEach(id=>all?Sx.delete(id):Sx.add(id));R.library()},
+  libSelClear(){libSelSet().clear();S.ui.lbulk='';R.library()},
+  libShow(el){const k=el.dataset.k,o={...(S.ui.lshow||{})};o[k]=!o[k];S.ui.lshow=o;libLim=200;R.library()},
+  libSig(el){const k=el.dataset.k,a=Array.isArray(S.ui.lsig)?S.ui.lsig.slice():[];const i=a.indexOf(k);if(i<0)a.push(k);else a.splice(i,1);S.ui.lsig=a;libLim=200;R.library()},
+  libRack(el){S.ui.lrack=el.dataset.k||'';libLim=200;R.library()},
+  libCatSet(el){libCat=el.dataset.v||'All';libLim=200;R.library()},
+  libFixSet(el){S.ui.libFix=S.ui.libFix===el.dataset.k?'':el.dataset.k;libLim=200;R.library()},
+  libClearF(){libCat='All';libBrand='All';libQ='';S.ui.lshow={};S.ui.lsig=[];S.ui.lrack='';S.ui.libFix='';libLim=200;R.library()},
+  libBulk(el){S.ui.lbulk=el.dataset.k||'';R.library();const f=$('#lbCat')||$('#lbC')||$('#lbL');if(f)f.focus()},
+  libBulkFav(){const ids=[...libSelSet()],all=ids.every(id=>(byId(id)||{}).fav);ids.forEach(id=>{const p=byId(id);if(p)p.fav=!all});libAfterEdit(all?`Removed ${plural(ids.length,'product')} from favorites.`:`${plural(ids.length,'product')} added to favorites.`)},
+  libBulkCatGo(){const v=$('#lbCat')&&$('#lbCat').value;if(!v)return;const ids=[...libSelSet()];ids.forEach(id=>{const p=byId(id);if(p)p.cat=v});S.ui.lbulk='';libAfterEdit(`${plural(ids.length,'product')} moved to ${v}.`)},
+  libBulkPriceGo(){const c=parseFloat(($('#lbC')||{}).value)||0,m=parseFloat(($('#lbM')||{}).value)||0;if(!c&&!m){toast('Enter a percentage for dealer cost, MSRP or both.');return}
+    if(Math.abs(c)>90||Math.abs(m)>90){toast('Keep changes under 90% so a typo can’t wipe out prices.');return}
+    const ids=[...libSelSet()],r2=v=>Math.round(v*100)/100;ids.forEach(id=>{const p=byId(id);if(!p)return;if(c)p.cost=r2((+p.cost||0)*(1+c/100));if(m)p.msrp=r2((+p.msrp||0)*(1+m/100))});S.ui.lbulk='';
+    libAfterEdit(`Prices updated on ${plural(ids.length,'product')}${c?` · dealer ${c>0?'+':''}${c}%`:''}${m?` · MSRP ${m>0?'+':''}${m}%`:''}. Proposals that use them reprice when you open them.`)},
+  libBulkLaborGo(){const v=parseFloat(($('#lbL')||{}).value);if(!(v>=0)){toast('Enter the labor hours for each product.');return}const ids=[...libSelSet()];ids.forEach(id=>{const p=byId(id);if(p)p.labor=Math.round(v*4)/4});S.ui.lbulk='';libAfterEdit(`Labor set to ${v} h on ${plural(ids.length,'product')}.`)},
+  async libCsv(el){const sel=el&&el.dataset&&el.dataset.sel,ids=sel?[...libSelSet()]:null,L=ids?ids.map(byId).filter(Boolean):lib;
+    const r=await saveFile(new Blob([libCSV(L)],{type:'text/csv'}),`${dcFileName(firm())} equipment ${isoDay(0)}.csv`);if(r==='saved')toast(`${plural(L.length,'product')} exported. Import it with “Import a price list”.`)},
+  libCmp(){const ids=[...libSelSet()].filter(byId);if(ids.length<2){toast('Select 2 to 4 products to compare.');return}S.dwp={kind:'cmp',ids:ids.slice(0,4)};dwRender()},
+  libCmpDrop(el){if(!S.dwp)return;S.dwp.ids=S.dwp.ids.filter(x=>x!==el.dataset.id);libSelSet().delete(el.dataset.id);if(S.dwp.ids.length<2){dwClose()}else dwRender();R.library()},
+  libDup(el){const p=byId(el.dataset.id);if(!p)return;const c=JSON.parse(JSON.stringify(p));c.id='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);c.model=(p.model+' (copy)').slice(0,80);c.fav=false;delete c.spec;c.imgs=(p.imgs||[]).filter(x=>typeof x==='string'&&/^https?:/.test(x));
+    lib.push(c);save();if(S.dwp){S.dwp=null;dwRender()}openEditor(c.id);toast(`Copy made. Change what’s different and save.`)},
+  libPlace(el){const p=byId(el.dataset.id);if(!p||!placeable(p))return;if(S.dwp){S.dwp=null;dwRender()}if(S.studio)dcExit(true);setSheet('flow');requestAnimationFrame(()=>{try{placeNode(p.id,SW/2-W/2,SH/2-40)}catch(e){toast('Open the drawings and drag it in from the device list.')}})},
+  libBom(el){const p=byId(el.dataset.id);if(!p)return;mut(()=>{const ex=S.design.extras.find(e=>e.pid===p.id);if(ex)ex.qty+=1;else S.design.extras.push({pid:p.id,qty:1})});save();if(S.dwp)dwRender();toast(`Added 1 × ${p.model} to ${S.prop.project||'the project'}’s bill of materials.`)}
 });
 purgeSamples();
 window.addEventListener('pagehide',saveProjects);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveProjects()});
