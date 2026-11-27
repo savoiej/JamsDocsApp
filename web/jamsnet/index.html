@@ -1599,6 +1599,7 @@ button:not(:disabled):active{filter:brightness(.92)}
     <section class="view" id="v-contracts" hidden></section>
     <section class="view" id="v-assistant" hidden></section>
     <section class="view" id="v-design" hidden></section>
+    <section class="view" id="v-drawings" hidden></section>
     <section class="view" id="v-dcenter" hidden></section>
     <section class="view" id="v-clients" hidden></section>
     <section class="view" id="v-library" hidden></section>
@@ -1726,6 +1727,7 @@ button:not(:disabled):active{filter:brightness(.92)}
 :root[data-glass] .rail .nav button[aria-current="page"]::before{left:auto!important;right:12px!important;top:50%!important;bottom:auto!important;width:8px!important;height:8px!important;margin-top:-4px;border-radius:50%!important;background:var(--hl)!important}
 :root[data-glass] .rail .nvi,:root[data-glass] .rail .nav .k{color:var(--jrail-fg2)!important}
 :root[data-glass] .rail .nav [aria-current="page"] .nvi{color:var(--accent)!important}
+:root[data-glass] .rail .nav button[aria-current="page"] .badge{margin-right:14px}
 :root[data-glass] .rail .navsub,:root[data-glass] .rail .chev{border-left-color:var(--jrail-line)!important}
 :root[data-glass] .rail .nlhd,:root[data-glass] .rail .nav .nlhd{border-top-color:var(--jrail-line)!important}
 :root[data-glass] .rail .nav .badge{background:var(--jrail-hover)!important;color:var(--jrail-on-fg)!important}
@@ -1743,6 +1745,74 @@ button:not(:disabled):active{filter:brightness(.92)}
   :root[data-glass] .tabbar button{color:var(--muted)}
   :root[data-glass] .tabbar button[aria-current="page"]{color:var(--accent)}
   :root[data-glass] .tabbar button[aria-current="page"]::before{background:var(--hl)}}
+/* ===== Design drawings dashboard + preview ===== */
+.dwkpis .kbtn.on{box-shadow:0 0 0 2px var(--accent)!important}
+.dwgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+@media (max-width:1180px){.dwgrid{grid-template-columns:minmax(0,1fr)}}
+.dwmain{display:flex;flex-direction:column;gap:14px;min-width:0}
+.dwbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.dwn{font-variant-numeric:tabular-nums;opacity:.75;margin-left:2px}
+.dwsearch{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted);flex:0 1 300px}
+.dwsearch input{all:unset;flex:1;min-width:0;color:var(--fg);font-size:14px}
+.dwcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.dwcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card,16px);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);min-width:0}
+:root[data-glass] .dwcard{border-color:var(--jpanel-line)}
+.dwcard.cur{box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+.dwthumbbtn{all:unset;box-sizing:border-box;cursor:pointer;display:block;background:var(--sheet);border-bottom:1px solid var(--line);aspect-ratio:1700/1100;overflow:hidden}
+.dwthumbbtn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+@media (hover:hover) and (pointer:fine){.dwthumbbtn:hover .dwthumb{transform:scale(1.03)}}
+.dwthumb{display:grid;place-items:center;width:100%;height:100%;transition:transform .2s}
+.dwthumb svg{display:block;width:100%;height:100%}
+.dwload{width:70%;height:60%;border-radius:8px;background:linear-gradient(90deg,var(--sunk),var(--surface),var(--sunk));background-size:200% 100%;animation:dwsh 1.2s linear infinite}
+@keyframes dwsh{to{background-position:-200% 0}}@media (prefers-reduced-motion:reduce){.dwload{animation:none}.dwthumb{transition:none}}
+.dwempty{font-size:13px;color:var(--muted)}
+.dwbody{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.dwtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dwst{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.dwst-ns{background:var(--sunk);color:var(--muted)}.dwst-dft{background:var(--sunk);color:var(--fg)}
+.dwst-rdy{background:var(--accent-soft);color:var(--accent)}.dwst-chg{background:var(--warn-soft);color:var(--warn)}.dwst-iss{background:var(--ok-soft);color:var(--ok)}
+.dwcurtag{font-size:12px;font-weight:600;color:var(--accent)}
+.dwttl{margin:4px 0 0;font-size:16px;font-weight:600;line-height:1.25}.dwttl button{all:unset;cursor:pointer;overflow-wrap:anywhere}
+@media (hover:hover) and (pointer:fine){.dwttl button:hover{color:var(--accent)}}.dwttl button:focus-visible{outline:2px solid var(--accent);border-radius:4px}
+.dwcl{margin:0;font-size:13px;color:var(--muted)}.dwstats{margin:0;font-size:12.5px;color:var(--muted)}
+.dwsheets{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.dwsheets button{all:unset;cursor:pointer;font:500 11px var(--f-mono,monospace);padding:4px 8px;border-radius:8px;background:var(--sunk);color:var(--fg)}
+@media (hover:hover) and (pointer:fine){.dwsheets button:hover{background:var(--accent-soft);color:var(--accent)}}.dwsheets button:focus-visible{outline:2px solid var(--accent)}
+.dwacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+.dwnone{padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}.dwnone h2{margin:0;font-size:18px}.dwnone p{margin:0}
+.dwside{display:flex;flex-direction:column;gap:16px}
+.dwtodo{list-style:none;margin:0;padding:6px}
+.dwtodo button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;width:100%;padding:10px 12px;border-radius:12px}
+.dwtodo button>:first-child{grid-row:span 2}
+.dwtodo b{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dwtodo small{font-size:12.5px;color:var(--muted);grid-column:2}
+@media (hover:hover) and (pointer:fine){.dwtodo button:hover{background:var(--sunk)}}.dwtodo button:focus-visible{outline:2px solid var(--accent)}
+.dwtodo .dwnext{display:flex;flex-direction:column;align-items:flex-start;gap:4px}.dwtodo .dwnext b{white-space:normal}.dwtodo .dwst{font-size:11px;padding:2px 8px}
+.dwbar .apseg{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}.dwbar .apseg button{white-space:nowrap;flex:none}
+.dwrev{display:inline-grid;place-items:center;min-width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font:700 13px var(--f-mono,monospace)}
+.dwpv{position:fixed;inset:0;z-index:60;background:rgba(10,16,28,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
+.dwpv-card{width:min(1320px,100%);height:min(900px,calc(100dvh - 32px));background:var(--surface);color:var(--fg);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 100px -20px rgba(0,0,0,.5)}
+.dwpv-h{display:flex;align-items:center;gap:12px;padding:16px 18px 10px}
+.dwpv-t{flex:1;min-width:0}.dwpv-t .eyebrow{margin:0}.dwpv-h h2{margin:2px 0 0;font-size:20px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dwpv .apx{all:unset;cursor:pointer;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);font-size:20px;flex:none}.dwpv .apx:focus-visible{outline:2px solid var(--accent)}
+.dwpv-tabs{display:flex;gap:6px;padding:0 18px 12px;overflow-x:auto;scrollbar-width:thin}
+.dwpv-tabs button{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:500;white-space:nowrap}
+.dwpv-tabs .mono{font:600 11px var(--f-mono,monospace);color:var(--muted)}
+.dwpv-tabs button[aria-selected="true"]{background:var(--fg);border-color:var(--fg);color:var(--surface)}.dwpv-tabs button[aria-selected="true"] .mono{color:inherit;opacity:.8}
+.dwpv-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dwpv-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;border-top:1px solid var(--line)}
+.dwpv-sheet{overflow:auto;padding:18px;background:var(--sunk);display:flex;align-items:flex-start;justify-content:center}
+.dwpv-sheet .dsheet{max-width:none;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.dwpv-sheet .dhtml{width:100%;background:var(--surface);border-radius:12px;padding:16px;overflow:auto}
+.dwpv-side{overflow:auto;padding:18px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
+.dwpv-acts{display:flex;flex-direction:column;gap:8px}.dwpv-acts .btn{justify-content:center;width:100%}
+.dwpv-next{margin:0;font-size:13px;padding:10px 12px;border-radius:12px;background:var(--accent-soft)}
+.dwfacts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}.dwfacts div{background:var(--sunk);border-radius:12px;padding:10px 12px}
+.dwfacts dt{font-size:12px;color:var(--muted)}.dwfacts dd{margin:2px 0 0;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.dwpv-sec{display:flex;flex-direction:column;gap:8px}.dwpv-sec>b{font-size:13px;font-weight:600}
+.dwrevs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}.dwrevs li{display:flex;gap:10px;align-items:flex-start}
+.dwrevs li>span:last-child{display:flex;flex-direction:column;font-size:13px}.dwrevs small{color:var(--muted);font-size:12px}
+.dwpv-f{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid var(--line);font-size:13px;flex-wrap:wrap}
+@media (max-width:860px){.dwpv{padding:0}.dwpv-card{height:100dvh;border-radius:0}.dwpv-main{grid-template-columns:minmax(0,1fr);overflow:auto}.dwpv-sheet{overflow:visible;padding:10px}.dwpv-side{border-left:0;border-top:1px solid var(--line);overflow:visible}}
 /* ===== Appearance panel (rail footer + settings) ===== */
 .appanel{display:flex;flex-direction:column;gap:18px}
 .apbtn{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:36px;padding:4px 10px 4px 4px;border-radius:999px;font-size:12.5px;font-weight:600;touch-action:manipulation;max-width:100%}
@@ -2381,7 +2451,7 @@ function renderProjSwitch(){const b=$('#pjsw');if(!b)return;
   b.innerHTML=`<label class="navgroup" for="pjSel">Project</label><select class="inp" id="pjSel" aria-label="Open project">${projOptions()}</select><button class="btn sm" data-act="newProject">+ New project</button>`}
 function projOptions(){return PJ.list.map(e=>{const pr=e.id===PJ.cur?S.prop:(e.prop||{});return `<option value="${e.id}" ${e.id===PJ.cur?'selected':''}>${esc([pr.client,pr.project].filter(Boolean).join(' · ')||'Untitled project')}</option>`}).join('')}
 function badges(){renderProjSwitch();{const b=$('#bInbox');if(b&&typeof ibNeeds==='function'){const n=INBOX.convs.filter(ibNeeds).length;b.textContent=n;b.hidden=!n;b.classList.toggle('bad',n>0)}}{const b=$('#bPO');if(b&&typeof poAll==='function'){const n=poAll().filter(p=>{const st=poStatus(p);return st==='Sent'||st==='Partially received'}).length;b.textContent=n;b.hidden=!n}}{const b=$('#bCt');if(b&&typeof ctLive==='function'){const n=(S.contracts||[]).filter(ctLive).length;b.textContent=n;b.hidden=!n}}{const b=$('#bTime');if(b&&typeof tbAll==='function'){const n=tbAll().filter(({t})=>tbStatus(t).k==='unbilled').length;b.textContent=n;b.hidden=!n}}($('#bCl')||{}).textContent=S.clients.length;($('#bDesign')||{}).textContent=S.design.nodes.length;($('#bLib')||{}).textContent=lib.length;($('#bSvc')||{}).textContent=S.tickets.filter(t=>t.col!=='Completed').length;{const b=$('#bReg');if(b)b.textContent=(S.registers||[]).length}{const b=$('#bInv');if(b)b.textContent=(S.inventory||[]).length}cloudMark()}
-const VIEWS=['overview','assistant','design','dcenter','inbox','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
+const VIEWS=['overview','assistant','design','drawings','dcenter','inbox','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
 function go(v){
   if(v==='clients'&&S.view==='clients'&&S.ui.cpage){S.ui.cpage=null}
   if(!VIEWS.includes(v))v='overview';
@@ -2390,7 +2460,8 @@ function go(v){
   if(S.view==='design'&&v!=='design'){S.wire=null;S.drag=null;S.rdrag=null;S.pan=null;if(S.ui.fs){S.ui.fs=false;if(S.fsNative&&document.fullscreenElement)document.exitFullscreen().catch(()=>{});S.fsNative=false;document.body.classList.remove('dfs')}}
   S.view=v;document.body.classList.toggle('nlmode',v==='networks');if(typeof nlNavRender==='function')nlNavRender();if(typeof renderTopbar==='function')renderTopbar();
   VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v);
-  const nv=S.studio&&v==='design'?'dcenter':v;
+  const nv=S.studio&&v==='design'?'dcenter':v==='design'?'drawings':v;
+  if(v!=='drawings'&&S.dwp)dwClose();
   document.querySelectorAll('#nav [data-go]').forEach(b=>{if(b.dataset.go===nv)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});navSync(nv);
   R[v]();badges();window.scrollTo(0,0);
 }
@@ -6847,12 +6918,13 @@ function nlNav(st){NLST=st;try{localStorage.setItem(NLNAVK,JSON.stringify(st))}c
 const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 /* the sidebar, in the order a job runs: sell, design, build, bill, then support */
 const NAV_IC={"av:overview": "<path d=\"M3 11l9-7 9 7\"/><path d=\"M5 10v10h14V10\"/>", "av:dcenter": "<path d=\"M3 21l4-1 11-11-3-3L4 17z\"/><path d=\"M14 6l3 3\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/>", "av:inbox": "<path d=\"M3 13h5l1 3h6l1-3h5\"/><path d=\"M5.5 5h13L21 13v6H3v-6z\"/>", "av:assistant": "<path d=\"M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z\"/><path d=\"M19 16v4M17 18h4\"/>", "av:clients": "<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20a6.5 6.5 0 0 1 13 0\"/><path d=\"M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8\"/>", "av:proposal": "<path d=\"M6 3h9l4 4v14H6z\"/><path d=\"M14 3v5h5\"/><path d=\"M9 14l2 2 4-4\"/>", "av:projects": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4M7 14h4M7 17h7\"/>", "av:design": "<rect x=\"3\" y=\"4\" width=\"7\" height=\"6\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"6\" rx=\"1\"/><path d=\"M10 7h4a2 2 0 0 1 2 2v5\"/>", "av:library": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"5\" rx=\"1\"/><rect x=\"3\" y=\"11\" width=\"18\" height=\"5\" rx=\"1\"/><path d=\"M7 6.5h.01M7 13.5h.01M3 20h18\"/>", "av:estimate": "<path d=\"M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z\"/>", "av:purchasing": "<circle cx=\"9\" cy=\"20\" r=\"1.5\"/><circle cx=\"18\" cy=\"20\" r=\"1.5\"/><path d=\"M2 3h3l2.7 12.5h11.6L22 7H6.2\"/>", "av:field": "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/>", "av:billing": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "nl:billing": "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 7h6M9 11h6M9 15h4\"/>", "av:contracts": "<path d=\"M6 3h9l4 4v14H6z\"/><path d=\"M14 3v5h5M9 17c1.5-2 2.5-2 3 0s1.5 1 3-1\"/>", "av:service": "<path d=\"M4 13a8 8 0 0 1 16 0\"/><rect x=\"3\" y=\"13\" width=\"4\" height=\"6\" rx=\"1\"/><rect x=\"17\" y=\"13\" width=\"4\" height=\"6\" rx=\"1\"/>", "nl:tickets": "<path d=\"M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v8a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2z\"/><path d=\"M14 7v2M14 11v2M14 15v2\"/>", "nl:board": "<rect x=\"3\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\"/><rect x=\"10\" y=\"3\" width=\"5\" height=\"12\" rx=\"1\"/><rect x=\"17\" y=\"3\" width=\"4\" height=\"8\" rx=\"1\"/>", "nl:maint": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4\"/>", "nl:field": "<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><path d=\"M14 14h3v3h-3zM21 14v.01M14 21h.01M17 21h4v-4\"/>", "nl:contacts": "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M8 17a4 4 0 0 1 8 0\"/>", "nl:runbooks": "<path d=\"M4 4h6a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4z\"/><path d=\"M20 4h-5a2 2 0 0 0-2 2M20 4v15h-7\"/>", "nl:sites": "<path d=\"M4 21V5l8-2v18M12 7l8 3v11M2 21h20M8 8v.01M8 12v.01M8 16v.01M16 13v.01M16 17v.01\"/>", "nl:plans": "<path d=\"M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z\"/><path d=\"M9 4v14M15 6v14\"/>", "nl:devices": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"/><path d=\"M8 20h8M12 16v4\"/>", "nl:racks": "<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"1\"/><path d=\"M5 8h14M5 14h14M9 5h.01M9 11h.01M9 17h.01\"/>", "nl:power": "<path d=\"M13 2L4 14h7l-1 8 9-12h-7z\"/>", "nl:cabling": "<path d=\"M4 19v-4a4 4 0 0 1 4-4h8a4 4 0 0 0 4-4V5\"/><rect x=\"2\" y=\"19\" width=\"4\" height=\"3\" rx=\"1\"/><rect x=\"18\" y=\"2\" width=\"4\" height=\"3\" rx=\"1\"/>", "nl:jacks": "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"/><rect x=\"9\" y=\"7\" width=\"6\" height=\"4\" rx=\"1\"/><rect x=\"9\" y=\"13\" width=\"6\" height=\"4\" rx=\"1\"/>", "nl:lifecycle": "<path d=\"M20 11a8 8 0 0 0-14.9-3M4 13a8 8 0 0 0 14.9 3\"/><path d=\"M5 3v5h5M19 21v-5h-5\"/>", "nl:discover": "<path d=\"M12 3v12M7 10l5 5 5-5\"/><path d=\"M4 19h16\"/>", "nl:inventory": "<path d=\"M3 7l9-4 9 4-9 4z\"/><path d=\"M3 7v10l9 4 9-4V7M12 11v10\"/>", "nl:topology": "<rect x=\"9\" y=\"3\" width=\"6\" height=\"5\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"/><rect x=\"15\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"/><path d=\"M12 8v4M6 16v-2h12v2\"/>", "nl:ipam": "<path d=\"M5 9h15M4 15h15M10 3L8 21M16 3l-2 18\"/>", "nl:circuits": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18\"/>", "nl:wireless": "<path d=\"M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0\"/><path d=\"M12 19.5h.01\"/>", "nl:security": "<path d=\"M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z\"/>", "nl:dnscloud": "<path d=\"M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z\"/>", "nl:audit": "<rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M9 2h6v4H9zM9 14l2 2 4-4\"/>", "nl:revisions": "<path d=\"M3 12a9 9 0 1 0 3-6.7L3 8\"/><path d=\"M3 3v5h5M12 7v5l3 2\"/>", "nl:labels": "<path d=\"M3 12V3h9l9 9-9 9z\"/><path d=\"M7.5 7.5h.01\"/>", "nl:docset": "<path d=\"M8 3h8l4 4v12H8z\"/><path d=\"M16 3v4h4M4 7v14h12\"/>", "nl:portal": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 9h18M7 6.5h.01M10 6.5h.01\"/>", "av:registers": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"10\" rx=\"1\"/><path d=\"M6 11V5h8v6M16 8h3v3M8 15h.01M12 15h.01M16 15h.01\"/>", "nl:help": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14M12 17.5h.01\"/>", "av:settings": "<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2\"/>", "nl:admin": "<circle cx=\"11\" cy=\"8\" r=\"4\"/><path d=\"M3 21a8 8 0 0 1 11-7.4M18 15v6M15 18h6\"/>", "av:inventory": "<path d=\"M3 7l9-4 9 4-9 4z\"/><path d=\"M3 7v10l9 4 9-4V7M12 11v10\"/>"};
+NAV_IC['av:drawings']=NAV_IC['av:design'];
 const NAVL=[
  {top:'av:overview|Dashboard'},
  {top:'av:inbox|Client inbox|#bInbox'},
  {top:'av:assistant|Assistant|AI'},
  {sec:'clients',title:'Sell',items:['av:clients|Clients & invoices|#bCl', 'av:proposal|Proposals']},
- {sec:'design',title:'Design',items:['av:design|Design drawings|#bDesign', 'av:dcenter|Design Center', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables']},
+ {sec:'design',title:'Design',items:['av:drawings|Design drawings|#bDesign', 'av:dcenter|Design Center', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables']},
  {sec:'projects',title:'Build',items:['av:projects|Projects & schedule', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
  /* one place for billing: network support time opens from a switch on the Time & invoicing page */
  {sec:'billing',title:'Bill',items:['av:billing|Time & invoicing|#bTime']},
@@ -6866,7 +6938,7 @@ const NAVL=[
 const NL_DEF={sites:'Sites & rooms',plans:'Floor plans',devices:'Devices',racks:'Racks',power:'Power',cabling:'Cabling',jacks:'Wall jacks',lifecycle:'Lifecycle & budget',discover:'Import from switches',inventory:'Site inventory',topology:'Topology',ipam:'IP & VLANs',circuits:'WAN circuits',wireless:'Wireless',security:'Firewall & VPN',dnscloud:'DNS & cloud',tickets:'Tickets',board:'Board',billing:'Time & billing',maint:'Maintenance',field:'Field view',contacts:'Contacts',runbooks:'Runbooks',audit:'Audit',revisions:'Revisions',labels:'Labels',docset:'Document set',portal:'Client portal',help:'Help & guide',overview:'Network overview'};
 function nlItem(go){if(!NLST)return go==='admin'||go==='portal'?null:{go,label:NL_DEF[go]||go};const all=[...NLST.top,...NLST.secs.flatMap(x=>x.items)];return all.find(x=>x.go===go)||null}
 function navItem(spec,top,icon){const [k,lab,extra]=spec.split('|'),[kind,go]=k.split(':');if(S.tech&&((kind==='av'&&TECH_HIDE.includes(go))||(kind==='nl'&&go==='billing')))return '';
-  if(kind==='av'){const cur=(S.view===go&&S.view!=='networks')||(go==='billing'&&S.view==='networks'&&NLST&&NLST.view==='billing');
+  if(kind==='av'){const cur=(S.view===go&&S.view!=='networks')||(go==='drawings'&&S.view==='design'&&!S.studio)||(go==='billing'&&S.view==='networks'&&NLST&&NLST.view==='billing');
     return `<button data-go="${go}"${top?' class="navtop"':''}${cur?' aria-current="page"':''}${top?'':` title="${esc(lab)}"`}>${NVI(NAV_IC[k]||icon||'')}<span class="nvl">${esc(lab)}</span>${extra?(extra[0]==='#'?`<span class="badge" id="${extra.slice(1)}">0</span>`:`<span class="k">${esc(extra)}</span>`):''}</button>`}
   const it=nlItem(go);if(!it)return '';const cur=S.view==='networks'&&NLST&&NLST.view===go;
   return `<button data-nlgo="${go}"${it.locked?' class="locked"':''}${cur?' aria-current="page"':''}>${NVI(NAV_IC[k]||'<circle cx="12" cy="12" r="2"/>')}<span class="nvl">${esc(lab||it.label)}</span>${it.badge&&it.badge!=='0'?`<span class="badge${it.bad?' bad':''}">${esc(it.badge)}</span>`:''}</button>`}
@@ -8238,6 +8310,7 @@ const NEW_ITEMS=[
  ['Network','Client Networks',()=>{nlOpen('overview');setTimeout(()=>{const api=NLF&&NLF.contentWindow&&NLF.contentWindow.NL_API;if(api)api.net('__new')},400)}]];
 function navLabelFor(){if(S.view==='networks'&&NLST&&NLST.view==='billing')return ['Bill','Time & invoicing · Network support'];if(S.view==='networks'){const g=NLST&&NLST.view,f=[...NAVL].find(x=>x.items&&x.items.some(i=>i.startsWith('nl:'+g+'|')||i==='nl:'+g));if(!g||g==='overview')return ['Client Networks','Network overview'];const it=nlItem(g);const lab=f&&f.items.find(i=>i.split('|')[0]==='nl:'+g);return [f?f.title:'Client Networks',(lab&&lab.split('|')[1])||(it&&it.label)||'Network overview']}
   if(S.studio&&S.view==='design')return ['Design Center',(dcById(S.studio.id)||{}).name||'Template'];
+  if(S.view==='design')return ['Design drawings',(S.prop&&S.prop.project)||'Drawings'];
   for(const g of NAVL){if(g.top&&g.top.split('|')[0]==='av:'+S.view)return ['',g.top.split('|')[1]];if(g.items){const x=g.items.find(i=>i.split('|')[0]==='av:'+S.view);if(x)return [g.title,x.split('|')[1]]}}return ['','']}
 function renderTopbar(){const el=$('#topbar');if(!el)return;const [sec,page]=navLabelFor(),tm=typeof tbTimer==='function'?tbTimer():null;
   el.innerHTML=`<div class="crumb">${sec?`<span>${esc(sec)}</span><span aria-hidden="true">/</span>`:''}<b>${esc(page)}</b></div>
@@ -10522,6 +10595,118 @@ loadInvoices();
 loadRegisters();
 loadInventory();
 loadService();loadContracts();
+/* ================= DESIGN DRAWINGS DASHBOARD =================
+   Every client project's drawing set at a glance. Cards open a centered preview drawn with the editor's own renderer;
+   "Open in editor" switches to that project and opens the sheet. */
+const DWC={},DW_ORD={chg:0,rdy:1,dft:2,ns:3,iss:4},DW_F=[['all','All'],['work','Needs work'],['ready','Ready to issue'],['issued','Issued']];
+const dwDesign=e=>e.id===PJ.cur?S.design:(e.design||null);
+function dwInfo(e){const open=e.id===PJ.cur,P=pjProp(e),d=dwDesign(e),nodes=d&&Array.isArray(d.nodes)?d.nodes:[],cables=d&&Array.isArray(d.cables)?d.cables:[],racks=d&&Array.isArray(d.racks)?d.racks:[];
+  const revs=Array.isArray(P.revs)?P.revs:[],last=revs[revs.length-1]||null;let changed=false;
+  if(last&&last.ids){const pd=new Set(last.ids.d||[]),pc=new Set(last.ids.c||[]);changed=nodes.length!==pd.size||cables.length!==pc.size||nodes.some(n=>!pd.has(n.uid))||cables.some(c=>!pc.has(c.id))}
+  let st,cls,next;
+  if(!nodes.length){st='Not started';cls='ns';next='Place the devices on the signal flow'}
+  else if(!last){if(cables.length){st='Ready to issue';cls='rdy';next='Check the sheets, then issue rev '+((d.meta&&d.meta.rev)||'A')}else{st='Drafting';cls='dft';next='Wire the devices on the signal flow'}}
+  else if(changed){st='Changed since rev '+last.rev;cls='chg';next='Issue the next revision so the client has the latest set'}
+  else{st='Issued · rev '+last.rev;cls='iss';next=''}
+  let sv=[];try{const ty=pjTypeOf(P.ptype||'av');sv=P.services||ty.svc||[]}catch(_){}
+  const sheets=d?DSHEETS.map(([k,mk])=>({k,dwg:(d[mk]||{}).dwg||'',title:(d[mk]||{}).title||''})).filter(x=>x.dwg):[];
+  return {e,id:e.id,open,P,d,nodes:nodes.length,cables:cables.length,racks:racks.length,revs,last,changed,st,cls,next,sheets,usesDraw:sv.includes('design')||sv.includes('asbuilt'),
+    client:cliName(P),project:P.project||'Untitled project',job:e.job||'',no:P.no||''}}
+const dwInGroup=(x,f)=>f==='all'||(f==='work'?['ns','dft','chg'].includes(x.cls):f==='ready'?x.cls==='rdy':x.cls==='iss');
+function dwAll(){return PJ.list.map(dwInfo).filter(x=>x.usesDraw||x.nodes)}
+/* render a project's sheets with its own design and title block, then put the open project back */
+function dwWith(e,fn){if(e.id===PJ.cur)return fn();const keep={d:S.design,p:S.prop,l:S.liveSet,sh:S.ui.sheet};let out=null;
+  try{S.prop=e.prop||{};const dd=normDesign(JSON.parse(JSON.stringify(e.design||null)));if(!dd)return null;S.design=dd;out=fn()}catch(err){out=null}
+  finally{S.design=keep.d;S.prop=keep.p;S.liveSet=keep.l;S.ui.sheet=keep.sh}return out}
+function dwSig(e){try{return JSON.stringify(dwDesign(e)).length+'|'+JSON.stringify(pjProp(e).revs||[]).length+'|'+(pjProp(e).project||'')}catch(_){return String(Math.random())}}
+function dwThumb(e){const sg=dwSig(e),c=DWC['t'+e.id];if(c&&c.s===sg)return c.v;let v='';try{v=dwWith(e,()=>snapCanvas('flow'))||''}catch(_){v=''}DWC['t'+e.id]={s:sg,v};return v}
+function dwSetFor(e){const sg=dwSig(e),c=DWC['s'+e.id];if(c&&c.s===sg)return c.v;let v=null;try{v=dwWith(e,()=>drawingSet())}catch(_){v=null}DWC['s'+e.id]={s:sg,v};return v}
+const dwStHTML=x=>`<span class="dwst dwst-${x.cls}">${esc(x.st)}</span>`;
+function dwCardHTML(x){const lr=x.last;
+  return `<article class="dwcard${x.open?' cur':''}" aria-label="${esc(x.project)} for ${esc(x.client)}">
+   <button type="button" class="dwthumbbtn" data-act="dwPreview" data-pj="${x.id}" aria-label="Preview the drawings for ${esc(x.project)}"><span class="dwthumb" data-thumb="${x.id}">${x.nodes?'<span class="dwload" aria-hidden="true"></span>':'<span class="dwempty">No devices yet</span>'}</span></button>
+   <div class="dwbody">
+    <div class="dwtop">${dwStHTML(x)}${x.open?'<span class="dwcurtag">Open now</span>':''}</div>
+    <h3 class="dwttl"><button type="button" data-act="dwPreview" data-pj="${x.id}">${esc(x.project)}</button></h3>
+    <p class="dwcl">${esc(x.client)}${x.job?` · Job ${esc(x.job)}`:''}</p>
+    <p class="dwstats">${plural(x.nodes,'device')} · ${plural(x.cables,'cable')} · ${plural(x.racks,'rack')}${lr?` · rev ${esc(lr.rev)} ${esc(dayFmtIso(lr.at))}`:''}</p>
+    ${x.sheets.length?`<div class="dwsheets" role="group" aria-label="Sheets">${x.sheets.map(sh=>`<button type="button" data-act="dwPreview" data-pj="${x.id}" data-k="${sh.k}" title="${esc(sh.title)}">${esc(sh.dwg)}</button>`).join('')}</div>`:''}
+    <div class="dwacts"><button type="button" class="btn sm" data-act="dwPreview" data-pj="${x.id}">Preview</button><button type="button" class="btn sm primary" data-act="dwOpen" data-pj="${x.id}" data-sheet="flow">Open in editor</button></div>
+   </div></article>`}
+function dwListHTML(L){const f=S.ui.dwf||'all',q=(S.ui.dwq||'').trim().toLowerCase();
+  const shown=L.filter(x=>dwInGroup(x,f)&&(!q||[x.client,x.project,x.job,x.no].join(' ').toLowerCase().includes(q))).sort((a,b)=>(b.open-a.open)||(DW_ORD[a.cls]-DW_ORD[b.cls])||a.client.localeCompare(b.client)||a.project.localeCompare(b.project));
+  if(!L.length)return `<div class="panel dwnone"><h2>No drawing sets yet</h2><p class="muted">Start a project with drawings or an as-built survey and its drawing set shows up here.</p><button type="button" class="btn primary" data-act="newProject">+ New project</button></div>`;
+  if(!shown.length)return `<div class="panel dwnone"><h2>Nothing here</h2><p class="muted">No drawing sets match${q?` “${esc(S.ui.dwq)}”`:''}${f!=='all'?' in this filter':''}.</p><button type="button" class="btn" data-act="dwClear">Show all drawing sets</button></div>`;
+  return `<div class="dwcards">${shown.map(dwCardHTML).join('')}</div>`}
+R.drawings=function(){const L=dwAll(),f=S.ui.dwf||'all',n=k=>L.filter(x=>dwInGroup(x,k)).length,cls=c=>L.filter(x=>x.cls===c).length;
+  const devs=L.reduce((a,x)=>a+x.nodes,0),cbs=L.reduce((a,x)=>a+x.cables,0);
+  const revs=L.flatMap(x=>x.revs.map(r=>({x,r}))).sort((a,b)=>String(b.r.at||'').localeCompare(String(a.r.at||''))).slice(0,6);
+  const todo=L.filter(x=>x.cls==='chg'||x.cls==='rdy'||x.cls==='dft').sort((a,b)=>DW_ORD[a.cls]-DW_ORD[b.cls]).slice(0,5);
+  const kp=(k,l,v,s)=>`<button type="button" class="kbtn kpi${f===k?' on':''}" data-act="dwFilter" data-f="${k}" aria-pressed="${f===k}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></button>`;
+  let dcn=0;try{dcn=DC.length}catch(_){}
+  $('#v-drawings').innerHTML=`<header class="vh"><div><p class="eyebrow">Design</p><h1>Design drawings</h1><p class="sub">Every client's drawing set and where it stands. Pick one to preview it, or open it in the editor.</p></div>
+   <div class="actions"><button type="button" class="btn" data-go="dcenter">Design Center</button><button type="button" class="btn" data-act="dwOpen" data-pj="${PJ.cur}" data-sheet="${esc(S.ui.sheet||'flow')}">Open current drawings</button><button type="button" class="btn primary" data-act="newProject">+ New project</button></div></header>
+   <div class="kpis dwkpis">${kp('all','Drawing sets',L.length,`${plural(devs,'device')} · ${plural(cbs,'cable')} drawn`)}${kp('ready','Ready to issue',n('ready'),'Wired, never issued')}${kp('work','Needs work',n('work'),`${cls('chg')} changed since issue · ${cls('dft')+cls('ns')} drafting`)}${kp('issued','Issued and current',n('issued'),'Matches the last revision')}</div>
+   <div class="dwgrid"><section aria-label="Drawing sets" class="dwmain">
+    <div class="dwbar"><div class="apseg" role="group" aria-label="Show">${DW_F.map(([k,l])=>`<button type="button" data-act="dwFilter" data-f="${k}" aria-pressed="${f===k}">${l} <span class="dwn">${n(k)}</span></button>`).join('')}</div>
+     <label class="dwsearch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="dwQ" type="search" placeholder="Search client, project or job" aria-label="Search drawing sets" value="${esc(S.ui.dwq||'')}" autocomplete="off"></label></div>
+    <div id="dwList">${dwListHTML(L)}</div></section>
+   <aside class="dwside">
+    <div class="panel"><div class="ph"><h2>Next up</h2></div>${todo.length?`<ul class="dwtodo">${todo.map(x=>`<li><button type="button" class="dwnext" data-act="dwPreview" data-pj="${x.id}"><b>${esc(x.project)}</b>${dwStHTML(x)}<small>${esc(x.client)} · ${esc(x.next)}</small></button></li>`).join('')}</ul>`:'<p class="pb muted" style="margin:0">Every drawing set is issued and current.</p>'}</div>
+    <div class="panel"><div class="ph"><h2>Recent revisions</h2></div>${revs.length?`<ul class="dwtodo">${revs.map(({x,r})=>`<li><button type="button" data-act="dwPreview" data-pj="${x.id}"><span class="dwrev">${esc(r.rev)}</span><b>${esc(x.project)}</b><small>${esc(dayFmtIso(r.at))}${r.by?` · ${esc(r.by)}`:''}${r.summary?` · ${esc(clip(r.summary,60))}`:''}</small></button></li>`).join('')}</ul>`:'<p class="pb muted" style="margin:0">No revisions issued yet. Issue one from the preview or Projects → Closeout.</p>'}</div>
+    <div class="panel"><div class="ph"><h2>Templates</h2></div><div class="pb"><p class="muted" style="margin:0 0 10px">${dcn?`${plural(dcn,'saved template')} in the Design Center to start new drawing sets from.`:'Save a finished drawing set as a template to reuse it on the next job.'}</p><button type="button" class="btn sm" data-go="dcenter">Open the Design Center</button></div></div>
+   </aside></div>`;
+  const qi=$('#dwQ');if(qi)qi.addEventListener('input',()=>{S.ui.dwq=qi.value;$('#dwList').innerHTML=dwListHTML(dwAll());dwFill()});
+  dwFill()};
+/* thumbnails are drawn one at a time after the page shows, so the page never waits on them */
+function dwFill(){const q=[...document.querySelectorAll('#v-drawings [data-thumb]')].filter(el=>el.querySelector('.dwload'));let i=0;
+  const step=()=>{if(S.view!=='drawings'||i>=q.length)return;const el=q[i++];if(!el.isConnected){step();return}const e=pjById(el.dataset.thumb);
+    const v=e?dwThumb(e):'';el.innerHTML=v?`<svg viewBox="0 0 ${SW} ${SH}" aria-hidden="true">${snapDefs()}${v}</svg>`:'<span class="dwempty">Preview unavailable</span>';setTimeout(step,0)};
+  setTimeout(step,30)}
+/* ---------- the centered preview ---------- */
+function dwPreviewOpen(id,k,from){const e=pjById(id);if(!e)return;const x=dwInfo(e);if(!x.nodes){toast(`${x.project} has no devices yet. Open it in the editor to start.`);return}
+  const set=dwSetFor(e);if(!set||!set.sheets.length){toast('This drawing set can’t be previewed. Open it in the editor.');return}
+  let i=k?set.sheets.findIndex(s=>s.k===k):0;if(i<0)i=0;S.dwp={id,i,set,from:from||null};dwRender()}
+function dwSheetBody(set,sh){return sh.svg!=null?`<svg class="dsheet dwpvsvg" viewBox="0 0 ${SW} ${SH}" role="img" aria-label="${esc(sh.dwg+' '+sh.title)}">${snapDefs()}${sh.svg}</svg>`
+  :`<div class="dhtml"><div class="dhtml-h"><span class="mono">${esc(sh.dwg)} · rev ${esc(set.rev)}</span><b>${esc(sh.title)}</b></div>${sh.html}</div>`}
+function dwRender(){let el=$('#dwPrev');if(!S.dwp){if(el)el.remove();return}
+  const e=pjById(S.dwp.id);if(!e){S.dwp=null;if(el)el.remove();return}
+  const x=dwInfo(e),{set,i}=S.dwp,sh=set.sheets[i],n=set.sheets.length,RV=x.revs.slice().reverse().slice(0,4);
+  if(!el){el=document.createElement('div');el.id='dwPrev';el.className='dwpv';document.body.appendChild(el)}
+  el.innerHTML=`<div class="dwpv-card" role="dialog" aria-modal="true" aria-labelledby="dwpvH">
+   <header class="dwpv-h"><div class="dwpv-t"><p class="eyebrow">${esc(x.client)}${x.job?` · Job ${esc(x.job)}`:''}</p><h2 id="dwpvH">${esc(x.project)}</h2></div>${dwStHTML(x)}<button type="button" class="apx" data-act="dwClose" aria-label="Close preview">×</button></header>
+   <div class="dwpv-tabs" role="tablist" aria-label="Sheets">${set.sheets.map((s2,j)=>`<button type="button" role="tab" data-act="dwSheet" data-i="${j}" aria-selected="${j===i}"><span class="mono">${esc(s2.dwg)}</span>${esc(s2.title)}</button>`).join('')}</div>
+   <div class="dwpv-main">
+    <div class="dwpv-sheet">${dwSheetBody(set,sh)}</div>
+    <aside class="dwpv-side">
+     <div class="dwpv-acts"><button type="button" class="btn primary" data-act="dwOpen" data-pj="${x.id}" data-sheet="${esc(sh.k)}">Open ${esc(sh.dwg)} in the editor</button>
+      ${x.cls==='rdy'||x.cls==='chg'?`<button type="button" class="btn" data-act="dwIssue" data-pj="${x.id}">Issue the next revision</button>`:''}
+      <button type="button" class="btn" data-act="dwProject" data-pj="${x.id}">Project page</button></div>
+     ${x.next?`<p class="dwpv-next"><b>Next:</b> ${esc(x.next)}</p>`:''}
+     <dl class="dwfacts"><div><dt>Devices</dt><dd>${x.nodes}</dd></div><div><dt>Cables</dt><dd>${x.cables}</dd></div><div><dt>Racks</dt><dd>${x.racks}</dd></div><div><dt>Sheets</dt><dd>${n}</dd></div></dl>
+     <div class="dwpv-sec"><b>Proposal</b><span>${chip(x.P.status||'Draft')}${x.no?` <span class="muted">${esc(x.no)}</span>`:''}</span></div>
+     <div class="dwpv-sec"><b>Revisions</b>${RV.length?`<ul class="dwrevs">${RV.map(r=>`<li><span class="dwrev">${esc(r.rev)}</span><span><b>${esc(dayFmtIso(r.at))}</b>${r.summary?`<small>${esc(clip(r.summary,80))}</small>`:''}${r.approver?`<small>Approved by ${esc(r.approver)}</small>`:''}</span></li>`).join('')}</ul>`:'<p class="muted" style="margin:0">Not issued yet.</p>'}</div>
+    </aside></div>
+   <footer class="dwpv-f"><span class="muted">Sheet ${i+1} of ${n} · rev ${esc(set.rev)}${x.open?'':' · read-only preview'}</span><span class="actions"><button type="button" class="btn sm" data-act="dwStep" data-d="-1" ${i?'':'disabled'}>← Previous</button><button type="button" class="btn sm" data-act="dwStep" data-d="1" ${i<n-1?'':'disabled'}>Next →</button></span></footer></div>`;
+  const t=el.querySelector('[role="tab"][aria-selected="true"]');if(t&&t.scrollIntoView)t.scrollIntoView({block:'nearest',inline:'nearest'});
+  if(!el.contains(document.activeElement))(el.querySelector('[data-act="dwClose"]')).focus()}
+function dwClose(){const from=S.dwp&&S.dwp.from;S.dwp=null;dwRender();if(from){const b=document.querySelector(`#v-drawings [data-act="dwPreview"][data-pj="${from}"]`);if(b)b.focus()}}
+document.addEventListener('keydown',e=>{if(!S.dwp)return;if(e.key==='Escape'){e.preventDefault();e.stopPropagation();dwClose();return}
+  if((e.key==='ArrowRight'||e.key==='ArrowLeft')&&!/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||'')){e.preventDefault();A.dwStep({dataset:{d:e.key==='ArrowRight'?1:-1}})}
+  if(e.key==='Tab'){const f=[...document.querySelectorAll('#dwPrev button:not([disabled])')];if(!f.length)return;const a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}},true);
+document.addEventListener('click',e=>{const el=document.getElementById('dwPrev');if(el&&e.target===el)dwClose()});
+Object.assign(A,{
+  dwFilter(el){S.ui.dwf=el.dataset.f||'all';save();R.drawings()},
+  dwClear(){S.ui.dwf='all';S.ui.dwq='';save();R.drawings()},
+  dwPreview(el){dwPreviewOpen(el.dataset.pj,el.dataset.k,el.dataset.pj)},
+  dwSheet(el){if(!S.dwp)return;S.dwp.i=+el.dataset.i;dwRender()},
+  dwStep(el){if(!S.dwp)return;const n=S.dwp.set.sheets.length,j=S.dwp.i+(+el.dataset.d);if(j<0||j>=n)return;S.dwp.i=j;dwRender()},
+  dwClose(){dwClose()},
+  dwOpen(el){const id=el.dataset.pj,k=['flow','rack','patch','plan','sched','bom','ip'].includes(el.dataset.sheet)?el.dataset.sheet:'flow';S.dwp=null;dwRender();
+    if(S.studio)dcExit(true);if(id&&id!==PJ.cur&&switchProject(id))toast(`Opened ${S.prop.project} for ${cliName(S.prop)}.`);setSheet(k)},
+  dwProject(el){const id=el.dataset.pj;S.dwp=null;dwRender();if(id!==PJ.cur&&switchProject(id))toast(`Opened ${S.prop.project} for ${cliName(S.prop)}.`);go('projects')},
+  dwIssue(el){const id=el.dataset.pj;S.dwp=null;dwRender();if(id!==PJ.cur)switchProject(id);go('projects');setTimeout(()=>revDialog(),0)}
+});
 purgeSamples();
 window.addEventListener('pagehide',saveProjects);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveProjects()});
 if(!loadSaved())loadTemplate('huddle');
@@ -10533,12 +10718,13 @@ cloudBoot();
    Below 760px the rail becomes a menu that opens full screen; four everyday pages sit in a tab bar.
    Technicians get projects, drawings, the field app and the service desk instead of money pages. */
 const TABIC={overview:'<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',inbox:'<path d="M4 13l2.5-7h11L20 13v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20"/>',projects:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3M8 17h6"/>',design:'<rect x="3" y="4" width="7" height="6" rx="1"/><rect x="14" y="14" width="7" height="6" rx="1"/><path d="M10 7h4a2 2 0 0 1 2 2v5"/>',field:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/>',service:'<path d="M14.5 6.5a4 4 0 0 0 5 5L13 18a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5L17 4l3 3-2.5 2.5M10 15l-5.5 5.5"/>'};
+TABIC.drawings=TABIC.design;
 const tabIcon=v=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TABIC[v]||''}</svg>`;
 const TAB_MENU='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 function tabsRender(){let el=document.getElementById('tabbar');
   if(!el){el=document.createElement('nav');el.id='tabbar';el.className='tabbar';el.setAttribute('aria-label','Quick menu');document.body.appendChild(el)}
-  const list=S.tech?[['projects','Projects'],['design','Drawings'],['field','Field'],['service','Service']]:[['overview','Home'],['inbox','Inbox'],['projects','Projects'],['design','Drawings']];
-  const open=document.body.classList.contains('navopen'),cur=S.studio&&S.view==='design'?'dcenter':S.view,inTabs=list.some(([v])=>v===cur);
+  const list=S.tech?[['projects','Projects'],['drawings','Drawings'],['field','Field'],['service','Service']]:[['overview','Home'],['inbox','Inbox'],['projects','Projects'],['drawings','Drawings']];
+  const open=document.body.classList.contains('navopen'),cur=S.studio&&S.view==='design'?'dcenter':S.view==='design'?'drawings':S.view,inTabs=list.some(([v])=>v===cur);
   const nb=document.getElementById('bInbox'),n=nb&&!nb.hidden?+nb.textContent||0:0;
   el.innerHTML=list.map(([v,l])=>`<button type="button" data-go="${v}"${!open&&cur===v?' aria-current="page"':''}>${tabIcon(v)}<span>${l}</span>${v==='inbox'&&n?`<i aria-label="${n} waiting">${n>99?'99+':n}</i>`:''}</button>`).join('')
    +`<button type="button" data-act="navMenu" aria-expanded="${open}"${open||!inTabs?' aria-current="page"':''}>${TAB_MENU}<span>Menu</span></button>`}
