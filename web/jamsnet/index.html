@@ -1311,7 +1311,7 @@ button,[role="button"],[draggable="true"]{-webkit-user-select:none;user-select:n
 button:not(:disabled):active{filter:brightness(.92)}
 @media (pointer:coarse){input,textarea,select{font-size:16px!important}}
 </style>
-<script>try{var jp=localStorage.getItem("sitrep-palette");if(localStorage.getItem("sitrep-pal-v")!=="2"){if(!jp||jp==="sitrep"){jp="jdd";localStorage.setItem("sitrep-palette","jdd")}localStorage.setItem("sitrep-pal-v","2")}if(!jp)jp="jdd";if(jp==="hfh"||jp==="cable"||jp==="jdd")document.documentElement.setAttribute("data-palette",jp);var jm=localStorage.getItem("sitrep-mode");if(jm==="light"||jm==="dark")document.documentElement.setAttribute("data-theme",jm)}catch(e){}</script>
+<script>try{var jp=localStorage.getItem("sitrep-palette");if(localStorage.getItem("sitrep-pal-v")!=="2"){if(!jp||jp==="sitrep"){jp="jdd";localStorage.setItem("sitrep-palette","jdd")}localStorage.setItem("sitrep-pal-v","2")}if(!jp)jp="jdd";if(jp==="hfh"||jp==="cable"||jp==="jdd")document.documentElement.setAttribute("data-palette",jp);var jm=localStorage.getItem("sitrep-mode");if(jm!=="auto")document.documentElement.setAttribute("data-theme",jm==="dark"?"dark":"light")}catch(e){}</script>
 <style>.pclean{margin-left:auto;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;color:var(--fg);cursor:pointer}.pimg figcaption{flex-wrap:wrap;row-gap:4px}.pimg figcaption>:first-child{flex:1 0 100%;text-align:center;justify-content:center}
 .pimg img{background-color:#fff;background-image:linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%),linear-gradient(45deg,#f1f2f0 25%,transparent 25%,transparent 75%,#f1f2f0 75%);background-size:12px 12px;background-position:0 0,6px 6px}
 </style>
@@ -8898,7 +8898,7 @@ const ICO_SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
   ICO_AUTO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>';
 const MODES=[{id:'auto',name:'Automatic',ico:ICO_AUTO},{id:'light',name:'Light',ico:ICO_SUN},{id:'dark',name:'Dark',ico:ICO_MOON}];
 const MODE_KEY='sitrep-mode';
-function modeGet(){let v='';try{v=localStorage.getItem(MODE_KEY)||''}catch(e){}return v==='light'||v==='dark'?v:'auto'}
+function modeGet(){let v='';try{v=localStorage.getItem(MODE_KEY)||''}catch(e){}return v==='auto'||v==='dark'?v:'light'}
 const modeShown=()=>{const m=modeGet();return m!=='auto'?m:(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')};
 function modeApplyTo(doc,m){if(!doc||!doc.documentElement)return;if(m==='auto')doc.documentElement.removeAttribute('data-theme');else doc.documentElement.setAttribute('data-theme',m)}
 function modeApply(){const m=modeGet();modeApplyTo(document,m);try{if(NLF&&NLF.contentDocument)modeApplyTo(NLF.contentDocument,m)}catch(e){}
