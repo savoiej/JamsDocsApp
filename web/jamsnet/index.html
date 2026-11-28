@@ -1260,6 +1260,19 @@ body.tech .money{display:none!important}
 @media print{.ivt{font-size:11.5px}.ivt .ivtable th,.ivt .ivduebox,.ivt-modern .ivhead{-webkit-print-color-adjust:exact;print-color-adjust:exact}.ivt-modern .ivhead{margin:0 0 18px;border-radius:0}}
 .ackpis .v{white-space:nowrap}
 
+.lpv-drop{position:relative;outline:2px dashed transparent;outline-offset:-8px;transition:outline-color .15s}
+.lpv-drop.over{outline-color:var(--accent);background:var(--accent-soft)}
+.lpv-img.none.lpv-drop{height:auto;min-height:170px;padding:18px;aspect-ratio:auto;border:2px dashed var(--line)}
+.lpv-add{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;max-width:420px;color:#4a5060;font-size:13.5px;line-height:1.45}
+.lpv-add svg{fill:none;stroke:#9aa3ad;stroke-width:1.6}.lpv-add>b{font-size:15px;color:#17171c}
+.lpv-add kbd{font:600 12px var(--f-mono,ui-monospace,monospace);padding:1px 6px;border-radius:5px;border:1px solid #cfd4dc;background:#f6f7fa}
+.lpv-busy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.8);font-weight:600;font-size:14px;color:#17171c}
+.lpv-photoacts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:-6px}.lpv-photoacts .lpv-next{margin-left:auto}.lpv-alldone{margin-left:auto;font-size:12.5px}
+.lpv-thumbs button{all:unset;box-sizing:border-box;cursor:pointer;border-radius:8px;border:2px solid transparent;display:block}
+.lpv-thumbs button[aria-pressed="true"]{border-color:var(--accent)}.lpv-thumbs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lpv-thumbs button img{display:block}
+.lpv-photoacts a.btn{text-decoration:none}.lpv-photoacts a.btn:not(.primary){color:var(--fg)}
+
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -4990,7 +5003,7 @@ function ptPanelHTML(){const rows=ptRows();
        <td>${t&&(t.ins.length+t.outs.length)?`<button class="btn sm" data-act="ptOne" data-cat="${esc(cat)}">Apply to ${n}</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`
     :'<div class="pb"><p class="muted" style="margin:0">Every device in your library has ports.</p></div>'}</div>`}
 /* ---------- library check: what needs fixing, each count filters the table ---------- */
-const LIBFIX={ports:['without ports',p=>matOnly(p)],cost:['without a dealer cost',p=>!(+p.cost>0)&&!['Rack','Accessory'].includes(p.cat)&&!p.ctype],twins:['with the same name as another',p=>nameTwins(p).length>0],cat:['in “Other”',p=>!p.cat||p.cat==='Other']};
+const LIBFIX={ports:['without ports',p=>matOnly(p)],cost:['without a dealer cost',p=>!(+p.cost>0)&&!['Rack','Accessory'].includes(p.cat)&&!p.ctype],twins:['with the same name as another',p=>nameTwins(p).length>0],cat:['in “Other”',p=>!p.cat||p.cat==='Other'],photo:['without a photo',p=>!pImg(p)]};
 function libCheckHTML(){const c=Object.entries(LIBFIX).map(([k,[l,fn]])=>[k,l,lib.filter(fn).length]).filter(x=>x[2]>0);if(!c.length&&!S.ui.libFix)return '';
   return `<div class="libcheck" role="group" aria-label="Library check"><span class="l">Library check</span>${c.map(([k,l,n])=>`<button class="chip${S.ui.libFix===k?' Active':' Medium'}" data-act="libFix" data-k="${k}" aria-pressed="${S.ui.libFix===k}">${n} ${esc(l)}</button>`).join('')}${S.ui.libFix?'<button class="lnk" data-act="libFix" data-k="">Show all</button>':''}</div>`}
 R.library=function(){
@@ -11110,8 +11123,7 @@ function libPvHTML(){const p=byId(S.dwp.id);if(!p)return '';const L=S.dwp.list||
     <button type="button" class="dcstar" data-act="libFav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${p.fav?'Remove from':'Add to'} favorites"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg></button>
     <button type="button" class="apx" data-act="dwClose" aria-label="Close">×</button></header>
    <div class="dwpv-main"><div class="lpv-l">
-     <div class="lpv-img${img?'':' none'}">${img?`<img src="${esc(img)}" alt="${esc(p.mfr+' '+p.model)}" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'lcnone',textContent:'No photo'}))">`:`<span class="lcnone">${esc(p.cat.slice(0,1))}</span>`}</div>
-     ${(p.imgs||[]).length>1?`<div class="lpv-thumbs">${p.imgs.slice(0,6).map(x=>`<img src="${esc(imgSrc(x))}" alt="" loading="lazy" referrerpolicy="no-referrer">`).join('')}</div>`:''}
+     ${libPhotoHTML(p)}
      <p class="lpv-desc">${esc(p.desc||'')}</p>
      ${matOnly(p)?`<div class="banner" style="margin:0"><span>This product has no ports yet, so it goes on the bill of materials but not on drawings.</span><button class="btn sm" data-act="srFor" data-id="${esc(p.id)}">${p.specUrl?'Read its spec sheet':'Add ports from a spec sheet'}</button></div>`:p.ctype?`<div class="lpv-ports"><div><b>Cable</b><ul class="lports"><li><span class="dot ${(SIG[p.ctype]||{}).cls||''}" aria-hidden="true"></span>${esc((SIG[p.ctype]||{}).label||p.ctype)} cable</li></ul></div></div>`:`<div class="lpv-ports"><div><b>Inputs · ${(p.ins||[]).length}</b>${libPortsHTML(p.ins||[],'inputs')}</div><div><b>Outputs · ${(p.outs||[]).length}</b>${libPortsHTML(p.outs||[],'outputs')}</div></div>`}
      ${sim.length?`<div class="dwpv-sec"><b>Similar ${esc(p.cat.toLowerCase())} products</b><div class="lsim">${sim.map(x=>`<button type="button" data-act="libPv" data-id="${esc(x.id)}"><span class="lsimg">${thumb(x,'')||`<span class="lcnone">${esc(x.cat.slice(0,1))}</span>`}</span><b>${esc(x.model)}</b><small>${esc(x.mfr)}${cp?` · ${money(+x.cost||0)}`:''}</small></button>`).join('')}</div></div>`:''}
@@ -11701,6 +11713,52 @@ Object.assign(A,{
   async acBackup(){const r=await saveFile(new Blob([JSON.stringify({type:'sitrep-books',v:1,at:new Date().toISOString(),books:acB(),invoices:S.invoices},null,1)],{type:'application/json'}),`${dcFileName(firm())} accounting backup ${isoDay(0)}.json`);if(r==='saved')toast('Backup downloaded.')}
 });
 setTimeout(()=>{try{acRecurSweep(true)}catch(e){}},2500);
+
+/* ===== Library photos: find on the web, then paste, drop or choose ===== */
+const libImgFind=p=>'https://www.google.com/search?tbm=isch&q='+encodeURIComponent(`${p.mfr||''} ${p.model||''}`.trim());
+function libNoPhotoIds(){return lib.filter(p=>!pImg(p)).map(p=>p.id)}
+function libNextMissing(id){const L=(S.dwp&&S.dwp.list)||[],i=L.indexOf(id);for(let k=i+1;k<L.length;k++){const p=byId(L[k]);if(p&&!pImg(p))return {id:p.id,list:L}}
+  const all=libNoPhotoIds().filter(x=>x!==id);return all.length?{id:all[0],list:all}:null}
+function libPhotoHTML(p){const img=pImg(p),busy=S.libImgBusy===p.id,nx=libNextMissing(p.id),n=(p.imgs||[]).length;
+  return `<div class="lpv-img lpv-drop${img?'':' none'}${busy?' busy':''}" data-libdrop="${esc(p.id)}">
+     ${img?`<img src="${esc(img)}" alt="${esc(p.mfr+' '+p.model)}" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'lcnone',textContent:'Photo link broken'}))">`
+       :`<div class="lpv-add"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg><b>No photo yet</b><span>Click <b>Find image</b>, right-click a good photo and choose <b>Copy image</b>, then come back and press <kbd>${/Mac/.test(navigator.platform||'')?'⌘':'Ctrl'}</kbd>+<kbd>V</kbd>. You can also drop an image file here.</span></div>`}
+     ${busy?'<span class="lpv-busy" role="status">Adding photo…</span>':''}</div>
+   <div class="lpv-photoacts"><a class="btn sm${img?'':' primary'}" href="${esc(libImgFind(p))}" target="_blank" rel="noopener noreferrer">Find image ↗</a>
+     <button type="button" class="btn sm" data-act="libImgPaste" data-id="${esc(p.id)}">Paste</button>
+     <label class="btn sm">Choose file<input type="file" accept="image/*" data-libimgfile="${esc(p.id)}" hidden></label>
+     ${img?`<button type="button" class="btn sm" data-act="libImgDel" data-id="${esc(p.id)}">Remove photo</button>`:''}
+     ${nx?`<button type="button" class="btn sm lpv-next" data-act="libImgNext" data-id="${esc(p.id)}">Next without a photo →</button>`:`<span class="muted lpv-alldone">${img?'Every product has a photo.':''}</span>`}</div>
+   ${n>1?`<div class="lpv-thumbs" role="group" aria-label="Photos. The first is the main photo.">${p.imgs.slice(0,8).map((x,i)=>`<button type="button" data-act="libImgMain" data-id="${esc(p.id)}" data-i="${i}" aria-pressed="${i===0}" aria-label="${i===0?'Main photo':'Make this the main photo'}"><img src="${esc(imgSrc(x))}" alt="" loading="lazy" referrerpolicy="no-referrer"></button>`).join('')}</div>`:''}`}
+async function libImgAdd(id,src){const p=byId(id);if(!p)return;p.imgs=Array.isArray(p.imgs)?p.imgs:[];
+  if(p.imgs.length>=8){toast('That’s the most photos for one product (8). Remove one first.');return}
+  if(S.libImgBusy)return;S.libImgBusy=id;dwRender();let im=null,linked=false;
+  try{if(typeof src==='string'){if(/^data:image\//.test(src))im=await plStoreImage(await (await fetch(src)).blob());else{im=await plFetchImage(src);if(!im){im={src};linked=true}}}
+    else{if(src.size>25*1024*1024)throw new Error('big');im=await plStoreImage(src)}}
+  catch(e){S.libImgBusy=null;dwRender();toast(e&&e.message==='big'?'That image is over 25 MB.':e&&e.code==='quota_exceeded'?'The app’s photo storage is full. Remove some photos first.':'Couldn’t read that image. Copy the image itself (not its link), or save it and drop the file here.');return}
+  S.libImgBusy=null;if(!byId(id))return;p.imgs.unshift(im);save();badges();if(S.view==='library')R.library();dwRender();
+  toast(linked?'Saved as a link to that image. Links can break and may not print, so for a saved copy use Copy image, then paste.':`Photo added to ${p.model}.`)}
+function libImgFromData(dt){if(!dt)return null;const f=[...(dt.files||[])].find(x=>/^image\//.test(x.type));if(f)return f;
+  for(const it of [...(dt.items||[])]){if(it.kind==='file'&&/^image\//.test(it.type)){const g=it.getAsFile();if(g)return g}}
+  const h=dt.getData&&dt.getData('text/html');if(h){const m=h.match(/<img[^>]+src=["']([^"']+)["']/i);if(m&&/^(https?:|data:image\/)/.test(m[1]))return m[1].replace(/&amp;/g,'&')}
+  const u=((dt.getData&&(dt.getData('text/uri-list')||dt.getData('text/plain')))||'').trim().split(/\s+/)[0];if(/^(https?:\/\/\S+|data:image\/\S+)$/.test(u))return u;return null}
+document.addEventListener('paste',e=>{if(!S.dwp||S.dwp.kind!=='lib')return;const t=e.target;if(t&&t.closest&&t.closest('input,textarea,[contenteditable="true"]')&&!t.closest('.lpv'))return;
+  const src=libImgFromData(e.clipboardData);if(!src){toast('There’s no image on the clipboard. Right-click the photo and choose Copy image.');return}e.preventDefault();libImgAdd(S.dwp.id,src)});
+document.addEventListener('dragover',e=>{const z=e.target&&e.target.closest&&e.target.closest('[data-libdrop]');if(!z)return;e.preventDefault();z.classList.add('over')});
+document.addEventListener('dragleave',e=>{const z=e.target&&e.target.closest&&e.target.closest('[data-libdrop]');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
+document.addEventListener('drop',e=>{const z=e.target&&e.target.closest&&e.target.closest('[data-libdrop]');if(!z)return;e.preventDefault();z.classList.remove('over');const src=libImgFromData(e.dataTransfer);if(!src){toast('Drop an image file, or an image dragged from a web page.');return}libImgAdd(z.dataset.libdrop,src)});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.libimgfile)return;const f=t.files&&t.files[0],id=t.dataset.libimgfile;t.value='';if(f){if(!/^image\//.test(f.type)){toast('Use a PNG, JPG, WebP or GIF image.');return}libImgAdd(id,f)}});
+Object.assign(A,{
+  async libImgPaste(el){const id=el.dataset.id,key=/Mac/.test(navigator.platform||'')?'⌘V':'Ctrl+V';
+    try{if(!navigator.clipboard||!navigator.clipboard.read)throw 0;const items=await navigator.clipboard.read();
+      for(const it of items){const ty=it.types.find(x=>/^image\//.test(x));if(ty){libImgAdd(id,await it.getType(ty));return}}
+      for(const it of items){if(it.types.includes('text/plain')){const u=(await (await it.getType('text/plain')).text()).trim();if(/^https?:\/\/\S+$/.test(u)){libImgAdd(id,u);return}}}
+      toast('There’s no image on the clipboard. Right-click the photo and choose Copy image.')}
+    catch(e){toast(`The browser didn’t allow the Paste button here. Press ${key} instead.`)}},
+  libImgDel(el){const p=byId(el.dataset.id);if(!p||!(p.imgs||[]).length)return;const im=p.imgs.shift();dropAssets([im]);save();badges();if(S.view==='library')R.library();dwRender();toast('Photo removed.')},
+  libImgMain(el){const p=byId(el.dataset.id),i=+el.dataset.i;if(!p||!(i>0)||!p.imgs[i])return;const [im]=p.imgs.splice(i,1);p.imgs.unshift(im);save();if(S.view==='library')R.library();dwRender()},
+  libImgNext(el){const nx=libNextMissing(el.dataset.id);if(!nx){toast('Every product has a photo.');return}S.dwp={kind:'lib',id:nx.id,list:nx.list};dwRender();const z=document.querySelector('#dwPrev .lpv-drop');if(z)z.scrollIntoView({block:'nearest'})}
+});
 
 purgeSamples();
 window.addEventListener('pagehide',saveProjects);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveProjects()});
