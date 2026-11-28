@@ -1139,6 +1139,127 @@ body.tech .money{display:none!important}
 .fdin{display:flex;gap:6px;align-items:center}.fdin .inp{flex:1;min-width:0}.fdev-a{display:flex;gap:8px}
 .colist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.colist li{display:flex;gap:8px;align-items:baseline}.colist .cok{width:16px;color:var(--muted);font-weight:700}.colist li.ok .cok{color:var(--ok)}
 .paybox{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--sunk)}.paybox .addrow{display:flex;gap:8px}.paybox .addrow .inp{flex:1;min-width:0;font-size:12px}
+/* ===== Accounting ===== */
+.actabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:4px;margin:0 0 18px;border-radius:999px;background:var(--surface);border:1px solid var(--line);width:max-content;max-width:100%}
+.actabs button{all:unset;box-sizing:border-box;cursor:pointer;flex:none;display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 14px;border-radius:999px;font-size:13.5px;font-weight:500;color:var(--muted);white-space:nowrap}
+.actabs button[aria-current="page"]{background:var(--fg);color:var(--surface);font-weight:600}
+@media (hover:hover) and (pointer:fine){.actabs button:not([aria-current]):hover{background:var(--sunk);color:var(--fg)}}
+.actabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.acdot{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#C0392B;color:#fff;font-size:11px;font-weight:700}
+.acbody{display:flex;flex-direction:column;gap:16px}
+.ackpis{margin-bottom:0}.ackpis .v{font-variant-numeric:tabular-nums}
+.acneg{color:var(--bad)}.acpos{color:var(--ok)}
+.acgrid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.acgrid2{grid-template-columns:minmax(0,1fr)}}
+.acside{display:flex;flex-direction:column;gap:16px}
+.aclist{list-style:none;margin:0;padding:6px}.aclist li{display:flex;align-items:center;gap:8px;padding:2px 6px 2px 0}
+.aclist li button{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding:9px 10px;border-radius:12px}
+.aclist li b{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.aclist small{font-size:12.5px;color:var(--muted)}
+@media (hover:hover) and (pointer:fine){.aclist li button:hover{background:var(--sunk)}}.aclist li button:focus-visible{outline:2px solid var(--accent)}
+.acnone{padding:12px}
+.acchart{margin:0}.acchart svg{width:100%;height:auto;display:block}
+.acchart .acgrid line{stroke:var(--line)}.acchart text{font:11px var(--f-ui,system-ui);fill:var(--muted)}
+.acchart rect.acbi,.acchart figcaption i.acbi{fill:var(--accent);background:var(--accent)}.acchart rect.acbs,.acchart figcaption i.acbs{fill:#E8A33D;background:#E8A33D}
+.acchart figcaption{display:flex;gap:16px;font-size:12.5px;margin-top:6px}.acchart figcaption span{display:inline-flex;align-items:center;gap:6px}.acchart figcaption i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.acst{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap;background:var(--sunk);color:var(--muted)}
+.acst-paid,.acst-received,.acst-billed{background:var(--ok-soft);color:var(--ok)}
+.acst-overdue,.acst-1099-due{background:var(--bad-soft);color:var(--bad)}
+.acst-sent,.acst-open,.acst-partially-paid,.acst-partially-received,.acst-due-soon,.acst-to-bill,.acst-1099{background:var(--accent-soft);color:var(--accent)}
+.acst-draft,.acst-void{background:var(--sunk);color:var(--muted)}
+.acbar{flex-wrap:wrap;gap:10px}.acbar .inp{width:auto}.acq{flex:1 1 220px;min-width:180px}
+.acsub{margin-bottom:-4px}
+.acform{border:2px solid var(--accent)!important;margin-bottom:16px}.acform .row3{align-items:end}
+.acfa{margin-top:14px;align-items:center}
+.aclines .cellin{width:100%;min-width:90px}.aclines td:first-child .cellin{min-width:170px}.aclines select.cellin{min-width:150px}
+.actot{margin-left:auto;font-size:14px}.actot b{font-variant-numeric:tabular-nums}
+.acrowa{white-space:nowrap;text-align:right}.acrowa .btn{margin-left:4px}
+.acpayrow td{background:var(--accent-soft)}
+.acpay{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.acpay>b{width:100%}.acpay .field{min-width:140px;flex:1 1 140px}.acpay .actions{margin-left:auto}
+.acpick{border:2px solid var(--accent)!important}
+.acbanks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.acbank{padding:16px;display:flex;flex-direction:column;gap:6px}.acbkh{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.acbkv{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}.acbank .actions{margin-top:auto;padding-top:8px}
+.acbanknew{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:16px;border-radius:var(--r-card,16px);border:2px dashed var(--line);min-height:140px;font-size:14px}
+@media (hover:hover) and (pointer:fine){.acbanknew:hover{border-color:var(--accent)}}.acbanknew:focus-visible{outline:2px solid var(--accent)}
+.actx td{vertical-align:middle}.actxr{min-width:260px}.actxr .inp{width:100%;max-width:300px}.actxm{margin-top:6px;display:block}
+.acrules{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:4px}.acrules li{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px;padding:4px 0;border-bottom:1px solid var(--line)}
+.acruleadd{display:flex;flex-wrap:wrap;gap:8px}.acruleadd .inp{flex:1 1 150px;width:auto}
+.acgrp h3{margin:14px 18px 4px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.acgrp .cellin{width:100%}
+.acoff td{opacity:.5}
+.acreps{display:grid;grid-template-columns:220px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.acreps{grid-template-columns:minmax(0,1fr)}}
+.acreplist{padding:8px;display:flex;flex-direction:column;gap:2px;position:sticky;top:76px}
+@media (max-width:900px){.acreplist{position:static;flex-direction:row;flex-wrap:wrap}}
+.acreplist button{all:unset;box-sizing:border-box;cursor:pointer;padding:9px 12px;border-radius:10px;font-size:14px}
+.acreplist button[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+@media (hover:hover) and (pointer:fine){.acreplist button:not([aria-current]):hover{background:var(--sunk)}}.acreplist button:focus-visible{outline:2px solid var(--accent)}
+.acrephead{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}.acrephead h2{margin:2px 0 0;font-size:22px;font-weight:600}
+.acrep{width:100%}.acrep td,.acrep th{font-variant-numeric:tabular-nums}
+.acrep .acr-h td{font-weight:700;padding-top:16px;border-bottom:1px solid var(--fg)}
+.acrep .acr-t td{font-weight:600;border-top:1px solid var(--line)}
+.acrep .acr-g td{font-weight:700;border-top:2px solid var(--fg);font-size:15px}
+.acprint{padding:0}.acprint .acrep{font-size:12px}
+.aclay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
+@media (max-width:1100px){.aclay{grid-template-columns:minmax(0,1fr)}}
+.aclayopts{display:flex;flex-direction:column;gap:14px}
+.aclayprev{position:sticky;top:76px;display:flex;flex-direction:column;gap:8px}
+@media (max-width:1100px){.aclayprev{position:static}}
+.aclayprevh{display:flex;align-items:center;gap:10px}
+.aclaypaper{background:var(--sunk);border-radius:16px;padding:16px;max-height:calc(100vh - 140px);overflow:auto}
+.aclaypaper .invdoc{box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.aclbl{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px}.aclbl:first-child{margin-top:0}
+.aclayouts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.aclayouts button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;border-radius:12px;border:1.5px solid var(--line);font-size:13px;font-weight:600}
+.aclayouts button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}.aclayouts button:focus-visible{outline:2px solid var(--accent)}
+.aclthumb{width:100%;height:56px;border-radius:6px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;gap:4px;padding:6px;box-sizing:border-box}
+.aclthumb i{display:block;height:5px;border-radius:2px;background:#dfe3ea}.aclthumb i:first-child{height:9px;width:50%;background:var(--accent)}
+.aclthumb-modern i:first-child{width:100%;height:14px}.aclthumb-bold i:first-child{width:70%;height:12px;background:var(--fg)}.aclthumb-compact{gap:2px}.aclthumb-compact i:first-child{height:6px}
+.acsw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.acsw button{all:unset;box-sizing:border-box;cursor:pointer;width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.acsw button[aria-pressed="true"]{outline:2px solid var(--fg);outline-offset:2px}.acsw button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.acswc{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}.acswc input{width:30px;height:30px;border:0;padding:0;background:none;cursor:pointer}
+.acchecks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 14px}.acchecks .check{font-size:13.5px}
+.acrow2{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-bottom:6px}.acrow4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:560px){.acrow4{grid-template-columns:1fr 1fr}.aclayouts{grid-template-columns:1fr 1fr}}
+/* ===== Invoice layouts (screen, print and PDF) ===== */
+.ivt{--ivac:#4373C4;font-size:13px;color:#17171c;background:#fff;color-scheme:light}
+.ivt.ivf-serif{font-family:Georgia,'Times New Roman',serif}.ivt.ivf-mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}.ivt.ivf-inter{font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif}
+.ivt .ivhead{display:flex;align-items:flex-start;gap:16px;padding-bottom:14px;margin-bottom:18px;border-bottom:2px solid var(--ivac)}
+.ivt .ivlogo-at-center{flex-direction:column;align-items:center;text-align:center}.ivt .ivlogo-at-center .ivtitle{margin:6px 0 0}
+.ivt .ivlogo{object-fit:contain;flex:none}.ivt .ivlogo-s{width:44px;height:44px}.ivt .ivlogo-m{width:68px;height:68px}.ivt .ivlogo-l{width:100px;height:100px}
+.ivt .ivorg{flex:1;min-width:0;color:#4a5060;font-size:12px;line-height:1.5}.ivt .ivname{font-size:17px;font-weight:700;color:#17171c;letter-spacing:.01em}
+.ivt .ivtitle{margin-left:auto;font-size:28px;font-weight:700;color:var(--ivac);text-transform:uppercase;letter-spacing:.04em;line-height:1}
+.ivt .ivmid{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:18px;align-items:start;margin-bottom:18px}
+.ivt{container-type:inline-size}
+@container (max-width:680px){.ivt .ivmid{grid-template-columns:minmax(0,1fr) auto}.ivt.ivt .ivduebox{padding:10px 16px;grid-column:1/-1;flex-direction:row;align-items:baseline;justify-content:space-between;gap:10px}}
+@container (max-width:420px){.ivt .ivmid{grid-template-columns:1fr}.ivt .ivhead{flex-wrap:wrap}}
+.ivt .ivbill{display:flex;flex-direction:column;gap:2px}.ivt .ivlbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ivac);margin-bottom:2px}.ivt .ivbill b{font-size:15px}
+.ivt .ivmeta{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:12.5px}.ivt .ivmeta div{display:contents}.ivt .ivmeta dt{color:#5f6272}.ivt .ivmeta dd{margin:0;font-weight:600;text-align:right;white-space:nowrap}.ivt .ivmeta dd.ivw{white-space:normal;max-width:22ch}
+.ivt .ivduebox{background:var(--ivac);color:#fff;border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;align-items:flex-end;min-width:150px}
+.ivt .ivduebox span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.85}.ivt .ivduebox b{font-size:22px;font-variant-numeric:tabular-nums}.ivt .ivduebox small{font-size:11.5px;opacity:.9}
+.ivt .ivtable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ivt .ivtable th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:var(--ivac);padding:8px 10px}.ivt .ivtable th.n,.ivt .ivtable td.n{text-align:right}
+.ivt .ivtable td{padding:8px 10px;border-bottom:1px solid #e6e8ee;vertical-align:top}
+.ivt .ivtable tfoot td{border-bottom:0;padding:5px 10px}.ivt .ivtable tfoot td:first-child{text-align:right;color:#5f6272}
+.ivt .ivtable .ivgrand td{font-weight:700;color:#17171c;border-top:1.5px solid #17171c;font-size:14px}.ivt .ivtable .ivbal td{color:var(--ivac);font-size:15px}
+.ivt .ivtx{font-size:9.5px;font-weight:700;color:var(--ivac);border:1px solid var(--ivac);border-radius:3px;padding:0 3px}
+.ivt .ivnotes{margin:14px 0 0;padding:10px 12px;background:#f6f7fa;border-radius:8px;white-space:pre-wrap}
+.ivt .ivpay{font-size:12.5px;margin:12px 0 0}
+.ivt .ivfoot-sec{margin-top:14px;font-size:12px}.ivt .ivfoot-sec b{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ivac)}.ivt .ivfoot-sec p{margin:3px 0 0;white-space:pre-wrap;color:#3d4256}
+.ivt .ivsign{display:grid;grid-template-columns:2fr 1fr;gap:28px;margin-top:34px;font-size:11.5px;color:#5f6272}.ivt .ivsign span{display:block;border-bottom:1px solid #17171c;height:28px;margin-bottom:4px}
+.ivt .ivthanks{margin:18px 0 0;font-weight:600;color:var(--ivac);font-size:14px}
+.ivt .ivfooter{margin:20px 0 0;padding-top:10px;border-top:1px solid #e6e8ee;font-size:11px;color:#5f6272;text-align:center}
+.ivt-modern .ivhead{background:var(--ivac);color:#fff;margin:-32px calc(-1 * clamp(16px,4vw,44px)) 20px;padding:24px clamp(16px,4vw,44px);border:0;border-radius:4px 4px 0 0}
+.ivt-modern .ivorg,.ivt-modern .ivname{color:#fff}.ivt-modern .ivlogo{background:#fff;border-radius:12px;padding:5px;box-sizing:border-box}.ivt-modern .ivorg{opacity:.92}.ivt-modern .ivtitle{color:#fff}
+.ivt-modern .ivtable th{background:transparent;color:var(--ivac);border-bottom:2px solid var(--ivac)}
+.ivt-bold .ivhead{border-bottom:0;border-left:6px solid var(--ivac);padding-left:14px}.ivt-bold .ivtitle{font-size:40px;color:#17171c}
+.ivt-bold .ivtable th{background:#17171c}.ivt-bold .ivduebox{background:#17171c}
+.ivt-compact{font-size:12px}.ivt-compact .ivhead{padding-bottom:8px;margin-bottom:10px;border-bottom-width:1px}.ivt-compact .ivtitle{font-size:20px}.ivt-compact .ivlogo-m{width:48px;height:48px}
+.ivt-compact .ivmid{margin-bottom:10px;gap:12px}.ivt-compact .ivtable td{padding:4px 8px}.ivt-compact .ivtable th{padding:5px 8px;background:transparent;color:#17171c;border-bottom:1px solid #17171c}
+.ivt-compact .ivduebox{background:transparent;color:#17171c;border:1.5px solid var(--ivac);padding:8px 12px}
+@media print{.ivt{font-size:11.5px}.ivt .ivtable th,.ivt .ivduebox,.ivt-modern .ivhead{-webkit-print-color-adjust:exact;print-color-adjust:exact}.ivt-modern .ivhead{margin:0 0 18px;border-radius:0}}
+.ackpis .v{white-space:nowrap}
+
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -1606,6 +1727,7 @@ button:not(:disabled):active{filter:brightness(.92)}
     <section class="view" id="v-assistant" hidden></section>
     <section class="view" id="v-design" hidden></section>
     <section class="view" id="v-drawings" hidden></section>
+    <section class="view" id="v-accounting" hidden></section>
     <section class="view" id="v-dcenter" hidden></section>
     <section class="view" id="v-clients" hidden></section>
     <section class="view" id="v-library" hidden></section>
@@ -2591,7 +2713,7 @@ function navBack(){let e=NAVH.pop();const cur=navSig(navSnap());while(e&&navSig(
     if(e.v==='design'&&e.studio&&dcById(e.studio)){if(!(S.studio&&S.studio.id===e.studio))dcEnter(e.studio);else go('design')}
     else{if(S.studio)dcExit(true);if(e.v==='design'&&e.sheet)S.ui.sheet=e.sheet;if(S.view===e.v){R[e.v]();badges()}else go(e.v)}
   }finally{NAVR=false}renderTopbar();requestAnimationFrame(()=>window.scrollTo(0,e.y||0))}
-const VIEWS=['overview','assistant','design','drawings','dcenter','inbox','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts'];
+const VIEWS=['overview','assistant','design','drawings','dcenter','inbox','clients','library','purchasing','estimate','proposal','projects','field','service','registers','inventory','settings','networks','billing','contracts','accounting'];
 function go(v){
   if(S.view&&S.view!==v)navPush(NAVPRE&&NAVPRE.v===S.view?NAVPRE:navSnap());
   if(v==='clients'&&S.view==='clients'&&S.ui.cpage){S.ui.cpage=null}
@@ -2611,7 +2733,7 @@ function go(v){
    drawings (without prices), the library (without costs), the field app and the service desk;
    money pages are hidden and invoices and contracts never load or save for them (the database
    refuses those records to techs too). */
-const TECH_HIDE=['overview','dcenter','inbox','clients','proposal','billing','contracts','purchasing','estimate','assistant','settings'];
+const TECH_HIDE=['overview','dcenter','inbox','clients','proposal','billing','contracts','purchasing','estimate','assistant','settings','accounting'];
 const canPrice=()=>!S.tech;
 function techMode(){if(S.tech)return;S.tech=true;document.body.classList.add('tech');
   if(S.design&&S.design.meta6)S.design.meta6.price='none';
@@ -4824,7 +4946,7 @@ Kestrel Vision,KV-Bar,Soundbar,USB video bar with camera and mics,,1499,1,usb:US
 Marrow Pro,MP-4x150,Amplifier,4 × 150 W 70 V amplifier,1190,1690,1,audio:Line In 1|audio:Line In 2,audio:Spk A|audio:Spk B|audio:Spk C|audio:Spk D,2,640`;
 let libQ='',libCat='All',libBrand='All',libLim=200;
 /* remember where you were in this browser: list filters, view modes and tabs survive a reload */
-const UIKEEP_KEY='sitrep:view:v1',UIKEEP=['cwTab','crmTab','libFix','libView','lsort','lsig','lrack','lshow','dwf','dcs','dcv','fmode','iq','ist','tq','tf','tp','ta','tbf','tkWho','cq','cst'];
+const UIKEEP_KEY='sitrep:view:v1',UIKEEP=['cwTab','crmTab','libFix','libView','lsort','lsig','lrack','lshow','dwf','dcs','dcv','fmode','iq','ist','tq','tf','tp','ta','tbf','tkWho','cq','cst','actab','acRep','acBasis','acExpV'];
 function uiKeepSave(){try{const o={ui:{},lib:{q:libQ,cat:libCat,brand:libBrand},pm:S.projMode};UIKEEP.forEach(k=>{if(S.ui[k]!==undefined)o.ui[k]=S.ui[k]});localStorage.setItem(UIKEEP_KEY,JSON.stringify(o))}catch(e){}}
 function uiKeepLoad(){try{const o=JSON.parse(localStorage.getItem(UIKEEP_KEY)||'null');if(!o||typeof o!=='object')return;UIKEEP.forEach(k=>{if(o.ui&&o.ui[k]!==undefined)S.ui[k]=o.ui[k]});
   if(o.lib){libQ=String(o.lib.q||'');libCat=o.lib.cat||'All';libBrand=o.lib.brand||'All'}if(['kanban','list','gantt','week'].includes(o.pm))S.projMode=o.pm}catch(e){}}
@@ -7067,7 +7189,7 @@ function invCalc(v){const sub=r2(v.lines.reduce((s,l)=>s+(+l.qty||0)*(+l.rate||0
   const tax=r2(taxable*(+v.taxPct||0)/100),total=r2(sub+tax),paid=r2((v.payments||[]).reduce((s,p)=>s+(+p.amount||0),0));return {sub,tax,total,paid,bal:r2(total-paid)}}
 function invStatus(v){if(v.void)return 'Void';const k=invCalc(v);if(k.total>0&&k.bal<=0.005)return 'Paid';if(!v.sentAt)return 'Draft';if(v.due&&v.due<isoDay(0))return 'Overdue';return k.paid>0?'Partially paid':'Sent'}
 const invOpen=v=>['Sent','Partially paid','Overdue'].includes(invStatus(v));
-function nextInvNo(){const n=Math.max(1000,...S.invoices.map(i=>parseInt(String(i.no).replace(/\D/g,''),10)||0));return 'INV-'+(n+1)}
+function nextInvNo(){if(typeof acInvNext==='function')return acInvNext();const n=Math.max(1000,...S.invoices.map(i=>parseInt(String(i.no).replace(/\D/g,''),10)||0));return 'INV-'+(n+1)}
 function saveInvoices(){try{localStorage.setItem(IKEY,JSON.stringify(S.invoices))}catch(e){}cloudMark()}
 function seedInvoices(){return []}
 function loadInvoices(){try{const o=JSON.parse(localStorage.getItem(IKEY)||'null');S.invoices=Array.isArray(o)?o:seedInvoices()}catch(e){S.invoices=seedInvoices()}}
@@ -7139,6 +7261,7 @@ const NVI=d=>`<svg class="nvi" viewBox="0 0 24 24" width="16" height="16" aria-h
 /* the sidebar, in the order a job runs: sell, design, build, bill, then support */
 const NAV_IC={"av:overview": "<path d=\"M3 11l9-7 9 7\"/><path d=\"M5 10v10h14V10\"/>", "av:dcenter": "<path d=\"M3 21l4-1 11-11-3-3L4 17z\"/><path d=\"M14 6l3 3\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/>", "av:inbox": "<path d=\"M3 13h5l1 3h6l1-3h5\"/><path d=\"M5.5 5h13L21 13v6H3v-6z\"/>", "av:assistant": "<path d=\"M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z\"/><path d=\"M19 16v4M17 18h4\"/>", "av:clients": "<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20a6.5 6.5 0 0 1 13 0\"/><path d=\"M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8\"/>", "av:proposal": "<path d=\"M6 3h9l4 4v14H6z\"/><path d=\"M14 3v5h5\"/><path d=\"M9 14l2 2 4-4\"/>", "av:projects": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4M7 14h4M7 17h7\"/>", "av:design": "<rect x=\"3\" y=\"4\" width=\"7\" height=\"6\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"6\" rx=\"1\"/><path d=\"M10 7h4a2 2 0 0 1 2 2v5\"/>", "av:library": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"5\" rx=\"1\"/><rect x=\"3\" y=\"11\" width=\"18\" height=\"5\" rx=\"1\"/><path d=\"M7 6.5h.01M7 13.5h.01M3 20h18\"/>", "av:estimate": "<path d=\"M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z\"/>", "av:purchasing": "<circle cx=\"9\" cy=\"20\" r=\"1.5\"/><circle cx=\"18\" cy=\"20\" r=\"1.5\"/><path d=\"M2 3h3l2.7 12.5h11.6L22 7H6.2\"/>", "av:field": "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/>", "av:billing": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "nl:billing": "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 7h6M9 11h6M9 15h4\"/>", "av:contracts": "<path d=\"M6 3h9l4 4v14H6z\"/><path d=\"M14 3v5h5M9 17c1.5-2 2.5-2 3 0s1.5 1 3-1\"/>", "av:service": "<path d=\"M4 13a8 8 0 0 1 16 0\"/><rect x=\"3\" y=\"13\" width=\"4\" height=\"6\" rx=\"1\"/><rect x=\"17\" y=\"13\" width=\"4\" height=\"6\" rx=\"1\"/>", "nl:tickets": "<path d=\"M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v8a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2z\"/><path d=\"M14 7v2M14 11v2M14 15v2\"/>", "nl:board": "<rect x=\"3\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\"/><rect x=\"10\" y=\"3\" width=\"5\" height=\"12\" rx=\"1\"/><rect x=\"17\" y=\"3\" width=\"4\" height=\"8\" rx=\"1\"/>", "nl:maint": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4\"/>", "nl:field": "<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><path d=\"M14 14h3v3h-3zM21 14v.01M14 21h.01M17 21h4v-4\"/>", "nl:contacts": "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M8 17a4 4 0 0 1 8 0\"/>", "nl:runbooks": "<path d=\"M4 4h6a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4z\"/><path d=\"M20 4h-5a2 2 0 0 0-2 2M20 4v15h-7\"/>", "nl:sites": "<path d=\"M4 21V5l8-2v18M12 7l8 3v11M2 21h20M8 8v.01M8 12v.01M8 16v.01M16 13v.01M16 17v.01\"/>", "nl:plans": "<path d=\"M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z\"/><path d=\"M9 4v14M15 6v14\"/>", "nl:devices": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"/><path d=\"M8 20h8M12 16v4\"/>", "nl:racks": "<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"1\"/><path d=\"M5 8h14M5 14h14M9 5h.01M9 11h.01M9 17h.01\"/>", "nl:power": "<path d=\"M13 2L4 14h7l-1 8 9-12h-7z\"/>", "nl:cabling": "<path d=\"M4 19v-4a4 4 0 0 1 4-4h8a4 4 0 0 0 4-4V5\"/><rect x=\"2\" y=\"19\" width=\"4\" height=\"3\" rx=\"1\"/><rect x=\"18\" y=\"2\" width=\"4\" height=\"3\" rx=\"1\"/>", "nl:jacks": "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"/><rect x=\"9\" y=\"7\" width=\"6\" height=\"4\" rx=\"1\"/><rect x=\"9\" y=\"13\" width=\"6\" height=\"4\" rx=\"1\"/>", "nl:lifecycle": "<path d=\"M20 11a8 8 0 0 0-14.9-3M4 13a8 8 0 0 0 14.9 3\"/><path d=\"M5 3v5h5M19 21v-5h-5\"/>", "nl:discover": "<path d=\"M12 3v12M7 10l5 5 5-5\"/><path d=\"M4 19h16\"/>", "nl:inventory": "<path d=\"M3 7l9-4 9 4-9 4z\"/><path d=\"M3 7v10l9 4 9-4V7M12 11v10\"/>", "nl:topology": "<rect x=\"9\" y=\"3\" width=\"6\" height=\"5\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"/><rect x=\"15\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"/><path d=\"M12 8v4M6 16v-2h12v2\"/>", "nl:ipam": "<path d=\"M5 9h15M4 15h15M10 3L8 21M16 3l-2 18\"/>", "nl:circuits": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18\"/>", "nl:wireless": "<path d=\"M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0\"/><path d=\"M12 19.5h.01\"/>", "nl:security": "<path d=\"M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z\"/>", "nl:dnscloud": "<path d=\"M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z\"/>", "nl:audit": "<rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M9 2h6v4H9zM9 14l2 2 4-4\"/>", "nl:revisions": "<path d=\"M3 12a9 9 0 1 0 3-6.7L3 8\"/><path d=\"M3 3v5h5M12 7v5l3 2\"/>", "nl:labels": "<path d=\"M3 12V3h9l9 9-9 9z\"/><path d=\"M7.5 7.5h.01\"/>", "nl:docset": "<path d=\"M8 3h8l4 4v12H8z\"/><path d=\"M16 3v4h4M4 7v14h12\"/>", "nl:portal": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 9h18M7 6.5h.01M10 6.5h.01\"/>", "av:registers": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"10\" rx=\"1\"/><path d=\"M6 11V5h8v6M16 8h3v3M8 15h.01M12 15h.01M16 15h.01\"/>", "nl:help": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14M12 17.5h.01\"/>", "av:settings": "<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2\"/>", "nl:admin": "<circle cx=\"11\" cy=\"8\" r=\"4\"/><path d=\"M3 21a8 8 0 0 1 11-7.4M18 15v6M15 18h6\"/>", "av:inventory": "<path d=\"M3 7l9-4 9 4-9 4z\"/><path d=\"M3 7v10l9 4 9-4V7M12 11v10\"/>"};
 NAV_IC['av:drawings']=NAV_IC['av:design'];
+NAV_IC['av:accounting']='<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>';
 const NAVL=[
  {top:'av:overview|Dashboard'},
  {top:'av:inbox|Client inbox|#bInbox'},
@@ -7147,7 +7270,7 @@ const NAVL=[
  {sec:'design',title:'Design',items:['av:drawings|Design drawings|#bDesign', 'av:dcenter|Design Center', 'av:library|Equipment library|#bLib', 'av:estimate|Labor & consumables']},
  {sec:'projects',title:'Build',items:['av:projects|Projects & schedule', 'av:purchasing|Purchasing|#bPO', 'av:field|Field app|Mobile']},
  /* one place for billing: network support time opens from a switch on the Time & invoicing page */
- {sec:'billing',title:'Bill',items:['av:billing|Time & invoicing|#bTime']},
+ {sec:'billing',title:'Bill',items:['av:billing|Time & invoicing|#bTime', 'av:accounting|Accounting']},
  {sec:'support',title:'Support',items:['av:contracts|Service contracts|#bCt', 'av:service|AV service desk|#bSvc', 'nl:tickets|Network tickets', 'nl:board|Ticket board', 'nl:maint|Maintenance', 'nl:field|QR field view', 'nl:contacts|Contacts', 'nl:runbooks|Runbooks']},
  {net:true},
  {sec:'physical',title:'Physical',items:['nl:sites', 'nl:plans', 'nl:devices', 'nl:racks', 'nl:power', 'nl:cabling', 'nl:jacks', 'nl:lifecycle', 'nl:discover', 'nl:inventory|Site inventory']},
@@ -7216,24 +7339,9 @@ function renderInvList(){const box=$('#ivList');if(!box)return;const q=(S.ui.iq|
 function newInvoiceDraft(clientId,pjId){const c=clientById(clientId)||S.clients[0];const terms=(c&&TERM_DAYS[c.terms]!=null)?c.terms:'Net 30';
   const pjs=c?clientProjects(c):[],pj=pjId||((pjs[0]||{}).id)||null,pq=pj?projQuote(pj):null;
   return {id:'iv'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),no:nextInvNo(),clientId:c?c.id:null,pj,project:pj?(pjs.find(x=>x.id===pj)||{}).name||'':'',issued:isoDay(0),terms,due:addDays(isoDay(0),TERM_DAYS[terms]),
-    lines:[{desc:'',qty:1,rate:0,tax:false}],taxPct:pq?+pq.prop.tax||0:+S.prop.tax||0,payments:[],sentAt:null,notes:'',void:false}}
+    lines:[{desc:'',qty:1,rate:0,tax:false}],taxPct:pq?+pq.prop.tax||0:+S.prop.tax||0,payments:[],sentAt:null,notes:(typeof acTpl==='function'&&acTpl().defaultNotes)||'',po:'',void:false}}
 function openInvoice(id){const v=invById(id);if(!v)return;S.iv=invStatus(v)==='Draft'?{id,draft:JSON.parse(JSON.stringify(v)),mode:'edit'}:{id,draft:null,mode:'view'};renderInvoice()}
 const ivCur=()=>S.iv&&(S.iv.draft||invById(S.iv.id));
-function invDocHTML(v){const c=clientById(v.clientId)||{name:'—',contacts:[]},pc=primaryOf(c),k=invCalc(v),st=invStatus(v);
-  return `<div class="doc invdoc"><div class="dochead"><div class="orgrow">${logoSrc()?`<img src="${logoSrc()}" alt="">`:''}<div><div class="org">${esc(firm().toUpperCase())}</div><div class="muted" style="font-size:12px">${esc(SETTINGS.tagline||'')}${contactLine()?`<br>${esc(contactLine())}`:''}</div></div></div>
-   <dl><dt>Invoice</dt><dd>${esc(v.no)}</dd><dt>Issued</dt><dd>${fmtD(v.issued)}</dd><dt>Due</dt><dd>${fmtD(v.due)}</dd><dt>Terms</dt><dd>${esc(v.terms)}</dd>${v.project?`<dt>Project</dt><dd>${esc(v.project)}</dd>`:''}</dl></div>
-   <div class="billto"><span class="plh">Bill to</span><b>${esc(c.name)}</b>${pc?`<span>Attn: ${esc(pc.name)}${pc.title?', '+esc(pc.title):''}</span>`:''}${c.address?`<span>${esc(c.address)}</span>`:''}${pc&&pc.email?`<span>${esc(pc.email)}</span>`:''}</div>
-   ${st==='Void'?'<div class="banner" style="margin:12px 0">This invoice is void.</div>':''}
-   <div class="scroll"><table class="t"><thead><tr><th>Description</th><th class="n">Qty</th><th class="n">Rate</th><th class="n">Amount</th></tr></thead><tbody>
-   ${v.lines.map(l=>`<tr><td>${esc(l.desc||'—')}${l.tax?' <span class="muted mono" style="font-size:10px">T</span>':''}</td><td class="n">${+l.qty||0}</td><td class="n">${money2(+l.rate||0)}</td><td class="n">${money2(r2((+l.qty||0)*(+l.rate||0)))}</td></tr>`).join('')}
-   <tr class="tot"><td colspan="3">Subtotal</td><td class="n">${money2(k.sub)}</td></tr>
-   <tr class="tot"><td colspan="3">Tax (${+v.taxPct||0}% on items marked T)</td><td class="n">${money2(k.tax)}</td></tr>
-   <tr class="grand"><td colspan="3">Total</td><td class="n">${money2(k.total)}</td></tr>
-   ${(v.payments||[]).map(p=>`<tr class="tot"><td colspan="3">Payment · ${fmtD(p.date)} · ${esc(p.method)}${p.ref?' '+esc(p.ref):''}</td><td class="n">−${money2(+p.amount)}</td></tr>`).join('')}
-   <tr class="grand"><td colspan="3">Balance due</td><td class="n">${money2(st==='Void'?0:k.bal)}</td></tr></tbody></table></div>
-   ${v.notes?`<p class="note" style="margin-top:12px">${esc(v.notes)}</p>`:''}
-   ${v.payToken&&st!=='Void'&&st!=='Draft'&&k.bal>0.005?`<p style="font-size:13px;margin:14px 0 0"><b>Pay online by card or bank transfer:</b> <a href="${esc(payLink(v))}" target="_blank" rel="noopener">${esc(payLink(v))}</a></p>`:''}
-   <p class="muted" style="font-size:12px;margin:14px 0 0">${esc(SETTINGS.payNote||'')} <span class="mono">${esc(v.no)}</span></p></div>`}
 function invFormHTML(v){const c=clientById(v.clientId),pjs=c?clientProjects(c):[],pq=v.pj?projQuote(v.pj):null;
   const prior=v.pj?invoicedFor(v.pj,v.id):0,bal=pq?r2(pq.q.total-prior):0;
   return `<div class="bform" style="padding:18px">
@@ -7242,6 +7350,7 @@ function invFormHTML(v){const c=clientById(v.clientId),pjs=c?clientProjects(c):[
     <label class="field" for="ivP">Project<select id="ivP" data-iv="pj"><option value="">No project · enter a description</option>${pjs.map(p=>`<option value="${p.id}" ${p.id===v.pj?'selected':''}>${esc(p.name)} · ${esc(p.no||'')}</option>`).join('')}</select></label>
     <label class="field" for="ivT">Terms<select id="ivT" data-iv="terms">${Object.keys(TERM_DAYS).map(t=>`<option ${t===v.terms?'selected':''}>${t}</option>`).join('')}</select></label></div>
    ${v.pj?'':`<label class="field" for="ivPn">Invoice for<input id="ivPn" data-iv="project" value="${esc(v.project)}" placeholder="e.g. Service call SR-1043"></label>`}
+   <label class="field" for="ivPO">Client PO #<input id="ivPO" data-iv="po" value="${esc(v.po||'')}" placeholder="Optional"></label>
    <div class="row3"><label class="field" for="ivI">Issue date<input id="ivI" type="date" data-iv="issued" value="${v.issued}"></label><label class="field" for="ivD">Due date<input id="ivD" type="date" data-iv="due" value="${v.due}"></label><label class="field" for="ivX">Tax (%)<input id="ivX" type="number" min="0" step="0.001" data-iv="taxPct" value="${v.taxPct}"></label></div>
    ${pq?`<div class="fillbar"><span><b>Fill from ${esc(pq.prop.no)}</b> · proposal ${money2(pq.q.total)}${prior?` · ${money2(prior)} already invoiced`:''}</span><span class="actions"><button class="btn sm" data-act="ivFill" data-k="dep">${depPct()||50}% deposit · ${money(pq.q.total*(depPct()||50)/100)}</button><button class="btn sm" data-act="ivFill" data-k="bal" ${bal>0?'':'disabled'}>Remaining balance · ${money(Math.max(0,bal))}</button><button class="btn sm" data-act="ivFill" data-k="items">Itemized</button></span></div>`:''}
    <div class="scroll"><table class="t ivlines"><thead><tr><th>Description</th><th class="n">Qty</th><th class="n">Rate ($)</th><th>Tax</th><th class="n">Amount</th><th></th></tr></thead><tbody>
@@ -7286,7 +7395,7 @@ function renderInvoice(){
   const dlg=ov.querySelector('.dlg');
   dlg.addEventListener('input',e=>{const t=e.target,v=ivCur();if(!v||!S.iv.draft)return;
     if(t.dataset.il){const [i,f]=t.dataset.il.split(':'),l=v.lines[+i];if(!l||f==='tax')return;l[f]=f==='desc'?t.value:(t.value===''?'':+t.value);const a=$('#ila-'+i);if(a)a.textContent=money2(r2((+l.qty||0)*(+l.rate||0)));ivTotals();return}
-    if(t.dataset.iv==='taxPct'){v.taxPct=+t.value||0;ivTotals()}else if(t.dataset.iv==='notes'||t.dataset.iv==='project')v[t.dataset.iv]=t.value});
+    if(t.dataset.iv==='taxPct'){v.taxPct=+t.value||0;ivTotals()}else if(t.dataset.iv==='notes'||t.dataset.iv==='project'||t.dataset.iv==='po')v[t.dataset.iv]=t.value});
   dlg.addEventListener('change',e=>{const t=e.target,v=ivCur();if(!v||!S.iv.draft)return;
     if(t.dataset.il&&t.dataset.il.endsWith(':tax')){v.lines[+t.dataset.il.split(':')[0]].tax=t.checked;ivTotals();return}
     const f=t.dataset.iv;if(!f)return;
@@ -9140,7 +9249,7 @@ function cloudMark(){if(!DBX||!CLOUD.ready)return;clearTimeout(CLOUD.t);CLOUD.t=
 function libPayload(){return {lib:lib.filter(p=>!BASE_LIB.some(b=>b.id===p.id)),libOv:Object.fromEntries(BASE_LIB.map(b=>[b,byId(b.id)]).filter(([b,p])=>p&&JSON.stringify(p)!==JSON.stringify(b)).map(([b,p])=>[b.id,p])),libDel:BASE_LIB.filter(b=>!byId(b.id)).map(b=>b.id)}}
 function projectPayload(e){const cur=e.id===PJ.cur;return cur?{...e,prop:S.prop,design:S.studio?S.studio.back:S.design,u:uidc,tasks:S.tasks,time:S.time,photos:S.photos}:e}
 function cloudPayloads(){const out={},J=o=>JSON.stringify(o);
-  out['meta/settings']=J(SETTINGS);out['meta/clients']=J(S.clients);out['meta/invoices']=J(S.invoices);
+  out['meta/settings']=J(SETTINGS);out['meta/clients']=J(S.clients);out['meta/invoices']=J(S.invoices);if(!S.tech)out['meta/books']=J(acB());
   out['meta/service']=J({agreements:S.agreements,tseq:S.tseq,pipeline:S.pipeline,ticketsChunked:true});
   {const CH=100,n=Math.max(1,Math.ceil(S.tickets.length/CH)),m=Math.max(n,CLOUD.tkMax||0);for(let k=0;k<m;k++)out['meta/tickets-'+k]=J(k<n?S.tickets.slice(k*CH,(k+1)*CH):[]);CLOUD.tkMax=m}
   out['meta/library']=J(libPayload());out['meta/contracts']=J(S.contracts||[]);
@@ -9171,6 +9280,7 @@ function applyCloud(meta,pjs){
   if(meta.settings){const o=P(meta.settings);if(o&&typeof o==='object'){SETTINGS={...DEFAULT_SETTINGS,...o};try{localStorage.setItem(SKEY,JSON.stringify(SETTINGS))}catch(e){}}}
   if(meta.clients){const o=P(meta.clients);if(Array.isArray(o))S.clients=o}
   if(meta.invoices){const o=P(meta.invoices);if(Array.isArray(o))S.invoices=o}
+  if(meta.books&&!S.tech){try{const o=P(meta.books);if(o&&typeof o==='object'){BOOKS=acNorm(o);localStorage.setItem(ACKEY,JSON.stringify(BOOKS))}}catch(e){}}
   if(meta.contracts){const o=P(meta.contracts);if(Array.isArray(o))S.contracts=o}
   if(meta.inbox&&!S.tech){const o=P(meta.inbox);if(o&&Array.isArray(o.convs)){INBOX={convs:o.convs,rules:Array.isArray(o.rules)?o.rules:[]};try{localStorage.setItem(IBKEY,JSON.stringify(INBOX))}catch(e){}}}
   if(meta.service){const o=P(meta.service);if(o){if(Array.isArray(o.tickets))S.tickets=o.tickets;if(Array.isArray(o.agreements))S.agreements=o.agreements;if(Array.isArray(o.pipeline))S.pipeline=o.pipeline;if(o.tseq)S.tseq=o.tseq}}
@@ -11060,6 +11170,538 @@ Object.assign(A,{
   libPlace(el){const p=byId(el.dataset.id);if(!p||!placeable(p))return;if(S.dwp){S.dwp=null;dwRender()}if(S.studio)dcExit(true);setSheet('flow');requestAnimationFrame(()=>{try{placeNode(p.id,SW/2-W/2,SH/2-40)}catch(e){toast('Open the drawings and drag it in from the device list.')}})},
   libBom(el){const p=byId(el.dataset.id);if(!p)return;mut(()=>{const ex=S.design.extras.find(e=>e.pid===p.id);if(ex)ex.qty+=1;else S.design.extras.push({pid:p.id,qty:1})});save();if(S.dwp)dwRender();toast(`Added 1 × ${p.model} to ${S.prop.project||'the project'}’s bill of materials.`)}
 });
+/* ================= ACCOUNTING ================= */
+/* ================= ACCOUNTING =================
+   Books live in one record (BOOKS) next to invoices and clients and sync with them.
+   Invoices and their payments stay in S.invoices; everything else (accounts, vendors, expenses,
+   bills, bank lines, mileage, recurring invoices, invoice layout) lives here. */
+var BOOKS=null;const ACKEY='jdd-books-v1';
+const AC_TYPES=[['income','Income'],['cogs','Cost of goods sold'],['expense','Expenses'],['asset','Assets'],['liability','Liabilities'],['equity','Equity']];
+const AC_DEFAULT_ACCTS=[
+ ['4000','Equipment sales','income'],['4100','Installation labor','income'],['4200','Design & documentation','income'],['4300','Service contracts','income'],['4400','Service calls & support','income'],['4900','Other income','income'],
+ ['5000','Equipment & materials','cogs'],['5100','Subcontractors','cogs'],['5200','Freight & shipping','cogs'],
+ ['6000','Advertising & marketing','expense'],['6050','Bank & card fees','expense'],['6100','Software & subscriptions','expense'],['6150','Insurance','expense'],['6200','Professional fees','expense'],['6250','Office supplies','expense'],['6300','Rent & utilities','expense'],['6350','Phone & internet','expense'],['6400','Tools & small equipment','expense'],['6450','Vehicle & fuel','expense'],['6500','Travel','expense'],['6550','Meals','expense'],['6600','Training & licenses','expense'],['6650','Payroll & contract labor','expense'],['6700','Taxes & licenses','expense'],['6900','Other expenses','expense'],
+ ['1000','Business checking','asset'],['1010','Savings','asset'],['1200','Accounts receivable','asset'],['1500','Equipment & vehicles','asset'],
+ ['2000','Business credit card','liability'],['2100','Accounts payable','liability'],['2200','Sales tax payable','liability'],['2300','Loans','liability'],
+ ['3000','Owner’s equity','equity'],['3100','Owner draws','equity']];
+const AC_TPL0={layout:'classic',accent:'#4373C4',font:'inter',logo:'left',logoSize:'m',title:'Invoice',prefix:'INV-',next:'',
+  show:{tagline:true,address:true,phone:true,email:true,website:true,license:true,billAddr:true,billContact:true,billEmail:true,project:true,po:true,terms:true,due:true,qty:true,rate:true,taxMark:true,payments:true,dueBox:true,payLink:true,signature:false,thanks:true},
+  labels:{desc:'Description',qty:'Qty',rate:'Rate',amount:'Amount'},thanks:'Thank you for your business!',payInstr:'',tc:'',lateFee:'',footer:'',custom:[],defaultNotes:''};
+const AC_SET0={fyStart:1,basis:'accrual',taxName:'GET',mileRate:0.70,t1099:600};
+function acLoad(){let o=null;try{o=JSON.parse(localStorage.getItem(ACKEY)||'null')}catch(e){}return acNorm(o)}
+function acNorm(o){o=o&&typeof o==='object'?o:{};const A2=a=>Array.isArray(a)?a:[];
+  const b={accounts:A2(o.accounts),vendors:A2(o.vendors),expenses:A2(o.expenses),bills:A2(o.bills),recurring:A2(o.recurring),mileage:A2(o.mileage),
+    bank:{accounts:A2(o.bank&&o.bank.accounts),txns:A2(o.bank&&o.bank.txns),rules:A2(o.bank&&o.bank.rules)},
+    settings:{...AC_SET0,...(o.settings||{})},tpl:{...AC_TPL0,...(o.tpl||{})}};
+  b.tpl.show={...AC_TPL0.show,...((o.tpl||{}).show||{})};b.tpl.labels={...AC_TPL0.labels,...((o.tpl||{}).labels||{})};b.tpl.custom=A2(b.tpl.custom).slice(0,6);
+  if(!b.accounts.length)b.accounts=AC_DEFAULT_ACCTS.map(([code,name,type])=>({id:code,code,name,type,active:true}));
+  return b}
+function acB(){if(!BOOKS)BOOKS=acLoad();return BOOKS}
+function acM2(n){n=+n||0;return n<0?'−'+money2(-n):money2(n)}
+function acM(n){n=+n||0;return n<0?'\u2212'+money(-n):money(n)}
+function acSave(){try{localStorage.setItem(ACKEY,JSON.stringify(acB()))}catch(e){if(e&&(e.name==='QuotaExceededError'||e.code===22))toast('This browser is out of room. Remove old bank imports to free space.')}if(typeof cloudMark==='function')cloudMark()}
+const acTpl=()=>{try{return acB().tpl}catch(e){return AC_TPL0}};
+const acId=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const acAcct=id=>acB().accounts.find(a=>a.id===id);
+const acAcctName=id=>{const a=acAcct(id);return a?a.name:'Uncategorized'};
+const acAccts=(...types)=>acB().accounts.filter(a=>a.active!==false&&(!types.length||types.includes(a.type))).sort((a,b)=>String(a.code).localeCompare(String(b.code)));
+const acVendor=id=>acB().vendors.find(v=>v.id===id);
+const acVName=x=>x?((acVendor(x.vendorId)||{}).name||x.payee||'—'):'—';
+function acAcctOpts(sel,types,blank){return (blank?`<option value="">${esc(blank)}</option>`:'')+AC_TYPES.filter(([t])=>types.includes(t)).map(([t,l])=>`<optgroup label="${l}">${acAccts(t).map(a=>`<option value="${esc(a.id)}"${a.id===sel?' selected':''}>${esc(a.code)} · ${esc(a.name)}</option>`).join('')}</optgroup>`).join('')}
+const acPjName=id=>{const e=pjById(id);return e?(pjProp(e).project||'Project'):''};
+const acPjOpts=sel=>'<option value="">No project</option>'+PJ.list.map(e=>{const P=pjProp(e);return `<option value="${e.id}"${e.id===sel?' selected':''}>${esc(P.project||'Project')} · ${esc(cliName(P))}</option>`}).join('');
+/* ---------- invoices: numbering and income accounts ---------- */
+function acInvNext(){const t=acTpl(),pre=t.prefix||'INV-';let n=Math.max(+t.next>0?+t.next-1:1000,0);
+  S.invoices.forEach(i=>{const s=String(i.no||'');if(s.startsWith(pre)){const k=parseInt(s.slice(pre.length).replace(/\D/g,''),10);if(k>n)n=k}});return pre+(n+1)}
+function acGuessIncome(v,l){if(l&&l.acct&&acAcct(l.acct))return l.acct;const d=((l&&l.desc)||'')+' '+(v.project||'');
+  if(v.src&&v.src.app)return '4400';if(/contract|monthly|support plan|maintenance plan|retainer/i.test(d))return '4300';
+  if(/design|drawing|as-?built|documentation|survey|cad\b/i.test(d))return '4200';if(/labor|install|programming|hours?\b|technician|commission|service call/i.test(d))return '4100';return '4000'}
+/* income for a period, by account, excluding sales tax. basis: accrual = sent invoices by issue date; cash = payments by date */
+function acIncome(from,to,basis){const out={},add=(a,n)=>{out[a]=r2((out[a]||0)+n)};
+  S.invoices.forEach(v=>{if(v.void)return;const k=invCalc(v);if(k.sub<=0)return;
+    if(basis==='cash'){(v.payments||[]).forEach(p=>{if(p.date<from||p.date>to)return;const share=(+p.amount||0)*(k.sub/(k.total||k.sub));v.lines.forEach(l=>{const amt=(+l.qty||0)*(+l.rate||0);if(amt)add(acGuessIncome(v,l),share*amt/k.sub)})})}
+    else{if(!v.sentAt||v.issued<from||v.issued>to)return;v.lines.forEach(l=>{const amt=(+l.qty||0)*(+l.rate||0);if(amt)add(acGuessIncome(v,l),amt)})}});
+  acB().bank.txns.forEach(t=>{if(t.status!=='categorized'||t.date<from||t.date>to)return;const a=acAcct(t.cat);if(a&&a.type==='income')add(a.id,+t.amount||0)});
+  return out}
+/* spending for a period, by account */
+function acSpend(from,to,basis){const out={},add=(a,n)=>{if(!n)return;out[a]=r2((out[a]||0)+n)},B=acB();
+  B.expenses.forEach(x=>{if(x.date>=from&&x.date<=to)add(x.acct||'6900',+x.amount||0)});
+  B.bills.forEach(b=>{if(b.void)return;const tot=acBillTotal(b);if(!tot)return;
+    if(basis==='cash'){(b.payments||[]).forEach(p=>{if(p.date<from||p.date>to)return;b.lines.forEach(l=>add(l.acct||'6900',(+p.amount||0)*(+l.amount||0)/tot))})}
+    else if(b.date>=from&&b.date<=to)b.lines.forEach(l=>add(l.acct||'6900',+l.amount||0))});
+  B.bank.txns.forEach(t=>{if(t.status!=='categorized'||t.date<from||t.date>to)return;const a=acAcct(t.cat);if(a&&(a.type==='expense'||a.type==='cogs'))add(a.id,-(+t.amount||0))});
+  return out}
+const acSum=o=>r2(Object.values(o).reduce((a,n)=>a+n,0));
+function acPL(from,to,basis){const inc=acIncome(from,to,basis),sp=acSpend(from,to,basis),typ=id=>(acAcct(id)||{type:'expense'}).type;
+  const cogs={},exp={};Object.entries(sp).forEach(([k,n])=>{(typ(k)==='cogs'?cogs:exp)[k]=n});
+  const ti=acSum(inc),tc=acSum(cogs),te=acSum(exp);return {inc,cogs,exp,ti,tc,te,gross:r2(ti-tc),net:r2(ti-tc-te)}}
+/* bills */
+const acBillTotal=b=>r2((b.lines||[]).reduce((s,l)=>s+(+l.amount||0),0));
+const acBillPaid=b=>r2((b.payments||[]).reduce((s,p)=>s+(+p.amount||0),0));
+function acBillStatus(b){if(b.void)return 'Void';const t=acBillTotal(b),p=acBillPaid(b);if(t>0&&p>=t-0.005)return 'Paid';if(b.due&&b.due<isoDay(0))return 'Overdue';return p>0?'Partially paid':'Open'}
+const acBillOpen=b=>['Open','Overdue','Partially paid'].includes(acBillStatus(b));
+/* periods */
+function acFYStart(y){const m=Math.min(12,Math.max(1,+acB().settings.fyStart||1));return `${y}-${String(m).padStart(2,'0')}-01`}
+function acPeriod(k){const t=isoDay(0),y=+t.slice(0,4),m=+t.slice(5,7),pad=n=>String(n).padStart(2,'0'),eom=(yy,mm)=>new Date(yy,mm,0).getDate();
+  const fy=acFYStart(y)<=t?acFYStart(y):acFYStart(y-1),q=Math.floor((m-1)/3);
+  switch(k){case 'month':return [`${y}-${pad(m)}-01`,t];
+    case 'lastmonth':{const yy=m===1?y-1:y,mm=m===1?12:m-1;return [`${yy}-${pad(mm)}-01`,`${yy}-${pad(mm)}-${eom(yy,mm)}`]}
+    case 'quarter':return [`${y}-${pad(q*3+1)}-01`,t];
+    case 'lastquarter':{let qq=q-1,yy=y;if(qq<0){qq=3;yy--}return [`${yy}-${pad(qq*3+1)}-01`,`${yy}-${pad(qq*3+3)}-${eom(yy,qq*3+3)}`]}
+    case 'lastyear':{const s=acFYStart(+fy.slice(0,4)-1);return [s,addDays(fy,-1)]}
+    case 'last12':return [addDays(t,-365),t];
+    case 'all':return ['2000-01-01',t];
+    case 'custom':return [S.ui.acFrom||fy,S.ui.acTo||t];
+    default:return [fy,t]}}
+const AC_PERIODS=[['ytd','This fiscal year'],['month','This month'],['lastmonth','Last month'],['quarter','This quarter'],['lastquarter','Last quarter'],['lastyear','Last fiscal year'],['last12','Last 12 months'],['all','All time'],['custom','Custom dates']];
+function acPrevPeriod([f,t]){const d=Math.round((new Date(t)-new Date(f))/864e5)+1;return [addDays(f,-d),addDays(f,-1)]}
+/* receivables and payables aging */
+function acAging(items){const B={cur:0,a30:0,a60:0,a90:0,a90p:0},t=isoDay(0);items.forEach(({due,bal})=>{if(bal<=0.005)return;const d=due?Math.round((new Date(t)-new Date(due))/864e5):0;
+  if(d<=0)B.cur+=bal;else if(d<=30)B.a30+=bal;else if(d<=60)B.a60+=bal;else if(d<=90)B.a90+=bal;else B.a90p+=bal});Object.keys(B).forEach(k=>B[k]=r2(B[k]));return B}
+const AC_AGE=[['cur','Current'],['a30','1–30 days'],['a60','31–60 days'],['a90','61–90 days'],['a90p','Over 90']];
+function acAR(){return S.invoices.filter(invOpen).map(v=>({v,c:clientById(v.clientId),due:v.due,bal:invCalc(v).bal}))}
+function acAP(){return acB().bills.filter(acBillOpen).map(b=>({b,due:b.due,bal:r2(acBillTotal(b)-acBillPaid(b))}))}
+/* bank balances */
+function acBankBal(a,asOf){return r2((+a.opening||0)+acB().bank.txns.filter(t=>t.acct===a.id&&t.status!=='excluded'&&(!asOf||t.date<=asOf)).reduce((s,t)=>s+(+t.amount||0),0))}
+/* recurring invoices: make drafts when they come due */
+function acRecurAdvance(r){const d=r.next||isoDay(0);r.next=r.every==='year'?addDays(d,365):r.every==='quarter'?acAddMonths(d,3):r.every==='week'?addDays(d,7):acAddMonths(d,1)}
+function acAddMonths(iso,n){const d=new Date(iso+'T12:00:00'),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return d.toISOString().slice(0,10)}
+function acRecurSweep(quiet){const B=acB(),today=isoDay(0);let n=0;
+  B.recurring.forEach(r=>{let guard=0;while(r.active!==false&&r.next&&r.next<=today&&guard++<24){const c=clientById(r.clientId);if(!c)break;
+    const v=newInvoiceDraft(c.id,r.pj||null);v.issued=r.next;v.terms=r.terms||v.terms;v.due=addDays(r.next,TERM_DAYS[v.terms]||0);v.lines=JSON.parse(JSON.stringify(r.lines||[]));v.taxPct=+r.taxPct||0;v.project=r.name||v.project;v.recur=r.id;v.notes=r.notes||v.notes;
+    S.invoices.push(v);r.last=r.next;acRecurAdvance(r);n++}});
+  if(n){saveInvoices();acSave();if(!quiet||true)toast(`${plural(n,'recurring invoice')} ready to review and send in Accounting → Invoices.`)}return n}
+/* ---------- invoice layout: one renderer for the app, print and PDF ---------- */
+function invDocHTML(v){const T=acTpl(),sh=T.show,L=T.labels,c=v._client||clientById(v.clientId)||{name:'—',contacts:[]},pc=primaryOf(c),k=invCalc(v),st=invStatus(v),bal=st==='Void'?0:k.bal;
+  const logo=T.logo!=='none'&&logoSrc()?`<img class="ivlogo ivlogo-${T.logoSize||'m'}" src="${logoSrc()}" alt="">`:'';
+  const org=[sh.tagline&&SETTINGS.tagline,sh.address&&SETTINGS.address,[sh.phone&&SETTINGS.phone,sh.email&&SETTINGS.email,sh.website&&SETTINGS.website].filter(Boolean).join(' · '),sh.license&&SETTINGS.license?'License '+SETTINGS.license:''].filter(Boolean);
+  const meta=[[T.title||'Invoice',esc(v.no)],['Issued',fmtD(v.issued)],sh.due?['Due',fmtD(v.due)]:null,sh.terms?['Terms',esc(v.terms)]:null,sh.project&&v.project?['Project',esc(v.project)]:null,sh.po&&v.po?['PO #',esc(v.po)]:null,...(T.custom||[]).filter(x=>x&&x.label).map(x=>[esc(x.label),esc(x.value||'')])].filter(Boolean);
+  const cols=[sh.qty,sh.rate].filter(Boolean).length;
+  const bill=`<div class="ivbill"><span class="ivlbl">Bill to</span><b>${esc(c.name)}</b>${sh.billContact&&pc?`<span>Attn: ${esc(pc.name)}${pc.title?', '+esc(pc.title):''}</span>`:''}${sh.billAddr&&c.address?`<span>${esc(c.address)}</span>`:''}${sh.billEmail&&pc&&pc.email?`<span>${esc(pc.email)}</span>`:''}</div>`;
+  const dueBox=sh.dueBox?`<div class="ivduebox"><span>${st==='Paid'?'Paid in full':'Amount due'}</span><b>${money2(bal)}</b>${st!=='Paid'&&sh.due&&v.due?`<small>by ${fmtD(v.due)}</small>`:''}</div>`:'';
+  const head=`<div class="ivhead ivlogo-at-${T.logo}">${T.logo==='right'?'':logo}<div class="ivorg"><div class="ivname">${esc(firm())}</div>${org.map(x=>`<div>${esc(x)}</div>`).join('')}</div>${T.logo==='right'?logo:''}<div class="ivtitle">${esc(T.title||'Invoice')}</div></div>`;
+  return `<div class="doc invdoc ivt ivt-${T.layout} ivf-${T.font}" style="--ivac:${esc(T.accent||'#4373C4')}">
+   ${head}
+   <div class="ivmid">${bill}<dl class="ivmeta">${meta.map(([a,b])=>`<div><dt>${a}</dt><dd${String(b).length>14?' class="ivw"':''}>${b}</dd></div>`).join('')}</dl>${dueBox}</div>
+   ${st==='Void'?'<div class="banner" style="margin:12px 0">This invoice is void.</div>':''}
+   <table class="ivtable"><thead><tr><th>${esc(L.desc)}</th>${sh.qty?`<th class="n">${esc(L.qty)}</th>`:''}${sh.rate?`<th class="n">${esc(L.rate)}</th>`:''}<th class="n">${esc(L.amount)}</th></tr></thead><tbody>
+   ${v.lines.map(l=>`<tr><td>${esc(l.desc||'—')}${sh.taxMark&&l.tax?' <span class="ivtx">T</span>':''}</td>${sh.qty?`<td class="n">${+l.qty||0}</td>`:''}${sh.rate?`<td class="n">${money2(+l.rate||0)}</td>`:''}<td class="n">${money2(r2((+l.qty||0)*(+l.rate||0)))}</td></tr>`).join('')}</tbody>
+   <tfoot><tr><td colspan="${cols+1}">Subtotal</td><td class="n">${money2(k.sub)}</td></tr>
+   ${k.tax||+v.taxPct?`<tr><td colspan="${cols+1}">${esc(acB().settings.taxName||'Tax')} (${+v.taxPct||0}%${sh.taxMark?' on items marked T':''})</td><td class="n">${money2(k.tax)}</td></tr>`:''}
+   <tr class="ivgrand"><td colspan="${cols+1}">Total</td><td class="n">${money2(k.total)}</td></tr>
+   ${sh.payments?(v.payments||[]).map(p=>`<tr><td colspan="${cols+1}">Payment · ${fmtD(p.date)} · ${esc(p.method||'')}${p.ref?' '+esc(p.ref):''}</td><td class="n">−${money2(+p.amount||0)}</td></tr>`).join(''):''}
+   <tr class="ivgrand ivbal"><td colspan="${cols+1}">Balance due</td><td class="n">${money2(bal)}</td></tr></tfoot></table>
+   ${v.notes?`<p class="ivnotes">${esc(v.notes)}</p>`:''}
+   ${sh.payLink&&v.payToken&&st!=='Void'&&st!=='Draft'&&k.bal>0.005?`<p class="ivpay"><b>Pay online by card or bank transfer:</b> <a href="${esc(payLink(v))}" target="_blank" rel="noopener">${esc(payLink(v))}</a></p>`:''}
+   ${(T.payInstr||SETTINGS.payNote)?`<div class="ivfoot-sec"><b>How to pay</b><p>${esc(T.payInstr||SETTINGS.payNote)} <span class="mono">${esc(v.no)}</span></p></div>`:''}
+   ${T.lateFee?`<div class="ivfoot-sec"><b>Late payments</b><p>${esc(T.lateFee)}</p></div>`:''}
+   ${T.tc?`<div class="ivfoot-sec"><b>Terms &amp; conditions</b><p>${esc(T.tc)}</p></div>`:''}
+   ${sh.signature?'<div class="ivsign"><div><span></span>Customer signature</div><div><span></span>Date</div></div>':''}
+   ${sh.thanks&&T.thanks?`<p class="ivthanks">${esc(T.thanks)}</p>`:''}
+   ${T.footer?`<p class="ivfooter">${esc(T.footer)}</p>`:''}</div>`}
+
+/* ---------- Accounting screens ---------- */
+const AC_TABS=[['overview','Overview'],['invoices','Invoices'],['expenses','Expenses'],['bills','Bills'],['vendors','Vendors'],['banking','Banking'],['reports','Reports'],['accounts','Chart of accounts'],['layout','Invoice layout'],['settings','Settings']];
+const AC_METHODS=['Card','Bank transfer','Check','Cash','ACH','Other'];
+const acD=()=>S.acDraft||{};
+const acF=(label,f,type,attrs)=>{const d=acD(),v=d[f];return `<label class="field" for="acf-${f}">${label}${type==='textarea'?`<textarea class="inp" id="acf-${f}" data-acf="${f}" rows="2" ${attrs||''}>${esc(v??'')}</textarea>`:`<input class="inp" id="acf-${f}" data-acf="${f}" type="${type||'text'}" value="${esc(v??'')}" ${attrs||''}>`}</label>`};
+const acS=(label,f,opts)=>`<label class="field" for="acf-${f}">${label}<select class="inp" id="acf-${f}" data-acf="${f}">${opts}</select></label>`;
+const acC=(label,f)=>`<label class="check"><input type="checkbox" id="acf-${f}" data-acf="${f}" ${acD()[f]?'checked':''}> ${label}</label>`;
+const acOpts=(list,sel)=>list.map(x=>{const [v,l]=Array.isArray(x)?x:[x,x];return `<option value="${esc(v)}"${String(v)===String(sel??'')?' selected':''}>${esc(l)}</option>`}).join('');
+const acKpi=(l,v,s2,act)=>`<${act?`button type="button" class="kbtn kpi" ${act}`:'div class="kbtn kpi"'}><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s2||''}</div></${act?'button':'div'}>`;
+const acChip=st=>`<span class="acst acst-${String(st).toLowerCase().replace(/\s+/g,'-')}">${esc(st)}</span>`;
+const acSeg=(act,cur,list)=>`<div class="apseg" role="group">${list.map(([k,l])=>`<button type="button" data-act="${act}" data-k="${k}" aria-pressed="${cur===k}">${l}</button>`).join('')}</div>`;
+const acEmpty=(t,s2,btn)=>`<div class="panel empty"><b>${t}</b><span>${s2}</span>${btn||''}</div>`;
+const acFormWrap=(title,body,del)=>`<form class="panel acform" id="acForm" autocomplete="off"><div class="ph"><h2>${title}</h2></div><div class="pb">${body}
+  <div class="actions acfa">${del?`<button type="button" class="btn danger" data-act="acDel">${del}</button>`:''}<span style="flex:1"></span><button type="button" class="btn" data-act="acCancel">Cancel</button><button type="submit" class="btn primary">Save</button></div></div></form>`;
+function acLinesHTML(kind){const d=acD(),L=d.lines||[];
+  if(kind==='bill')return `<div class="scroll"><table class="t aclines"><thead><tr><th>Category</th><th>Description</th><th>Project</th><th class="n">Amount ($)</th><th></th></tr></thead><tbody>${L.map((l,i)=>`<tr>
+    <td><select class="cellin" data-acl="${i}:acct" aria-label="Line ${i+1} category">${acAcctOpts(l.acct,['cogs','expense','asset'])}</select></td>
+    <td><input class="cellin" data-acl="${i}:desc" value="${esc(l.desc||'')}" aria-label="Line ${i+1} description"></td>
+    <td><select class="cellin" data-acl="${i}:pj" aria-label="Line ${i+1} project">${acPjOpts(l.pj)}</select></td>
+    <td class="n"><input class="cellin num" type="number" step="0.01" data-acl="${i}:amount" value="${l.amount??''}" aria-label="Line ${i+1} amount"></td>
+    <td><button type="button" class="btn sm ghost" data-act="acLineDel" data-i="${i}" aria-label="Remove line ${i+1}" ${L.length<2?'disabled':''}>×</button></td></tr>`).join('')}</tbody></table></div>
+    <div class="actions"><button type="button" class="btn sm" data-act="acLineAdd">+ Add line</button><span class="actot">Total <b>${money2(r2(L.reduce((s,l)=>s+(+l.amount||0),0)))}</b></span></div>`;
+  return `<div class="scroll"><table class="t aclines"><thead><tr><th>Description</th><th class="n">Qty</th><th class="n">Rate ($)</th><th>Tax</th><th class="n">Amount</th><th></th></tr></thead><tbody>${L.map((l,i)=>`<tr>
+    <td><input class="cellin" data-acl="${i}:desc" value="${esc(l.desc||'')}" aria-label="Line ${i+1} description"></td>
+    <td class="n"><input class="cellin num" type="number" step="any" data-acl="${i}:qty" value="${l.qty??1}" aria-label="Line ${i+1} quantity"></td>
+    <td class="n"><input class="cellin num" type="number" step="0.01" data-acl="${i}:rate" value="${l.rate??0}" aria-label="Line ${i+1} rate"></td>
+    <td><input type="checkbox" data-acl="${i}:tax" ${l.tax?'checked':''} aria-label="Line ${i+1} taxable"></td>
+    <td class="n">${money2(r2((+l.qty||0)*(+l.rate||0)))}</td>
+    <td><button type="button" class="btn sm ghost" data-act="acLineDel" data-i="${i}" aria-label="Remove line ${i+1}" ${L.length<2?'disabled':''}>×</button></td></tr>`).join('')}</tbody></table></div>
+    <div class="actions"><button type="button" class="btn sm" data-act="acLineAdd">+ Add line</button></div>`}
+/* ===== Overview ===== */
+function acMonths(n){const out=[],t=isoDay(0);let y=+t.slice(0,4),m=+t.slice(5,7);for(let i=0;i<n;i++){out.unshift([y,m]);m--;if(!m){m=12;y--}}
+  return out.map(([y,m])=>{const f=`${y}-${String(m).padStart(2,'0')}-01`,e=`${y}-${String(m).padStart(2,'0')}-${new Date(y,m,0).getDate()}`;return {f,e,label:new Date(f+'T12:00:00').toLocaleDateString('en-US',{month:'short'})}})}
+function acChartHTML(){const b=acB().settings.basis,M=acMonths(12).map(x=>({...x,inc:acSum(acIncome(x.f,x.e,b)),sp:acSum(acSpend(x.f,x.e,b))})),mx=Math.max(1,...M.map(x=>Math.max(x.inc,x.sp))),W=720,H=210,bw=(W-40)/12;
+  const yb=v=>H-28-(v/mx)*(H-48);
+  return `<figure class="acchart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Income and spending by month for the last 12 months"><g class="acgrid">${[0,.5,1].map(p=>`<line x1="30" x2="${W}" y1="${yb(mx*p)}" y2="${yb(mx*p)}"/><text x="26" y="${yb(mx*p)+4}" text-anchor="end">${p?money(Math.round(mx*p/100)*100):'0'}</text>`).join('')}</g>
+    ${M.map((x,i)=>{const X=36+i*bw;return `<rect class="acbi" x="${X+bw*.12}" y="${yb(x.inc)}" width="${bw*.34}" height="${Math.max(0,H-28-yb(x.inc))}" rx="3"><title>${x.label}: income ${money2(x.inc)}</title></rect><rect class="acbs" x="${X+bw*.5}" y="${yb(x.sp)}" width="${bw*.34}" height="${Math.max(0,H-28-yb(x.sp))}" rx="3"><title>${x.label}: spending ${money2(x.sp)}</title></rect><text x="${X+bw*.46}" y="${H-10}" text-anchor="middle">${x.label}</text>`}).join('')}</svg>
+    <figcaption><span><i class="acbi"></i>Income</span><span><i class="acbs"></i>Spending</span><span class="muted">${b==='cash'?'Cash basis':'Accrual basis'}</span></figcaption>
+    <table class="sr"><caption>Income and spending by month</caption><tr><th>Month</th><th>Income</th><th>Spending</th></tr>${M.map(x=>`<tr><td>${x.label}</td><td>${money2(x.inc)}</td><td>${money2(x.sp)}</td></tr>`).join('')}</table></figure>`}
+function acOverviewHTML(){const B=acB(),[f,t]=acPeriod('ytd'),pl=acPL(f,t,B.settings.basis),ar=acAR(),ap=acAP(),today=isoDay(0);
+  const arT=r2(ar.reduce((s,x)=>s+x.bal,0)),arO=r2(ar.filter(x=>x.due&&x.due<today).reduce((s,x)=>s+x.bal,0)),apT=r2(ap.reduce((s,x)=>s+x.bal,0)),soon=ap.filter(x=>x.due&&x.due<=addDays(today,7));
+  const banks=B.bank.accounts,cash=r2(banks.filter(a=>a.kind!=='credit').reduce((s,a)=>s+acBankBal(a),0)),rev=B.bank.txns.filter(x=>x.status==='new').length;
+  const drafts=S.invoices.filter(v=>invStatus(v)==='Draft'),overdue=ar.filter(x=>x.due&&x.due<today).sort((a,b)=>a.due.localeCompare(b.due)).slice(0,6);
+  const rec=B.recurring.filter(r=>r.active!==false&&r.next&&r.next<=addDays(today,30)).sort((a,b)=>a.next.localeCompare(b.next)).slice(0,5);
+  return `<div class="kpis ackpis">${acKpi('Income · this fiscal year',money(pl.ti),`Since ${fmtD(f)}`,'data-act="acRepGo" data-k="pl"')}${acKpi('Spending',money(r2(pl.tc+pl.te)),`${money(pl.tc)} cost of goods · ${money(pl.te)} expenses`,'data-act="acRepGo" data-k="exp"')}${acKpi('Net profit',`<span class="${pl.net<0?'acneg':''}">${acM(pl.net)}</span>`,pl.ti?`${Math.round(pl.net/pl.ti*100)}% margin`:'No income yet','data-act="acRepGo" data-k="pl"')}
+    ${acKpi('Owed to you',money(arT),arO?`<span class="acneg">${money(arO)} overdue</span>`:`${plural(ar.length,'open invoice')}`,'data-act="acRepGo" data-k="ar"')}${acKpi('You owe',money(apT),soon.length?`${plural(soon.length,'bill')} due this week`:`${plural(ap.length,'open bill')}`,'data-act="acTab" data-k="bills"')}${acKpi('Cash in bank',banks.length?acM(cash):'—',banks.length?`${plural(banks.length,'account')}${rev?` · ${rev} to review`:''}`:'Import a statement to track it','data-act="acTab" data-k="banking"')}</div>
+   <div class="acgrid2"><section class="panel"><div class="ph"><h2>Income and spending</h2><button class="btn sm" data-act="acRepGo" data-k="pl">Profit &amp; loss</button></div><div class="pb">${acChartHTML()}</div></section>
+    <div class="acside">
+     <section class="panel"><div class="ph"><h2>Needs attention</h2></div><ul class="aclist">
+      ${overdue.map(x=>`<li><button type="button" data-act="acOpenInv" data-id="${x.v.id}"><b>${esc(x.v.no)} · ${esc((x.c||{}).name||'')}</b><small>${money2(x.bal)} · due ${fmtD(x.due)}</small></button>${acChip('Overdue')}</li>`).join('')}
+      ${soon.map(x=>`<li><button type="button" data-act="acEdit" data-k="bill" data-id="${x.b.id}"><b>Bill · ${esc(acVName(x.b))}</b><small>${money2(x.bal)} · due ${fmtD(x.due)}</small></button>${acChip(x.due<today?'Overdue':'Due soon')}</li>`).join('')}
+      ${drafts.length?`<li><button type="button" data-act="acIvF" data-k="draft"><b>${plural(drafts.length,'draft invoice')}</b><small>Review and send</small></button></li>`:''}
+      ${rev?`<li><button type="button" data-act="acTab" data-k="banking"><b>${plural(rev,'bank transaction')} to review</b><small>Categorize or match them</small></button></li>`:''}
+      ${!overdue.length&&!soon.length&&!drafts.length&&!rev?'<li class="muted acnone">Nothing overdue, nothing waiting. Nice.</li>':''}</ul></section>
+     <section class="panel"><div class="ph"><h2>Recurring invoices</h2><button class="btn sm" data-act="acNew" data-k="recur">+ New</button></div>${rec.length?`<ul class="aclist">${rec.map(r=>`<li><button type="button" data-act="acEdit" data-k="recur" data-id="${r.id}"><b>${esc(r.name||'Recurring invoice')}</b><small>${esc((clientById(r.clientId)||{}).name||'')} · next ${fmtD(r.next)} · ${money2(acRecurTotal(r))}</small></button></li>`).join('')}</ul>`:'<p class="pb muted" style="margin:0">Set up monthly support or service billing once and the drafts make themselves.</p>'}</section>
+    </div></div>`}
+const acRecurTotal=r=>{const s=(r.lines||[]).reduce((a,l)=>a+(+l.qty||0)*(+l.rate||0),0),tx=(r.lines||[]).filter(l=>l.tax).reduce((a,l)=>a+(+l.qty||0)*(+l.rate||0),0);return r2(s+tx*(+r.taxPct||0)/100)};
+/* ===== Invoices ===== */
+function acInvoicesHTML(){const f=S.ui.acIvF||'all',q=(S.ui.acIvQ||'').toLowerCase(),today=isoDay(0),all=S.invoices.slice().sort((a,b)=>String(b.issued).localeCompare(String(a.issued))||String(b.no).localeCompare(String(a.no)));
+  const grp={all:()=>true,draft:v=>invStatus(v)==='Draft',open:v=>invOpen(v),overdue:v=>invStatus(v)==='Overdue',paid:v=>invStatus(v)==='Paid',void:v=>v.void};
+  const L=all.filter(grp[f]||grp.all).filter(v=>!q||[v.no,v.project,v.po,(clientById(v.clientId)||{}).name].join(' ').toLowerCase().includes(q));
+  const open=all.filter(invOpen),od=all.filter(v=>invStatus(v)==='Overdue'),pays=S.invoices.flatMap(v=>(v.payments||[]).map(p=>({v,p}))).sort((a,b)=>String(b.p.date).localeCompare(String(a.p.date)));
+  const p30=r2(pays.filter(x=>x.p.date>=addDays(today,-30)).reduce((s,x)=>s+(+x.p.amount||0),0)),B=acB();
+  return `<div class="kpis ackpis">${acKpi('Open',money(r2(open.reduce((s,v)=>s+invCalc(v).bal,0))),plural(open.length,'invoice'),'data-act="acIvF" data-k="open"')}${acKpi('Overdue',`<span class="${od.length?'acneg':''}">${money(r2(od.reduce((s,v)=>s+invCalc(v).bal,0)))}</span>`,plural(od.length,'invoice'),'data-act="acIvF" data-k="overdue"')}${acKpi('Paid · last 30 days',money(p30),plural(pays.filter(x=>x.p.date>=addDays(today,-30)).length,'payment'))}${acKpi('Drafts',all.filter(grp.draft).length,'Not sent yet','data-act="acIvF" data-k="draft"')}</div>
+  <section class="panel"><div class="ph acbar">${acSeg('acIvF',f,[['all','All'],['draft','Drafts'],['open','Open'],['overdue','Overdue'],['paid','Paid'],['void','Void']])}<label class="sr" for="acIvQ">Search invoices</label><input class="inp acq" id="acIvQ" type="search" placeholder="Search number, client, project or PO" value="${esc(S.ui.acIvQ||'')}"><button class="btn sm" data-act="acCsv" data-k="invoices">Export CSV</button></div>
+   ${L.length?`<div class="scroll"><table class="t"><thead><tr><th>Invoice</th><th>Client</th><th>Project</th><th>Issued</th><th>Due</th><th class="n">Total</th><th class="n">Balance</th><th>Status</th></tr></thead><tbody>${L.slice(0,300).map(v=>{const k=invCalc(v),st=invStatus(v);return `<tr class="click" data-act="acOpenInv" data-id="${v.id}"><td><b>${esc(v.no)}</b>${v.recur?' <span class="muted" title="From a recurring invoice">↻</span>':''}</td><td>${esc((clientById(v.clientId)||{}).name||'—')}</td><td>${esc(v.project||'')}${v.po?` <span class="muted">PO ${esc(v.po)}</span>`:''}</td><td>${fmtD(v.issued)}</td><td>${fmtD(v.due)}</td><td class="n">${money2(k.total)}</td><td class="n">${money2(st==='Void'?0:k.bal)}</td><td>${acChip(st)}</td></tr>`}).join('')}</tbody></table></div>`:`<p class="pb muted">No invoices here. <button class="lnk" data-act="newInvoice">Create one</button>.</p>`}</section>
+  <section class="panel"><div class="ph"><h2>Recurring invoices</h2><button class="btn sm primary" data-act="acNew" data-k="recur">+ New recurring invoice</button></div>
+   ${B.recurring.length?`<div class="scroll"><table class="t"><thead><tr><th>Name</th><th>Client</th><th>Repeats</th><th>Next draft</th><th class="n">Amount</th><th>On</th><th></th></tr></thead><tbody>${B.recurring.map(r=>`<tr><td><b>${esc(r.name||'Recurring invoice')}</b></td><td>${esc((clientById(r.clientId)||{}).name||'—')}</td><td>${esc({week:'Weekly',month:'Monthly',quarter:'Quarterly',year:'Yearly'}[r.every]||'Monthly')}</td><td>${r.active===false?'<span class="muted">Paused</span>':fmtD(r.next)}</td><td class="n">${money2(acRecurTotal(r))}</td><td><input type="checkbox" data-act="acRecurToggle" data-id="${r.id}" ${r.active===false?'':'checked'} aria-label="Recurring invoice ${esc(r.name||'')} on"></td><td><button class="btn sm" data-act="acEdit" data-k="recur" data-id="${r.id}">Edit</button></td></tr>`).join('')}</tbody></table></div><p class="pb note" style="margin:0">On each date a draft invoice is created for you to review and send. Nothing is emailed without you.</p>`:'<p class="pb muted" style="margin:0">Bill monthly support plans, retainers or rentals automatically. Each period a draft appears here for you to send.</p>'}</section>
+  <section class="panel"><div class="ph"><h2>Payments received</h2><button class="btn sm" data-act="acCsv" data-k="payments">Export CSV</button></div>${pays.length?`<div class="scroll"><table class="t"><thead><tr><th>Date</th><th>Client</th><th>Invoice</th><th>Method</th><th>Reference</th><th class="n">Amount</th></tr></thead><tbody>${pays.slice(0,100).map(({v,p})=>`<tr class="click" data-act="acOpenInv" data-id="${v.id}"><td>${fmtD(p.date)}</td><td>${esc((clientById(v.clientId)||{}).name||'—')}</td><td>${esc(v.no)}</td><td>${esc(p.method||'')}</td><td>${esc(p.ref||'')}</td><td class="n">${money2(+p.amount||0)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="pb muted" style="margin:0">Payments you record on invoices, or match from your bank, show here.</p>'}</section>`}
+function acRecurForm(){const d=acD();return acFormWrap(d.id?'Edit recurring invoice':'New recurring invoice',`
+  <div class="row3">${acF('Name','name','text','placeholder="Monthly support plan" maxlength="80"')}${acS('Client','clientId',acOpts(S.clients.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(c=>[c.id,c.name]),d.clientId))}${acS('Project','pj',acPjOpts(d.pj))}</div>
+  <div class="row3">${acS('Repeats','every',acOpts([['week','Every week'],['month','Every month'],['quarter','Every quarter'],['year','Every year']],d.every||'month'))}${acF('Next invoice date','next','date')}${acS('Terms','terms',acOpts(Object.keys(TERM_DAYS),d.terms))}</div>
+  <div class="row3">${acF('Tax (%)','taxPct','number','step="0.001" min="0"')}${acC('Active','active')}</div>
+  ${acLinesHTML('inv')}${acF('Note on each invoice','notes','textarea')}`,d.id?'Delete':'')}
+/* ===== Expenses + mileage ===== */
+const acExpAccts=()=>['cogs','expense','asset','liability','equity'];
+function acExpensesHTML(){const v=S.ui.acExpV==='mileage'?'mileage':'list';return `<div class="acsub">${acSeg('acExpV',v,[['list','Expenses'],['mileage','Mileage']])}</div>${v==='mileage'?acMileHTML():acExpListHTML()}`}
+function acExpListHTML(){const B=acB(),pk=S.ui.acExpP||'ytd',[f,t]=acPeriod(pk),cat=S.ui.acExpC||'',q=(S.ui.acExpQ||'').toLowerCase();
+  const L=B.expenses.filter(x=>x.date>=f&&x.date<=t&&(!cat||x.acct===cat)&&(!q||[acVName(x),x.memo,x.ref,acAcctName(x.acct),acPjName(x.pj)].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date));
+  const tot=r2(L.reduce((s,x)=>s+(+x.amount||0),0)),ub=B.expenses.filter(x=>x.billable&&!x.billed),byc={};L.forEach(x=>byc[x.acct]=(byc[x.acct]||0)+(+x.amount||0));const top=Object.entries(byc).sort((a,b)=>b[1]-a[1])[0];
+  return `<div class="kpis ackpis">${acKpi('Spent',money(tot),`${plural(L.length,'expense')} · ${esc(AC_PERIODS.find(p=>p[0]===pk)[1].toLowerCase())}`)}${acKpi('Biggest category',top?money(top[1]):'—',top?esc(acAcctName(top[0])):'No expenses yet')}${acKpi('Billable, not billed yet',money(r2(ub.reduce((s,x)=>s+(+x.amount||0),0))),ub.length?plural(ub.length,'expense')+' to put on invoices':'Mark expenses billable to re-bill clients',ub.length?'data-act="acExpBill"':'')}</div>
+  ${S.ui.acBillPick?acExpBillHTML(ub):''}
+  <section class="panel"><div class="ph acbar"><label class="sr" for="acExpP">Period</label><select class="inp" id="acExpP" data-acui="acExpP">${acOpts(AC_PERIODS,pk)}</select>${pk==='custom'?acDatesHTML():''}
+   <label class="sr" for="acExpC">Category</label><select class="inp" id="acExpC" data-acui="acExpC"><option value="">All categories</option>${acAcctOpts(cat,acExpAccts())}</select>
+   <label class="sr" for="acExpQ">Search expenses</label><input class="inp acq" id="acExpQ" type="search" placeholder="Search payee, memo or project" value="${esc(S.ui.acExpQ||'')}"><button class="btn sm" data-act="acCsv" data-k="expenses">Export CSV</button><button class="btn sm primary" data-act="acNew" data-k="expense">+ Record an expense</button></div>
+   ${L.length?`<div class="scroll"><table class="t"><thead><tr><th>Date</th><th>Payee</th><th>Category</th><th>Project · client</th><th>Paid with</th><th class="n">Amount</th><th>Billable</th></tr></thead><tbody>${L.slice(0,400).map(x=>`<tr class="click" data-act="acEdit" data-k="expense" data-id="${x.id}"><td>${fmtD(x.date)}</td><td><b>${esc(acVName(x))}</b>${x.memo?`<br><span class="muted">${esc(clip(x.memo,60))}</span>`:''}</td><td>${esc(acAcctName(x.acct))}</td><td>${esc([acPjName(x.pj),(clientById(x.clientId)||{}).name].filter(Boolean).join(' · ')||'—')}</td><td>${esc(x.method||'')}${x.txn?' <span class="muted" title="Matched to a bank transaction">✓ bank</span>':''}</td><td class="n">${money2(+x.amount||0)}</td><td>${x.billable?(x.billed?acChip('Billed'):acChip('To bill')):''}</td></tr>`).join('')}</tbody></table></div>`:`<p class="pb muted">No expenses in this period. <button class="lnk" data-act="acNew" data-k="expense">Record one</button>, or import your bank statement and categorize it in Banking.</p>`}</section>`}
+function acDatesHTML(){return `<label class="sr" for="acFrom">From</label><input class="inp" type="date" id="acFrom" data-acui="acFrom" value="${esc(S.ui.acFrom||acPeriod('ytd')[0])}"><label class="sr" for="acTo">To</label><input class="inp" type="date" id="acTo" data-acui="acTo" value="${esc(S.ui.acTo||isoDay(0))}">`}
+function acExpForm(){const d=acD(),V=acB().vendors.slice().sort((a,b)=>a.name.localeCompare(b.name));return acFormWrap(d.id?'Edit expense':'Record an expense',`
+  <div class="row3">${acF('Date','date','date')}${acS('Vendor','vendorId',`<option value="">Other payee…</option>${acOpts(V.map(v=>[v.id,v.name]),d.vendorId)}`)}${d.vendorId?'':acF('Payee','payee','text','placeholder="Who you paid" maxlength="80"')}</div>
+  <div class="row3">${acS('Category','acct',acAcctOpts(d.acct,acExpAccts()))}${acF('Amount ($)','amount','number','step="0.01" min="0" inputmode="decimal"')}${acS('Paid with','method',acOpts(AC_METHODS,d.method))}</div>
+  <div class="row3">${acS('Project','pj',acPjOpts(d.pj))}${acS('Client','clientId',`<option value="">No client</option>${acOpts(S.clients.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(c=>[c.id,c.name]),d.clientId)}`)}${acF('Receipt or reference #','ref','text','maxlength="60"')}</div>
+  ${acF('Memo','memo','textarea','maxlength="300"')}<div class="row3">${acC('Billable to the client','billable')}${d.billed?`<span class="note">Billed on ${esc((invById(d.billed)||{}).no||'an invoice')}</span>`:''}</div>`,d.id?'Delete':'')}
+function acExpBillHTML(ub){const cl=[...new Set(ub.map(x=>x.clientId||(pjById(x.pj)?(S.clients.find(c=>sameName(c.name,cliName(pjProp(pjById(x.pj)))))||{}).id:'')).filter(Boolean))];
+  return `<section class="panel acpick"><div class="ph"><h2>Bill expenses to a client</h2></div><div class="pb"><div class="row3"><label class="field" for="acBillCl">Client<select class="inp" id="acBillCl">${cl.length?acOpts(cl.map(id=>[id,(clientById(id)||{}).name||'Client'])):'<option value="">Set a client on the billable expenses first</option>'}</select></label><label class="field" for="acBillMk">Markup (%)<input class="inp" id="acBillMk" type="number" min="0" step="1" value="0"></label></div>
+   <p class="note">Creates a draft invoice with one line per expense, then marks them billed.</p><div class="actions"><button class="btn" data-act="acExpBillX">Cancel</button><button class="btn primary" data-act="acExpBillGo" ${cl.length?'':'disabled'}>Create the invoice</button></div></div></section>`}
+function acMileHTML(){const B=acB(),rate=+B.settings.mileRate||0,[f,t]=acPeriod('ytd'),L=B.mileage.slice().sort((a,b)=>b.date.localeCompare(a.date)),y=L.filter(m=>m.date>=f&&m.date<=t),mi=y.reduce((s,m)=>s+(+m.miles||0),0);
+  return `<div class="kpis ackpis">${acKpi('Miles · this fiscal year',mi.toLocaleString(),plural(y.length,'trip'))}${acKpi('Deduction',money(r2(mi*rate)),`At $${rate.toFixed(2)} a mile · change it in Settings`)}</div>
+  <section class="panel"><div class="ph"><h2>Mileage log</h2><span style="flex:1"></span><button class="btn sm" data-act="acCsv" data-k="mileage">Export CSV</button><button class="btn sm primary" data-act="acNew" data-k="mile">+ Log a trip</button></div>
+   ${L.length?`<div class="scroll"><table class="t"><thead><tr><th>Date</th><th>Purpose</th><th>From → to</th><th>Project</th><th class="n">Miles</th><th class="n">Deduction</th></tr></thead><tbody>${L.map(m=>`<tr class="click" data-act="acEdit" data-k="mile" data-id="${m.id}"><td>${fmtD(m.date)}</td><td>${esc(m.purpose||'')}</td><td>${esc([m.from,m.to].filter(Boolean).join(' → '))}</td><td>${esc(acPjName(m.pj))}</td><td class="n">${+m.miles||0}</td><td class="n">${money2(r2((+m.miles||0)*rate))}</td></tr>`).join('')}</tbody></table></div>`:'<p class="pb muted" style="margin:0">Log drives to job sites and supply runs for the IRS standard mileage deduction.</p>'}</section>`}
+function acMileForm(){const d=acD();return acFormWrap(d.id?'Edit trip':'Log a trip',`<div class="row3">${acF('Date','date','date')}${acF('Miles','miles','number','step="0.1" min="0" inputmode="decimal"')}${acS('Project','pj',acPjOpts(d.pj))}</div><div class="row3">${acF('Purpose','purpose','text','placeholder="Site survey at Kahala Medical" maxlength="120"')}${acF('From','from','text','maxlength="80"')}${acF('To','to','text','maxlength="80"')}</div>`,d.id?'Delete':'')}
+/* ===== Bills + vendors ===== */
+function acBillsHTML(){const B=acB(),f=S.ui.acBF||'open',today=isoDay(0),grp={all:()=>true,open:acBillOpen,overdue:b=>acBillStatus(b)==='Overdue',paid:b=>acBillStatus(b)==='Paid'};
+  const L=B.bills.filter(grp[f]||grp.all).sort((a,b)=>String(a.due||'').localeCompare(String(b.due||''))),open=B.bills.filter(acBillOpen),od=B.bills.filter(b=>acBillStatus(b)==='Overdue');
+  const pm=r2(B.bills.flatMap(b=>b.payments||[]).filter(p=>p.date>=acPeriod('month')[0]).reduce((s,p)=>s+(+p.amount||0),0));
+  const pos=[];PJ.list.forEach(e=>{const P=pjProp(e);((P.purch&&P.purch.pos)||[]).forEach(po=>{const st=poStatus(po);if((st==='Received'||st==='Partially received')&&!po.billId)pos.push({e,P,po})})});
+  return `<div class="kpis ackpis">${acKpi('Open bills',money(r2(open.reduce((s,b)=>s+acBillTotal(b)-acBillPaid(b),0))),plural(open.length,'bill'),'data-act="acBF" data-k="open"')}${acKpi('Overdue',`<span class="${od.length?'acneg':''}">${money(r2(od.reduce((s,b)=>s+acBillTotal(b)-acBillPaid(b),0)))}</span>`,plural(od.length,'bill'),'data-act="acBF" data-k="overdue"')}${acKpi('Due in 7 days',money(r2(open.filter(b=>b.due&&b.due>=today&&b.due<=addDays(today,7)).reduce((s,b)=>s+acBillTotal(b)-acBillPaid(b),0))),'Plan your payments')}${acKpi('Paid this month',money(pm),'Bill payments')}</div>
+  ${pos.length?`<section class="panel"><div class="ph"><h2>Received purchase orders without a bill</h2></div><div class="scroll"><table class="t"><thead><tr><th>PO</th><th>Vendor</th><th>Project</th><th>Status</th><th class="n">Cost</th><th></th></tr></thead><tbody>${pos.map(({e,P,po})=>`<tr><td><b>${esc(po.no)}</b></td><td>${esc(po.vendor||'')}</td><td>${esc(P.project||'')}</td><td>${acChip(poStatus(po))}</td><td class="n">${money2(r2(po.lines.reduce((s,l)=>s+(+l.qty||0)*(+l.cost||0),0)))}</td><td><button class="btn sm" data-act="acPoBill" data-pj="${e.id}" data-id="${po.id}">Create bill</button></td></tr>`).join('')}</tbody></table></div></section>`:''}
+  <section class="panel"><div class="ph acbar">${acSeg('acBF',f,[['open','Open'],['overdue','Overdue'],['paid','Paid'],['all','All']])}<span style="flex:1"></span><button class="btn sm" data-act="acCsv" data-k="bills">Export CSV</button><button class="btn sm primary" data-act="acNew" data-k="bill">+ Enter a bill</button></div>
+   ${L.length?`<div class="scroll"><table class="t"><thead><tr><th>Vendor</th><th>Bill #</th><th>Bill date</th><th>Due</th><th class="n">Total</th><th class="n">Balance</th><th>Status</th><th></th></tr></thead><tbody>${L.map(b=>{const st=acBillStatus(b),bal=r2(acBillTotal(b)-acBillPaid(b));return `<tr><td><b>${esc(acVName(b))}</b>${b.poNo?` <span class="muted">${esc(b.poNo)}</span>`:''}</td><td>${esc(b.no||'')}</td><td>${fmtD(b.date)}</td><td>${fmtD(b.due)}</td><td class="n">${money2(acBillTotal(b))}</td><td class="n">${money2(st==='Void'?0:bal)}</td><td>${acChip(st)}</td><td class="acrowa">${acBillOpen(b)?`<button class="btn sm primary" data-act="acPayOpen" data-id="${b.id}">Pay</button>`:''}<button class="btn sm" data-act="acEdit" data-k="bill" data-id="${b.id}">Edit</button></td></tr>${S.ui.acPay===b.id?`<tr class="acpayrow"><td colspan="8"><div class="acpay"><b>Pay ${esc(acVName(b))}</b><label class="field" for="acPD">Date<input class="inp" type="date" id="acPD" value="${isoDay(0)}"></label><label class="field" for="acPA">Amount ($)<input class="inp" type="number" step="0.01" id="acPA" value="${bal}"></label><label class="field" for="acPM">Paid with<select class="inp" id="acPM">${acOpts(AC_METHODS,'Bank transfer')}</select></label><label class="field" for="acPR">Reference<input class="inp" id="acPR" placeholder="Check # or confirmation"></label><span class="actions"><button class="btn sm" data-act="acPayX">Cancel</button><button class="btn sm primary" data-act="acPaySave" data-id="${b.id}">Record payment</button></span></div></td></tr>`:''}`}).join('')}</tbody></table></div>`:`<p class="pb muted">No bills here. Enter vendor bills to track what you owe and when it’s due.</p>`}</section>`}
+function acBillForm(){const d=acD(),V=acB().vendors.slice().sort((a,b)=>a.name.localeCompare(b.name));return acFormWrap(d.id?'Edit bill':'Enter a bill',`
+  <div class="row3">${acS('Vendor','vendorId',`<option value="">New vendor…</option>${acOpts(V.map(v=>[v.id,v.name]),d.vendorId)}`)}${d.vendorId?'':acF('Vendor name','payee','text','maxlength="80" placeholder="Saved as a new vendor"')}${acF('Bill #','no','text','maxlength="40"')}</div>
+  <div class="row3">${acF('Bill date','date','date')}${acS('Terms','terms',acOpts(Object.keys(TERM_DAYS),d.terms))}${acF('Due date','due','date')}</div>
+  ${acLinesHTML('bill')}${acF('Memo','memo','textarea','maxlength="300"')}
+  ${(d.payments||[]).length?`<div class="note">Payments: ${d.payments.map(p=>`${fmtD(p.date)} ${money2(+p.amount||0)}${p.method?' · '+esc(p.method):''}`).join(' · ')}</div>`:''}`,d.id?((d.payments||[]).length?'Void bill':'Delete'):'')}
+function acVendorsHTML(){const B=acB(),[f,t]=acPeriod('ytd'),q=(S.ui.acVQ||'').toLowerCase();
+  const paid=id=>r2(B.expenses.filter(x=>x.vendorId===id&&x.date>=f&&x.date<=t).reduce((s,x)=>s+(+x.amount||0),0)+B.bills.filter(b=>b.vendorId===id).flatMap(b=>b.payments||[]).filter(p=>p.date>=f&&p.date<=t).reduce((s,p)=>s+(+p.amount||0),0));
+  const owe=id=>r2(B.bills.filter(b=>b.vendorId===id&&acBillOpen(b)).reduce((s,b)=>s+acBillTotal(b)-acBillPaid(b),0));
+  const L=B.vendors.filter(v=>!q||[v.name,v.contact,v.email].join(' ').toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name));
+  return `<section class="panel"><div class="ph acbar"><label class="sr" for="acVQ">Search vendors</label><input class="inp acq" id="acVQ" type="search" placeholder="Search vendors" value="${esc(S.ui.acVQ||'')}"><span style="flex:1"></span><button class="btn sm" data-act="acCsv" data-k="vendors">Export CSV</button><button class="btn sm primary" data-act="acNew" data-k="vendor">+ Add a vendor</button></div>
+   ${L.length?`<div class="scroll"><table class="t"><thead><tr><th>Vendor</th><th>Contact</th><th>Terms</th><th>Default category</th><th class="n">Paid this year</th><th class="n">You owe</th><th>1099</th></tr></thead><tbody>${L.map(v=>`<tr class="click" data-act="acEdit" data-k="vendor" data-id="${v.id}"><td><b>${esc(v.name)}</b></td><td>${esc([v.contact,v.email,v.phone].filter(Boolean).join(' · '))}</td><td>${esc(v.terms||'')}</td><td>${esc(v.acct?acAcctName(v.acct):'')}</td><td class="n">${money2(paid(v.id))}</td><td class="n">${money2(owe(v.id))}</td><td>${v.is1099?acChip(paid(v.id)>=(+B.settings.t1099||600)?'1099 due':'1099'):''}</td></tr>`).join('')}</tbody></table></div>`:'<p class="pb muted">Add the distributors, subcontractors and services you pay. Vendors are also created when you enter a bill.</p>'}</section>`}
+function acVendorForm(){const d=acD();return acFormWrap(d.id?'Edit vendor':'Add a vendor',`<div class="row3">${acF('Name','name','text','maxlength="80" required')}${acF('Contact person','contact','text','maxlength="80"')}${acS('Terms','terms',acOpts(['',...Object.keys(TERM_DAYS)].map(x=>[x,x||'—']),d.terms))}</div>
+  <div class="row3">${acF('Email','email','email','maxlength="120"')}${acF('Phone','phone','tel','maxlength="40"')}${acS('Default category','acct',acAcctOpts(d.acct,['cogs','expense'],'None'))}</div>
+  ${acF('Address','address','textarea','maxlength="200"')}<div class="row3">${acC('Send this vendor a 1099 (contractors you pay $600+ a year)','is1099')}${acF('Tax ID on file (W-9)','taxId','text','maxlength="20" placeholder="Last 4 digits is enough"')}</div>${acF('Notes','notes','textarea','maxlength="400"')}`,d.id?'Delete':'')}
+/* ===== Banking ===== */
+function acBankingHTML(){const B=acB(),f=S.ui.acTxF||'new',today=isoDay(0),cnt=k=>B.bank.txns.filter(t=>t.status===k).length;
+  const L=B.bank.txns.filter(t=>t.status===f&&(!S.ui.acTxA||t.acct===S.ui.acTxA)).sort((a,b)=>b.date.localeCompare(a.date));
+  const cards=B.bank.accounts.map(a=>{const n=B.bank.txns.filter(t=>t.acct===a.id).length;return `<div class="panel acbank"><div class="acbkh"><b>${esc(a.name)}</b><span class="muted">${esc({checking:'Checking',savings:'Savings',credit:'Credit card'}[a.kind]||a.kind)}</span></div><div class="acbkv ${acBankBal(a)<0&&a.kind!=='credit'?'acneg':''}">${acM2(acBankBal(a))}</div><small class="muted">${plural(n,'transaction')}${a.recon?` · reconciled to ${fmtD(a.recon.date)}`:''}</small>
+    <div class="actions"><label class="btn sm filebtn">Import a statement<input type="file" accept=".csv,text/csv" data-acimport="${a.id}" aria-label="Import a CSV statement into ${esc(a.name)}"></label><button class="btn sm" data-act="acEdit" data-k="bankacct" data-id="${a.id}">Edit</button></div></div>`}).join('');
+  return `<div class="acbanks">${cards}<button type="button" class="panel acbanknew" data-act="acNew" data-k="bankacct"><b>+ Add a bank or card account</b><span class="muted">Then import its CSV statement from your bank’s website</span></button></div>
+  ${B.bank.accounts.length?`<section class="panel"><div class="ph acbar">${acSeg('acTxF',f,[['new',`For review ${cnt('new')}`],['categorized',`Categorized ${cnt('categorized')}`],['matched',`Matched ${cnt('matched')}`],['excluded',`Excluded ${cnt('excluded')}`]])}
+    <label class="sr" for="acTxA">Account</label><select class="inp" id="acTxA" data-acui="acTxA"><option value="">All accounts</option>${acOpts(B.bank.accounts.map(a=>[a.id,a.name]),S.ui.acTxA)}</select><span style="flex:1"></span>${f==='new'&&L.some(t=>acTxSuggest(t).cat)?'<button class="btn sm primary" data-act="acTxAll">Add all with a suggested category</button>':''}</div>
+   ${L.length?`<div class="scroll"><table class="t actx"><thead><tr><th>Date</th><th>Description</th><th class="n">Amount</th><th>${f==='new'?'Category or match':'Recorded as'}</th><th></th></tr></thead><tbody>${L.slice(0,300).map(t=>acTxRow(t,f)).join('')}</tbody></table></div>`:`<p class="pb muted" style="margin:0">${f==='new'?'Nothing to review. Import a statement to bring in new transactions.':'Nothing here yet.'}</p>`}</section>
+   <div class="acgrid2"><section class="panel"><div class="ph"><h2>Rules</h2></div><div class="pb"><p class="note" style="margin-top:0">When a description contains this text, suggest this category.</p>
+    ${B.bank.rules.length?`<ul class="acrules">${B.bank.rules.map((r,i)=>`<li><span>“${esc(r.text)}” → <b>${esc(acAcctName(r.acct))}</b></span><button class="btn sm ghost" data-act="acRuleDel" data-i="${i}" aria-label="Delete rule ${esc(r.text)}">×</button></li>`).join('')}</ul>`:''}
+    <div class="acruleadd"><label class="sr" for="acRT">Description contains</label><input class="inp" id="acRT" placeholder="e.g. ADORAMA"><label class="sr" for="acRA">Category</label><select class="inp" id="acRA">${acAcctOpts('',['income','cogs','expense','asset','liability','equity'])}</select><button class="btn sm" data-act="acRuleAdd">Add rule</button></div></div></section>
+    <section class="panel"><div class="ph"><h2>Reconcile</h2></div><div class="pb"><p class="note" style="margin-top:0">Compare the app with your statement’s ending balance.</p><div class="row3"><label class="field" for="acRcA">Account<select class="inp" id="acRcA">${acOpts(B.bank.accounts.map(a=>[a.id,a.name]))}</select></label><label class="field" for="acRcD">Statement end date<input class="inp" type="date" id="acRcD" value="${today}"></label><label class="field" for="acRcB">Ending balance ($)<input class="inp" type="number" step="0.01" id="acRcB"></label></div><div class="actions"><span id="acRcOut" class="note" style="flex:1" aria-live="polite"></span><button class="btn sm" data-act="acRecon">Check</button></div></div></section></div>`:''}`}
+function acTxRow(t,f){const a=acB().bank.accounts.find(x=>x.id===t.acct),amt=+t.amount||0;
+  let right='',act='';
+  if(f==='new'){const sg=acTxSuggest(t);right=`<label class="sr" for="acTc-${t.id}">Category</label><select class="inp actxcat" id="acTc-${t.id}" data-actxcat="${t.id}"><option value="">Choose a category…</option>${acAcctOpts(t.cat||sg.cat||'',['income','cogs','expense','asset','liability','equity'])}</select>${sg.match?`<button class="btn sm actxm" data-act="acTx" data-op="match" data-id="${t.id}">Match ${esc(sg.match.label)}</button>`:''}`;
+    act=`<button class="btn sm primary" data-act="acTx" data-op="add" data-id="${t.id}">Add</button><button class="btn sm ghost" data-act="acTx" data-op="exclude" data-id="${t.id}" title="Transfers between your accounts, duplicates">Exclude</button>`}
+  else{right=t.status==='matched'?esc(t.match&&t.match.label||'Matched'):t.status==='categorized'?esc(acAcctName(t.cat)):'<span class="muted">Excluded</span>';act=`<button class="btn sm" data-act="acTx" data-op="undo" data-id="${t.id}">Undo</button>`}
+  return `<tr><td>${fmtD(t.date)}</td><td><b>${esc(clip(t.desc||'',70))}</b>${a&&!S.ui.acTxA?`<br><span class="muted">${esc(a.name)}</span>`:''}</td><td class="n ${amt<0?'':'acpos'}">${amt<0?'−':''}${money2(Math.abs(amt))}</td><td class="actxr">${right}</td><td class="acrowa">${act}</td></tr>`}
+function acBankForm(){const d=acD();return acFormWrap(d.id?'Edit account':'Add a bank or card account',`<div class="row3">${acF('Name','name','text','maxlength="60" placeholder="First Hawaiian checking"')}${acS('Type','kind',acOpts([['checking','Checking'],['savings','Savings'],['credit','Credit card']],d.kind))}${acS('In your chart of accounts','coa',acAcctOpts(d.coa,['asset','liability']))}</div>
+  <div class="row3">${acF('Opening balance ($)','opening','number','step="0.01"')}${acF('As of','openingDate','date')}${acC('My statement shows charges as positive numbers','flip')}</div>
+  <p class="note">Download a CSV of transactions from your bank’s website, then use “Import a statement” on the account. Columns for date, description and amount (or debit and credit) are found automatically. Nothing connects to your bank.</p>`,d.id?'Delete':'')}
+/* suggestions: rules, vendor names, then exact-amount matches */
+const AC_GUESS=[[/shell|chevron|exxon|texaco|76 |aloha petro|gas ?station|fuel|parking|toll|jiffy|auto ?zone|napa/,'6450'],[/home ?depot|lowe'?s|ace hardware|harbor freight|grainger/,'6400'],[/adi |anixter|graybar|wesco|b ?& ?h|crutchfield|monoprice|newegg|cdw|amazon/,'5000'],[/ups|fedex|usps|dhl|freight/,'5200'],[/adobe|microsoft|google|autodesk|dropbox|github|vercel|supabase|openai|anthropic|zoom|slack|notion|quickbooks|intuit|apple\.com|subscription/,'6100'],[/verizon|at&t|t-mobile|spectrum|hawaiian telcom|comcast|internet|wireless/,'6350'],[/hawaiian electric|heco|board of water|utilit|rent/,'6300'],[/office ?max|office depot|staples/,'6250'],[/airline|hawaiian air|southwest|united|delta|alaska air|hotel|marriott|hilton|uber|lyft|rental car|hertz|enterprise/,'6500'],[/restaurant|cafe|coffee|starbucks|mcdonald|zippy|l&l|grill|pizza|doordash|grubhub/,'6550'],[/insurance|geico|state farm|progressive/,'6150'],[/fee|service charge|interest charge/,'6050'],[/facebook|meta ads|google ads|yelp|advertis/,'6000'],[/irs|tax|dept of taxation|license/,'6700'],[/owner|transfer from|capital/,'3000']];
+function acTxSuggest(t){const B=acB(),d=String(t.desc||'').toLowerCase(),amt=+t.amount||0,out={cat:null,match:null};
+  const r=B.bank.rules.find(r=>r.text&&d.includes(String(r.text).toLowerCase()));if(r)out.cat=r.acct;
+  if(!out.cat){const v=B.vendors.find(v=>v.name&&v.acct&&d.includes(v.name.toLowerCase().slice(0,12)));if(v)out.cat=v.acct}
+  if(!out.cat){const g=AC_GUESS.find(([re,k])=>re.test(d)&&(amt<0?!/^4/.test(k):/^4/.test(k)||k==='3000'));if(g&&acAcct(g[1])&&acAcct(g[1]).active!==false)out.cat=g[1]}
+  if(amt>0){const v=S.invoices.find(v=>invOpen(v)&&Math.abs(invCalc(v).bal-amt)<0.01);if(v)out.match={type:'inv',id:v.id,label:`${v.no} · ${(clientById(v.clientId)||{}).name||''}`}}
+  else if(amt<0){const b=B.bills.find(b=>acBillOpen(b)&&Math.abs(acBillTotal(b)-acBillPaid(b)+amt)<0.01);if(b)out.match={type:'bill',id:b.id,label:`bill · ${acVName(b)}`};
+    else{const x=B.expenses.find(x=>!x.txn&&Math.abs((+x.amount||0)+amt)<0.01&&Math.abs(new Date(x.date)-new Date(t.date))<=7*864e5);if(x)out.match={type:'exp',id:x.id,label:`expense · ${acVName(x)}`}}}
+  return out}
+/* CSV statement import */
+function acCsvParse(s){const rows=[];let row=[],cur='',q=false;for(let i=0;i<s.length;i++){const ch=s[i];
+  if(q){if(ch==='"'){if(s[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}
+  else if(ch==='"')q=true;else if(ch===','){row.push(cur);cur=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&s[i+1]==='\n')i++;row.push(cur);rows.push(row);row=[];cur=''}else cur+=ch}
+  if(cur||row.length){row.push(cur);rows.push(row)}return rows.filter(r=>r.some(c=>String(c).trim()))}
+function acDate(s){s=String(s||'').trim();let m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  m=/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/.exec(s);if(m){const y=m[3].length===2?'20'+m[3]:m[3];return `${y}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`}
+  const d=Date.parse(s);return isNaN(d)?null:new Date(d).toISOString().slice(0,10)}
+const acNum=s=>{s=String(s||'').trim();if(!s)return null;const neg=/^\(.*\)$/.test(s)||/^-/.test(s)||/-$/.test(s);const n=parseFloat(s.replace(/[^0-9.]/g,''));return isNaN(n)?null:(neg?-n:n)};
+function acImport(acctId,text){const B=acB(),a=B.bank.accounts.find(x=>x.id===acctId);if(!a)return;const rows=acCsvParse(text);if(rows.length<2){toast('That file has no rows.');return}
+  let hi=rows.findIndex(r=>r.some(c=>/date/i.test(c)));if(hi<0)hi=0;const H=rows[hi].map(c=>String(c).trim().toLowerCase()),col=(...re)=>H.findIndex(h=>re.some(r=>r.test(h)));
+  const cD=col(/^date$/,/posted|post date|transaction date|^date/),cDs=col(/description|payee|merchant|details|^name$|memo/),cA=col(/^amount$/,/amount/),cDr=col(/debit|withdraw|money out|paid out/),cCr=col(/credit|deposit|money in|paid in/);
+  if(cD<0||(cA<0&&cDr<0&&cCr<0)){toast('Couldn’t find date and amount columns in that file. Use your bank’s CSV download.');return}
+  const seen=new Set(B.bank.txns.filter(t=>t.acct===acctId).map(t=>t.date+'|'+t.amount+'|'+t.desc));let n=0,dup=0;
+  rows.slice(hi+1).forEach(r=>{const date=acDate(r[cD]);if(!date)return;let amt=null;
+    if(cA>=0&&cDr<0&&cCr<0){amt=acNum(r[cA]);if(amt!=null&&a.flip)amt=-amt}else{const dr=cDr>=0?acNum(r[cDr]):null,cr=cCr>=0?acNum(r[cCr]):null;amt=(cr?Math.abs(cr):0)-(dr?Math.abs(dr):0);if(cA>=0&&!dr&&!cr)amt=acNum(r[cA])}
+    if(amt==null||!amt)return;amt=r2(amt);const desc=String(cDs>=0?r[cDs]:'').trim().replace(/\s+/g,' ').slice(0,140)||'Bank transaction',key=date+'|'+amt+'|'+desc;
+    if(seen.has(key)){dup++;return}seen.add(key);const t={id:acId('tx'),acct:acctId,date,desc,amount:amt,status:'new'};const sg=acTxSuggest(t);if(sg.cat)t.cat=sg.cat;B.bank.txns.push(t);n++});
+  acSave();S.ui.actab='banking';S.ui.acTxF='new';R.accounting();toast(n?`${plural(n,'transaction')} imported${dup?` · ${dup} already here skipped`:''}. Review them below.`:`No new transactions${dup?` · ${dup} were already imported`:''}.`)}
+/* ===== Chart of accounts ===== */
+function acAccountsHTML(){const B=acB(),[f,t]=acPeriod('ytd'),pl=acPL(f,t,B.settings.basis),amt=a=>a.type==='income'?pl.inc[a.id]:a.type==='cogs'?pl.cogs[a.id]:a.type==='expense'?pl.exp[a.id]:null;
+  return `${S.ui.acNewAcct?`<form class="panel acform" id="acAcctF"><div class="ph"><h2>Add an account</h2></div><div class="pb"><div class="row3"><label class="field" for="acNC">Number<input class="inp" id="acNC" maxlength="8" placeholder="6150" required></label><label class="field" for="acNN">Name<input class="inp" id="acNN" maxlength="60" required></label><label class="field" for="acNT">Type<select class="inp" id="acNT">${acOpts(AC_TYPES,'expense')}</select></label></div><div class="actions"><button type="button" class="btn" data-act="acAcctX">Cancel</button><button class="btn primary">Add account</button></div></div></form>`:''}
+  <section class="panel"><div class="ph"><h2>Chart of accounts</h2><span class="muted" style="font-size:13px">Amounts are this fiscal year</span><span style="flex:1"></span><button class="btn sm primary" data-act="acAcctNew">+ Add an account</button></div>
+   ${AC_TYPES.map(([ty,lab])=>`<div class="acgrp"><h3>${lab}</h3><div class="scroll"><table class="t"><tbody>${B.accounts.filter(a=>a.type===ty).sort((a,b)=>String(a.code).localeCompare(String(b.code))).map(a=>`<tr class="${a.active===false?'acoff':''}"><td class="mono" style="width:80px">${esc(a.code)}</td><td><label class="sr" for="acAn-${a.id}">Name for ${esc(a.code)}</label><input class="cellin" id="acAn-${a.id}" data-acacct="${a.id}" value="${esc(a.name)}" maxlength="60"></td><td class="n">${amt(a)!=null?money2(amt(a)||0):''}</td><td style="width:110px"><label class="check"><input type="checkbox" data-act="acAcctOn" data-id="${a.id}" ${a.active===false?'':'checked'}> In use</label></td></tr>`).join('')}</tbody></table></div></div>`).join('')}</section>`}
+
+/* ===== Reports ===== */
+const AC_REPS=[['pl','Profit & loss'],['bs','Balance sheet'],['ar','Receivables aging'],['ap','Payables aging'],['salescl','Sales by client'],['salespj','Sales by project'],['exp','Expenses by category'],['expv','Expenses by vendor'],['tax','Sales tax'],['t1099','1099 vendors'],['mile','Mileage log'],['txns','Transaction list']];
+const M$=v=>({m:r2(v)});
+function acRep(k){const B=acB(),pk=S.ui.acRepP||'ytd',[f,t]=acPeriod(pk),basis=S.ui.acBasis||B.settings.basis,per=`${fmtD(f)} – ${fmtD(t)}`,today=isoDay(0);
+  if(k==='pl'){const cmp=!!S.ui.acCmp,[pf,pt]=acPrevPeriod([f,t]),a=acPL(f,t,basis),b=cmp?acPL(pf,pt,basis):null,rows=[];
+    const sec=(title,obj,objB,total,totB)=>{rows.push({cls:'h',c:[title]});Object.keys({...obj,...(objB||{})}).sort().forEach(id=>rows.push({c:[`${(acAcct(id)||{}).code||''} ${acAcctName(id)}`,M$(obj[id]||0),...(cmp?[M$((objB||{})[id]||0)]:[])]}));rows.push({cls:'t',c:['Total '+title.toLowerCase(),M$(total),...(cmp?[M$(totB)]:[])]})};
+    sec('Income',a.inc,b&&b.inc,a.ti,b&&b.ti);sec('Cost of goods sold',a.cogs,b&&b.cogs,a.tc,b&&b.tc);rows.push({cls:'g',c:['Gross profit',M$(a.gross),...(cmp?[M$(b.gross)]:[])]});
+    sec('Expenses',a.exp,b&&b.exp,a.te,b&&b.te);rows.push({cls:'g',c:['Net profit',M$(a.net),...(cmp?[M$(b.net)]:[])]});
+    return {title:'Profit & loss',sub:`${per} · ${basis==='cash'?'Cash':'Accrual'} basis`,cols:['Account',`${fmtD(f)} – ${fmtD(t)}`,...(cmp?[`${fmtD(pf)} – ${fmtD(pt)}`]:[])],rows,opts:'pl'}}
+  if(k==='bs'){const asOf=t,ar=r2(S.invoices.filter(v=>!v.void&&v.sentAt&&v.issued<=asOf).reduce((s,v)=>{const k2=invCalc(v),pd=(v.payments||[]).filter(p=>p.date<=asOf).reduce((a,p)=>a+(+p.amount||0),0);return s+Math.max(0,k2.total-pd)},0));
+    const ap=r2(B.bills.filter(b=>!b.void&&b.date<=asOf).reduce((s,b)=>s+Math.max(0,acBillTotal(b)-(b.payments||[]).filter(p=>p.date<=asOf).reduce((a,p)=>a+(+p.amount||0),0)),0));
+    const banks=B.bank.accounts.map(a=>({a,bal:acBankBal(a,asOf)})),cashA=banks.filter(x=>x.a.kind!=='credit'),cards=banks.filter(x=>x.a.kind==='credit');
+    const taxOut=r2(S.invoices.filter(v=>!v.void&&v.sentAt&&v.issued<=asOf).reduce((s,v)=>s+invCalc(v).tax,0)-B.expenses.filter(x=>x.acct==='2200'&&x.date<=asOf).reduce((s,x)=>s+(+x.amount||0),0)-B.bank.txns.filter(x=>x.status==='categorized'&&x.cat==='2200'&&x.date<=asOf).reduce((s,x)=>s-(+x.amount||0),0));
+    const rows=[{cls:'h',c:['Assets']},...cashA.map(x=>({c:[x.a.name,M$(x.bal)]})),...(cashA.length?[]:[{c:['Cash (import a bank statement to track it)',M$(0)]}]),{c:['Accounts receivable',M$(ar)]}];const ta=r2(cashA.reduce((s,x)=>s+x.bal,0)+ar);rows.push({cls:'t',c:['Total assets',M$(ta)]});
+    rows.push({cls:'h',c:['Liabilities']},{c:['Accounts payable',M$(ap)]},...cards.map(x=>({c:[x.a.name,M$(-x.bal)]})),{c:[`${B.settings.taxName||'Sales tax'} payable`,M$(taxOut)]});const tl=r2(ap+taxOut-cards.reduce((s,x)=>s+x.bal,0));rows.push({cls:'t',c:['Total liabilities',M$(tl)]});
+    const [fy]=acPeriod('ytd'),ni=acPL(fy,asOf,'accrual').net;rows.push({cls:'h',c:['Equity']},{c:['Net income this fiscal year',M$(ni)]},{c:['Owner’s equity and prior earnings',M$(r2(ta-tl-ni))]},{cls:'t',c:['Total equity',M$(r2(ta-tl))]},{cls:'g',c:['Liabilities and equity',M$(ta)]});
+    return {title:'Balance sheet',sub:`As of ${fmtD(asOf)}`,cols:['',''],rows,note:'A simplified balance sheet from what’s in the app: bank balances you import, open invoices and bills, and tax collected. Owner’s equity balances it. Ask your accountant before filing from it.'}}
+  if(k==='ar'||k==='ap'){const L=k==='ar'?acAR().map(x=>({who:(x.c||{}).name||'No client',...x})):acAP().map(x=>({who:acVName(x.b),...x})),g={};L.forEach(x=>{(g[x.who]=g[x.who]||[]).push(x)});
+    const rows=Object.entries(g).sort((a,b)=>a[0].localeCompare(b[0])).map(([who,xs])=>{const a=acAging(xs);return {c:[who,...AC_AGE.map(([kk])=>M$(a[kk])),M$(r2(xs.reduce((s,x)=>s+x.bal,0)))]}}),tot=acAging(L);
+    rows.push({cls:'g',c:['Total',...AC_AGE.map(([kk])=>M$(tot[kk])),M$(r2(L.reduce((s,x)=>s+x.bal,0)))]});
+    return {title:k==='ar'?'Receivables aging':'Payables aging',sub:`As of ${fmtD(today)} · by days past due`,cols:[k==='ar'?'Client':'Vendor',...AC_AGE.map(x=>x[1]),'Total'],rows}}
+  if(k==='salescl'||k==='salespj'){const g={};S.invoices.filter(v=>!v.void&&v.sentAt&&v.issued>=f&&v.issued<=t).forEach(v=>{const key=k==='salescl'?((clientById(v.clientId)||{}).name||'No client'):(v.project||'No project');const o=g[key]=g[key]||{n:0,sales:0,tax:0,paid:0,bal:0};const c=invCalc(v);o.n++;o.sales+=c.sub;o.tax+=c.tax;o.paid+=c.paid;o.bal+=c.bal});
+    const E=Object.entries(g).sort((a,b)=>b[1].sales-a[1].sales),T=E.reduce((s,[,o])=>({n:s.n+o.n,sales:s.sales+o.sales,tax:s.tax+o.tax,paid:s.paid+o.paid,bal:s.bal+o.bal}),{n:0,sales:0,tax:0,paid:0,bal:0});
+    return {title:k==='salescl'?'Sales by client':'Sales by project',sub:`${per} · invoices sent, by issue date`,cols:[k==='salescl'?'Client':'Project','Invoices','Sales before tax','Tax','Paid','Still owed'],rows:[...E.map(([n,o])=>({c:[n,o.n,M$(o.sales),M$(o.tax),M$(o.paid),M$(o.bal)]})),{cls:'g',c:['Total',T.n,M$(T.sales),M$(T.tax),M$(T.paid),M$(T.bal)]}]}}
+  if(k==='exp'){const sp=acSpend(f,t,basis),tot=acSum(sp)||1;return {title:'Expenses by category',sub:`${per} · ${basis==='cash'?'Cash':'Accrual'} basis`,cols:['Category','Amount','Share'],rows:[...Object.entries(sp).sort((a,b)=>b[1]-a[1]).map(([id,n])=>({c:[`${(acAcct(id)||{}).code||''} ${acAcctName(id)}`,M$(n),Math.round(n/tot*1000)/10+'%']})),{cls:'g',c:['Total',M$(acSum(sp)),'']}],opts:'basis'}}
+  if(k==='expv'){const g={},add=(n,v)=>{g[n]=r2((g[n]||0)+v)};B.expenses.filter(x=>x.date>=f&&x.date<=t).forEach(x=>add(acVName(x),+x.amount||0));B.bills.forEach(b=>(b.payments||[]).filter(p=>p.date>=f&&p.date<=t).forEach(p=>add(acVName(b),+p.amount||0)));
+    return {title:'Expenses by vendor',sub:`${per} · money paid out`,cols:['Vendor or payee','Paid'],rows:[...Object.entries(g).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({c:[n,M$(v)]})),{cls:'g',c:['Total',M$(acSum(g))]}]}}
+  if(k==='tax'){const M=acMonths(24).filter(m=>m.e>=f&&m.f<=t),rows=M.map(m=>{let gross=0,taxable=0,tax=0,coll=0;S.invoices.forEach(v=>{if(v.void)return;const c=invCalc(v);
+      if(v.sentAt&&v.issued>=m.f&&v.issued<=m.e){gross+=c.sub;taxable+=v.lines.filter(l=>l.tax).reduce((s,l)=>s+(+l.qty||0)*(+l.rate||0),0);tax+=c.tax}
+      (v.payments||[]).forEach(p=>{if(p.date>=m.f&&p.date<=m.e&&c.total)coll+=(+p.amount||0)*c.tax/c.total})});return {c:[m.label+' '+m.f.slice(0,4),M$(gross),M$(taxable),M$(tax),M$(coll)]}});
+    const T=i=>M$(rows.reduce((s,r)=>s+r.c[i].m,0));rows.push({cls:'g',c:['Total',T(1),T(2),T(3),T(4)]});
+    return {title:`${B.settings.taxName||'Sales tax'} report`,sub:per,cols:['Month','Gross sales','Taxable sales','Tax charged','Tax collected'],rows,note:B.settings.taxName==='GET'?'Hawaiʻi GET is on gross income, not only items marked taxable, so file from the gross sales column with your accountant’s guidance.':''}}
+  if(k==='t1099'){const th=+B.settings.t1099||600,y=t.slice(0,4),fy=`${y}-01-01`,ty=`${y}-12-31`,rows=B.vendors.filter(v=>v.is1099).map(v=>{const paid=r2(B.expenses.filter(x=>x.vendorId===v.id&&x.date>=fy&&x.date<=ty&&x.method!=='Card').reduce((s,x)=>s+(+x.amount||0),0)+B.bills.filter(b=>b.vendorId===v.id).flatMap(b=>b.payments||[]).filter(p=>p.date>=fy&&p.date<=ty&&p.method!=='Card').reduce((s,p)=>s+(+p.amount||0),0));return {c:[v.name,v.taxId?'On file':'Missing',M$(paid),paid>=th?'Yes':'No']}});
+    return {title:`1099 vendors · ${y}`,sub:`Calendar year ${y}`,cols:['Vendor','W-9 / tax ID','Paid (not by card)','1099 needed'],rows,note:`Payments by credit card are reported by the card company, so they’re left out. Threshold: $${th}.`}}
+  if(k==='mile'){const rate=+B.settings.mileRate||0,L=B.mileage.filter(m=>m.date>=f&&m.date<=t).sort((a,b)=>a.date.localeCompare(b.date)),mi=L.reduce((s,m)=>s+(+m.miles||0),0);
+    return {title:'Mileage log',sub:`${per} · $${rate.toFixed(2)} a mile`,cols:['Date','Purpose','From → to','Miles','Deduction'],rows:[...L.map(m=>({c:[fmtD(m.date),m.purpose||'',[m.from,m.to].filter(Boolean).join(' → '),+m.miles||0,M$((+m.miles||0)*rate)]})),{cls:'g',c:['Total','','',Math.round(mi*10)/10,M$(mi*rate)]}]}}
+  if(k==='txns'){const L=[];S.invoices.forEach(v=>{if(v.void)return;const cn=(clientById(v.clientId)||{}).name||'';if(v.sentAt&&v.issued>=f&&v.issued<=t)L.push([v.issued,'Invoice',v.no,cn,invCalc(v).total]);(v.payments||[]).forEach(p=>{if(p.date>=f&&p.date<=t)L.push([p.date,'Payment received',v.no,cn,+p.amount||0])})});
+    B.expenses.forEach(x=>{if(x.date>=f&&x.date<=t)L.push([x.date,'Expense',acAcctName(x.acct),acVName(x),-(+x.amount||0)])});
+    B.bills.forEach(b=>{if(!b.void&&b.date>=f&&b.date<=t)L.push([b.date,'Bill',b.no||'',acVName(b),-acBillTotal(b)]);(b.payments||[]).forEach(p=>{if(p.date>=f&&p.date<=t)L.push([p.date,'Bill payment',b.no||'',acVName(b),-(+p.amount||0)])})});
+    B.bank.txns.forEach(x=>{if(x.status==='categorized'&&x.date>=f&&x.date<=t)L.push([x.date,'Bank',acAcctName(x.cat),x.desc,+x.amount||0])});
+    L.sort((a,b)=>a[0].localeCompare(b[0]));return {title:'Transaction list',sub:per,cols:['Date','Type','Number or category','Name','Amount'],rows:L.map(r=>({c:[fmtD(r[0]),r[1],r[2],r[3],M$(r[4])]}))}}
+  return {title:'',cols:[],rows:[]}}
+const acCell=x=>x&&typeof x==='object'&&'m' in x?`<span class="${x.m<0?'acneg':''}">${x.m<0?'−':''}${money2(Math.abs(x.m))}</span>`:esc(String(x??''));
+function acRepTableHTML(r){return `<table class="t acrep"><thead><tr>${r.cols.map((c,i)=>`<th${i?' class="n"':''}>${esc(c)}</th>`).join('')}</tr></thead><tbody>${r.rows.map(row=>`<tr class="${row.cls?'acr-'+row.cls:''}">${row.cls==='h'?`<td colspan="${r.cols.length}">${esc(row.c[0])}</td>`:row.c.map((x,i)=>`<td${i?' class="n"':''}>${acCell(x)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${r.cols.length}" class="muted">Nothing for this period.</td></tr>`}</tbody></table>`}
+function acReportsHTML(){const k=AC_REPS.some(x=>x[0]===S.ui.acRep)?S.ui.acRep:'pl',r=acRep(k),pk=S.ui.acRepP||'ytd',basis=S.ui.acBasis||acB().settings.basis,dated=!['ar','ap'].includes(k);
+  return `<div class="acreps"><nav class="panel acreplist" aria-label="Reports">${AC_REPS.map(([kk,l])=>`<button type="button" data-act="acRepGo" data-k="${kk}" ${kk===k?'aria-current="page"':''}>${l}</button>`).join('')}</nav>
+   <section class="panel acrepbox"><div class="ph acbar">${dated?`<label class="sr" for="acRepP">Period</label><select class="inp" id="acRepP" data-acui="acRepP">${acOpts(k==='bs'?AC_PERIODS.filter(p=>p[0]!=='all'):AC_PERIODS,pk)}</select>${pk==='custom'?acDatesHTML():''}`:''}
+    ${['pl','exp'].includes(k)?`<div class="apseg" role="group" aria-label="Basis"><button type="button" data-act="acBasis" data-k="accrual" aria-pressed="${basis==='accrual'}">Accrual</button><button type="button" data-act="acBasis" data-k="cash" aria-pressed="${basis==='cash'}">Cash</button></div>`:''}
+    ${k==='pl'?`<label class="check"><input type="checkbox" data-act="acCmp" ${S.ui.acCmp?'checked':''}> Compare with the period before</label>`:''}<span style="flex:1"></span><button class="btn sm" data-act="acRepCsv">Export CSV</button><button class="btn sm" data-act="acRepPrint">Print or save PDF</button></div>
+    <div class="pb"><div class="acrephead"><b>${esc(firm())}</b><h2>${esc(r.title)}</h2><span class="muted">${esc(r.sub||'')}</span></div><div class="scroll">${acRepTableHTML(r)}</div>${r.note?`<p class="note">${esc(r.note)}</p>`:''}</div></section></div>`}
+function acPrintHTML(html){const w=document.createElement('div');w.className='printhost';w.innerHTML=html;document.body.appendChild(w);document.body.classList.add('printing');
+  const done=()=>{document.body.classList.remove('printing');w.remove();window.removeEventListener('afterprint',done)};window.addEventListener('afterprint',done);try{window.print()}catch(e){done();toast('Printing isn’t available here. Open the app in its own tab to print.')}}
+const acCsvQ=v=>{v=String(v??'');return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+async function acCsvSave(name,rows){const r=await saveFile(new Blob([rows.map(r=>r.map(acCsvQ).join(',')).join('\n')],{type:'text/csv'}),`${dcFileName(firm())} ${name} ${isoDay(0)}.csv`);if(r==='saved')toast('Exported.')}
+/* ===== Invoice layout designer ===== */
+const AC_ACCENTS=['#4373C4','#17171C','#0B7480','#2E7D32','#C2410C','#6D4AE0','#B42318','#8A6D1D'];
+function acSampleInv(){const v=S.invoices.slice().reverse().find(x=>!x.void&&x.lines&&x.lines.some(l=>l.desc));if(v)return v;
+  return {id:'sample',no:acInvNext(),_client:{name:'Kahala Medical Group',address:'4211 Waialae Ave, Honolulu, HI 96816',contacts:[{name:'Leilani Akana',title:'Facilities manager',email:'leilani@example.com',primary:true}]},
+    project:'Board room as-built',po:'KM-2291',issued:isoDay(0),due:addDays(isoDay(0),30),terms:'Net 30',taxPct:+SETTINGS.tax||4.712,sentAt:isoDay(0),
+    lines:[{desc:'Site survey and as-built documentation',qty:1,rate:1850,tax:true},{desc:'Signal flow, rack and cable schedule drawings',qty:1,rate:1200,tax:true},{desc:'On-site labor',qty:6,rate:115,tax:true}],payments:[],notes:''}}
+function acLayoutHTML(){const T=acTpl(),sh=T.show,ck=(p,l)=>`<label class="check"><input type="checkbox" data-actpl="show.${p}" ${sh[p]?'checked':''}> ${l}</label>`,inp=(p,l,attrs)=>`<label class="field" for="actp-${p}">${l}<input class="inp" id="actp-${p}" data-actpl="${p}" value="${esc(p.split('.').reduce((o,k)=>o&&o[k],T)??'')}" ${attrs||''}></label>`,ta=(p,l,ph)=>`<label class="field" for="actp-${p}">${l}<textarea class="inp" id="actp-${p}" data-actpl="${p}" rows="2" placeholder="${esc(ph||'')}">${esc(T[p]||'')}</textarea></label>`;
+  return `<div class="aclay"><div class="aclayopts">
+   <section class="panel"><div class="ph"><h2>Look</h2></div><div class="pb">
+    <span class="aclbl">Layout</span><div class="aclayouts">${[['classic','Classic'],['modern','Modern'],['bold','Bold'],['compact','Compact']].map(([k,l])=>`<button type="button" data-act="acTplSet" data-p="layout" data-v="${k}" aria-pressed="${T.layout===k}"><span class="aclthumb aclthumb-${k}" aria-hidden="true"><i></i><i></i><i></i></span>${l}</button>`).join('')}</div>
+    <span class="aclbl">Accent color</span><div class="acsw">${AC_ACCENTS.map(c=>`<button type="button" data-act="acTplSet" data-p="accent" data-v="${c}" aria-pressed="${T.accent.toLowerCase()===c.toLowerCase()}" aria-label="Accent ${c}" style="background:${c}"></button>`).join('')}<label class="acswc"><input type="color" data-actpl="accent" value="${esc(T.accent)}" aria-label="Custom accent color">Custom</label></div>
+    <div class="row3"><label class="field" for="actp-font">Font<select class="inp" id="actp-font" data-actpl="font">${acOpts([['inter','Modern sans'],['serif','Classic serif'],['mono','Technical mono']],T.font)}</select></label><label class="field" for="actp-logo">Logo<select class="inp" id="actp-logo" data-actpl="logo">${acOpts([['left','Left'],['right','Right'],['center','Centered'],['none','Hide']],T.logo)}</select></label><label class="field" for="actp-logoSize">Logo size<select class="inp" id="actp-logoSize" data-actpl="logoSize">${acOpts([['s','Small'],['m','Medium'],['l','Large']],T.logoSize)}</select></label></div>
+    <p class="note">Your logo, business name, address and contact details come from Settings → Business.</p></div></section>
+   <section class="panel"><div class="ph"><h2>Your details</h2></div><div class="pb acchecks">${ck('tagline','Tagline')}${ck('address','Address')}${ck('phone','Phone')}${ck('email','Email')}${ck('website','Website')}${ck('license','License number')}</div>
+    <div class="pb" style="padding-top:0">${inp('title','Document title','maxlength="30"')}<span class="aclbl">Extra fields in the header</span>${[0,1,2,3].map(i=>`<div class="acrow2"><label class="sr" for="actp-cl${i}">Field ${i+1} label</label><input class="inp" id="actp-cl${i}" data-actpl="custom.${i}.label" value="${esc((T.custom[i]||{}).label||'')}" placeholder="${['GET license #','Contractor license','Federal EIN','Account #'][i]}" maxlength="30"><label class="sr" for="actp-cv${i}">Field ${i+1} value</label><input class="inp" id="actp-cv${i}" data-actpl="custom.${i}.value" value="${esc((T.custom[i]||{}).value||'')}" placeholder="Value" maxlength="60"></div>`).join('')}</div></section>
+   <section class="panel"><div class="ph"><h2>Client and invoice details</h2></div><div class="pb acchecks">${ck('billContact','Client contact name')}${ck('billAddr','Client address')}${ck('billEmail','Client email')}${ck('project','Project name')}${ck('po','Client PO number')}${ck('terms','Payment terms')}${ck('due','Due date')}${ck('dueBox','“Amount due” box at the top')}</div></section>
+   <section class="panel"><div class="ph"><h2>Line items and totals</h2></div><div class="pb acchecks">${ck('qty','Quantity column')}${ck('rate','Rate column')}${ck('taxMark','Mark taxable items with T')}${ck('payments','Show payments already made')}${ck('payLink','Pay-online link')}</div>
+    <div class="pb" style="padding-top:0"><span class="aclbl">Column names</span><div class="acrow4">${['desc','qty','rate','amount'].map(k=>`<label class="sr" for="actp-l${k}">${k} column name</label><input class="inp" id="actp-l${k}" data-actpl="labels.${k}" value="${esc(T.labels[k])}" maxlength="20">`).join('')}</div><p class="note">For example, call Qty “Hours” and Rate “Hourly rate” for service work.</p></div></section>
+   <section class="panel"><div class="ph"><h2>Footer</h2></div><div class="pb">${ta('payInstr','How to pay',SETTINGS.payNote||'ACH, check or card…')}${ta('lateFee','Late payment note','e.g. 1.5% a month on balances over 30 days past due')}${ta('tc','Terms & conditions','')}${inp('thanks','Thank-you line','maxlength="120"')}${inp('footer','Page footer','maxlength="160" placeholder="e.g. Licensed and insured · jamsdocsanddesigns.com"')}<div class="acchecks">${ck('thanks','Show the thank-you line')}${ck('signature','Signature and date lines')}</div></div></section>
+   <section class="panel"><div class="ph"><h2>Numbering and defaults</h2></div><div class="pb"><div class="row3">${inp('prefix','Number prefix','maxlength="12"')}${inp('next','Next number','type="number" min="1" step="1" placeholder="'+esc(acInvNext().replace(/^\D+/,''))+'"')}<label class="field">Next invoice<input class="inp" value="${esc(acInvNext())}" readonly tabindex="-1" aria-readonly="true"></label></div>${ta('defaultNotes','Default note on new invoices','')}
+    <div class="actions"><button class="btn sm" data-act="acTplReset">Reset to the default layout</button></div></div></section>
+  </div><div class="aclayprev"><div class="aclayprevh"><b>Preview</b><span class="muted">${S.invoices.some(x=>!x.void)?'Your latest invoice':'Sample invoice'}</span><span style="flex:1"></span><button class="btn sm" data-act="acTplPrint">Print a test page</button></div><div class="aclaypaper" id="acPrev">${invDocHTML(acSampleInv())}</div></div></div>`}
+let acTplT=null;
+function acTplPath(path,val){const T=acTpl(),k=path.split('.');if(k[0]==='custom'){const i=+k[1];T.custom=T.custom||[];while(T.custom.length<=i)T.custom.push({label:'',value:''});T.custom[i][k[2]]=val;T.custom=T.custom.slice(0,6)}
+  else if(k.length===2)T[k[0]][k[1]]=val;else T[k[0]]=val;
+  if(k[0]==='next'){const n=parseInt(val,10);T.next=n>0?n:''}
+  const p=$('#acPrev');if(p)p.innerHTML=invDocHTML(acSampleInv());clearTimeout(acTplT);acTplT=setTimeout(acSave,400)}
+/* ===== Settings ===== */
+function acSettingsHTML(){const B=acB(),s=B.settings,mo=Array.from({length:12},(_,i)=>[i+1,new Date(2026,i,1).toLocaleDateString('en-US',{month:'long'})]);
+  return `<section class="panel"><div class="ph"><h2>Accounting settings</h2></div><div class="pb">
+   <div class="row3"><label class="field" for="acs-fy">Fiscal year starts<select class="inp" id="acs-fy" data-acset="fyStart">${acOpts(mo,s.fyStart)}</select></label><label class="field" for="acs-basis">Default report basis<select class="inp" id="acs-basis" data-acset="basis">${acOpts([['accrual','Accrual · income when invoiced'],['cash','Cash · income when paid']],s.basis)}</select></label><label class="field" for="acs-tn">Sales tax name<input class="inp" id="acs-tn" data-acset="taxName" value="${esc(s.taxName)}" maxlength="20"></label></div>
+   <div class="row3"><label class="field" for="acs-tax">Default tax rate (%)<input class="inp" id="acs-tax" type="number" step="0.001" min="0" data-acglob="tax" value="${+SETTINGS.tax||0}"></label><label class="field" for="acs-terms">Default payment terms<select class="inp" id="acs-terms" data-acglob="terms">${acOpts(Object.keys(TERM_DAYS),SETTINGS.terms)}</select></label><label class="field" for="acs-mr">Mileage rate ($ a mile)<input class="inp" id="acs-mr" type="number" step="0.005" min="0" data-acset="mileRate" value="${+s.mileRate||0}"></label></div>
+   <div class="row3"><label class="field" for="acs-1099">1099 threshold ($)<input class="inp" id="acs-1099" type="number" step="1" min="0" data-acset="t1099" value="${+s.t1099||600}"></label></div>
+   <p class="note">The default tax rate and terms are shared with proposals and invoices. The tax rate for each invoice can still be changed on the invoice.</p></div></section>
+  <section class="panel"><div class="ph"><h2>Your accounting data</h2></div><div class="pb"><p class="muted" style="margin-top:0">${plural(B.expenses.length,'expense')} · ${plural(B.bills.length,'bill')} · ${plural(B.vendors.length,'vendor')} · ${plural(B.bank.txns.length,'bank transaction')} · ${plural(B.mileage.length,'trip')}. It saves to the app with your clients and invoices.</p>
+   <div class="actions"><button class="btn sm" data-act="acBackup">Download a backup (JSON)</button><button class="btn sm" data-act="acCsv" data-k="all">Export everything for your accountant (CSV)</button></div></div></section>`}
+/* ===== View ===== */
+R.accounting=function(){const el=$('#v-accounting');if(!el)return;acRecurSweep(true);const tab=AC_TABS.some(t=>t[0]===S.ui.actab)?S.ui.actab:'overview',B=acB(),rev=B.bank.txns.filter(t=>t.status==='new').length,d=S.acDraft;
+  const form=d?({expense:acExpForm,bill:acBillForm,vendor:acVendorForm,recur:acRecurForm,mile:acMileForm,bankacct:acBankForm}[d.k]||(()=>''))():'';
+  const body={overview:acOverviewHTML,invoices:acInvoicesHTML,expenses:acExpensesHTML,bills:acBillsHTML,vendors:acVendorsHTML,banking:acBankingHTML,reports:acReportsHTML,accounts:acAccountsHTML,layout:acLayoutHTML,settings:acSettingsHTML}[tab]();
+  el.innerHTML=`<header class="vh"><div><p class="eyebrow">${esc(firm())} · Bill</p><h1>Accounting</h1><p class="sub">Invoices, expenses, bills, banking and reports in one place. Invoices and payments from Clients &amp; invoices are already here.</p></div>
+   <div class="actions"><button class="btn" data-act="acNew" data-k="expense">Record an expense</button><button class="btn" data-act="acNew" data-k="bill">Enter a bill</button><button class="btn primary" data-act="newInvoice">+ New invoice</button></div></header>
+   <nav class="actabs" aria-label="Accounting sections">${AC_TABS.map(([k,l])=>`<button type="button" data-act="acTab" data-k="${k}" ${k===tab?'aria-current="page"':''}>${l}${k==='banking'&&rev?` <span class="acdot">${rev}</span>`:''}</button>`).join('')}</nav>
+   ${form}<div class="acbody">${body}</div>`;
+  const F=$('#acForm');if(F)F.addEventListener('submit',e=>{e.preventDefault();acSaveDraft()});
+  const AF=$('#acAcctF');if(AF)AF.addEventListener('submit',e=>{e.preventDefault();const code=$('#acNC').value.trim(),name=$('#acNN').value.trim(),type=$('#acNT').value;if(!code||!name){toast('Enter a number and a name.');return}
+    if(B.accounts.some(a=>a.code===code)){toast(`Account ${code} already exists.`);return}B.accounts.push({id:code,code,name,type,active:true});S.ui.acNewAcct=false;acSave();R.accounting();toast(`${code} · ${name} added.`)});
+  ['acIvQ','acExpQ','acVQ'].forEach(id=>{const q=$('#'+id);if(q)q.addEventListener('input',()=>{S.ui[id]=q.value;const p=q.selectionStart;R.accounting();const q2=$('#'+id);if(q2){q2.focus();try{q2.setSelectionRange(p,p)}catch(e){}}})})};
+function acDraftNew(k){const t=isoDay(0);return ({expense:{k,date:t,acct:'6900',method:'Card',amount:''},bill:{k,date:t,terms:'Net 30',due:addDays(t,30),lines:[{acct:'5000',desc:'',amount:''}]},vendor:{k,terms:'Net 30'},
+  recur:{k,every:'month',next:t,terms:SETTINGS.terms||'Net 30',taxPct:+SETTINGS.tax||0,active:true,clientId:(S.clients[0]||{}).id||'',lines:[{desc:'',qty:1,rate:0,tax:false}]},mile:{k,date:t},bankacct:{k,kind:'checking',coa:'1000',opening:0,openingDate:t}})[k]}
+const AC_TAB_OF={expense:'expenses',mile:'expenses',bill:'bills',vendor:'vendors',recur:'invoices',bankacct:'banking'};
+function acShowForm(){if(S.view!=='accounting')go('accounting');else R.accounting();requestAnimationFrame(()=>{const f=$('#acForm');if(f){f.scrollIntoView({block:'start',behavior:'smooth'});const i=f.querySelector('input:not([type=checkbox]),select,textarea');if(i)i.focus({preventScroll:true})}})}
+function acSaveDraft(){const d=S.acDraft,B=acB();if(!d)return;const n=v=>r2(parseFloat(v)||0),upsert=(arr,o)=>{const i=arr.findIndex(x=>x.id===o.id);if(i<0)arr.push(o);else arr[i]=o};
+  const vendorFor=()=>{if(d.vendorId&&acVendor(d.vendorId))return d.vendorId;const nm=String(d.payee||'').trim();if(!nm)return '';let v=B.vendors.find(x=>x.name.toLowerCase()===nm.toLowerCase());if(!v){v={id:acId('vd'),name:nm,terms:d.terms||''};B.vendors.push(v)}return v.id};
+  if(d.k==='expense'){if(!(n(d.amount)>0)){toast('Enter the amount.');return}if(!d.date){toast('Enter the date.');return}if(!d.vendorId&&!String(d.payee||'').trim()){toast('Choose a vendor or type who you paid.');return}
+    upsert(B.expenses,{id:d.id||acId('ex'),date:d.date,vendorId:d.vendorId||'',payee:d.vendorId?'':String(d.payee||'').trim(),acct:d.acct||'6900',amount:n(d.amount),method:d.method||'',pj:d.pj||'',clientId:d.clientId||'',ref:d.ref||'',memo:d.memo||'',billable:!!d.billable,billed:d.billed||null,txn:d.txn||null});toast('Expense saved.')}
+  else if(d.k==='bill'){const lines=(d.lines||[]).filter(l=>n(l.amount)).map(l=>({acct:l.acct||'5000',desc:l.desc||'',amount:n(l.amount),pj:l.pj||''}));if(!lines.length){toast('Add at least one line with an amount.');return}
+    const vid=vendorFor();if(!vid){toast('Choose a vendor or type its name.');return}upsert(B.bills,{id:d.id||acId('bl'),vendorId:vid,no:d.no||'',date:d.date||isoDay(0),terms:d.terms||'',due:d.due||d.date,lines,memo:d.memo||'',payments:d.payments||[],poId:d.poId||null,poNo:d.poNo||'',void:!!d.void});toast('Bill saved.')}
+  else if(d.k==='vendor'){const nm=String(d.name||'').trim();if(!nm){toast('Enter the vendor’s name.');return}upsert(B.vendors,{id:d.id||acId('vd'),name:nm,contact:d.contact||'',email:d.email||'',phone:d.phone||'',terms:d.terms||'',acct:d.acct||'',address:d.address||'',is1099:!!d.is1099,taxId:d.taxId||'',notes:d.notes||''});toast('Vendor saved.')}
+  else if(d.k==='recur'){if(!clientById(d.clientId)){toast('Choose a client.');return}const lines=(d.lines||[]).filter(l=>String(l.desc||'').trim()||+l.rate).map(l=>({desc:l.desc||'',qty:+l.qty||0,rate:+l.rate||0,tax:!!l.tax}));if(!lines.length){toast('Add a line with a description and rate.');return}if(!d.next){toast('Choose the next invoice date.');return}
+    upsert(B.recurring,{id:d.id||acId('rc'),name:String(d.name||'').trim()||'Recurring invoice',clientId:d.clientId,pj:d.pj||'',every:d.every||'month',next:d.next,terms:d.terms||'Net 30',taxPct:+d.taxPct||0,active:d.active!==false,lines,notes:d.notes||'',last:d.last||null});toast(d.next<=isoDay(0)?'Saved. The first draft is ready in Invoices.':'Recurring invoice saved.')}
+  else if(d.k==='mile'){if(!(n(d.miles)>0)){toast('Enter the miles.');return}upsert(B.mileage,{id:d.id||acId('mi'),date:d.date||isoDay(0),miles:n(d.miles),purpose:d.purpose||'',from:d.from||'',to:d.to||'',pj:d.pj||''});toast('Trip saved.')}
+  else if(d.k==='bankacct'){const nm=String(d.name||'').trim();if(!nm){toast('Name the account.');return}upsert(B.bank.accounts,{id:d.id||acId('ba'),name:nm,kind:d.kind||'checking',coa:d.coa||(d.kind==='credit'?'2000':'1000'),opening:n(d.opening),openingDate:d.openingDate||isoDay(0),flip:!!d.flip,recon:d.recon||null});toast('Account saved. Import its statement next.')}
+  S.acDraft=null;acSave();R.accounting()}
+
+/* ===== Accounting: inputs ===== */
+document.addEventListener('input',e=>{const t=e.target;if(!t||!t.closest||!t.closest('#v-accounting'))return;
+  if(t.dataset.acf&&S.acDraft&&t.type!=='checkbox'&&t.tagName!=='SELECT'){S.acDraft[t.dataset.acf]=t.value;return}
+  if(t.dataset.acl&&S.acDraft&&t.type!=='checkbox'&&t.tagName!=='SELECT'){const [i,f]=t.dataset.acl.split(':'),l=(S.acDraft.lines||[])[+i];if(l)l[f]=t.value;
+    const tot=t.closest('form')&&t.closest('form').querySelector('.actot b');if(tot&&S.acDraft.k==='bill')tot.textContent=money2(r2(S.acDraft.lines.reduce((s,x)=>s+(+x.amount||0),0)));return}
+  if(t.dataset.actpl&&t.type!=='checkbox'&&t.tagName!=='SELECT'){acTplPath(t.dataset.actpl,t.value);return}});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.closest||!t.closest('#v-accounting'))return;const d=S.acDraft,B=acB();
+  if(t.dataset.acf&&d){const f=t.dataset.acf;d[f]=t.type==='checkbox'?t.checked:t.value;
+    if(f==='vendorId'){const v=acVendor(t.value);if(v){if(d.k==='bill'){if(v.terms){d.terms=v.terms;d.due=addDays(d.date||isoDay(0),TERM_DAYS[v.terms]||0)}if(v.acct)(d.lines||[]).forEach(l=>{if(!+l.amount)l.acct=v.acct})}if(d.k==='expense'&&v.acct)d.acct=v.acct}R.accounting();return}
+    if(d.k==='bill'&&(f==='terms'||f==='date')){d.due=addDays(d.date||isoDay(0),TERM_DAYS[d.terms]||0);R.accounting();return}
+    if(t.tagName==='SELECT'&&(f==='clientId'||f==='kind'))R.accounting();return}
+  if(t.dataset.acl&&d){const [i,f]=t.dataset.acl.split(':'),l=(d.lines||[])[+i];if(!l)return;l[f]=t.type==='checkbox'?t.checked:t.value;if(d.k!=='bill'&&(f==='qty'||f==='rate'||f==='tax'))R.accounting();return}
+  if(t.dataset.acui){S.ui[t.dataset.acui]=t.value;R.accounting();return}
+  if(t.dataset.actxcat){const x=B.bank.txns.find(z=>z.id===t.dataset.actxcat);if(x){x.cat=t.value;x.catSet=!!t.value;acSave()}return}
+  if(t.dataset.acacct){const a=acAcct(t.dataset.acacct);if(a&&t.value.trim()){a.name=t.value.trim().slice(0,60);acSave();toast('Account renamed.')}return}
+  if(t.dataset.acimport){const f=t.files&&t.files[0],id=t.dataset.acimport;t.value='';if(!f)return;if(f.size>8e6){toast('That file is too large for a statement. Export a shorter date range.');return}const rd=new FileReader();rd.onload=()=>acImport(id,String(rd.result||''));rd.readAsText(f);return}
+  if(t.dataset.actpl){acTplPath(t.dataset.actpl,t.type==='checkbox'?t.checked:t.value);if(t.dataset.actpl==='accent'||t.dataset.actpl==='next')R.accounting();return}
+  if(t.dataset.acset){const s=B.settings,k=t.dataset.acset;s[k]=['fyStart','mileRate','t1099'].includes(k)?(+t.value||0):t.value;acSave();toast('Saved.');return}
+  if(t.dataset.acglob){const k=t.dataset.acglob;SETTINGS[k]=k==='tax'?(+t.value||0):t.value;saveSettings();toast('Saved.');return}});
+/* ===== Accounting: actions ===== */
+function acPoBill(pjId,poId){const e=pjById(pjId);if(!e)return;const P=pjProp(e),po=((P.purch&&P.purch.pos)||[]).find(x=>x.id===poId);if(!po)return;const B=acB();
+  let v=B.vendors.find(x=>x.name.toLowerCase()===String(po.vendor||'').toLowerCase());if(!v){v={id:acId('vd'),name:po.vendor||'Vendor',terms:'Net 30',acct:'5000'};B.vendors.push(v)}
+  const amt=r2(po.lines.reduce((s,l)=>s+(+l.qty||0)*(+l.cost||0),0)),d0=isoDay(0),terms=v.terms||'Net 30';
+  const b={id:acId('bl'),vendorId:v.id,no:'',date:d0,terms,due:addDays(d0,TERM_DAYS[terms]||30),lines:[{acct:'5000',desc:`${po.no} · ${po.lines.length} item${po.lines.length===1?'':'s'} for ${P.project||'project'}`,amount:amt,pj:e.id}],memo:po.notes||'',payments:[],poId:po.id,poNo:po.no};
+  B.bills.push(b);po.billId=b.id;acSave();try{save();if(typeof saveProjects==='function')saveProjects()}catch(x){}
+  S.acDraft={k:'bill',...JSON.parse(JSON.stringify(b))};R.accounting();acShowForm();toast(`Bill created from ${po.no}. Add the vendor’s bill number and check the amount.`)}
+function acTxApplyMatch(t,m){const B=acB();if(m.type==='inv'){const v=invById(m.id);if(!v)return false;const p={id:acId('pm'),date:t.date,amount:r2(+t.amount),method:'Bank transfer',ref:'Bank deposit'};v.payments=v.payments||[];v.payments.push(p);saveInvoices();t.match={...m,pay:p.id}}
+  else if(m.type==='bill'){const b=B.bills.find(x=>x.id===m.id);if(!b)return false;const p={id:acId('pm'),date:t.date,amount:r2(-(+t.amount)),method:'Bank transfer',ref:'Bank'};b.payments=b.payments||[];b.payments.push(p);t.match={...m,pay:p.id}}
+  else if(m.type==='exp'){const x=B.expenses.find(z=>z.id===m.id);if(!x)return false;x.txn=t.id;t.match={...m}}
+  t.status='matched';return true}
+function acTxUndo(t){const B=acB(),m=t.match;if(t.status==='matched'&&m){if(m.type==='inv'){const v=invById(m.id);if(v){v.payments=(v.payments||[]).filter(p=>p.id!==m.pay);saveInvoices()}}
+  else if(m.type==='bill'){const b=B.bills.find(x=>x.id===m.id);if(b)b.payments=(b.payments||[]).filter(p=>p.id!==m.pay)}
+  else if(m.type==='exp'){const x=B.expenses.find(z=>z.id===m.id);if(x)x.txn=null}}t.match=null;t.status='new'}
+Object.assign(A,{
+  acTab(el){S.ui.actab=el.dataset.k;S.acDraft=null;S.ui.acPay=null;R.accounting();window.scrollTo(0,0)},
+  acNew(el){const k=el.dataset.k;S.acDraft=acDraftNew(k);S.ui.actab=AC_TAB_OF[k]||S.ui.actab;if(k==='mile')S.ui.acExpV='mileage';acShowForm()},
+  acEdit(el){const k=el.dataset.k,id=el.dataset.id,B=acB(),src={expense:B.expenses,bill:B.bills,vendor:B.vendors,recur:B.recurring,mile:B.mileage,bankacct:B.bank.accounts}[k],o=src&&src.find(x=>x.id===id);if(!o)return;
+    S.acDraft={k,...JSON.parse(JSON.stringify(o))};if(k==='bill'&&!(S.acDraft.lines||[]).length)S.acDraft.lines=[{acct:'5000',desc:'',amount:''}];S.ui.actab=AC_TAB_OF[k]||S.ui.actab;if(k==='mile')S.ui.acExpV='mileage';acShowForm()},
+  acCancel(){S.acDraft=null;R.accounting()},
+  acDel(){const d=S.acDraft,B=acB();if(!d||!d.id)return;
+    if(d.k==='bill'&&(d.payments||[]).length){const b=B.bills.find(x=>x.id===d.id);if(b)b.void=true;toast('Bill voided. Its payments stay on record.')}
+    else if(d.k==='vendor'&&(B.bills.some(b=>b.vendorId===d.id)||B.expenses.some(x=>x.vendorId===d.id))){toast('This vendor has bills or expenses, so it can’t be deleted.');return}
+    else if(d.k==='bankacct'&&B.bank.txns.some(t=>t.acct===d.id&&t.status!=='new')){toast('Undo this account’s categorized and matched transactions first.');return}
+    else{const key={expense:'expenses',bill:'bills',vendor:'vendors',recur:'recurring',mile:'mileage'}[d.k];if(key)B[key]=B[key].filter(x=>x.id!==d.id);
+      if(d.k==='bankacct'){B.bank.accounts=B.bank.accounts.filter(a=>a.id!==d.id);B.bank.txns=B.bank.txns.filter(t=>t.acct!==d.id)}
+      if(d.k==='bill'&&d.poId)PJ.list.forEach(e=>{const P=pjProp(e);((P.purch&&P.purch.pos)||[]).forEach(po=>{if(po.billId===d.id)po.billId=null})});toast('Deleted.')}
+    S.acDraft=null;acSave();R.accounting()},
+  acLineAdd(){const d=S.acDraft;if(!d)return;d.lines=d.lines||[];d.lines.push(d.k==='bill'?{acct:(d.lines[d.lines.length-1]||{}).acct||'5000',desc:'',amount:''}:{desc:'',qty:1,rate:0,tax:!!(d.lines[0]||{}).tax});R.accounting();const r=document.querySelectorAll('#acForm [data-acl$=":desc"]');if(r.length)r[r.length-1].focus()},
+  acLineDel(el){const d=S.acDraft;if(!d||(d.lines||[]).length<2)return;d.lines.splice(+el.dataset.i,1);R.accounting()},
+  acOpenInv(el){openInvoice(el.dataset.id)},
+  acIvF(el){S.ui.acIvF=el.dataset.k;S.ui.actab='invoices';R.accounting()},
+  acBF(el){S.ui.acBF=el.dataset.k;R.accounting()},
+  acExpV(el){S.ui.acExpV=el.dataset.k;S.acDraft=null;R.accounting()},
+  acTxF(el){S.ui.acTxF=el.dataset.k;R.accounting()},
+  acRecurToggle(el){const r=acB().recurring.find(x=>x.id===el.dataset.id);if(!r)return;r.active=!(r.active!==false);if(r.active&&r.next<isoDay(0))r.next=isoDay(0);acSave();R.accounting();toast(r.active?'Recurring invoice on.':'Recurring invoice paused.')},
+  acExpBill(){S.ui.acBillPick=true;S.ui.actab='expenses';S.ui.acExpV='list';R.accounting()},
+  acExpBillX(){S.ui.acBillPick=false;R.accounting()},
+  acExpBillGo(){const cid=($('#acBillCl')||{}).value,mk=+(($('#acBillMk')||{}).value)||0,c=clientById(cid);if(!c)return;const B=acB();
+    const xs=B.expenses.filter(x=>x.billable&&!x.billed&&(x.clientId===cid||(!x.clientId&&x.pj&&pjById(x.pj)&&sameName(cliName(pjProp(pjById(x.pj))),c.name))));if(!xs.length){toast('No unbilled expenses for this client.');return}
+    const v=newInvoiceDraft(cid);v.lines=xs.map(x=>({desc:`${acAcctName(x.acct)} · ${acVName(x)}${x.memo?' · '+x.memo:''} (${fmtD(x.date)})`,qty:1,rate:r2((+x.amount||0)*(1+mk/100)),tax:false}));v.project=v.project||'Reimbursable expenses';S.invoices.push(v);xs.forEach(x=>x.billed=v.id);saveInvoices();acSave();S.ui.acBillPick=false;R.accounting();openInvoice(v.id);toast(`Draft ${v.no} created from ${plural(xs.length,'expense')}.`)},
+  acPayOpen(el){S.ui.acPay=el.dataset.id;R.accounting();const a=$('#acPA');if(a)a.focus()},
+  acPayX(){S.ui.acPay=null;R.accounting()},
+  acPaySave(el){const b=acB().bills.find(x=>x.id===el.dataset.id);if(!b)return;const amt=r2(parseFloat(($('#acPA')||{}).value)||0),bal=r2(acBillTotal(b)-acBillPaid(b));if(!(amt>0)){toast('Enter the amount paid.');return}if(amt>bal+0.005){toast(`That’s more than the ${money2(bal)} owed.`);return}
+    b.payments=b.payments||[];b.payments.push({id:acId('pm'),date:($('#acPD')||{}).value||isoDay(0),amount:amt,method:($('#acPM')||{}).value||'',ref:($('#acPR')||{}).value||''});S.ui.acPay=null;acSave();R.accounting();toast(`Payment of ${money2(amt)} recorded${acBillStatus(b)==='Paid'?'. Bill paid in full.':'.'}`)},
+  acPoBill(el){acPoBill(el.dataset.pj,el.dataset.id)},
+  acTx(el){const B=acB(),t=B.bank.txns.find(x=>x.id===el.dataset.id),op=el.dataset.op;if(!t)return;
+    if(op==='add'){const sel=$('#acTc-'+t.id),cat=(sel&&sel.value)||t.cat;if(!cat){toast('Choose a category first.');if(sel)sel.focus();return}t.cat=cat;t.status='categorized';toast(`Added to ${acAcctName(cat)}.`)}
+    else if(op==='exclude'){t.status='excluded'}
+    else if(op==='match'){const m=acTxSuggest(t).match;if(!m||!acTxApplyMatch(t,m)){toast('That match is no longer available.');return}t.match.label=m.label;toast(`Matched to ${m.label}.`)}
+    else if(op==='undo'){acTxUndo(t)}
+    acSave();R.accounting()},
+  acTxAll(){const B=acB();let n=0;B.bank.txns.filter(t=>t.status==='new'&&(!S.ui.acTxA||t.acct===S.ui.acTxA)).forEach(t=>{const sg=acTxSuggest(t),sel=$('#acTc-'+t.id),c=(t.catSet&&t.cat)||(sel&&sel.value)||t.cat;if(!t.catSet&&sg.match&&acTxApplyMatch(t,sg.match)){t.match.label=sg.match.label;n++;return}const c2=c||sg.cat;if(c2){t.cat=c2;t.status='categorized';n++}});acSave();R.accounting();toast(`${plural(n,'transaction')} added.`)},
+  acRuleAdd(){const tx=(($('#acRT')||{}).value||'').trim(),a=($('#acRA')||{}).value;if(!tx||!a){toast('Type some description text and choose a category.');return}const B=acB();B.bank.rules.push({text:tx.slice(0,60),acct:a});
+    let n=0;B.bank.txns.forEach(t=>{if(t.status==='new'&&String(t.desc).toLowerCase().includes(tx.toLowerCase())){t.cat=a;n++}});acSave();R.accounting();toast(`Rule added${n?` · suggested for ${plural(n,'transaction')} waiting`:''}.`)},
+  acRuleDel(el){acB().bank.rules.splice(+el.dataset.i,1);acSave();R.accounting()},
+  acRecon(){const a=acB().bank.accounts.find(x=>x.id===($('#acRcA')||{}).value),d=($('#acRcD')||{}).value||isoDay(0),st=parseFloat(($('#acRcB')||{}).value);const o=$('#acRcOut');if(!a||!o)return;if(isNaN(st)){o.textContent='Enter the ending balance from your statement.';return}
+    const bal=acBankBal(a,d),diff=r2(st-bal),pending=acB().bank.txns.filter(t=>t.acct===a.id&&t.status==='new'&&t.date<=d).length;
+    if(Math.abs(diff)<0.005){a.recon={date:d,bal:st};acSave();o.innerHTML=`<b style="color:var(--ok)">Balanced.</b> ${esc(a.name)} matches ${money2(st)} on ${fmtD(d)}.${pending?` ${plural(pending,'transaction')} still need reviewing.`:''}`}
+    else o.innerHTML=`<b class="acneg">Off by ${money2(Math.abs(diff))}.</b> The app shows ${money2(bal)}. Check for a missing import, a duplicate, or the opening balance.`},
+  acAcctNew(){S.ui.acNewAcct=true;R.accounting();const c=$('#acNC');if(c)c.focus()},
+  acAcctX(){S.ui.acNewAcct=false;R.accounting()},
+  acAcctOn(el){const a=acAcct(el.dataset.id);if(!a)return;a.active=a.active===false;acSave();R.accounting()},
+  acRepGo(el){S.ui.acRep=el.dataset.k;S.ui.actab='reports';S.acDraft=null;if(S.view!=='accounting')go('accounting');else R.accounting()},
+  acBasis(el){S.ui.acBasis=el.dataset.k;R.accounting()},
+  acCmp(){S.ui.acCmp=!S.ui.acCmp;R.accounting()},
+  acRepPrint(){const k=S.ui.acRep||'pl',r=acRep(k);acPrintHTML(`<div class="doc acprint"><div class="acrephead"><b>${esc(firm())}</b><h2>${esc(r.title)}</h2><span class="muted">${esc(r.sub||'')}</span></div>${acRepTableHTML(r)}${r.note?`<p class="note">${esc(r.note)}</p>`:''}</div>`)},
+  acRepCsv(){const r=acRep(S.ui.acRep||'pl');acCsvSave(r.title.replace(/[^\w ]+/g,''),[[r.title],[r.sub||''],[],r.cols,...r.rows.map(x=>x.c.map(c=>c&&typeof c==='object'&&'m' in c?c.m:c))])},
+  acCsv(el){const k=el.dataset.k,B=acB(),cn=id=>(clientById(id)||{}).name||'';
+    const sets={invoices:()=>[['Invoice','Client','Project','PO','Issued','Due','Subtotal','Tax','Total','Paid','Balance','Status'],...S.invoices.map(v=>{const c=invCalc(v);return [v.no,cn(v.clientId),v.project||'',v.po||'',v.issued,v.due,c.sub,c.tax,c.total,c.paid,c.bal,invStatus(v)]})],
+      payments:()=>[['Date','Invoice','Client','Method','Reference','Amount'],...S.invoices.flatMap(v=>(v.payments||[]).map(p=>[p.date,v.no,cn(v.clientId),p.method||'',p.ref||'',+p.amount||0]))],
+      expenses:()=>[['Date','Payee','Category','Account','Amount','Paid with','Project','Client','Reference','Memo','Billable','Billed on'],...B.expenses.map(x=>[x.date,acVName(x),acAcctName(x.acct),x.acct,+x.amount||0,x.method||'',acPjName(x.pj),cn(x.clientId),x.ref||'',x.memo||'',x.billable?'Yes':'',x.billed?((invById(x.billed)||{}).no||''):''])],
+      bills:()=>[['Vendor','Bill #','Date','Due','Total','Paid','Balance','Status','PO'],...B.bills.map(b=>[acVName(b),b.no||'',b.date,b.due,acBillTotal(b),acBillPaid(b),r2(acBillTotal(b)-acBillPaid(b)),acBillStatus(b),b.poNo||''])],
+      vendors:()=>[['Vendor','Contact','Email','Phone','Terms','1099','Address'],...B.vendors.map(v=>[v.name,v.contact||'',v.email||'',v.phone||'',v.terms||'',v.is1099?'Yes':'',v.address||''])],
+      mileage:()=>[['Date','Purpose','From','To','Miles','Project'],...B.mileage.map(m=>[m.date,m.purpose||'',m.from||'',m.to||'',+m.miles||0,acPjName(m.pj)])]};
+    if(k==='all'){acCsvSave('transactions',(()=>{const r=acRep('txns');S.ui.acRepP=S.ui.acRepP;return [r.cols,...r.rows.map(x=>x.c.map(c=>c&&typeof c==='object'&&'m' in c?c.m:c))]})());return}
+    if(sets[k])acCsvSave(k,sets[k]())},
+  acTplSet(el){acTplPath(el.dataset.p,el.dataset.v);R.accounting()},
+  acTplReset(){acB().tpl=JSON.parse(JSON.stringify(AC_TPL0));acSave();R.accounting();toast('Invoice layout reset.')},
+  acTplPrint(){acPrintHTML(invDocHTML(acSampleInv()))},
+  async acBackup(){const r=await saveFile(new Blob([JSON.stringify({type:'sitrep-books',v:1,at:new Date().toISOString(),books:acB(),invoices:S.invoices},null,1)],{type:'application/json'}),`${dcFileName(firm())} accounting backup ${isoDay(0)}.json`);if(r==='saved')toast('Backup downloaded.')}
+});
+setTimeout(()=>{try{acRecurSweep(true)}catch(e){}},2500);
+
 purgeSamples();
 window.addEventListener('pagehide',saveProjects);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveProjects()});
 if(!loadSaved())loadTemplate('huddle');
