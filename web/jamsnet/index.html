@@ -1273,6 +1273,22 @@ body.tech .money{display:none!important}
 .lpv-thumbs button img{display:block}
 .lpv-photoacts a.btn{text-decoration:none}.lpv-photoacts a.btn:not(.primary){color:var(--fg)}
 
+.lblogo{height:14px;width:auto;max-width:56px;object-fit:contain;vertical-align:-2px;margin-right:5px}
+.lbrandl{display:inline-flex;align-items:center;gap:0}
+.lpvlogo{display:block;height:26px;width:auto;max-width:140px;object-fit:contain;margin-bottom:6px}
+.blhelp{margin:0 0 14px;font-size:13.5px;color:var(--muted);max-width:760px}.blhelp b{color:var(--fg)}
+.blhelp kbd{font:600 12px var(--f-mono,ui-monospace,monospace);padding:1px 6px;border-radius:5px;border:1px solid var(--line);background:var(--sunk);color:var(--fg)}
+.blgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
+.blrow{display:grid;grid-template-columns:96px minmax(0,1fr);grid-template-rows:auto auto;gap:6px 12px;align-items:center;padding:10px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface)}
+.blrow.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}.blrow.over{border-style:dashed;border-color:var(--accent);background:var(--accent-soft)}
+.blimg{all:unset;box-sizing:border-box;cursor:pointer;grid-row:1/3;position:relative;width:96px;height:64px;border-radius:10px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.blimg img{max-width:84px;max-height:52px;object-fit:contain}.blimg span{font-weight:700;font-size:18px;color:#9aa3ad;letter-spacing:.04em}
+.blimg i{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.85);font-style:normal;font-size:12px;font-weight:600;color:#17171c}
+.blimg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.blname{display:flex;flex-direction:column;min-width:0}.blname b{font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.blname small{font-size:12px;color:var(--muted)}
+.blacts{display:flex;flex-wrap:wrap;gap:6px}.blacts a.btn{text-decoration:none}.blacts a.btn:not(.primary){color:var(--fg)}
+.lcm .lblogo,.libt .lblogo{height:13px}
+
 </style>
 
 <style id="jnTheme">/* ===== SITREP look: basalt rail, lagoon accent, cable-amber markers ===== */
@@ -2241,7 +2257,7 @@ const byId=id=>lib.find(p=>p.id===id);
 const imgSrc=im=>!im?'':im.asset?'/_blob/'+im.asset:(im.src||'');
 const pImg=p=>p&&Array.isArray(p.imgs)&&p.imgs[0]?imgSrc(p.imgs[0]):'';
 const thumb=(p,cls)=>{const u=pImg(p);return u?`<img class="${cls||'pthumb'}" src="${esc(u)}" alt="" loading="lazy">`:''};
-const assetUsed=id=>lib.some(p=>(p.imgs||[]).some(im=>im.asset===id))||(S.bld&&(S.bld.imgs||[]).some(im=>im.asset===id));
+const assetUsed=id=>lib.some(p=>(p.imgs||[]).some(im=>im.asset===id))||(S.bld&&(S.bld.imgs||[]).some(im=>im.asset===id))||Object.values(SETTINGS.brandLogos||{}).some(im=>im&&im.asset===id);
 function dropAssets(list){if(!ASSETS)return;(list||[]).forEach(im=>{if(im&&im.asset&&!assetUsed(im.asset))ASSETS.delete(im.asset).catch(()=>{})})}
 const isMod=p=>!!(p&&p.fits);
 const slotsOf=p=>p&&Array.isArray(p.slots)?p.slots:[];
@@ -5004,8 +5020,8 @@ function ptPanelHTML(){const rows=ptRows();
     :'<div class="pb"><p class="muted" style="margin:0">Every device in your library has ports.</p></div>'}</div>`}
 /* ---------- library check: what needs fixing, each count filters the table ---------- */
 const LIBFIX={ports:['without ports',p=>matOnly(p)],cost:['without a dealer cost',p=>!(+p.cost>0)&&!['Rack','Accessory'].includes(p.cat)&&!p.ctype],twins:['with the same name as another',p=>nameTwins(p).length>0],cat:['in “Other”',p=>!p.cat||p.cat==='Other'],photo:['without a photo',p=>!pImg(p)]};
-function libCheckHTML(){const c=Object.entries(LIBFIX).map(([k,[l,fn]])=>[k,l,lib.filter(fn).length]).filter(x=>x[2]>0);if(!c.length&&!S.ui.libFix)return '';
-  return `<div class="libcheck" role="group" aria-label="Library check"><span class="l">Library check</span>${c.map(([k,l,n])=>`<button class="chip${S.ui.libFix===k?' Active':' Medium'}" data-act="libFix" data-k="${k}" aria-pressed="${S.ui.libFix===k}">${n} ${esc(l)}</button>`).join('')}${S.ui.libFix?'<button class="lnk" data-act="libFix" data-k="">Show all</button>':''}</div>`}
+function libCheckHTML(){const c=Object.entries(LIBFIX).map(([k,[l,fn]])=>[k,l,lib.filter(fn).length]).filter(x=>x[2]>0),bm=blMissing().length;if(!c.length&&!S.ui.libFix&&!bm)return '';
+  return `<div class="libcheck" role="group" aria-label="Library check"><span class="l">Library check</span>${c.map(([k,l,n])=>`<button class="chip${S.ui.libFix===k?' Active':' Medium'}" data-act="libFix" data-k="${k}" aria-pressed="${S.ui.libFix===k}">${n} ${esc(l)}</button>`).join('')}${bm&&!S.ui.blOpen?`<button class="chip Medium" data-act="blOpen">${plural(bm,'brand')} without a logo</button>`:''}${S.ui.libFix?'<button class="lnk" data-act="libFix" data-k="">Show all</button>':''}</div>`}
 R.library=function(){
   const brands=[...new Set(lib.map(p=>p.mfr))].sort((a,b)=>a.localeCompare(b));if(libBrand!=='All'&&!brands.includes(libBrand))libBrand='All';
   const inBrand=lib.filter(p=>libBrand==='All'||p.mfr===libBrand),cats=['All',...new Set(inBrand.map(p=>p.cat))];if(!cats.includes(libCat))libCat='All';
@@ -5024,7 +5040,7 @@ R.library=function(){
   const usedTxt=p=>{const u=U.get(p.id);return u?`<span class="lused" title="In ${plural(u.pj.size,'project')}">${u.units}</span>`:'<span class="muted">—</span>'};
   const allSel=shown.length&&shown.every(p=>SEL.has(p.id));
   const table=`<div class="scroll"><table class="t libt"><thead><tr><th><input type="checkbox" class="lsel" data-act="libSelAll" ${allSel?'checked':''} aria-label="Select all shown"></th><th><span class="sr">Favorite</span></th><th><span class="sr">Photo</span></th><th>Product</th><th>Ports</th><th class="n">Rack</th>${cp?'<th class="n money">Dealer</th><th class="n money">MSRP</th><th class="n money">Margin</th>':''}<th class="n">Labor h</th><th class="n">Used</th><th><span class="sr">Edit</span></th></tr></thead><tbody>
-   ${shown.map(p=>`<tr class="click${SEL.has(p.id)?' sel':''}" data-act="libPv" data-id="${esc(p.id)}" title="View ${esc(p.model)}"><td>${ck(p)}</td><td>${star(p)}</td><td class="thumbcell">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><b>${esc(p.model)}</b> <span class="muted">${esc(p.mfr)}</span>${links(p)}<br><span class="catchip">${esc(p.cat)}</span> <span class="muted">${esc(clip(p.desc,90))}</span></td>
+   ${shown.map(p=>`<tr class="click${SEL.has(p.id)?' sel':''}" data-act="libPv" data-id="${esc(p.id)}" title="View ${esc(p.model)}"><td>${ck(p)}</td><td>${star(p)}</td><td class="thumbcell">${thumb(p,'libthumb')||'<span class="libthumb none" aria-hidden="true"></span>'}</td><td><b>${esc(p.model)}</b> <span class="muted lbrandl">${brandTag(p.mfr)}${esc(p.mfr)}</span>${links(p)}<br><span class="catchip">${esc(p.cat)}</span> <span class="muted">${esc(clip(p.desc,90))}</span></td>
     <td>${portsCell(p)}</td>
     <td class="n">${placeable(p)&&!['Cable','Rack','Patch panel'].includes(p.cat)?`<select class="cellin libru" data-libru="${esc(p.id)}" aria-label="Rack space for ${esc(p.model)}"><option value="0" ${p.ru>0?'':'selected'}>Not racked</option>${[1,2,3,4,5,6,7,8].map(u=>`<option value="${u}" ${p.ru===u&&p.mount!=='shelf'?'selected':''}>${u}U</option><option value="${u}s" ${p.ru===u&&p.mount==='shelf'?'selected':''}>${u}U shelf</option>`).join('')}</select>`:(p.ru?p.ru+'U':'<span class="muted">—</span>')}</td>
     ${cp?`<td class="n money">${money2(+p.cost||0)}</td><td class="n money">${money2(+p.msrp||0)}</td><td class="n money">${libMargin(p)==null?'<span class="muted">—</span>':`<span class="lmg ${libMargin(p)<.15?'lo':libMargin(p)>=.3?'hi':''}">${Math.round(libMargin(p)*100)}%</span>`}</td>`:''}<td class="n">${p.labor}</td><td class="n">${usedTxt(p)}</td><td><button class="btn sm" data-act="libEdit" data-id="${esc(p.id)}">Edit</button></td></tr>`).join('')||`<tr><td colspan="12" class="muted">No products match. <button class="lnk" data-act="libClearF">Clear filters</button></td></tr>`}
@@ -5032,16 +5048,17 @@ R.library=function(){
   const grid=`<div class="libcards">${shown.map(p=>{const u=pImg(p),us=U.get(p.id);return `<article class="libcard${SEL.has(p.id)?' sel':''}">
      <button type="button" class="lcimg" data-act="libPv" data-id="${esc(p.id)}" aria-label="View ${esc(p.mfr+' '+p.model)}">${u?`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">`:`<span class="lcnone" aria-hidden="true">${esc(p.cat.slice(0,1))}</span>`}</button>
      <span class="lcov">${ck(p)}${star(p)}</span>
-     <span class="lcb"><span class="lcm"><span class="catchip">${esc(p.cat)}</span>${matOnly(p)?'<span class="chip">Materials only</span>':''}${us?`<span class="lused" title="In ${plural(us.pj.size,'project')}">Used ${us.units}</span>`:''}</span><b>${esc(p.model)}</b><span class="muted">${esc(p.mfr)}</span><span class="lcd">${esc(clip(p.desc,80))}</span>
+     <span class="lcb"><span class="lcm"><span class="catchip">${esc(p.cat)}</span>${matOnly(p)?'<span class="chip">Materials only</span>':''}${us?`<span class="lused" title="In ${plural(us.pj.size,'project')}">Used ${us.units}</span>`:''}</span><b>${esc(p.model)}</b><span class="muted lbrandl">${brandTag(p.mfr)}${esc(p.mfr)}</span><span class="lcd">${esc(clip(p.desc,80))}</span>
      ${cp?`<span class="lcp money"><span><small>Dealer</small>${money2(+p.cost||0)}</span><span><small>MSRP</small>${money2(+p.msrp||0)}</span>${libMargin(p)!=null?`<span><small>Margin</small>${Math.round(libMargin(p)*100)}%</span>`:''}</span>`:''}</span></article>`}).join('')||`<p class="muted" style="padding:14px">No products match. <button class="lnk" data-act="libClearF">Clear filters</button></p>`}</div>`;
   $('#v-library').innerHTML=`
   <header class="vh"><div><p class="eyebrow">My library · ${lib.length} products · ${brands.length} brands</p><h1>Equipment library</h1>
    <p class="sub">Every device carries its photos, ports, rack space, power, dealer cost and install labor, so drawings, the bill of materials and proposals stay in sync.</p></div>
-   <div class="actions"><button class="btn primary money" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="newBlockLib">Build a custom device</button><details class="dcmore ltools"><summary class="btn">Tools</summary><div class="dcmenu down"><button data-act="ptOpen">Port templates</button><button data-act="srOpenA">Ports from spec sheets</button><button data-act="libCsv">Export the library as CSV</button></div></details></div></header>
+   <div class="actions"><button class="btn primary money" data-act="plOpen">Import a price list</button>${S.specBusy?`<span class="chip Sent">Reading ${esc(clip(S.specBusy,28))}…</span>`:`<label class="btn filebtn" title="Upload a manufacturer PDF or a photo of one">Add from spec sheet<input type="file" id="specFile" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Add equipment from a spec sheet"></label>`}<button class="btn" data-act="newBlockLib">Build a custom device</button><details class="dcmore ltools"><summary class="btn">Tools</summary><div class="dcmenu down"><button data-act="ptOpen">Port templates</button><button data-act="srOpenA">Ports from spec sheets</button><button data-act="blOpen">Brand logos</button><button data-act="libCsv">Export the library as CSV</button></div></details></div></header>
   ${libKpisHTML(U,brands)}
   <input type="file" id="srOne" hidden accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" aria-label="Spec sheet for this product">
   ${canPrice()&&(S.pl||S.plOpen)?plPanelHTML():''}
   ${libCheckHTML()}
+  ${S.ui.blOpen?blPanelHTML():''}
   ${S.ui.ptOpen?ptPanelHTML():''}
   ${S.sr&&S.sr.open?srPanelHTML():''}
   ${pls.length&&canPrice()?`<div class="panel"><div class="ph" style="flex-wrap:wrap"><h2>Price lists</h2><span class="muted" style="font-size:12px">Import a newer list from the same brand to update its prices</span><span class="tgrow"></span><label class="field inl" for="pDays">Flag lists older than<select class="inp" id="pDays" style="width:auto">${[30,60,90,180,365].map(d=>`<option value="${d}" ${priceDays()===d?'selected':''}>${d} days</option>`).join('')}</select></label></div>
@@ -11119,7 +11136,7 @@ function libPvHTML(){const p=byId(S.dwp.id);if(!p)return '';const L=S.dwp.list||
     return `<li><button type="button" data-act="dwOpen" data-pj="${id}" data-sheet="flow"><b>${esc(P.project||'Project')}</b><small>${esc(cliName(P))}${c?` · ${c} ${c===1?'unit':'units'}`:''}</small></button></li>`}).join(''):'';
   const cmpOn=libSelSet().has(p.id);
   return `<div class="dwpv-card lpv" role="dialog" aria-modal="true" aria-labelledby="dwpvH">
-   <header class="dwpv-h"><div class="dwpv-t"><p class="eyebrow">${esc(p.mfr)} · ${esc(p.cat)}</p><h2 id="dwpvH">${esc(p.model)}</h2></div>
+   <header class="dwpv-h"><div class="dwpv-t">${brandTag(p.mfr,'lpvlogo')}<p class="eyebrow">${esc(p.mfr)} · ${esc(p.cat)}</p><h2 id="dwpvH">${esc(p.model)}</h2></div>
     <button type="button" class="dcstar" data-act="libFav" data-id="${esc(p.id)}" aria-pressed="${!!p.fav}" aria-label="${p.fav?'Remove from':'Add to'} favorites"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg></button>
     <button type="button" class="apx" data-act="dwClose" aria-label="Close">×</button></header>
    <div class="dwpv-main"><div class="lpv-l">
@@ -11758,6 +11775,51 @@ Object.assign(A,{
   libImgDel(el){const p=byId(el.dataset.id);if(!p||!(p.imgs||[]).length)return;const im=p.imgs.shift();dropAssets([im]);save();badges();if(S.view==='library')R.library();dwRender();toast('Photo removed.')},
   libImgMain(el){const p=byId(el.dataset.id),i=+el.dataset.i;if(!p||!(i>0)||!p.imgs[i])return;const [im]=p.imgs.splice(i,1);p.imgs.unshift(im);save();if(S.view==='library')R.library();dwRender()},
   libImgNext(el){const nx=libNextMissing(el.dataset.id);if(!nx){toast('Every product has a photo.');return}S.dwp={kind:'lib',id:nx.id,list:nx.list};dwRender();const z=document.querySelector('#dwPrev .lpv-drop');if(z)z.scrollIntoView({block:'nearest'})}
+});
+
+/* ===== Brand logos: one per brand, kept in settings so they sync ===== */
+const brandLogos=()=>{if(!SETTINGS.brandLogos||typeof SETTINGS.brandLogos!=='object')SETTINGS.brandLogos={};return SETTINGS.brandLogos};
+const brandLogo=b=>{const im=b&&(SETTINGS.brandLogos||{})[b];return im?imgSrc(im):''};
+const brandTag=(b,cls)=>{const u=brandLogo(b);return u?`<img class="${cls||'lblogo'}" src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''};
+const blFind=b=>'https://www.google.com/search?tbm=isch&tbs=ic:trans&q='+encodeURIComponent(`${b} logo`);
+function blBrands(){return [...new Set(lib.map(p=>p.mfr).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+function blMissing(){return blBrands().filter(b=>!brandLogo(b))}
+function blNextMissing(after){const m=blMissing().filter(b=>b!==after);return m.find(b=>b.localeCompare(after)>0)||m[0]||null}
+function blPanelHTML(){const B=blBrands(),cnt={};lib.forEach(p=>cnt[p.mfr]=(cnt[p.mfr]||0)+1);const have=B.filter(b=>brandLogo(b)).length,key=/Mac/.test(navigator.platform||'')?'⌘':'Ctrl';
+  if(!S.ui.blFor||!B.includes(S.ui.blFor))S.ui.blFor=blMissing()[0]||B[0]||null;
+  const order=S.ui.blAll?B:[...B.filter(b=>!brandLogo(b)),...B.filter(b=>brandLogo(b))];
+  return `<div class="panel blpanel" id="blPanel"><div class="ph" style="flex-wrap:wrap"><h2>Brand logos</h2><span class="muted" style="font-size:12.5px">${have} of ${plural(B.length,'brand')} have a logo</span><span class="tgrow"></span><button class="btn sm" data-act="blClose">Done</button></div>
+   <div class="pb"><p class="blhelp">Click <b>Find logo ↗</b>, right-click a clean logo (a transparent PNG works best) and choose <b>Copy image</b>, then come back and press <kbd>${key}</kbd>+<kbd>V</kbd>. The highlighted brand gets the logo, then the next brand without one is highlighted. You can also drop an image file on a brand.</p>
+   <div class="blgrid">${order.map(b=>{const u=brandLogo(b),on=S.ui.blFor===b,busy=S.blBusy===b;return `<div class="blrow${on?' on':''}${busy?' busy':''}" data-bldrop="${esc(b)}">
+     <button type="button" class="blimg" data-act="blPick" data-b="${esc(b)}" aria-pressed="${on}" aria-label="${on?'Pasting into':'Paste into'} ${esc(b)}">${u?`<img src="${esc(u)}" alt="${esc(b)} logo" referrerpolicy="no-referrer">`:`<span>${esc(b.replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase()||'?')}</span>`}${busy?'<i role="status">Adding…</i>':''}</button>
+     <div class="blname"><b>${esc(b)}</b><small>${plural(cnt[b]||0,'product')}${on?' · paste goes here':''}</small></div>
+     <div class="blacts"><a class="btn sm${u?'':' primary'}" href="${esc(blFind(b))}" target="_blank" rel="noopener noreferrer" data-blfind="${esc(b)}">Find logo ↗</a><button type="button" class="btn sm" data-act="blPaste" data-b="${esc(b)}">Paste</button><label class="btn sm">File<input type="file" accept="image/*" data-blfile="${esc(b)}" hidden></label>${u?`<button type="button" class="btn sm" data-act="blDel" data-b="${esc(b)}" aria-label="Remove the ${esc(b)} logo">Remove</button>`:''}</div></div>`}).join('')}</div></div></div>`}
+async function blSet(b,src){if(!b||S.blBusy)return;S.blBusy=b;R.library();let im=null,linked=false;
+  try{if(typeof src==='string'){if(/^data:image\//.test(src))im=(await prepProductPhoto(await (await fetch(src)).blob(),{clean:false})).im;else{const r=await fetch(src,{mode:'cors',credentials:'omit',referrerPolicy:'no-referrer'}).catch(()=>null);const bl=r&&r.ok?await r.blob():null;if(bl&&/^image\//.test(bl.type))im=(await prepProductPhoto(bl,{clean:false})).im;else{im={src};linked=true}}}
+    else{if(src.size>10*1024*1024)throw new Error('big');im=(await prepProductPhoto(src,{clean:false})).im}}
+  catch(e){S.blBusy=null;R.library();toast(e&&e.message==='big'?'That logo file is over 10 MB.':'Couldn’t read that image. Copy the image itself (not its link), or save it and drop the file here.');return}
+  const L=brandLogos(),old=L[b];L[b]=im;S.blBusy=null;if(old&&old.asset&&old.asset!==im.asset)dropAssets([old]);saveSettings();
+  S.ui.blFor=blNextMissing(b)||b;R.library();
+  requestAnimationFrame(()=>{const r=document.querySelector(`#blPanel .blrow.on`);if(r)r.scrollIntoView({block:'nearest',behavior:'smooth'})});
+  toast(linked?`Saved ${b} as a link to that image. Links can break, so for a saved copy use Copy image, then paste.`:`${b} logo added.${blMissing().length?'':' Every brand has a logo now.'}`)}
+document.addEventListener('click',e=>{const a=e.target&&e.target.closest&&e.target.closest('[data-blfind]');if(a){S.ui.blFor=a.dataset.blfind;document.querySelectorAll('#blPanel .blrow').forEach(r=>{const on=r.dataset.bldrop===S.ui.blFor;r.classList.toggle('on',on);const bt=r.querySelector('.blimg');if(bt)bt.setAttribute('aria-pressed',on)})}},true);
+document.addEventListener('paste',e=>{if(S.view!=='library'||!S.ui.blOpen||(S.dwp&&S.dwp.kind==='lib')||!S.ui.blFor)return;const t=e.target;if(t&&t.closest&&t.closest('input,textarea,[contenteditable="true"]'))return;
+  const src=libImgFromData(e.clipboardData);if(!src){toast('There’s no image on the clipboard. Right-click the logo and choose Copy image.');return}e.preventDefault();blSet(S.ui.blFor,src)});
+document.addEventListener('dragover',e=>{const z=e.target&&e.target.closest&&e.target.closest('[data-bldrop]');if(!z)return;e.preventDefault();z.classList.add('over')});
+document.addEventListener('dragleave',e=>{const z=e.target&&e.target.closest&&e.target.closest('[data-bldrop]');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
+document.addEventListener('drop',e=>{const z=e.target&&e.target.closest&&e.target.closest('[data-bldrop]');if(!z)return;e.preventDefault();z.classList.remove('over');const src=libImgFromData(e.dataTransfer);if(!src){toast('Drop an image file, or an image dragged from a web page.');return}blSet(z.dataset.bldrop,src)});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.blfile)return;const f=t.files&&t.files[0],b=t.dataset.blfile;t.value='';if(f){if(!/^image\//.test(f.type)){toast('Use a PNG, JPG, SVG, WebP or GIF image.');return}blSet(b,f)}});
+Object.assign(A,{
+  blOpen(){S.ui.blOpen=true;R.library();requestAnimationFrame(()=>{const el=$('#blPanel');if(el)el.scrollIntoView({block:'start',behavior:'smooth'})})},
+  blClose(){S.ui.blOpen=false;R.library()},
+  blPick(el){S.ui.blFor=el.dataset.b;R.library()},
+  async blPaste(el){const b=el.dataset.b,key=/Mac/.test(navigator.platform||'')?'⌘V':'Ctrl+V';S.ui.blFor=b;
+    try{if(!navigator.clipboard||!navigator.clipboard.read)throw 0;const items=await navigator.clipboard.read();
+      for(const it of items){const ty=it.types.find(x=>/^image\//.test(x));if(ty){blSet(b,await it.getType(ty));return}}
+      for(const it of items){if(it.types.includes('text/plain')){const u=(await (await it.getType('text/plain')).text()).trim();if(/^https?:\/\/\S+$/.test(u)){blSet(b,u);return}}}
+      toast('There’s no image on the clipboard. Right-click the logo and choose Copy image.')}
+    catch(e){R.library();toast(`The browser didn’t allow the Paste button here. ${b} is highlighted, so press ${key} instead.`)}},
+  blDel(el){const b=el.dataset.b,L=brandLogos(),im=L[b];if(!im)return;delete L[b];saveSettings();dropAssets([im]);S.ui.blFor=b;R.library();toast(`${b} logo removed.`)}
 });
 
 purgeSamples();
